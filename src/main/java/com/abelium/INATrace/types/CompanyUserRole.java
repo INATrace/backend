@@ -2,5 +2,7 @@ package com.abelium.INATrace.types;
 
 public enum CompanyUserRole {
 	USER,
-    ADMIN;
+    ADMIN,
+    MANAGER,
+    ACCOUNTANT;
 }

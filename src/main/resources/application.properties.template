@@ -102,9 +102,9 @@ INATrace.info.mail =
 INATrace.auth.authenticationTokenCookieName = authenticationToken
 INATrace.auth.authenticationTokenExpirationSec = 31536000
 
-INATrace.auth.accessTokenCookieName = INATrace-accessToken
+INATrace.auth.accessTokenCookieName = inatrace-accessToken
 INATrace.auth.accessTokenExpirationSec = 60
-INATrace.auth.refreshTokenCookieName = INATrace-refreshToken
+INATrace.auth.refreshTokenCookieName = inatrace-refreshToken
 INATrace.auth.refreshTokenExpirationSec = 300
 INATrace.auth.jwtSigningKey = 
 

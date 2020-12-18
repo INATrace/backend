@@ -3,6 +3,7 @@ package com.abelium.INATrace.components.company;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,10 +27,10 @@ import com.abelium.INATrace.components.company.api.ApiCompanyGet;
 import com.abelium.INATrace.components.company.api.ApiCompanyListResponse;
 import com.abelium.INATrace.components.company.api.ApiCompanyPublic;
 import com.abelium.INATrace.components.company.api.ApiCompanyUpdate;
+import com.abelium.INATrace.components.company.api.ApiCompanyUser;
 import com.abelium.INATrace.components.company.api.ApiListCompaniesRequest;
 import com.abelium.INATrace.components.company.types.CompanyAction;
 import com.abelium.INATrace.components.user.UserQueries;
-import com.abelium.INATrace.components.user.api.ApiUserBase;
 import com.abelium.INATrace.db.entities.Company;
 import com.abelium.INATrace.db.entities.CompanyUser;
 import com.abelium.INATrace.db.entities.Document;
@@ -40,6 +41,7 @@ import com.abelium.INATrace.tools.Queries;
 import com.abelium.INATrace.tools.QueryTools;
 import com.abelium.INATrace.tools.TorpedoProjector;
 import com.abelium.INATrace.types.CompanyStatus;
+import com.abelium.INATrace.types.CompanyUserRole;
 import com.abelium.INATrace.types.Language;
 import com.abelium.INATrace.types.UserRole;
 
@@ -132,7 +134,7 @@ public class CompanyEngine extends BaseEngine {
     @Transactional
 	public ApiCompanyGet getCompany(CustomUserDetails authUser, long id, Language language) throws ApiException {
 		Company c = companyQueries.fetchCompany(id);
-		List<ApiUserBase> users = companyQueries.fetchUsersForCompany(id);
+		List<ApiCompanyUser> users = companyQueries.fetchUsersForCompany(id);
 		
 		if (authUser.getUserRole() != UserRole.ADMIN && !users.stream().anyMatch(u -> u.getId().equals(authUser.getUserId()))) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "Not authorized");
@@ -149,7 +151,10 @@ public class CompanyEngine extends BaseEngine {
 				case DEACTIVATED: actions.add(CompanyAction.ACTIVATE_COMPANY); break;
 			}
 			actions.add(CompanyAction.ADD_USER_TO_COMPANY);
-			if (!users.isEmpty()) actions.add(CompanyAction.REMOVE_USER_FROM_COMPANY);
+			if (!users.isEmpty()) {
+				actions.add(CompanyAction.REMOVE_USER_FROM_COMPANY);
+				actions.add(CompanyAction.SET_USER_COMPANY_ROLE);
+			}
 			actions.add(CompanyAction.MERGE_TO_COMPANY);
 		}
 		
@@ -174,7 +179,8 @@ public class CompanyEngine extends BaseEngine {
     	switch (action) {
     		case ACTIVATE_COMPANY: activateCompany(c); break;
     		case DEACTIVATE_COMPANY: deactivateCompany(c); break;
-    		case ADD_USER_TO_COMPANY: addUserToCompany(request.userId, c); break;
+    		case ADD_USER_TO_COMPANY: addUserToCompany(request.userId, c, request.companyUserRole); break;
+    		case SET_USER_COMPANY_ROLE: setUserCompanyRole(request.userId, c, request.companyUserRole); break;
     		case REMOVE_USER_FROM_COMPANY: removeUserFromCompany(request.userId, c); break;
     		case MERGE_TO_COMPANY: mergeToCompany(c, request.otherCompanyId); break;
     		default: throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid action");
@@ -203,7 +209,7 @@ public class CompanyEngine extends BaseEngine {
 		c.getUsers().removeIf(cu -> cu.getUser().getId().equals(userId));
 	}
 
-	private void addUserToCompany(Long userId, Company c) throws ApiException {
+	private void addUserToCompany(Long userId, Company c, CompanyUserRole cur) throws ApiException {
 		if (c.getUsers().stream().anyMatch(cu -> cu.getUser().getId().equals(userId))) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "User already exists");
 		}
@@ -211,7 +217,16 @@ public class CompanyEngine extends BaseEngine {
 		CompanyUser cu = new CompanyUser();
 		cu.setUser(user);
 		cu.setCompany(c);
+		cu.setRole(cur);
 		c.getUsers().add(cu);
+	}
+	
+	private void setUserCompanyRole(Long userId, Company c, CompanyUserRole cur) throws ApiException {
+		Optional<CompanyUser> optCu = c.getUsers().stream().filter(cu -> cu.getUser().getId().equals(userId)).findAny();
+		if (optCu.isEmpty()) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "User does not exist or does not exist on the company");
+		}
+		optCu.get().setRole(cur);
 	}
 
     private void activateCompany(Company company) throws ApiException {

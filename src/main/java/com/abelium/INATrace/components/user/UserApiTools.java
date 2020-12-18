@@ -11,7 +11,8 @@ import com.abelium.INATrace.db.entities.User;
 
 public class UserApiTools {
 
-	private static void updateApiUserBase(ApiUserBase apiUser, User user) {
+	public static void updateApiUserBase(ApiUserBase apiUser, User user) {
+		CommonApiTools.updateApiBaseEntity(apiUser, user);
 		apiUser.email = user.getEmail();
 		apiUser.name = user.getName();
 		apiUser.surname = user.getSurname();
@@ -24,7 +25,6 @@ public class UserApiTools {
 		if (user == null) return null;
 		
 		ApiUserBase apiUser = new ApiUserBase();
-		CommonApiTools.updateApiBaseEntity(apiUser, user);
 		updateApiUserBase(apiUser, user);
 		return apiUser;
 	}
@@ -33,7 +33,6 @@ public class UserApiTools {
 		if (user == null) return null;
 		
 		ApiUser apiUser = new ApiUser();
-		CommonApiTools.updateApiBaseEntity(apiUser, user);
 		updateApiUserBase(apiUser, user);
 		// Add more
 		return apiUser;
@@ -45,7 +44,6 @@ public class UserApiTools {
 		if (user == null) return null;
 		
 		ApiUserGet apiUser = new ApiUserGet();
-		CommonApiTools.updateApiBaseEntity(apiUser, user);
 		updateApiUserBase(apiUser, user);
 		// Add more
 		apiUser.actions = actions;

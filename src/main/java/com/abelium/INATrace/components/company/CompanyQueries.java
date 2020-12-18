@@ -12,8 +12,7 @@ import org.torpedoquery.jpa.Torpedo;
 import com.abelium.INATrace.api.ApiStatus;
 import com.abelium.INATrace.api.errors.ApiException;
 import com.abelium.INATrace.components.common.BaseEngine;
-import com.abelium.INATrace.components.user.UserApiTools;
-import com.abelium.INATrace.components.user.api.ApiUserBase;
+import com.abelium.INATrace.components.company.api.ApiCompanyUser;
 import com.abelium.INATrace.db.entities.Company;
 import com.abelium.INATrace.db.entities.CompanyTranslation;
 import com.abelium.INATrace.db.entities.CompanyUser;
@@ -52,10 +51,10 @@ public class CompanyQueries extends BaseEngine {
 	}
 
 	@Transactional
-	public List<ApiUserBase> fetchUsersForCompany(Long companyId) throws ApiException {
+	public List<ApiCompanyUser> fetchUsersForCompany(Long companyId) throws ApiException {
 		CompanyUser cuProxy = Torpedo.from(CompanyUser.class);
 		Torpedo.where(cuProxy.getCompany().getId()).eq(companyId);
-		return Torpedo.select(cuProxy.getUser()).map(em, UserApiTools::toApiUserBase);
+		return Torpedo.select(cuProxy).map(em, CompanyApiTools::toApiCompanyUser);
 	}
 
 	@Transactional

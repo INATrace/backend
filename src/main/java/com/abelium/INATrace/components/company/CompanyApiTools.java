@@ -19,10 +19,11 @@ import com.abelium.INATrace.components.company.api.ApiCompanyGet;
 import com.abelium.INATrace.components.company.api.ApiCompanyListResponse;
 import com.abelium.INATrace.components.company.api.ApiCompanyPublic;
 import com.abelium.INATrace.components.company.api.ApiCompanyUpdate;
+import com.abelium.INATrace.components.company.api.ApiCompanyUser;
 import com.abelium.INATrace.components.company.types.CompanyAction;
 import com.abelium.INATrace.components.company.types.CompanyTranslatables;
+import com.abelium.INATrace.components.user.UserApiTools;
 import com.abelium.INATrace.components.user.UserQueries;
-import com.abelium.INATrace.components.user.api.ApiUserBase;
 import com.abelium.INATrace.db.entities.Company;
 import com.abelium.INATrace.db.entities.CompanyCertification;
 import com.abelium.INATrace.db.entities.CompanyDocument;
@@ -81,7 +82,7 @@ public class CompanyApiTools {
 	
 	public ApiCompanyGet toApiCompanyGet(Long userId, Company c, Language language, 
 			List<CompanyAction> actions,
-			List<ApiUserBase> users) {
+			List<ApiCompanyUser> users) {
 		if (c == null) return null;
 		
 		ApiCompanyGet ac = new ApiCompanyGet();
@@ -232,6 +233,13 @@ public class CompanyApiTools {
 		pd.setValidity(ac.validity);
 		pd.setCertificate(commonEngine.fetchDocument(userId, ac.certificate));
 		return pd;
+	}
+	
+	public static ApiCompanyUser toApiCompanyUser(CompanyUser cu) {
+		ApiCompanyUser acu = new ApiCompanyUser();
+		UserApiTools.updateApiUserBase(acu, cu.getUser());
+		acu.companyRole = cu.getRole();
+		return acu;
 	}
 				
 }

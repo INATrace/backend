@@ -1,11 +1,16 @@
 package com.abelium.INATrace.db.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
+import com.abelium.INATrace.api.types.Lengths;
 import com.abelium.INATrace.db.base.BaseEntity;
+import com.abelium.INATrace.types.CompanyUserRole;
 
 @Entity
 public class CompanyUser extends BaseEntity {
@@ -13,10 +18,9 @@ public class CompanyUser extends BaseEntity {
 	@Version
 	private long entityVersion;
 	
-	//  Enable if needed
-	//	@Enumerated(EnumType.STRING)
-	//	@Column(length = Lengths.ENUM, nullable = false)
-	//	private CompanyUserRole role;
+	@Enumerated(EnumType.STRING)
+	@Column(length = Lengths.ENUM)
+	private CompanyUserRole role;
 	
 	@ManyToOne
 	@NotNull
@@ -26,14 +30,13 @@ public class CompanyUser extends BaseEntity {
 	@NotNull
 	private Company company;
 
-	
-	//	public CompanyUserRole getRole() {
-	//		return role;
-	//	}
-	//
-	//	public void setRole(CompanyUserRole role) {
-	//		this.role = role;
-	//	}
+	public CompanyUserRole getRole() {
+		return role;
+	}
+
+	public void setRole(CompanyUserRole role) {
+		this.role = role;
+	}
 
 	public User getUser() {
 		return user;

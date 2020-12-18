@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.abelium.INATrace.components.company.types.CompanyAction;
-import com.abelium.INATrace.components.user.api.ApiUserBase;
-
 import io.swagger.annotations.ApiModelProperty;
 
 public class ApiCompanyGet extends ApiCompany {
@@ -14,7 +12,7 @@ public class ApiCompanyGet extends ApiCompany {
 	public List<CompanyAction> actions = new ArrayList<>();
 
 	@ApiModelProperty("Company users")
-	public List<ApiUserBase> users = new ArrayList<>();
+	public List<ApiCompanyUser> users = new ArrayList<>();
 
 	public List<CompanyAction> getActions() {
 		return actions;
@@ -24,11 +22,11 @@ public class ApiCompanyGet extends ApiCompany {
 		this.actions = actions;
 	}
 
-	public List<ApiUserBase> getUsers() {
+	public List<ApiCompanyUser> getUsers() {
 		return users;
 	}
 
-	public void setUsers(List<ApiUserBase> users) {
+	public void setUsers(List<ApiCompanyUser> users) {
 		this.users = users;
 	}
 

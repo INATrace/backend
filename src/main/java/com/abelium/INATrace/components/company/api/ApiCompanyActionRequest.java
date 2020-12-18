@@ -4,6 +4,8 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.validation.annotation.Validated;
 
+import com.abelium.INATrace.types.CompanyUserRole;
+
 import io.swagger.annotations.ApiModelProperty;
 
 @Validated
@@ -18,6 +20,10 @@ public class ApiCompanyActionRequest {
 
 	@ApiModelProperty(value = "Other company id", position = 2)
 	public Long otherCompanyId;
+	
+	@ApiModelProperty(value = "Company user role", position = 3)
+	public CompanyUserRole companyUserRole = CompanyUserRole.USER;
+	
 
 	public Long getCompanyId() {
 		return companyId;
@@ -41,5 +47,13 @@ public class ApiCompanyActionRequest {
 
 	public void setOtherCompanyId(Long otherCompanyId) {
 		this.otherCompanyId = otherCompanyId;
+	}
+
+	public CompanyUserRole getCompanyUserRole() {
+		return companyUserRole;
+	}
+
+	public void setCompanyUserRole(CompanyUserRole companyUserRole) {
+		this.companyUserRole = companyUserRole;
 	}
 }
