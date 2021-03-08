@@ -64,6 +64,7 @@ import com.abelium.INATrace.db.entities.Responsibility;
 import com.abelium.INATrace.db.entities.ResponsibilityFarmerPicture;
 import com.abelium.INATrace.db.entities.Sustainability;
 import com.abelium.INATrace.tools.FieldTools;
+import com.abelium.INATrace.tools.ListTools;
 
 
 @Lazy
@@ -370,7 +371,7 @@ public class ProductApiTools {
 		s.setCo2Footprint(as.co2Footprint);
 	}
 	
-	private void updateSettings(Long userId, ProductSettings ps, ApiProductSettings aps) {
+	private void updateSettings(Long userId, ProductSettings ps, ApiProductSettings aps) throws ApiException {
 		ps.setCheckAuthenticity(aps.checkAuthenticity);
 		ps.setTraceOrigin(aps.traceOrigin);
 		ps.setGiveFeedback(aps.giveFeedback);
@@ -390,32 +391,32 @@ public class ProductApiTools {
 		ps.setDescription(aps.description);
 	}
 	
-	private void updateResponsibility(Long userId, Responsibility r, ApiResponsibility ar) {
+	private void updateResponsibility(Long userId, Responsibility r, ApiResponsibility ar) throws ApiException {
 		r.setLaborPolicies(ar.laborPolicies);
 		r.setRelationship(ar.relationship);
 		r.setFarmer(ar.farmer);
 		if (ar.pictures != null) {
 			r.getPictures().clear();
-			r.getPictures().addAll(ar.pictures.stream().map(arfp -> toResponsibilityFarmerPicture(userId, r, arfp)).collect(Collectors.toList()));
+			r.getPictures().addAll(ListTools.mapThrowable(ar.pictures, arfp -> toResponsibilityFarmerPicture(userId, r, arfp)));
 		}
 		r.setStory(ar.story);
 	}
 
-	private void updateProcess(Long userId, Process p, ApiProcess ap) {
+	private void updateProcess(Long userId, Process p, ApiProcess ap) throws ApiException {
 		p.setProduction(ap.production);
 		p.setStorage(ap.storage);
 		p.setCodesOfConduct(ap.codesOfConduct);
 		if (ap.standards != null) {
 			p.getStandards().clear();
-			p.getStandards().addAll(ap.standards.stream().map(aps -> toProcessStandard(userId, p, aps)).collect(Collectors.toList()));
+			p.getStandards().addAll(ListTools.mapThrowable(ap.standards, aps -> toProcessStandard(userId, p, aps)));
 		}
 		if (ap.records != null) {
 			p.getRecords().clear();
-			p.getRecords().addAll(ap.records.stream().map(apr -> toProcessDocument(userId, p, apr)).collect(Collectors.toList()));
+			p.getRecords().addAll(ListTools.mapThrowable(ap.records, apr -> toProcessDocument(userId, p, apr)));
 		}
 	}
 
-	private ResponsibilityFarmerPicture toResponsibilityFarmerPicture(Long userId, Responsibility r, ApiResponsibilityFarmerPicture arfp) {
+	private ResponsibilityFarmerPicture toResponsibilityFarmerPicture(Long userId, Responsibility r, ApiResponsibilityFarmerPicture arfp) throws ApiException {
 		ResponsibilityFarmerPicture rfp = new ResponsibilityFarmerPicture();
 		rfp.setResponsibility(r);
 		rfp.setDescription(arfp.description);
@@ -423,7 +424,7 @@ public class ProductApiTools {
 		return rfp;
 	}
 	
-	private ProcessDocument toProcessDocument(Long userId, Process p, ApiProcessDocument ad) {
+	private ProcessDocument toProcessDocument(Long userId, Process p, ApiProcessDocument ad) throws ApiException {
 		ProcessDocument pd = new ProcessDocument();
 		pd.setProcess(p);
 		pd.setDescription(ad.description);
@@ -431,7 +432,7 @@ public class ProductApiTools {
 		return pd;
 	}
 	
-	private ProcessStandard toProcessStandard(Long userId, Process p, ApiCertification aps) {
+	private ProcessStandard toProcessStandard(Long userId, Process p, ApiCertification aps) throws ApiException {
 		ProcessStandard ps = new ProcessStandard();
 		ps.setProcess(p);
 		ps.setDescription(aps.description);
@@ -624,7 +625,7 @@ public class ProductApiTools {
 		akbb.youtubeUrl = kb.getYoutubeUrl();
 	}
 
-	public void updateKnowledgeBlog(Long userId, KnowledgeBlog kb, ApiKnowledgeBlog akb) {
+	public void updateKnowledgeBlog(Long userId, KnowledgeBlog kb, ApiKnowledgeBlog akb) throws ApiException {
 		if (akb == null) return;
 		
 		kb.setTitle(akb.getTitle());
@@ -634,7 +635,7 @@ public class ProductApiTools {
 		kb.setYoutubeUrl(akb.getYoutubeUrl());
 		if (akb.documents != null) {
 			kb.getDocuments().clear();
-			kb.getDocuments().addAll(akb.documents.stream().map(ad -> commonEngine.fetchDocument(userId, ad)).collect(Collectors.toList()));
+			kb.getDocuments().addAll(ListTools.mapThrowable(akb.documents, ad -> commonEngine.fetchDocument(userId, ad)));
 		}
 	}
 	

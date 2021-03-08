@@ -29,6 +29,7 @@ import com.abelium.INATrace.db.entities.CompanyCertification;
 import com.abelium.INATrace.db.entities.CompanyDocument;
 import com.abelium.INATrace.db.entities.CompanyTranslation;
 import com.abelium.INATrace.db.entities.CompanyUser;
+import com.abelium.INATrace.tools.ListTools;
 import com.abelium.INATrace.types.Language;
 
 
@@ -124,7 +125,7 @@ public class CompanyApiTools {
 	}
 	
 	
-	private void updateCompanyTranslatables(Long userId, CompanyTranslatables c, ApiCompany ac) {
+	private void updateCompanyTranslatables(Long userId, CompanyTranslatables c, ApiCompany ac) throws ApiException {
 		c.setName(ac.name);
 		c.setAbbreviation(ac.abbreviation);
 		c.setAbout(ac.about);
@@ -139,11 +140,11 @@ public class CompanyApiTools {
 		
 		if (ac.documents != null) {
 			c.getDocuments().clear();
-			c.getDocuments().addAll(ac.documents.stream().map(acd -> toCompanyDocument(userId, cc, cct, acd)).collect(Collectors.toList()));
+			c.getDocuments().addAll(ListTools.mapThrowable(ac.documents, acd -> toCompanyDocument(userId, cc, cct, acd)));
 		}
 		if (ac.certifications != null) {
 			c.getCertifications().clear();
-			c.getCertifications().addAll(ac.certifications.stream().map(acc -> toCompanyCertification(userId, cc, cct, acc)).collect(Collectors.toList()));
+			c.getCertifications().addAll(ListTools.mapThrowable(ac.certifications, acc -> toCompanyCertification(userId, cc, cct, acc)));
 		}
 	}
 
@@ -210,7 +211,7 @@ public class CompanyApiTools {
 		return acc;
 	}
 	
-	private CompanyDocument toCompanyDocument(Long userId, Company c, CompanyTranslation ct, ApiCompanyDocument ad) {
+	private CompanyDocument toCompanyDocument(Long userId, Company c, CompanyTranslation ct, ApiCompanyDocument ad) throws ApiException {
 		CompanyDocument pd = new CompanyDocument();
 		pd.setCompany(c);
 		pd.setCompanyTranslation(ct);
@@ -224,7 +225,7 @@ public class CompanyApiTools {
 		return pd;
 	}
 	
-	private CompanyCertification toCompanyCertification(Long userId, Company c, CompanyTranslation ct, ApiCertification ac) {
+	private CompanyCertification toCompanyCertification(Long userId, Company c, CompanyTranslation ct, ApiCertification ac) throws ApiException {
 		CompanyCertification pd = new CompanyCertification();
 		pd.setCompany(c);
 		pd.setCompanyTranslation(ct);

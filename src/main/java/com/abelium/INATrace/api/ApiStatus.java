@@ -60,6 +60,11 @@ public enum ApiStatus {
     INVALID_REQUEST(HttpStatus.BAD_REQUEST),
     
     /**
+     * Storage key (for documents) is invalid or expired 
+     */
+    INVALID_OR_EXPIRED_STORAGE_KEY(HttpStatus.BAD_REQUEST),
+
+    /**
      * not implemented error
      */
     NOT_IMPLEMENTED(HttpStatus.NOT_IMPLEMENTED), 

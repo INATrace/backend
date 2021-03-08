@@ -101,11 +101,15 @@ public class CommonEngine extends BaseEngine {
 	}
     
     @Transactional 
-    public Document fetchDocument(Long userId, ApiDocument ad) {
+    public Document fetchDocument(Long userId, ApiDocument ad) throws ApiException {
     	if (ad == null) {
     		return null;
     	} else {
         	String storageKey = StorageKeyCache.get(ad.storageKey, userId);
+        	
+        	if (storageKey == null) {
+        		throw new ApiException(ApiStatus.INVALID_OR_EXPIRED_STORAGE_KEY, "Invalid storage key or storage key has expired");
+        	}
     		return Queries.getUniqueBy(em, Document.class, Document::getStorageKey, storageKey);
     		// return Queries.get(em, Document.class, ad.id);
     	}

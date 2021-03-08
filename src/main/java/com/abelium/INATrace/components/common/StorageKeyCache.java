@@ -20,7 +20,7 @@ public class StorageKeyCache {
 	}
 	
 	private static Cache<String, CacheValue> cache = CacheBuilder.newBuilder().
-		expireAfterWrite(Duration.ofMinutes(15)).
+		expireAfterWrite(Duration.ofMinutes(120)).
 		build(); 
 	
 

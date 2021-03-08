@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.abelium.INATrace.api.errors.ApiException;
+
 public class ListTools
 {
     public static <T> Iterable<T> toIterable(Enumeration<T> enumeration) {
@@ -31,6 +33,15 @@ public class ListTools
         }
         return result;
     }
+    
+    public static <T, R> List<R> mapThrowable(Collection<T> source, ThrowableFunction<T, R> function) throws ApiException {
+        if (source == null) return null;
+        List<R> result = new ArrayList<R>(source.size());
+        for (T x : source) {
+            result.add(function.apply(x));
+        }
+        return result;
+    }    
 
     public static <T, R, C extends Collection<R>> C map(Collection<T> source, Function<T, R> function, Supplier<C> resultCreator) {
         if (source == null) return null;
