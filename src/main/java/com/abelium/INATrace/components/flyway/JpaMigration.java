@@ -1,9 +1,0 @@
-package com.abelium.INATrace.components.flyway;
-
-import javax.persistence.EntityManager;
-
-import org.springframework.core.env.Environment;
-
-public interface JpaMigration {
-    void migrate(EntityManager em, Environment environment) throws Exception;
-}
