@@ -1,11 +1,11 @@
 package com.abelium.inatrace.components.analytics;
 
+import com.abelium.inatrace.components.analytics.AnalyticsQueries.AggregateUpdate;
+import com.abelium.inatrace.db.entities.analytics.RequestLog;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.abelium.inatrace.components.analytics.AnalyticsQueries.AggregateUpdate;
-import com.abelium.inatrace.db.entities.RequestLog;
 
 public class CountAggregator extends Aggregator {
 

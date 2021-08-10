@@ -1,9 +1,9 @@
 package com.abelium.inatrace.components.analytics;
 
-import java.util.List;
-
 import com.abelium.inatrace.components.analytics.AnalyticsQueries.AggregateUpdate;
-import com.abelium.inatrace.db.entities.RequestLog;
+import com.abelium.inatrace.db.entities.analytics.RequestLog;
+
+import java.util.List;
 
 public class Aggregator {
 

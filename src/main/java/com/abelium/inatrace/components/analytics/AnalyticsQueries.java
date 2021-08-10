@@ -1,24 +1,17 @@
 package com.abelium.inatrace.components.analytics;
 
-import java.time.Instant;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.transaction.Transactional;
-
+import com.abelium.inatrace.components.common.BaseEngine;
+import com.abelium.inatrace.db.entities.analytics.AnalyticsAggregate;
+import com.abelium.inatrace.db.entities.analytics.AnalyticsAggregateItem;
+import com.abelium.inatrace.db.entities.analytics.RequestLog;
+import com.abelium.inatrace.tools.Queries;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.torpedoquery.jpa.Torpedo;
 
-import com.abelium.inatrace.components.common.BaseEngine;
-import com.abelium.inatrace.db.entities.AnalyticsAggregate;
-import com.abelium.inatrace.db.entities.AnalyticsAggregateItem;
-import com.abelium.inatrace.db.entities.RequestLog;
-import com.abelium.inatrace.tools.Queries;
+import javax.transaction.Transactional;
+import java.time.Instant;
+import java.util.*;
 
 @Lazy
 @Component

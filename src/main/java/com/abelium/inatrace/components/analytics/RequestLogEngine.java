@@ -1,26 +1,26 @@
 package com.abelium.inatrace.components.analytics;
 
-import java.util.concurrent.CompletableFuture;
-
-import javax.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
-//import org.springframework.web.client.RestTemplate;
-
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.analytics.api.ApiLogRequest;
 import com.abelium.inatrace.components.common.BaseEngine;
 import com.abelium.inatrace.components.transactions.AbTransactionTemplate;
-import com.abelium.inatrace.db.entities.RequestGeoLocation;
-import com.abelium.inatrace.db.entities.RequestLog;
+import com.abelium.inatrace.db.entities.analytics.RequestGeoLocation;
+import com.abelium.inatrace.db.entities.analytics.RequestLog;
 import com.abelium.inatrace.types.RequestLogType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.CompletableFuture;
+
+//import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component

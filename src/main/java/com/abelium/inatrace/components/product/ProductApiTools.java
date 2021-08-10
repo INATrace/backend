@@ -1,13 +1,5 @@
 package com.abelium.inatrace.components.product;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
-
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.CommonApiTools;
 import com.abelium.inatrace.components.common.CommonEngine;
@@ -16,55 +8,23 @@ import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.company.CompanyApiTools;
 import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
-import com.abelium.inatrace.components.product.api.ApiComparisonOfPrice;
-import com.abelium.inatrace.components.product.api.ApiKnowledgeBlog;
-import com.abelium.inatrace.components.product.api.ApiKnowledgeBlogBase;
-import com.abelium.inatrace.components.product.api.ApiLocation;
-import com.abelium.inatrace.components.product.api.ApiProcess;
-import com.abelium.inatrace.components.product.api.ApiProcessDocument;
-import com.abelium.inatrace.components.product.api.ApiProduct;
-import com.abelium.inatrace.components.product.api.ApiUserCustomer;
-import com.abelium.inatrace.components.product.api.ApiProductCompany;
-import com.abelium.inatrace.components.product.api.ApiProductContent;
-import com.abelium.inatrace.components.product.api.ApiProductLabelBase;
-import com.abelium.inatrace.components.product.api.ApiProductLabelBatch;
-import com.abelium.inatrace.components.product.api.ApiProductLabelContent;
-import com.abelium.inatrace.components.product.api.ApiProductLabelFeedback;
-import com.abelium.inatrace.components.product.api.ApiProductLabelField;
-import com.abelium.inatrace.components.product.api.ApiProductLabelFieldValue;
-import com.abelium.inatrace.components.product.api.ApiProductLabel;
-import com.abelium.inatrace.components.product.api.ApiProductLabelValues;
-import com.abelium.inatrace.components.product.api.ApiProductLabelUpdateValues;
-import com.abelium.inatrace.components.product.api.ApiProductListResponse;
-import com.abelium.inatrace.components.product.api.ApiProductOrigin;
-import com.abelium.inatrace.components.product.api.ApiProductSettings;
-import com.abelium.inatrace.components.product.api.ApiResponsibility;
-import com.abelium.inatrace.components.product.api.ApiResponsibilityFarmerPicture;
-import com.abelium.inatrace.components.product.api.ApiSustainability;
-import com.abelium.inatrace.db.entities.BatchLocation;
-import com.abelium.inatrace.db.entities.KnowledgeBlog;
-import com.abelium.inatrace.db.entities.Location;
-import com.abelium.inatrace.db.entities.Process;
-import com.abelium.inatrace.db.entities.ProcessDocument;
-import com.abelium.inatrace.db.entities.ProcessStandard;
-import com.abelium.inatrace.db.entities.Product;
-import com.abelium.inatrace.db.entities.UserCustomer;
-import com.abelium.inatrace.db.entities.ProductCompany;
-import com.abelium.inatrace.db.entities.ProductContent;
-import com.abelium.inatrace.db.entities.CompanyCustomer;
-import com.abelium.inatrace.db.entities.ComparisonOfPrice;
-import com.abelium.inatrace.db.entities.ProductLabel;
-import com.abelium.inatrace.db.entities.ProductLabelBatch;
-import com.abelium.inatrace.db.entities.ProductLabelContent;
-import com.abelium.inatrace.db.entities.ProductLabelFeedback;
-import com.abelium.inatrace.db.entities.ProductLabelField;
-import com.abelium.inatrace.db.entities.ProductLocation;
-import com.abelium.inatrace.db.entities.ProductSettings;
-import com.abelium.inatrace.db.entities.Responsibility;
-import com.abelium.inatrace.db.entities.ResponsibilityFarmerPicture;
-import com.abelium.inatrace.db.entities.Sustainability;
+import com.abelium.inatrace.components.product.api.*;
+import com.abelium.inatrace.db.entities.common.Location;
+import com.abelium.inatrace.db.entities.common.UserCustomer;
+import com.abelium.inatrace.db.entities.company.CompanyCustomer;
+import com.abelium.inatrace.db.entities.process.Process;
+import com.abelium.inatrace.db.entities.process.ProcessDocument;
+import com.abelium.inatrace.db.entities.process.ProcessStandard;
+import com.abelium.inatrace.db.entities.product.*;
 import com.abelium.inatrace.tools.FieldTools;
 import com.abelium.inatrace.tools.ListTools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Lazy

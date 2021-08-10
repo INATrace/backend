@@ -15,7 +15,7 @@ import org.springframework.http.HttpCookie;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
-import com.abelium.inatrace.db.entities.User;
+import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.UserRole;
 import com.auth0.jwt.JWT;

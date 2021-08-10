@@ -1,7 +1,7 @@
 package com.abelium.inatrace.security.service;
 
 import com.abelium.inatrace.components.user.UserEngine;
-import com.abelium.inatrace.db.entities.User;
+import com.abelium.inatrace.db.entities.common.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

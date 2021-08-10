@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.db.entities.Document;
+import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.tools.ImageTools;
 import com.abelium.inatrace.tools.ImageTools.ImageSizeData;
 import com.abelium.inatrace.tools.Queries;

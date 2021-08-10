@@ -3,8 +3,8 @@ package com.abelium.inatrace.components.company.types;
 import java.util.List;
 import java.util.Map;
 
-import com.abelium.inatrace.db.entities.CompanyCertification;
-import com.abelium.inatrace.db.entities.CompanyDocument;
+import com.abelium.inatrace.db.entities.company.CompanyCertification;
+import com.abelium.inatrace.db.entities.company.CompanyDocument;
 
 public interface CompanyTranslatables {
 

@@ -1,18 +1,16 @@
 package com.abelium.inatrace.db.migrations;
 
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-
-import javax.persistence.EntityManager;
-
+import com.abelium.inatrace.components.flyway.JpaMigration;
+import com.abelium.inatrace.db.entities.common.Country;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 
-import com.abelium.inatrace.components.flyway.JpaMigration;
-import com.abelium.inatrace.db.entities.Country;
+import javax.persistence.EntityManager;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 
 public class V2020_03_27_15_00__Prefill_Countries implements JpaMigration 
 {

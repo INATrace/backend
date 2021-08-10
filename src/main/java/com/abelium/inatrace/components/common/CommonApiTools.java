@@ -11,10 +11,10 @@ import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.components.company.api.ApiAddress;
 import com.abelium.inatrace.components.company.api.ApiGeoAddress;
 import com.abelium.inatrace.db.base.BaseEntity;
-import com.abelium.inatrace.db.entities.Address;
-import com.abelium.inatrace.db.entities.Country;
-import com.abelium.inatrace.db.entities.Document;
-import com.abelium.inatrace.db.entities.GeoAddress;
+import com.abelium.inatrace.db.entities.common.Address;
+import com.abelium.inatrace.db.entities.common.Country;
+import com.abelium.inatrace.db.entities.common.Document;
+import com.abelium.inatrace.db.entities.common.GeoAddress;
 
 @Lazy
 @Service

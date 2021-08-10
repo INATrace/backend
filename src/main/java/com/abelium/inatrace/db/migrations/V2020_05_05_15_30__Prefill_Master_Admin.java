@@ -6,7 +6,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.abelium.inatrace.components.flyway.JpaMigration;
-import com.abelium.inatrace.db.entities.User;
+import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.types.UserRole;
 import com.abelium.inatrace.types.UserStatus;
 

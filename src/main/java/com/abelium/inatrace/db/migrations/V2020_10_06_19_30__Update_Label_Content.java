@@ -6,8 +6,8 @@ import javax.persistence.EntityManager;
 
 import org.springframework.core.env.Environment;
 import com.abelium.inatrace.components.flyway.JpaMigration;
-import com.abelium.inatrace.db.entities.ProductLabel;
-import com.abelium.inatrace.db.entities.ProductLabelContent;
+import com.abelium.inatrace.db.entities.product.ProductLabel;
+import com.abelium.inatrace.db.entities.product.ProductLabelContent;
 import com.abelium.inatrace.tools.Queries;
 
 public class V2020_10_06_19_30__Update_Label_Content implements JpaMigration {

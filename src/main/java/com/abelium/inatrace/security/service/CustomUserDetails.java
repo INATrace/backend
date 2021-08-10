@@ -3,7 +3,7 @@ package com.abelium.inatrace.security.service;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.abelium.inatrace.db.entities.User;
+import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.types.UserRole;
 import java.util.Arrays;
 import java.util.Collection;

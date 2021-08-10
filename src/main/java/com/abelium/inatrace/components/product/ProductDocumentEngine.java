@@ -23,7 +23,7 @@ import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseEngine;
 import com.abelium.inatrace.components.documents.DocumentGeneratorEngine;
-import com.abelium.inatrace.db.entities.ProductLabel;
+import com.abelium.inatrace.db.entities.product.ProductLabel;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.documents.Bookmark;
 import com.abelium.inatrace.tools.documents.DocumentForm;

@@ -11,8 +11,8 @@ import org.torpedoquery.jpa.Torpedo;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseEngine;
-import com.abelium.inatrace.db.entities.CompanyUser;
-import com.abelium.inatrace.db.entities.User;
+import com.abelium.inatrace.db.entities.company.CompanyUser;
+import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.UserStatus;
 

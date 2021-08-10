@@ -6,7 +6,7 @@ import javax.persistence.EntityManager;
 
 import org.springframework.core.env.Environment;
 import com.abelium.inatrace.components.flyway.JpaMigration;
-import com.abelium.inatrace.db.entities.CompanyUser;
+import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.CompanyUserRole;
 

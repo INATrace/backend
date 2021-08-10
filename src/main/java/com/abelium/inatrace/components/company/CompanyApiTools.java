@@ -24,11 +24,11 @@ import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.company.types.CompanyTranslatables;
 import com.abelium.inatrace.components.user.UserApiTools;
 import com.abelium.inatrace.components.user.UserQueries;
-import com.abelium.inatrace.db.entities.Company;
-import com.abelium.inatrace.db.entities.CompanyCertification;
-import com.abelium.inatrace.db.entities.CompanyDocument;
-import com.abelium.inatrace.db.entities.CompanyTranslation;
-import com.abelium.inatrace.db.entities.CompanyUser;
+import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.company.CompanyCertification;
+import com.abelium.inatrace.db.entities.company.CompanyDocument;
+import com.abelium.inatrace.db.entities.company.CompanyTranslation;
+import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.tools.ListTools;
 import com.abelium.inatrace.types.Language;
 

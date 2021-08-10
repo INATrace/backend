@@ -1,11 +1,9 @@
 package com.abelium.inatrace.components.analytics;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-
-import javax.annotation.PostConstruct;
-
+import com.abelium.inatrace.db.entities.analytics.RequestGeoLocation;
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
+import com.maxmind.geoip2.model.CityResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.abelium.inatrace.db.entities.RequestGeoLocation;
-import com.maxmind.geoip2.DatabaseReader;
-import com.maxmind.geoip2.exception.GeoIp2Exception;
-import com.maxmind.geoip2.model.CityResponse;
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
 
 @Lazy
 @Component

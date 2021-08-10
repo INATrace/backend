@@ -1,15 +1,11 @@
 package com.abelium.inatrace.components.analytics;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.abelium.inatrace.components.analytics.AnalyticsQueries.AggregateUpdate;
+import com.abelium.inatrace.components.product.api.ApiProductLabelAnalytics;
+import com.abelium.inatrace.db.entities.analytics.RequestLog;
+import com.abelium.inatrace.db.entities.analytics.AnalyticsAggregate;
+import com.abelium.inatrace.db.entities.analytics.AnalyticsAggregateItem;
+import com.abelium.inatrace.types.RequestLogType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +13,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.abelium.inatrace.components.analytics.AnalyticsQueries.AggregateUpdate;
-import com.abelium.inatrace.components.product.api.ApiProductLabelAnalytics;
-import com.abelium.inatrace.db.entities.AnalyticsAggregate;
-import com.abelium.inatrace.db.entities.AnalyticsAggregateItem;
-import com.abelium.inatrace.db.entities.RequestLog;
-import com.abelium.inatrace.types.RequestLogType;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @EnableScheduling

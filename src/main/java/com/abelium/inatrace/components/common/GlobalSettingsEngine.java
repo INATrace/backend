@@ -3,7 +3,7 @@ package com.abelium.inatrace.components.common;
 import javax.transaction.Transactional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import com.abelium.inatrace.db.entities.GlobalSettings;
+import com.abelium.inatrace.db.entities.common.GlobalSettings;
 import com.abelium.inatrace.tools.Queries;
 
 @Lazy

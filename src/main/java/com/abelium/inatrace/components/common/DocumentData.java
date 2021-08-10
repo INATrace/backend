@@ -5,7 +5,7 @@ import java.security.NoSuchAlgorithmException;
 
 import org.springframework.security.crypto.codec.Hex;
 
-import com.abelium.inatrace.db.entities.Document;
+import com.abelium.inatrace.db.entities.common.Document;
 
 
 public class DocumentData 

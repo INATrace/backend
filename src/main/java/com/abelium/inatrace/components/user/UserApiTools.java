@@ -7,7 +7,7 @@ import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.components.user.api.ApiUserBase;
 import com.abelium.inatrace.components.user.api.ApiUserGet;
 import com.abelium.inatrace.components.user.types.UserAction;
-import com.abelium.inatrace.db.entities.User;
+import com.abelium.inatrace.db.entities.common.User;
 
 public class UserApiTools {
 
