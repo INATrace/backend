@@ -1,12 +1,11 @@
 package com.abelium.inatrace.db.base;
 
-import java.time.Instant;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import java.time.Instant;
 
 
 /**
@@ -23,7 +22,6 @@ public class TimestampEntity extends BaseEntity {
     @UpdateTimestamp
     @Column
     private Instant updateTimestamp;
-
     
     public Instant getCreationTimestamp() {
         return creationTimestamp;
