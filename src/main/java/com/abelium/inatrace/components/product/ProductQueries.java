@@ -2,12 +2,12 @@ package com.abelium.inatrace.components.product;
 
 import javax.transaction.Transactional;
 
+import com.abelium.inatrace.components.common.BaseService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.common.BaseEngine;
 import com.abelium.inatrace.db.entities.product.ProductLabel;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.Queries;
@@ -15,7 +15,7 @@ import com.abelium.inatrace.types.UserRole;
 
 @Lazy
 @Component
-public class ProductQueries extends BaseEngine {
+public class ProductQueries extends BaseService {
 	
 	@Transactional
 	public ProductLabel fetchProductLabel(CustomUserDetails authUser, Long id) throws ApiException {

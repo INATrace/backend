@@ -1,6 +1,6 @@
 package com.abelium.inatrace.security.service;
 
-import com.abelium.inatrace.components.user.UserEngine;
+import com.abelium.inatrace.components.user.UserService;
 import com.abelium.inatrace.db.entities.common.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class CustomUserDetailsServiceImpl implements UserDetailsService {
 	
     @Autowired
-    private UserEngine userEngine;
+    private UserService userEngine;
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {

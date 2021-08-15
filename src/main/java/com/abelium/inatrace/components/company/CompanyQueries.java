@@ -1,17 +1,8 @@
 package com.abelium.inatrace.components.company;
 
-import java.util.List;
-import java.util.Optional;
-
-import javax.transaction.Transactional;
-
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
-import org.torpedoquery.jpa.Torpedo;
-
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.common.BaseEngine;
+import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.company.api.ApiCompanyUser;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyTranslation;
@@ -21,10 +12,17 @@ import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.CompanyStatus;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserRole;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+import org.torpedoquery.jpa.Torpedo;
+
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 
 @Lazy
 @Component
-public class CompanyQueries extends BaseEngine {
+public class CompanyQueries extends BaseService {
 
 	@Transactional
 	public Company fetchCompany(Long companyId) throws ApiException {
@@ -59,9 +57,9 @@ public class CompanyQueries extends BaseEngine {
 
 	@Transactional
 	public Company fetchCompany(CustomUserDetails authUser, Long companyId) throws ApiException {
-		if (authUser.getUserRole() == UserRole.ADMIN) 
+		if (authUser.getUserRole() == UserRole.ADMIN)
 			return fetchCompany(companyId);
-		
+
 		CompanyUser cuProxy = Torpedo.from(CompanyUser.class);
 		Torpedo.where(cuProxy.getCompany().getId()).eq(companyId).
 			and(cuProxy.getUser().getId()).eq(authUser.getUserId());

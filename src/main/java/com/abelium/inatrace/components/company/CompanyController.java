@@ -1,44 +1,29 @@
 package com.abelium.inatrace.components.company;
 
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.ApiDefaultResponse;
 import com.abelium.inatrace.api.ApiPaginatedResponse;
 import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.company.api.ApiCompany;
-import com.abelium.inatrace.components.company.api.ApiCompanyActionRequest;
-import com.abelium.inatrace.components.company.api.ApiCompanyGet;
-import com.abelium.inatrace.components.company.api.ApiCompanyListResponse;
-import com.abelium.inatrace.components.company.api.ApiCompanyUpdate;
-import com.abelium.inatrace.components.company.api.ApiListCompaniesRequest;
+import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/company")
 public class CompanyController {
 	
 	@Autowired
-	private CompanyEngine companyEngine;
+	private CompanyService companyEngine;
 	
     @PostMapping(value = "/create")
     @ApiOperation(value = "Create a new company (with the logged-in user as company admin)")

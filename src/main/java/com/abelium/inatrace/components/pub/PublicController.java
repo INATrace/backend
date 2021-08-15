@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.abelium.inatrace.components.analytics.RequestLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,14 +20,13 @@ import com.abelium.inatrace.api.ApiDefaultResponse;
 import com.abelium.inatrace.api.ApiPaginatedResponse;
 import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.analytics.RequestLogEngine;
 import com.abelium.inatrace.components.analytics.api.ApiLogRequest;
-import com.abelium.inatrace.components.common.CommonEngine;
-import com.abelium.inatrace.components.common.GlobalSettingsEngine;
+import com.abelium.inatrace.components.common.CommonService;
+import com.abelium.inatrace.components.common.GlobalSettingsService;
 import com.abelium.inatrace.components.common.api.ApiGlobalSettingsValue;
-import com.abelium.inatrace.components.company.CompanyEngine;
+import com.abelium.inatrace.components.company.CompanyService;
 import com.abelium.inatrace.components.company.api.ApiCompanyPublic;
-import com.abelium.inatrace.components.product.ProductEngine;
+import com.abelium.inatrace.components.product.ProductService;
 import com.abelium.inatrace.components.product.api.ApiKnowledgeBlog;
 import com.abelium.inatrace.components.product.api.ApiListProductLabelFeedbackRequest;
 import com.abelium.inatrace.components.product.api.ApiLocation;
@@ -45,22 +45,22 @@ import io.swagger.annotations.ApiParam;
 public class PublicController {
 	
 	@Autowired
-	private CompanyEngine companyEngine;
+	private CompanyService companyEngine;
 	
 	@Autowired
-	private ProductEngine productEngine;
+	private ProductService productEngine;
 	
 	//	@Autowired
-	//	private NotificationEngine notificationEngine;
+	//	private NotificationService notificationEngine;
 	
     @Autowired
-    private CommonEngine commonEngine;
+    private CommonService commonEngine;
     
 	@Autowired
-	private RequestLogEngine requestLogEngine;
+	private RequestLogService requestLogEngine;
 	
     @Autowired
-    private GlobalSettingsEngine globalSettingsEngine;
+    private GlobalSettingsService globalSettingsEngine;
     
 
 	//    @GetMapping(value = "/test")

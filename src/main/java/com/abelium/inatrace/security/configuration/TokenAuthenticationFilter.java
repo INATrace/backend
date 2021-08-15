@@ -1,5 +1,6 @@
 package com.abelium.inatrace.security.configuration;
 
+import com.abelium.inatrace.components.common.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,6 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.abelium.inatrace.components.common.TokenEngine;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -25,7 +25,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     protected final Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
 
     @Autowired
-    private TokenEngine tokenEngine;
+    private TokenService tokenEngine;
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {

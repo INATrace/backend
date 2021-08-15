@@ -1,6 +1,6 @@
 package com.abelium.inatrace.components.analytics;
 
-import com.abelium.inatrace.components.common.BaseEngine;
+import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.analytics.AnalyticsAggregate;
 import com.abelium.inatrace.db.entities.analytics.AnalyticsAggregateItem;
 import com.abelium.inatrace.db.entities.analytics.RequestLog;
@@ -15,7 +15,7 @@ import java.util.*;
 
 @Lazy
 @Component
-public class AnalyticsQueries extends BaseEngine {
+public class AnalyticsQueries extends BaseService {
 	
 	@FunctionalInterface
 	public interface AggregateUpdate {

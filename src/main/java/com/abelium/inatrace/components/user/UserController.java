@@ -41,7 +41,7 @@ import io.swagger.annotations.ApiOperation;
 public class UserController {
 	
 	@Autowired
-	private UserEngine userEngine;
+	private UserService userEngine;
 	
     @PostMapping(value = "/login")
     @ApiOperation(value = "Logs in a user")

@@ -1,50 +1,24 @@
 package com.abelium.inatrace.components.product;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.ApiDefaultResponse;
 import com.abelium.inatrace.api.ApiPaginatedResponse;
 import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
-import com.abelium.inatrace.components.product.api.ApiKnowledgeBlog;
-import com.abelium.inatrace.components.product.api.ApiKnowledgeBlogBase;
-import com.abelium.inatrace.components.product.api.ApiListCollectorsRequest;
-import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
-import com.abelium.inatrace.components.product.api.ApiListKnowledgeBlogRequest;
-import com.abelium.inatrace.components.product.api.ApiListProductLabelBatchesRequest;
-import com.abelium.inatrace.components.product.api.ApiListProductsRequest;
-import com.abelium.inatrace.components.product.api.ApiProduct;
-import com.abelium.inatrace.components.product.api.ApiUserCustomer;
-import com.abelium.inatrace.components.product.api.ApiProductLabel;
-import com.abelium.inatrace.components.product.api.ApiProductLabelAnalytics;
-import com.abelium.inatrace.components.product.api.ApiProductLabelBase;
-import com.abelium.inatrace.components.product.api.ApiProductLabelBatch;
-import com.abelium.inatrace.components.product.api.ApiProductLabelContent;
-import com.abelium.inatrace.components.product.api.ApiProductLabelValues;
-import com.abelium.inatrace.components.product.api.ApiProductLabelUpdateValues;
-import com.abelium.inatrace.components.product.api.ApiProductListResponse;
+import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.product.types.ProductLabelAction;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
 
 
 @RestController
@@ -52,10 +26,10 @@ import io.swagger.annotations.ApiParam;
 public class ProductController {
 	
 	@Autowired
-	private ProductEngine productEngine;
+	private ProductService productEngine;
 	
 	@Autowired
-	private ProductDocumentEngine productDocumentEngine;
+	private ProductDocumentService productDocumentEngine;
 
 	
     @PostMapping(value = "/create")

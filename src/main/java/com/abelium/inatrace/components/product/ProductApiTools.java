@@ -2,7 +2,7 @@ package com.abelium.inatrace.components.product;
 
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.CommonApiTools;
-import com.abelium.inatrace.components.common.CommonEngine;
+import com.abelium.inatrace.components.common.CommonService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.company.CompanyApiTools;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public class ProductApiTools {
 	
 	@Autowired
-	private CommonEngine commonEngine;
+	private CommonService commonEngine;
 	
 	@Autowired
 	private CommonApiTools commonApiTools;	

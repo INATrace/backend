@@ -1,0 +1,59 @@
+package com.abelium.inatrace.components.codebook.processing_evidence_type;
+
+import com.abelium.inatrace.api.ApiDefaultResponse;
+import com.abelium.inatrace.api.ApiPaginatedRequest;
+import com.abelium.inatrace.api.ApiPaginatedResponse;
+import com.abelium.inatrace.api.ApiResponse;
+import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+/**
+ * REST controller for processing evidence type entity.
+ *
+ * @author Pece Adjievski, Sunesis d.o.o.
+ */
+@RestController
+@RequestMapping("/chain/processing-evidence-type")
+public class ProcessingEvidenceTypeController {
+
+	private final ProcessingEvidenceTypeService processingEvidenceTypeService;
+
+	@Autowired
+	public ProcessingEvidenceTypeController(ProcessingEvidenceTypeService processingEvidenceTypeService) {
+		this.processingEvidenceTypeService = processingEvidenceTypeService;
+	}
+
+	@GetMapping("list")
+	@ApiOperation("Get a paginated list of processing evidence types.")
+	public ApiPaginatedResponse<ApiProcessingEvidenceType> getProcessingEvidenceTypeList(@Valid ApiPaginatedRequest request) {
+
+		return null;
+	}
+
+	@GetMapping("{id}")
+	@ApiOperation("Get a single processing evidence type with the provided ID.")
+	public ApiResponse<ApiProcessingEvidenceType> getProcessingEvidenceType(@Valid @ApiParam(value = "Processing evidence type ID", required = true) @PathVariable("id") Long id) {
+
+		return null;
+	}
+
+	@PutMapping
+	@ApiOperation("Create or update processing evidence type. If ID is provided, the entity with the provided ID is updated.")
+	public ApiResponse<ApiProcessingEvidenceType> createOrUpdateProcessingEvidenceType(@Valid @RequestBody ApiProcessingEvidenceType apiProcessingEvidenceType) {
+
+		return null;
+	}
+
+	@DeleteMapping("{id}")
+	@ApiOperation("Deletes a processing evidence type with the provided ID.")
+	public ApiDefaultResponse deleteProcessingEvidenceType(@Valid @ApiParam(value = "Processing evidence type ID", required = true) @PathVariable("id") Long id) {
+
+		return new ApiDefaultResponse();
+	}
+
+}

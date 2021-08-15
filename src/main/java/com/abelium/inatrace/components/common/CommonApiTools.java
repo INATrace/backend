@@ -21,7 +21,7 @@ import com.abelium.inatrace.db.entities.common.GeoAddress;
 public class CommonApiTools {
 	
 	@Autowired
-	private CommonEngine commonEngine;
+	private CommonService commonEngine;
 	
 	public static void updateApiBaseEntity(ApiBaseEntity apiEntity, BaseEntity entity) {
 		apiEntity.id = entity.getId();

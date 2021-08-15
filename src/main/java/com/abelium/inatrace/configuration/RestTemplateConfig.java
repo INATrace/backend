@@ -15,8 +15,8 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-public class RestTemplateConfig
-{
+public class RestTemplateConfig {
+
     @Autowired
     private RestTemplateAutoConfiguration restTemplateConfiguration;
     

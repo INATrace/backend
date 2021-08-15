@@ -1,36 +1,25 @@
 package com.abelium.inatrace.components.company;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
-
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.CommonApiTools;
-import com.abelium.inatrace.components.common.CommonEngine;
+import com.abelium.inatrace.components.common.CommonService;
 import com.abelium.inatrace.components.common.api.ApiCertification;
-import com.abelium.inatrace.components.company.api.ApiCompany;
-import com.abelium.inatrace.components.company.api.ApiCompanyDocument;
-import com.abelium.inatrace.components.company.api.ApiCompanyGet;
-import com.abelium.inatrace.components.company.api.ApiCompanyListResponse;
-import com.abelium.inatrace.components.company.api.ApiCompanyPublic;
-import com.abelium.inatrace.components.company.api.ApiCompanyUpdate;
-import com.abelium.inatrace.components.company.api.ApiCompanyUser;
+import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.company.types.CompanyTranslatables;
 import com.abelium.inatrace.components.user.UserApiTools;
 import com.abelium.inatrace.components.user.UserQueries;
-import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.db.entities.company.CompanyCertification;
-import com.abelium.inatrace.db.entities.company.CompanyDocument;
-import com.abelium.inatrace.db.entities.company.CompanyTranslation;
-import com.abelium.inatrace.db.entities.company.CompanyUser;
+import com.abelium.inatrace.db.entities.company.*;
 import com.abelium.inatrace.tools.ListTools;
 import com.abelium.inatrace.types.Language;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Lazy
@@ -38,7 +27,7 @@ import com.abelium.inatrace.types.Language;
 public class CompanyApiTools {
 	
 	@Autowired
-	private CommonEngine commonEngine;
+	private CommonService commonEngine;
 
 	@Autowired
 	private CommonApiTools commonApiTools;

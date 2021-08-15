@@ -42,7 +42,7 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	/**
 	 * high-resolution logo of the company (jpeg, jpg, png)
 	 */
-	@ManyToOne
+	@OneToOne
 	private Document logo;
 	
 	@Embedded

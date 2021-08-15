@@ -1,22 +1,5 @@
 package com.abelium.inatrace.components.common;
 
-import java.io.IOException;
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.abelium.inatrace.api.ApiDefaultResponse;
 import com.abelium.inatrace.api.ApiPaginatedQueryStringRequest;
 import com.abelium.inatrace.api.ApiPaginatedResponse;
@@ -27,18 +10,27 @@ import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.components.common.api.ApiGlobalSettingsValue;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.DocumentType;
-
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/common")
 public class CommonController 
 {
     @Autowired
-    private CommonEngine commonEngine;
+    private CommonService commonEngine;
     
     @Autowired
-    private GlobalSettingsEngine globalSettingsEngine;
+    private GlobalSettingsService globalSettingsEngine;
     
     
     @ApiOperation(value = "List countries")

@@ -23,10 +23,10 @@ import java.util.EnumSet;
 
 @Lazy
 @Service
-public class CommonEngine extends BaseEngine {
+public class CommonService extends BaseService {
 	
 	@Autowired
-	private StorageEngine storageEngine;
+	private StorageService storageEngine;
 
     private Country countryListQueryObject(ApiPaginatedQueryStringRequest request) {
         Country cProxy = Torpedo.from(Country.class);
