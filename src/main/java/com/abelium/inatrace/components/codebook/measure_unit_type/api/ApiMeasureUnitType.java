@@ -12,8 +12,19 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class ApiMeasureUnitType extends ApiCodebookBaseEntity {
 
-	@ApiModelProperty(value = "the underlying measurement unit type", position = 3)
+	@ApiModelProperty(value = "the weight of the measurement unit type", position = 3)
+	private Integer weight;
+
+	@ApiModelProperty(value = "the underlying measurement unit type", position = 4)
 	private ApiMeasureUnitType underlyingMeasurementUnitType;
+
+	public Integer getWeight() {
+		return weight;
+	}
+
+	public void setWeight(Integer weight) {
+		this.weight = weight;
+	}
 
 	public ApiMeasureUnitType getUnderlyingMeasurementUnitType() {
 		return underlyingMeasurementUnitType;
