@@ -32,7 +32,7 @@ public class FacilityTypeController {
 	@ApiOperation("Get a paginated list of facility types.")
 	public ApiPaginatedResponse<ApiFacilityType> getFacilityTypeList(@Valid ApiPaginatedRequest request) {
 
-		return null;
+		return new ApiPaginatedResponse<>(facilityTypeService.getFacilityTypeList(request));
 	}
 
 	@GetMapping("{id}")

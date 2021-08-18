@@ -14,6 +14,8 @@ import javax.validation.Valid;
 
 /**
  * REST controller for grade abbreviation entity.
+ *
+ * @author Pece Adjievski, Sunesis d.o.o.
  */
 @RestController
 @RequestMapping("/chain/grade-abbreviation")
@@ -30,7 +32,7 @@ public class GradeAbbreviationController {
 	@ApiOperation("Get a paginated list of grade abbreviations.")
 	public ApiPaginatedResponse<ApiGradeAbbreviation> getGradeAbbreviationList(@Valid ApiPaginatedRequest request) {
 
-		return null;
+		return new ApiPaginatedResponse<>(gradeAbbreviationService.getGradeAbbreviationList(request));
 	}
 
 	@GetMapping("{id}")

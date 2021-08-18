@@ -32,26 +32,29 @@ public class ProcessingEvidenceTypeController {
 	@ApiOperation("Get a paginated list of processing evidence types.")
 	public ApiPaginatedResponse<ApiProcessingEvidenceType> getProcessingEvidenceTypeList(@Valid ApiPaginatedRequest request) {
 
-		return null;
+		return new ApiPaginatedResponse<>(processingEvidenceTypeService.getProcEvidenceTypeList(request));
 	}
 
 	@GetMapping("{id}")
 	@ApiOperation("Get a single processing evidence type with the provided ID.")
-	public ApiResponse<ApiProcessingEvidenceType> getProcessingEvidenceType(@Valid @ApiParam(value = "Processing evidence type ID", required = true) @PathVariable("id") Long id) {
+	public ApiResponse<ApiProcessingEvidenceType> getProcessingEvidenceType(
+			@Valid @ApiParam(value = "Processing evidence type ID", required = true) @PathVariable("id") Long id) {
 
 		return null;
 	}
 
 	@PutMapping
 	@ApiOperation("Create or update processing evidence type. If ID is provided, the entity with the provided ID is updated.")
-	public ApiResponse<ApiProcessingEvidenceType> createOrUpdateProcessingEvidenceType(@Valid @RequestBody ApiProcessingEvidenceType apiProcessingEvidenceType) {
+	public ApiResponse<ApiProcessingEvidenceType> createOrUpdateProcessingEvidenceType(
+			@Valid @RequestBody ApiProcessingEvidenceType apiProcessingEvidenceType) {
 
 		return null;
 	}
 
 	@DeleteMapping("{id}")
 	@ApiOperation("Deletes a processing evidence type with the provided ID.")
-	public ApiDefaultResponse deleteProcessingEvidenceType(@Valid @ApiParam(value = "Processing evidence type ID", required = true) @PathVariable("id") Long id) {
+	public ApiDefaultResponse deleteProcessingEvidenceType(
+			@Valid @ApiParam(value = "Processing evidence type ID", required = true) @PathVariable("id") Long id) {
 
 		return new ApiDefaultResponse();
 	}

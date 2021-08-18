@@ -35,7 +35,7 @@ public class ActionTypeService extends BaseService {
 				QueryTools.orderBy(request.sort, actionTypeProxy.getCode());
 				break;
 			case "label":
-				QueryTools.orderBy(request.sort, actionTypeProxy.getFacilityType());
+				QueryTools.orderBy(request.sort, actionTypeProxy.getLabel());
 				break;
 			default:
 				QueryTools.orderBy(request.sort, actionTypeProxy.getId());
@@ -62,6 +62,10 @@ public class ActionTypeService extends BaseService {
 			entity.setCode(apiActionType.getCode());
 		}
 		entity.setLabel(apiActionType.getLabel());
+
+		if (entity.getId() == null) {
+			em.persist(entity);
+		}
 
 		return new ApiBaseEntity(entity);
 	}
