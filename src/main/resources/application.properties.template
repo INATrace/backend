@@ -73,7 +73,8 @@ spring.thymeleaf.cache = false
 
 # SMTP settings (Amazon SES)
 spring.mail.protocol = smtps
-spring.mail.host = 
+spring.mail.host =
+spring.mail.port = 1025
 spring.mail.username =  
 spring.mail.password = 
 spring.mail.properties.mail.smtp.ssl.checkserveridentity = true
@@ -84,7 +85,6 @@ spring.mail.properties.mail.smtp.timeout = 3000
 spring.mail.properties.mail.smtp.writetimeout = 5000
 # set to true to log smtp server requests/responses
 spring.mail.properties.mail.debug = false
-
 
 # mail template properties
 INATrace.mail.template.from = 
@@ -120,10 +120,10 @@ INATrace.documents.root = documents/
 INATrace.fileStorage.root = /home/backend/file_storage/
 
 # url (prefix) for email confirmation after registration
-INATrace.emailConfirmation.url =
+INATrace.emailConfirmation.url = http://localhost:4200/confirm-email/
 
 # url (prefix) for password reset
-INATrace.passwordReset.url =
+INATrace.passwordReset.url = http://localhost:4200/reset-password/
 
 # prefix for FE
 INATrace.fe.url = 
