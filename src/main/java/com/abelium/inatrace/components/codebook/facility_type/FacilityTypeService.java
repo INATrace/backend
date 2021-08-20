@@ -1,15 +1,21 @@
 package com.abelium.inatrace.components.codebook.facility_type;
 
+import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
+import com.abelium.inatrace.api.ApiStatus;
+import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
 import com.abelium.inatrace.tools.PaginationTools;
+import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
+
+import javax.transaction.Transactional;
 
 /**
  * Service for facility type entity.
@@ -42,6 +48,37 @@ public class FacilityTypeService extends BaseService {
 		}
 
 		return facilityTypeProxy;
+	}
+
+	@Transactional
+	public ApiBaseEntity createOrUpdateFacilityType(ApiFacilityType apiFacilityType) throws ApiException {
+
+		FacilityType entity;
+
+		if (apiFacilityType.getId() != null) {
+			entity = fetchFacilityType(apiFacilityType.getId());
+		} else {
+
+			entity = new FacilityType();
+			entity.setCode(apiFacilityType.getCode());
+		}
+		entity.setLabel(entity.getLabel());
+
+		if (entity.getId() == null) {
+			em.persist(entity);
+		}
+
+		return new ApiBaseEntity(entity);
+	}
+
+	public FacilityType fetchFacilityType(Long id) throws ApiException {
+
+		FacilityType facilityType = Queries.get(em, FacilityType.class, id);
+		if (facilityType == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid facility type ID");
+		}
+
+		return facilityType;
 	}
 
 }

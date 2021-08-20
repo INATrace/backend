@@ -103,7 +103,7 @@ public class MeasureUnitTypeService extends BaseService {
 
 		MeasureUnitType measureUnitType = Queries.get(em, MeasureUnitType.class, id);
 		if (measureUnitType == null) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid measure unit type");
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid measure unit type ID");
 		}
 
 		return measureUnitType;

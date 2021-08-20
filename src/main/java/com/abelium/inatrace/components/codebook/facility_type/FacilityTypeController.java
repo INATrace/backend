@@ -1,9 +1,7 @@
 package com.abelium.inatrace.components.codebook.facility_type;
 
-import com.abelium.inatrace.api.ApiDefaultResponse;
-import com.abelium.inatrace.api.ApiPaginatedRequest;
-import com.abelium.inatrace.api.ApiPaginatedResponse;
-import com.abelium.inatrace.api.ApiResponse;
+import com.abelium.inatrace.api.*;
+import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -44,9 +42,10 @@ public class FacilityTypeController {
 
 	@PutMapping
 	@ApiOperation("Create or update facility type. If ID is provided, the entity entity with the provided ID is updated.")
-	public ApiResponse<ApiFacilityType> createOrUpdateFacilityType(@Valid @RequestBody ApiFacilityType apiFacilityType) {
+	public ApiResponse<ApiBaseEntity> createOrUpdateFacilityType(
+			@Valid @RequestBody ApiFacilityType apiFacilityType) throws ApiException {
 
-		return null;
+		return new ApiResponse<>(facilityTypeService.createOrUpdateFacilityType(apiFacilityType));
 	}
 
 	@DeleteMapping("{id}")

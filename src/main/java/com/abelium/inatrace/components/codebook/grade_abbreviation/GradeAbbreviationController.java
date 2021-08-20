@@ -1,9 +1,7 @@
 package com.abelium.inatrace.components.codebook.grade_abbreviation;
 
-import com.abelium.inatrace.api.ApiDefaultResponse;
-import com.abelium.inatrace.api.ApiPaginatedRequest;
-import com.abelium.inatrace.api.ApiPaginatedResponse;
-import com.abelium.inatrace.api.ApiResponse;
+import com.abelium.inatrace.api.*;
+import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.grade_abbreviation.api.ApiGradeAbbreviation;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -44,9 +42,10 @@ public class GradeAbbreviationController {
 
 	@PutMapping
 	@ApiOperation("Create or update grade abbreviation. If ID is provided, the entity with the provided ID is updated.")
-	public ApiResponse<ApiGradeAbbreviation> createOrUpdateGradeAbbreviation(@Valid @RequestBody ApiGradeAbbreviation apiGradeAbbreviation) {
+	public ApiResponse<ApiBaseEntity> createOrUpdateGradeAbbreviation(
+			@Valid @RequestBody ApiGradeAbbreviation apiGradeAbbreviation) throws ApiException {
 
-		return null;
+		return new ApiResponse<>(gradeAbbreviationService.createOrUpdateGradeAbbreviation(apiGradeAbbreviation));
 	}
 
 	@DeleteMapping("{id}")
