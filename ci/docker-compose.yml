@@ -18,7 +18,7 @@ services:
 
   inatrace-backend:
     image: ${IMAGE_NAME}:${TAG}
-    container_name: inatrace-backend
+    container_name: inatrace-be
     environment:
       - INATRACE_DATABASE_NAME=${DATABASE_NAME}
       - INATRACE_DATABASE_HOSTNAME=inatrace-mysql
