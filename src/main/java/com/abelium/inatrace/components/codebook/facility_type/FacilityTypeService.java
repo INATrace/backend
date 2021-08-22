@@ -50,6 +50,11 @@ public class FacilityTypeService extends BaseService {
 		return facilityTypeProxy;
 	}
 
+	public ApiFacilityType getFacilityType(Long id) throws ApiException {
+
+		return FacilityTypeMapper.toApiFacilityType(fetchFacilityType(id));
+	}
+
 	@Transactional
 	public ApiBaseEntity createOrUpdateFacilityType(ApiFacilityType apiFacilityType) throws ApiException {
 
@@ -62,13 +67,20 @@ public class FacilityTypeService extends BaseService {
 			entity = new FacilityType();
 			entity.setCode(apiFacilityType.getCode());
 		}
-		entity.setLabel(entity.getLabel());
+		entity.setLabel(apiFacilityType.getLabel());
 
 		if (entity.getId() == null) {
 			em.persist(entity);
 		}
 
 		return new ApiBaseEntity(entity);
+	}
+
+	@Transactional
+	public void deleteFacilityType(Long id) throws ApiException {
+
+		FacilityType facilityType = fetchFacilityType(id);
+		em.remove(facilityType);
 	}
 
 	public FacilityType fetchFacilityType(Long id) throws ApiException {

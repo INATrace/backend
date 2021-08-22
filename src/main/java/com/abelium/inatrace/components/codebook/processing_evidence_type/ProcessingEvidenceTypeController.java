@@ -36,9 +36,9 @@ public class ProcessingEvidenceTypeController {
 	@GetMapping("{id}")
 	@ApiOperation("Get a single processing evidence type with the provided ID.")
 	public ApiResponse<ApiProcessingEvidenceType> getProcessingEvidenceType(
-			@Valid @ApiParam(value = "Processing evidence type ID", required = true) @PathVariable("id") Long id) {
+			@Valid @ApiParam(value = "Processing evidence type ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
-		return null;
+		return new ApiResponse<>(processingEvidenceTypeService.getProcessingEvidenceType(id));
 	}
 
 	@PutMapping
@@ -53,8 +53,9 @@ public class ProcessingEvidenceTypeController {
 	@DeleteMapping("{id}")
 	@ApiOperation("Deletes a processing evidence type with the provided ID.")
 	public ApiDefaultResponse deleteProcessingEvidenceType(
-			@Valid @ApiParam(value = "Processing evidence type ID", required = true) @PathVariable("id") Long id) {
+			@Valid @ApiParam(value = "Processing evidence type ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
+		processingEvidenceTypeService.deleteProcessingEvidenceType(id);
 		return new ApiDefaultResponse();
 	}
 

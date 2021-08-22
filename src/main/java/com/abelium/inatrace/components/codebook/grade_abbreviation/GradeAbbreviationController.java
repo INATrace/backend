@@ -35,9 +35,10 @@ public class GradeAbbreviationController {
 
 	@GetMapping("{id}")
 	@ApiOperation("Get a single grade abbreviation with the provided ID.")
-	public ApiResponse<ApiGradeAbbreviation> getGradeAbbreviation(@Valid @ApiParam(value = "Grade abbreviation ID", required = true) @PathVariable("id") Long id) {
+	public ApiResponse<ApiGradeAbbreviation> getGradeAbbreviation(
+			@Valid @ApiParam(value = "Grade abbreviation ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
-		return null;
+		return new ApiResponse<>(gradeAbbreviationService.getGradeAbbreviation(id));
 	}
 
 	@PutMapping
@@ -50,8 +51,10 @@ public class GradeAbbreviationController {
 
 	@DeleteMapping("{id}")
 	@ApiOperation("Deletes a grade abbreviation with the provided ID.")
-	public ApiDefaultResponse deleteGradeAbbreviation(@Valid @ApiParam(value = "Grade abbreviation ID", required = true) @PathVariable("id") Long id) {
+	public ApiDefaultResponse deleteGradeAbbreviation(
+			@Valid @ApiParam(value = "Grade abbreviation ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
+		gradeAbbreviationService.deleteGradeAbbreviation(id);
 		return new ApiDefaultResponse();
 	}
 

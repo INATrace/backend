@@ -50,6 +50,11 @@ public class ProcessingEvidenceTypeService extends BaseService {
 		return processingEvidenceType;
 	}
 
+	public ApiProcessingEvidenceType getProcessingEvidenceType(Long id) throws ApiException {
+
+		return ProcessingEvidenceTypeMapper.toApiProcessingEvidenceType(fetchProcessingEvidenceType(id));
+	}
+
 	@Transactional
 	public ApiBaseEntity createOrUpdateProcessingEvidenceType(ApiProcessingEvidenceType apiProcessingEvidenceType) throws ApiException {
 
@@ -77,6 +82,13 @@ public class ProcessingEvidenceTypeService extends BaseService {
 		}
 
 		return new ApiBaseEntity(entity);
+	}
+
+	@Transactional
+	public void deleteProcessingEvidenceType(Long id) throws ApiException {
+
+		ProcessingEvidenceType processingEvidenceType = fetchProcessingEvidenceType(id);
+		em.remove(processingEvidenceType);
 	}
 
 	public ProcessingEvidenceType fetchProcessingEvidenceType(Long id) throws ApiException {

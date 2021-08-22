@@ -35,9 +35,10 @@ public class FacilityTypeController {
 
 	@GetMapping("{id}")
 	@ApiOperation("Get a single facility type with the provided ID.")
-	public ApiResponse<ApiFacilityType> getFacilityType(@Valid @ApiParam(value = "Facility type ID", required = true) @PathVariable("id") Long id) {
+	public ApiResponse<ApiFacilityType> getFacilityType(
+			@Valid @ApiParam(value = "Facility type ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
-		return null;
+		return new ApiResponse<>(facilityTypeService.getFacilityType(id));
 	}
 
 	@PutMapping
@@ -50,8 +51,10 @@ public class FacilityTypeController {
 
 	@DeleteMapping("{id}")
 	@ApiOperation("Deletes a facility type with the provided ID.")
-	public ApiDefaultResponse deleteFacilityType(@Valid @ApiParam(value = "Facility type ID", required = true) @PathVariable("id") Long id) {
+	public ApiDefaultResponse deleteFacilityType(
+			@Valid @ApiParam(value = "Facility type ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
+		facilityTypeService.deleteFacilityType(id);
 		return new ApiDefaultResponse();
 	}
 }

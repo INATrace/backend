@@ -6,7 +6,6 @@ import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.grade_abbreviation.api.ApiGradeAbbreviation;
-import com.abelium.inatrace.components.codebook.grade_abbreviation.api.GradeAbbreviationMapper;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.GradeAbbreviationType;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -29,11 +28,11 @@ public class GradeAbbreviationService extends BaseService {
 
 	public ApiPaginatedList<ApiGradeAbbreviation> getGradeAbbreviationList(ApiPaginatedRequest request) {
 
-		return PaginationTools.createPaginatedResponse(em, request, () -> gradeAbrvQueryObject(request),
+		return PaginationTools.createPaginatedResponse(em, request, () -> gradeAbbreviationQueryObject(request),
 				GradeAbbreviationMapper::toApiGradeAbbreviation);
 	}
 
-	private GradeAbbreviationType gradeAbrvQueryObject(ApiPaginatedRequest request) {
+	private GradeAbbreviationType gradeAbbreviationQueryObject(ApiPaginatedRequest request) {
 
 		GradeAbbreviationType gradeAbbreviationType = Torpedo.from(GradeAbbreviationType.class);
 
@@ -49,6 +48,11 @@ public class GradeAbbreviationService extends BaseService {
 		}
 
 		return gradeAbbreviationType;
+	}
+
+	public ApiGradeAbbreviation getGradeAbbreviation(Long id) throws ApiException {
+
+		return GradeAbbreviationMapper.toApiGradeAbbreviation(fetchGradeAbbreviationType(id));
 	}
 
 	@Transactional
@@ -70,6 +74,13 @@ public class GradeAbbreviationService extends BaseService {
 		}
 
 		return new ApiBaseEntity(entity);
+	}
+
+	@Transactional
+	public void deleteGradeAbbreviation(Long id) throws ApiException {
+
+		GradeAbbreviationType gradeAbbreviationType = fetchGradeAbbreviationType(id);
+		em.remove(gradeAbbreviationType);
 	}
 
 	public GradeAbbreviationType fetchGradeAbbreviationType(Long id) throws ApiException {

@@ -1,5 +1,6 @@
-package com.abelium.inatrace.components.codebook.grade_abbreviation.api;
+package com.abelium.inatrace.components.codebook.grade_abbreviation;
 
+import com.abelium.inatrace.components.codebook.grade_abbreviation.api.ApiGradeAbbreviation;
 import com.abelium.inatrace.db.entities.codebook.GradeAbbreviationType;
 
 /**
