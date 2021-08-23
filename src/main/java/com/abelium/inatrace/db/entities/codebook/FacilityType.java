@@ -15,9 +15,6 @@ import javax.persistence.ManyToOne;
 @Entity
 public class FacilityType extends CodebookBaseEntity {
   
-  @ManyToOne(fetch = FetchType.LAZY)
-  private Facility facility;
-
 	public FacilityType() {
 		super();
 	}

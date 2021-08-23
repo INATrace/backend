@@ -7,7 +7,11 @@ import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.facility.api.ApiFacility;
 import com.abelium.inatrace.components.common.BaseService;
+import com.abelium.inatrace.db.entities.codebook.FacilityType;
+import com.abelium.inatrace.db.entities.common.Address;
+import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.facility.Facility;
+import com.abelium.inatrace.db.entities.facility.FacilityLocation;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -29,22 +33,14 @@ public class FacilityService extends BaseService {
 
   public ApiPaginatedList<ApiFacility> getFacilityList(ApiPaginatedRequest request) {
 
-    return PaginationTools
-      .createPaginatedResponse(
-        em, 
-        request, 
-        () -> facilityQueryObject(request),
-        FacilityMapper::toApiFacility
-      );
+    return PaginationTools.createPaginatedResponse(em, request, () -> facilityQueryObject(request),
+      FacilityMapper::toApiFacility);
 
   }
 
   private Facility facilityQueryObject(ApiPaginatedRequest request) {
 
     Facility facilityProxy = Torpedo.from(Facility.class);
-
-    // TODO: By which attributes are we gonna be able to sortBy?
-    // I've set name and id for a facility
     switch (request.sortBy) {
       case "name":
         QueryTools.orderBy(request.sort, facilityProxy.getName());
@@ -65,16 +61,45 @@ public class FacilityService extends BaseService {
   public ApiBaseEntity createOrUpdateFacility(ApiFacility apiFacility) throws ApiException {
 
     Facility entity;
-    
     if (apiFacility.getId() != null) {
+
       entity = fetchFacility(apiFacility.getId());
+
     } else {
+
       entity = new Facility();
-      // TODO: Are also facilities containing code and label?
-      // Still not sure what those fields are
-//      entity.setCode(apiFacility.getCode());
+
+      entity.setName(apiFacility.getName());
+      entity.setIsCollectionFacility(apiFacility.getIsCollectionFacility());
+      entity.setIsPublic(apiFacility.getIsPublic());
+
+      FacilityLocation facilityLocation = new FacilityLocation();
+      facilityLocation.setLatitude(apiFacility.getFacilityLocation().getLatitude());
+      facilityLocation.setLongitude(apiFacility.getFacilityLocation().getLongitude());
+      facilityLocation.setNumberOfFarmers(apiFacility.getFacilityLocation().getNumberOfFarmers());
+      facilityLocation.setPinName(apiFacility.getFacilityLocation().getPinName());
+
+      Address address = new Address();
+      address.setAddress(apiFacility.getFacilityLocation().getAddress().getAddress());
+      address.setCity(apiFacility.getFacilityLocation().getAddress().getCity());
+      address.setState(apiFacility.getFacilityLocation().getAddress().getState());
+      address.setZip(apiFacility.getFacilityLocation().getAddress().getZip());
+
+      Country country = new Country();
+      country.setCode(apiFacility.getFacilityLocation().getAddress().getCountry().getCode());
+      country.setName(apiFacility.getFacilityLocation().getAddress().getCountry().getName());
+
+      address.setCountry(country);
+      facilityLocation.setAddress(address);
+
+      FacilityType facilityType = new FacilityType();
+      facilityType.setCode(apiFacility.getFacilityType().getCode());
+      facilityType.setLabel(apiFacility.getFacilityType().getLabel());
+
+      entity.setFacilityLocation(facilityLocation);
+      entity.setFacilityType(facilityType);
+
     }
-//    entity.setLabel(apiFacilityType.getLabel());
 
     if (entity.getId() == null) {
       em.persist(entity);
@@ -85,8 +110,10 @@ public class FacilityService extends BaseService {
 
   @Transactional
   public void deleteFacility(Long id) throws ApiException {
+
     Facility facility = fetchFacility(id);
     em.remove(facility);
+
   }
 
   public Facility fetchFacility(Long id) throws ApiException {
@@ -97,6 +124,7 @@ public class FacilityService extends BaseService {
     }
 
     return facility;
+
   }
 
 }
