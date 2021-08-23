@@ -15,13 +15,32 @@ public final class SemiProductMapper {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static ApiSemiProduct toApiSemiProduct(SemiProduct entity) {
+	/**
+	 * Mapping the base entity attributes - no associations are included.
+	 *
+	 * @param entity DB entity.
+	 * @return API model entity.
+	 */
+	public static ApiSemiProduct toApiSemiProductBase(SemiProduct entity) {
 
 		ApiSemiProduct apiSemiProduct = new ApiSemiProduct();
-
 		apiSemiProduct.setId(entity.getId());
 		apiSemiProduct.setName(entity.getName());
 		apiSemiProduct.setDescription(entity.getDescription());
+
+		return apiSemiProduct;
+	}
+
+	/**
+	 * Mapping of the base attributes and all the associations.
+	 *
+	 * @param entity DB entity.
+	 * @return API model entity.
+	 */
+	public static ApiSemiProduct toApiSemiProduct(SemiProduct entity) {
+
+		ApiSemiProduct apiSemiProduct = SemiProductMapper.toApiSemiProductBase(entity);
+
 		apiSemiProduct.setSKU(entity.getSKU());
 		apiSemiProduct.setSKUEndCustomer(entity.getSKUEndCustomer());
 		apiSemiProduct.setBuyable(entity.getBuyable());
