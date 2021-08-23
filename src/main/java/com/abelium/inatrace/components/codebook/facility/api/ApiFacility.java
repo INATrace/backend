@@ -3,7 +3,7 @@ package com.abelium.inatrace.components.codebook.facility.api;
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
-import com.abelium.inatrace.db.entities.common.Location;
+import com.abelium.inatrace.components.product.api.ApiLocation;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,13 +11,10 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Entity;
-
 import io.swagger.annotations.ApiModelProperty;
 
 @Getter
 @Setter
-@Entity
 public class ApiFacility extends ApiBaseEntity {
 
   @ApiModelProperty(value = "") // TODO: not sure what values I should add here and for consequent fields too -
@@ -31,7 +28,7 @@ public class ApiFacility extends ApiBaseEntity {
   private Boolean isPublic;
 
   @ApiModelProperty(value = "")
-  private Location location;
+  private ApiLocation location;
 
   @ApiModelProperty(value = "")
   private List<ApiFacilityCompany> companies = new ArrayList<>();

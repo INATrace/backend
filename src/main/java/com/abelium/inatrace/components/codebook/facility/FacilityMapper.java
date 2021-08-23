@@ -21,7 +21,7 @@ public final class FacilityMapper {
     apiFacility.setName(entity.getName());
     apiFacility.setIsCollectionFacility(entity.getIsCollectionFacility());
     apiFacility.setIsPublic(entity.getIsPublic());
-    apiFacility.setLocation(entity.getLocation());
+    // apiFacility.setLocation(entity.getLocation());
     // TODO: How are you mapping collections? Is there a utility?
 
     return apiFacility;

@@ -35,8 +35,8 @@ public class Facility extends TimestampEntity {
   @Column
   private Boolean isPublic;
   
-  @OneToOne
-  private Location location;
+//  @OneToOne
+//  private Location location;
   
   @OneToMany(mappedBy = "facility")
   private List<FacilityCompany> companyFacilities = new ArrayList<>();
