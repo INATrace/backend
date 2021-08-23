@@ -7,8 +7,8 @@ import javax.persistence.Entity;
 @Entity
 public class FacilityLocation extends Location {
 
-  public FacilityLocation() {
-    super();
-  }
+	public FacilityLocation() {
+		super();
+	}
 
 }

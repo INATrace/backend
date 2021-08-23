@@ -31,42 +31,42 @@ import io.swagger.annotations.ApiParam;
 @RequestMapping("/chain/facility")
 public class FacilityController {
 
-  @Autowired
-  private FacilityService facilityService;
+	@Autowired
+	private FacilityService facilityService;
 
-  @GetMapping("list")
-  @ApiOperation("Get a paginated list of facilities.")
-  public ApiPaginatedResponse<ApiFacility> getFacilityList(@Valid ApiPaginatedRequest request) {
+	@GetMapping("list")
+	@ApiOperation("Get a paginated list of facilities.")
+	public ApiPaginatedResponse<ApiFacility> getFacilityList(@Valid ApiPaginatedRequest request) {
 
-    return new ApiPaginatedResponse<>(facilityService.getFacilityList(request));
+		return new ApiPaginatedResponse<>(facilityService.getFacilityList(request));
 
-  }
+	}
 
-  @GetMapping("{id}")
-  @ApiOperation("Get a single facility with the provided ID.")
-  public ApiResponse<ApiFacility> getFacility(
-    @Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) throws ApiException {
+	@GetMapping("{id}")
+	@ApiOperation("Get a single facility with the provided ID.")
+	public ApiResponse<ApiFacility> getFacility(
+			@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
-    return new ApiResponse<>(facilityService.getFacility(id));
-    
-  }
+		return new ApiResponse<>(facilityService.getFacility(id));
 
-  @PutMapping
-  @ApiOperation("Create or update facility. If ID is provided, then the entity with the provided ID is updated.")
-  public ApiResponse<ApiBaseEntity> createOrUpdateFacilityType(
-    @Valid @RequestBody ApiFacility apiFacility) throws ApiException {
+	}
 
-    return new ApiResponse<>(facilityService.createOrUpdateFacility(apiFacility));
+	@PutMapping
+	@ApiOperation("Create or update facility. If ID is provided, then the entity with the provided ID is updated.")
+	public ApiResponse<ApiBaseEntity> createOrUpdateFacilityType(@Valid @RequestBody ApiFacility apiFacility)
+			throws ApiException {
 
-  }
+		return new ApiResponse<>(facilityService.createOrUpdateFacility(apiFacility));
 
-  @DeleteMapping("{id}")
-  @ApiOperation("Deletes a facility with the provided ID.")
-  public ApiDefaultResponse deleteFacilityType(
-    @Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) throws ApiException {
+	}
 
-    facilityService.deleteFacility(id);
-    return new ApiDefaultResponse();
+	@DeleteMapping("{id}")
+	@ApiOperation("Deletes a facility with the provided ID.")
+	public ApiDefaultResponse deleteFacilityType(
+			@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
-  }
+		facilityService.deleteFacility(id);
+		return new ApiDefaultResponse();
+
+	}
 }

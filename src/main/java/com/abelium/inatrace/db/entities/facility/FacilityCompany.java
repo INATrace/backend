@@ -11,51 +11,50 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class FacilityCompany extends TimestampEntity {
 
-  @Version
-  private long entityVersion;
+	@Version
+	private long entityVersion;
 
-  @ManyToOne
-  @NotNull
-  private Company company;
+	@ManyToOne
+	@NotNull
+	private Company company;
 
-  @ManyToOne
-  @NotNull
-  private Facility facility;
+	@ManyToOne
+	@NotNull
+	private Facility facility;
 
-  public long getEntityVersion() {
-    return entityVersion;
-  }
+	public long getEntityVersion() {
+		return entityVersion;
+	}
 
-  public void setEntityVersion(long entityVersion) {
-    this.entityVersion = entityVersion;
-  }
+	public void setEntityVersion(long entityVersion) {
+		this.entityVersion = entityVersion;
+	}
 
-  public Company getCompany() {
-    return company;
-  }
+	public Company getCompany() {
+		return company;
+	}
 
-  public void setCompany(Company company) {
-    this.company = company;
-  }
+	public void setCompany(Company company) {
+		this.company = company;
+	}
 
-  public Facility getFacility() {
-    return facility;
-  }
+	public Facility getFacility() {
+		return facility;
+	}
 
-  public void setFacility(Facility facility) {
-    this.facility = facility;
-  }
+	public void setFacility(Facility facility) {
+		this.facility = facility;
+	}
 
-  public FacilityCompany() {
-    super();
-    // TODO Auto-generated constructor stub
-  }
+	public FacilityCompany() {
+		super();
+	}
 
-  public FacilityCompany(long entityVersion, @NotNull Company company, @NotNull Facility facility) {
-    super();
-    this.entityVersion = entityVersion;
-    this.company = company;
-    this.facility = facility;
-  }
+	public FacilityCompany(long entityVersion, @NotNull Company company, @NotNull Facility facility) {
+		super();
+		this.entityVersion = entityVersion;
+		this.company = company;
+		this.facility = facility;
+	}
 
 }

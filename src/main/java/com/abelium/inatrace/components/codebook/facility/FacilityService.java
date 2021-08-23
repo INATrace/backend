@@ -31,100 +31,100 @@ import javax.transaction.Transactional;
 @Service
 public class FacilityService extends BaseService {
 
-  public ApiPaginatedList<ApiFacility> getFacilityList(ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiFacility> getFacilityList(ApiPaginatedRequest request) {
 
-    return PaginationTools.createPaginatedResponse(em, request, () -> facilityQueryObject(request),
-      FacilityMapper::toApiFacility);
+		return PaginationTools.createPaginatedResponse(em, request, () -> facilityQueryObject(request),
+				FacilityMapper::toApiFacility);
 
-  }
+	}
 
-  private Facility facilityQueryObject(ApiPaginatedRequest request) {
+	private Facility facilityQueryObject(ApiPaginatedRequest request) {
 
-    Facility facilityProxy = Torpedo.from(Facility.class);
-    switch (request.sortBy) {
-      case "name":
-        QueryTools.orderBy(request.sort, facilityProxy.getName());
-        break;
-      default:
-        QueryTools.orderBy(request.sort, facilityProxy.getId());
-        break;
-    }
+		Facility facilityProxy = Torpedo.from(Facility.class);
+		switch (request.sortBy) {
+			case "name":
+				QueryTools.orderBy(request.sort, facilityProxy.getName());
+				break;
+			default:
+				QueryTools.orderBy(request.sort, facilityProxy.getId());
+				break;
+		}
 
-    return facilityProxy;
-  }
+		return facilityProxy;
+	}
 
-  public ApiFacility getFacility(Long id) throws ApiException {
-    return FacilityMapper.toApiFacility(fetchFacility(id));
-  }
+	public ApiFacility getFacility(Long id) throws ApiException {
+		return FacilityMapper.toApiFacility(fetchFacility(id));
+	}
 
-  @Transactional
-  public ApiBaseEntity createOrUpdateFacility(ApiFacility apiFacility) throws ApiException {
+	@Transactional
+	public ApiBaseEntity createOrUpdateFacility(ApiFacility apiFacility) throws ApiException {
 
-    Facility entity;
-    if (apiFacility.getId() != null) {
+		Facility entity;
+		if (apiFacility.getId() != null) {
 
-      entity = fetchFacility(apiFacility.getId());
+			entity = fetchFacility(apiFacility.getId());
 
-    } else {
+		} else {
 
-      entity = new Facility();
+			entity = new Facility();
 
-      entity.setName(apiFacility.getName());
-      entity.setIsCollectionFacility(apiFacility.getIsCollectionFacility());
-      entity.setIsPublic(apiFacility.getIsPublic());
+			entity.setName(apiFacility.getName());
+			entity.setIsCollectionFacility(apiFacility.getIsCollectionFacility());
+			entity.setIsPublic(apiFacility.getIsPublic());
 
-      FacilityLocation facilityLocation = new FacilityLocation();
-      facilityLocation.setLatitude(apiFacility.getFacilityLocation().getLatitude());
-      facilityLocation.setLongitude(apiFacility.getFacilityLocation().getLongitude());
-      facilityLocation.setNumberOfFarmers(apiFacility.getFacilityLocation().getNumberOfFarmers());
-      facilityLocation.setPinName(apiFacility.getFacilityLocation().getPinName());
+			FacilityLocation facilityLocation = new FacilityLocation();
+			facilityLocation.setLatitude(apiFacility.getFacilityLocation().getLatitude());
+			facilityLocation.setLongitude(apiFacility.getFacilityLocation().getLongitude());
+			facilityLocation.setNumberOfFarmers(apiFacility.getFacilityLocation().getNumberOfFarmers());
+			facilityLocation.setPinName(apiFacility.getFacilityLocation().getPinName());
 
-      Address address = new Address();
-      address.setAddress(apiFacility.getFacilityLocation().getAddress().getAddress());
-      address.setCity(apiFacility.getFacilityLocation().getAddress().getCity());
-      address.setState(apiFacility.getFacilityLocation().getAddress().getState());
-      address.setZip(apiFacility.getFacilityLocation().getAddress().getZip());
+			Address address = new Address();
+			address.setAddress(apiFacility.getFacilityLocation().getAddress().getAddress());
+			address.setCity(apiFacility.getFacilityLocation().getAddress().getCity());
+			address.setState(apiFacility.getFacilityLocation().getAddress().getState());
+			address.setZip(apiFacility.getFacilityLocation().getAddress().getZip());
 
-      Country country = new Country();
-      country.setCode(apiFacility.getFacilityLocation().getAddress().getCountry().getCode());
-      country.setName(apiFacility.getFacilityLocation().getAddress().getCountry().getName());
+			Country country = new Country();
+			country.setCode(apiFacility.getFacilityLocation().getAddress().getCountry().getCode());
+			country.setName(apiFacility.getFacilityLocation().getAddress().getCountry().getName());
 
-      address.setCountry(country);
-      facilityLocation.setAddress(address);
+			address.setCountry(country);
+			facilityLocation.setAddress(address);
 
-      FacilityType facilityType = new FacilityType();
-      facilityType.setCode(apiFacility.getFacilityType().getCode());
-      facilityType.setLabel(apiFacility.getFacilityType().getLabel());
+			FacilityType facilityType = new FacilityType();
+			facilityType.setCode(apiFacility.getFacilityType().getCode());
+			facilityType.setLabel(apiFacility.getFacilityType().getLabel());
 
-      entity.setFacilityLocation(facilityLocation);
-      entity.setFacilityType(facilityType);
+			entity.setFacilityLocation(facilityLocation);
+			entity.setFacilityType(facilityType);
 
-    }
+		}
 
-    if (entity.getId() == null) {
-      em.persist(entity);
-    }
+		if (entity.getId() == null) {
+			em.persist(entity);
+		}
 
-    return new ApiBaseEntity(entity);
-  }
+		return new ApiBaseEntity(entity);
+	}
 
-  @Transactional
-  public void deleteFacility(Long id) throws ApiException {
+	@Transactional
+	public void deleteFacility(Long id) throws ApiException {
 
-    Facility facility = fetchFacility(id);
-    em.remove(facility);
+		Facility facility = fetchFacility(id);
+		em.remove(facility);
 
-  }
+	}
 
-  public Facility fetchFacility(Long id) throws ApiException {
+	public Facility fetchFacility(Long id) throws ApiException {
 
-    Facility facility = Queries.get(em, Facility.class, id);
-    if (facility == null) {
-      throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid facility ID");
-    }
+		Facility facility = Queries.get(em, Facility.class, id);
+		if (facility == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid facility ID");
+		}
 
-    return facility;
+		return facility;
 
-  }
+	}
 
 }

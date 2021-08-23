@@ -11,50 +11,50 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class FacilitySemiProduct extends TimestampEntity {
 
-  @Version
-  private long entityVersion;
+	@Version
+	private long entityVersion;
 
-  @ManyToOne
-  @NotNull
-  private Facility facility;
+	@ManyToOne
+	@NotNull
+	private Facility facility;
 
-  @ManyToOne
-  @NotNull
-  private SemiProduct semiProduct;
+	@ManyToOne
+	@NotNull
+	private SemiProduct semiProduct;
 
-  public long getEntityVersion() {
-    return entityVersion;
-  }
+	public long getEntityVersion() {
+		return entityVersion;
+	}
 
-  public void setEntityVersion(long entityVersion) {
-    this.entityVersion = entityVersion;
-  }
+	public void setEntityVersion(long entityVersion) {
+		this.entityVersion = entityVersion;
+	}
 
-  public Facility getFacility() {
-    return facility;
-  }
+	public Facility getFacility() {
+		return facility;
+	}
 
-  public void setFacility(Facility facility) {
-    this.facility = facility;
-  }
+	public void setFacility(Facility facility) {
+		this.facility = facility;
+	}
 
-  public SemiProduct getSemiProduct() {
-    return semiProduct;
-  }
+	public SemiProduct getSemiProduct() {
+		return semiProduct;
+	}
 
-  public void setSemiProduct(SemiProduct semiProduct) {
-    this.semiProduct = semiProduct;
-  }
+	public void setSemiProduct(SemiProduct semiProduct) {
+		this.semiProduct = semiProduct;
+	}
 
-  public FacilitySemiProduct() {
-    super();
-  }
+	public FacilitySemiProduct() {
+		super();
+	}
 
-  public FacilitySemiProduct(long entityVersion, @NotNull Facility facility, @NotNull SemiProduct semiProduct) {
-    super();
-    this.entityVersion = entityVersion;
-    this.facility = facility;
-    this.semiProduct = semiProduct;
-  }
+	public FacilitySemiProduct(long entityVersion, @NotNull Facility facility, @NotNull SemiProduct semiProduct) {
+		super();
+		this.entityVersion = entityVersion;
+		this.facility = facility;
+		this.semiProduct = semiProduct;
+	}
 
 }

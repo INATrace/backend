@@ -36,106 +36,123 @@ import java.util.stream.Collectors;
 @Lazy
 @Service
 public class CompanyService extends BaseService {
-	
+
 	@Autowired
 	private CompanyApiTools companyApiTools;
-	
+
 	@Autowired
 	private CompanyQueries companyQueries;
-	
+
 	@Autowired
 	private UserQueries userQueries;
-	
-    private Company companyListQueryObject(ApiListCompaniesRequest request) {
-        Company cProxy = Torpedo.from(Company.class);
-        
-        OnGoingLogicalCondition condition = Torpedo.condition();        
-        if (StringUtils.isNotBlank(request.name)) {
-            condition = condition.and(cProxy.getName()).like().startsWith(request.name);
-        }
-        if (request.status != null) {
-        	condition = condition.and(cProxy.getStatus()).eq(request.status);
-        }
-        Torpedo.where(condition);
-        switch (request.sortBy) {
-	        case "name": QueryTools.orderBy(request.sort, cProxy.getName()); break;
-	        case "status": QueryTools.orderBy(request.sort, cProxy.getStatus()); break;
-	        default: QueryTools.orderBy(request.sort, cProxy.getId());
-        }
-        return cProxy;
-    }	
 
-    @Transactional
+	private Company companyListQueryObject(ApiListCompaniesRequest request) {
+		Company cProxy = Torpedo.from(Company.class);
+
+		OnGoingLogicalCondition condition = Torpedo.condition();
+		if (StringUtils.isNotBlank(request.name)) {
+			condition = condition.and(cProxy.getName()).like().startsWith(request.name);
+		}
+		if (request.status != null) {
+			condition = condition.and(cProxy.getStatus()).eq(request.status);
+		}
+		Torpedo.where(condition);
+		switch (request.sortBy) {
+			case "name":
+				QueryTools.orderBy(request.sort, cProxy.getName());
+				break;
+			case "status":
+				QueryTools.orderBy(request.sort, cProxy.getStatus());
+				break;
+			default:
+				QueryTools.orderBy(request.sort, cProxy.getId());
+		}
+		return cProxy;
+	}
+
+	@Transactional
 	public ApiPaginatedList<ApiCompanyListResponse> listCompanies(ApiListCompaniesRequest request) {
-    	return PaginationTools.createPaginatedResponse(em, request, () -> companyListQueryObject(request), 
-    			CompanyApiTools::toApiCompanyListResponse); 
+		return PaginationTools.createPaginatedResponse(em, request, () -> companyListQueryObject(request),
+				CompanyApiTools::toApiCompanyListResponse);
 	}
 
-    private TorpedoProjector<CompanyUser, ApiCompanyListResponse> userCompanyListQueryObject(Long userId, ApiListCompaniesRequest request) {
-        CompanyUser cuProxy = Torpedo.from(CompanyUser.class);
-        
-        Company cProxy = Torpedo.innerJoin(cuProxy.getCompany());
-        OnGoingLogicalCondition condition = Torpedo.condition();
-        condition = condition.and(cuProxy.getUser().getId()).eq(userId);
-        if (StringUtils.isNotBlank(request.name)) {
-            condition = condition.and(cProxy.getName()).like().startsWith(request.name);
-        }
-        if (request.status != null) {
-        	condition = condition.and(cProxy.getStatus()).eq(request.status);
-        }
-        Document dProxy = Torpedo.leftJoin(cProxy.getLogo());
-        Torpedo.where(condition);
-        switch (request.sortBy) {
-	        case "name": QueryTools.orderBy(request.sort, cProxy.getName()); break;
-	        case "status": QueryTools.orderBy(request.sort, cProxy.getStatus()); break;
-	        default: QueryTools.orderBy(request.sort, cProxy.getId());
-        }
-        return new TorpedoProjector<>(cuProxy, ApiCompanyListResponse.class).
-        		add(cProxy.getId(), ApiCompanyListResponse::setId).
-        		add(cProxy.getStatus(), ApiCompanyListResponse::setStatus).
-        		add(cProxy.getName(), ApiCompanyListResponse::setName).
-        		add(dProxy.getStorageKey(), (r, s) -> r.setLogoStorageKey(StorageKeyCache.put(s, userId)));
-    }	    
-    
+	private TorpedoProjector<CompanyUser, ApiCompanyListResponse> userCompanyListQueryObject(Long userId,
+			ApiListCompaniesRequest request) {
+		CompanyUser cuProxy = Torpedo.from(CompanyUser.class);
+
+		Company cProxy = Torpedo.innerJoin(cuProxy.getCompany());
+		OnGoingLogicalCondition condition = Torpedo.condition();
+		condition = condition.and(cuProxy.getUser().getId()).eq(userId);
+		if (StringUtils.isNotBlank(request.name)) {
+			condition = condition.and(cProxy.getName()).like().startsWith(request.name);
+		}
+		if (request.status != null) {
+			condition = condition.and(cProxy.getStatus()).eq(request.status);
+		}
+		Document dProxy = Torpedo.leftJoin(cProxy.getLogo());
+		Torpedo.where(condition);
+		switch (request.sortBy) {
+			case "name":
+				QueryTools.orderBy(request.sort, cProxy.getName());
+				break;
+			case "status":
+				QueryTools.orderBy(request.sort, cProxy.getStatus());
+				break;
+			default:
+				QueryTools.orderBy(request.sort, cProxy.getId());
+		}
+		return new TorpedoProjector<>(cuProxy, ApiCompanyListResponse.class)
+				.add(cProxy.getId(), ApiCompanyListResponse::setId)
+				.add(cProxy.getStatus(), ApiCompanyListResponse::setStatus)
+				.add(cProxy.getName(), ApiCompanyListResponse::setName)
+				.add(dProxy.getStorageKey(), (r, s) -> r.setLogoStorageKey(StorageKeyCache.put(s, userId)));
+	}
+
 	public ApiPaginatedList<ApiCompanyListResponse> listUserCompanies(Long userId, ApiListCompaniesRequest request) {
-    	return PaginationTools.createPaginatedResponse(em, request, () -> userCompanyListQueryObject(userId, request)); 
+		return PaginationTools.createPaginatedResponse(em, request, () -> userCompanyListQueryObject(userId, request));
 	}
-    
 
-    @Transactional
+	@Transactional
 	public ApiBaseEntity createCompany(Long userId, ApiCompany request) throws ApiException {
 		User user = Queries.get(em, User.class, userId);
 		Company company = new Company();
 		CompanyUser companyUser = new CompanyUser();
-		
+
 		companyApiTools.updateCompany(userId, company, request, null);
 		em.persist(company);
-		
+
 		companyUser.setUser(user);
 		companyUser.setCompany(company);
 		em.persist(companyUser);
-		
+
 		return new ApiBaseEntity(company);
 	}
 
-    @Transactional
+	@Transactional
 	public ApiCompanyGet getCompany(CustomUserDetails authUser, long id, Language language) throws ApiException {
 		Company c = companyQueries.fetchCompany(id);
 		List<ApiCompanyUser> users = companyQueries.fetchUsersForCompany(id);
-		
-		if (authUser.getUserRole() != UserRole.ADMIN && !users.stream().anyMatch(u -> u.getId().equals(authUser.getUserId()))) {
+
+		if (authUser.getUserRole() != UserRole.ADMIN
+				&& !users.stream().anyMatch(u -> u.getId().equals(authUser.getUserId()))) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "Not authorized");
 		}
-		
+
 		List<CompanyAction> actions = new ArrayList<>();
 		actions.add(CompanyAction.VIEW_COMPANY_PROFILE);
 		actions.add(CompanyAction.UPDATE_COMPANY_PROFILE);
-		
+
 		if (authUser.getUserRole() == UserRole.ADMIN) {
 			switch (c.getStatus()) {
-				case REGISTERED: actions.addAll(Arrays.asList(CompanyAction.ACTIVATE_COMPANY, CompanyAction.DEACTIVATE_COMPANY)); break;
-				case ACTIVE: actions.add(CompanyAction.DEACTIVATE_COMPANY); break;
-				case DEACTIVATED: actions.add(CompanyAction.ACTIVATE_COMPANY); break;
+				case REGISTERED:
+					actions.addAll(Arrays.asList(CompanyAction.ACTIVATE_COMPANY, CompanyAction.DEACTIVATE_COMPANY));
+					break;
+				case ACTIVE:
+					actions.add(CompanyAction.DEACTIVATE_COMPANY);
+					break;
+				case DEACTIVATED:
+					actions.add(CompanyAction.ACTIVATE_COMPANY);
+					break;
 			}
 			actions.add(CompanyAction.ADD_USER_TO_COMPANY);
 			if (!users.isEmpty()) {
@@ -144,34 +161,47 @@ public class CompanyService extends BaseService {
 			}
 			actions.add(CompanyAction.MERGE_TO_COMPANY);
 		}
-		
+
 		return companyApiTools.toApiCompanyGet(authUser.getUserId(), c, language, actions, users);
 	}
 
-    @Transactional
+	@Transactional
 	public ApiCompanyPublic getCompanyPublic(long id, Language language) throws ApiException {
 		Company c = companyQueries.fetchCompany(id);
 		return companyApiTools.toApiCompanyPublic(c, language);
 	}
 
-    @Transactional
+	@Transactional
 	public void updateCompany(CustomUserDetails authUser, ApiCompanyUpdate ac) throws ApiException {
 		Company c = companyQueries.fetchCompany(authUser, ac.id);
 		companyApiTools.updateCompanyWithUsers(authUser.getUserId(), c, ac);
 	}
-    
-    @Transactional
+
+	@Transactional
 	public void executeAction(ApiCompanyActionRequest request, CompanyAction action) throws ApiException {
-    	Company c = companyQueries.fetchCompany(request.companyId);
-    	switch (action) {
-    		case ACTIVATE_COMPANY: activateCompany(c); break;
-    		case DEACTIVATE_COMPANY: deactivateCompany(c); break;
-    		case ADD_USER_TO_COMPANY: addUserToCompany(request.userId, c, request.companyUserRole); break;
-    		case SET_USER_COMPANY_ROLE: setUserCompanyRole(request.userId, c, request.companyUserRole); break;
-    		case REMOVE_USER_FROM_COMPANY: removeUserFromCompany(request.userId, c); break;
-    		case MERGE_TO_COMPANY: mergeToCompany(c, request.otherCompanyId); break;
-    		default: throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid action");
-    	}
+		Company c = companyQueries.fetchCompany(request.companyId);
+		switch (action) {
+			case ACTIVATE_COMPANY:
+				activateCompany(c);
+				break;
+			case DEACTIVATE_COMPANY:
+				deactivateCompany(c);
+				break;
+			case ADD_USER_TO_COMPANY:
+				addUserToCompany(request.userId, c, request.companyUserRole);
+				break;
+			case SET_USER_COMPANY_ROLE:
+				setUserCompanyRole(request.userId, c, request.companyUserRole);
+				break;
+			case REMOVE_USER_FROM_COMPANY:
+				removeUserFromCompany(request.userId, c);
+				break;
+			case MERGE_TO_COMPANY:
+				mergeToCompany(c, request.otherCompanyId);
+				break;
+			default:
+				throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid action");
+		}
 	}
 
 	private void mergeToCompany(Company c, Long otherCompanyId) throws ApiException {
@@ -179,7 +209,7 @@ public class CompanyService extends BaseService {
 		if (other.getStatus() != CompanyStatus.ACTIVE) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Merging to non-active company is impossible");
 		}
-		
+
 		Set<Long> otherUsers = other.getUsers().stream().map(cu -> cu.getUser().getId()).collect(Collectors.toSet());
 		for (CompanyUser cu : c.getUsers()) {
 			if (!otherUsers.contains(cu.getUser().getId())) {
@@ -207,7 +237,7 @@ public class CompanyService extends BaseService {
 		cu.setRole(cur);
 		c.getUsers().add(cu);
 	}
-	
+
 	private void setUserCompanyRole(Long userId, Company c, CompanyUserRole cur) throws ApiException {
 		Optional<CompanyUser> optCu = c.getUsers().stream().filter(cu -> cu.getUser().getId().equals(userId)).findAny();
 		if (optCu.isEmpty()) {
@@ -216,20 +246,19 @@ public class CompanyService extends BaseService {
 		optCu.get().setRole(cur);
 	}
 
-    private void activateCompany(Company company) throws ApiException {
-    	if (company.getStatus() == CompanyStatus.ACTIVE) {
-    		throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid status");
-    	}
-    	company.setStatus(CompanyStatus.ACTIVE);
-    	userQueries.activateUsersForCompany(company.getId());
-    }
-    
-    private void deactivateCompany(Company company) throws ApiException {
-    	if (company.getStatus() == CompanyStatus.DEACTIVATED) {
-    		throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid status");
-    	}
-    	company.setStatus(CompanyStatus.DEACTIVATED);
-    }
+	private void activateCompany(Company company) throws ApiException {
+		if (company.getStatus() == CompanyStatus.ACTIVE) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid status");
+		}
+		company.setStatus(CompanyStatus.ACTIVE);
+		userQueries.activateUsersForCompany(company.getId());
+	}
 
+	private void deactivateCompany(Company company) throws ApiException {
+		if (company.getStatus() == CompanyStatus.DEACTIVATED) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid status");
+		}
+		company.setStatus(CompanyStatus.DEACTIVATED);
+	}
 
 }
