@@ -5,13 +5,33 @@ import com.abelium.inatrace.components.company.types.CompanyTranslatables;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.common.Address;
 import com.abelium.inatrace.db.entities.common.Document;
+import com.abelium.inatrace.db.entities.facility.Facility;
+import com.abelium.inatrace.db.entities.facility.FacilityCompany;
 import com.abelium.inatrace.types.CompanyStatus;
 
-import javax.persistence.*;
+import org.apache.poi.ss.formula.functions.T;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.Index;
+import javax.persistence.Lob;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Version;
 
 @Entity
 @Table(indexes = { @Index(columnList = "name") })
@@ -119,7 +139,10 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	@OneToMany(mappedBy = "company")
 	private List<CompanyTranslation> translations = new ArrayList<>();
 	
-    public CompanyStatus getStatus() {
+	@OneToMany(mappedBy = "company")
+  private List<FacilityCompany> companyFacilities = new ArrayList<>();
+  
+  public CompanyStatus getStatus() {
 		return status;
 	}
 
@@ -246,4 +269,13 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	public void setCertifications(List<CompanyCertification> certifications) {
 		this.certifications = certifications;
 	}
+	
+	public List<FacilityCompany> getCompanyFacilities() {
+    return companyFacilities;
+  }
+
+  public void setCompanyFacilities(List<FacilityCompany> companyFacilities) {
+    this.companyFacilities = companyFacilities;
+  }
+
 }

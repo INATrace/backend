@@ -1,8 +1,11 @@
 package com.abelium.inatrace.db.entities.codebook;
 
 import com.abelium.inatrace.db.base.CodebookBaseEntity;
+import com.abelium.inatrace.db.entities.facility.Facility;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 
 /**
  * Codebook entity for facility types.
@@ -11,6 +14,9 @@ import javax.persistence.Entity;
  */
 @Entity
 public class FacilityType extends CodebookBaseEntity {
+  
+  @ManyToOne(fetch = FetchType.LAZY)
+  private Facility facility;
 
 	public FacilityType() {
 		super();
