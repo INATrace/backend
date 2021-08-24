@@ -131,7 +131,8 @@ public class FacilityService extends BaseService {
 	
 	public List<ApiFacility> listFacilitiesByCompany(Long companyId) {
 
-		List<Facility> facilities = em.createNamedQuery("Facility.listFacilitiesByCompany", Facility.class)
+		List<Facility> facilities = 
+			em.createNamedQuery("Facility.listFacilitiesByCompany", Facility.class)
 				.setParameter("companyId", companyId)
 				.getResultList();
 
