@@ -12,12 +12,20 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(indexes = { @Index(columnList = "name") })
+@NamedQueries({
+	@NamedQuery(name = "Facility.listFacilitiesByCompany", 
+				query = "SELECT DISTINCT f FROM Facility f "
+						+ "INNER JOIN f.company c "
+						+ "WHERE c.id = :companyId") 
+})
 public class Facility extends TimestampEntity {
 
 	@Column

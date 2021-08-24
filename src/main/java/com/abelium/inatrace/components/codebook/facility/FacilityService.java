@@ -20,8 +20,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -129,34 +129,13 @@ public class FacilityService extends BaseService {
 
 	}
 	
-	public List<ApiFacility> listFacilitiesByCompany(Long companyId) throws ApiException {
+	public List<ApiFacility> listFacilitiesByCompany(Long companyId) {
 
-		String jpql = ""
-			+ "SELECT DISTINCT f FROM Facility f "
-			+ "INNER JOIN f.company c "
-			+ "WHERE c.id= :companyId";
-		
-		em.getTransaction().begin();
-		
-		List<Facility> facilities = new ArrayList<>();
-		facilities = em.createQuery(jpql, Facility.class)
+		List<Facility> facilities = em.createNamedQuery("Facility.listFacilitiesByCompany", Facility.class)
 				.setParameter("companyId", companyId)
 				.getResultList();
-		
-		em.getTransaction().commit();
 
-		List<ApiFacility> apiFacilities = new ArrayList<>();
-		if (facilities == null) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid company ID");
-		} else {
-			// Transform db entities to api entities
-			facilities.stream().forEach(
-				(f) -> apiFacilities.add(FacilityMapper.toApiFacility(f))
-			);
-		}
-		
-		em.close();
-		return apiFacilities;
+		return facilities.stream().map(f -> FacilityMapper.toApiFacility(f)).collect(Collectors.toList());
 
 	}
 
