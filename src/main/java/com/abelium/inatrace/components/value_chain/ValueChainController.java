@@ -52,7 +52,7 @@ public class ValueChainController {
 		return new ApiResponse<>(valueChainService.createOrUpdateValueChain(apiValueChain));
 	}
 
-	@PostMapping("{id}")
+	@PostMapping("{id}/enable")
 	@ApiOperation("Set the status of the value chain with the provided ID as 'ENABLED'.")
 	public ApiResponse<ApiBaseEntity> enableValueChain(
 			@Valid @ApiParam(value = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {
@@ -60,7 +60,7 @@ public class ValueChainController {
 		return new ApiResponse<>(valueChainService.enableValueChain(id));
 	}
 
-	@PostMapping("{id}")
+	@PostMapping("{id}/disable")
 	@ApiOperation("Set the status of the value chain with the provided ID as 'DISABLED'.")
 	public ApiResponse<ApiBaseEntity> disableValueChain(
 			@Valid @ApiParam(value = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {
