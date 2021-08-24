@@ -2,7 +2,6 @@ package com.abelium.inatrace.components.codebook.facility;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.ApiDefaultResponse;
-import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiPaginatedResponse;
 import com.abelium.inatrace.api.ApiResponse;
@@ -51,6 +50,14 @@ public class FacilityController {
 	public List<ApiFacility> listFacilitiesByCompany(@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId) throws ApiException {
 
 		return new ArrayList<ApiFacility>(facilityService.listFacilitiesByCompany(companyId));
+
+	}
+	
+	@GetMapping("list/collecting/organization/{id}")
+	@ApiOperation("Get a list of collecting facilities by company ID.")
+	public List<ApiFacility> listCollectingFacilitiesByCompany(@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId) throws ApiException {
+
+		return new ArrayList<ApiFacility>(facilityService.listCollectingFacilitiesByCompany(companyId));
 
 	}
 

@@ -139,5 +139,16 @@ public class FacilityService extends BaseService {
 		return facilities.stream().map(f -> FacilityMapper.toApiFacility(f)).collect(Collectors.toList());
 
 	}
+	
+	public List<ApiFacility> listCollectingFacilitiesByCompany(Long companyId) {
+
+		List<Facility> facilities = 
+			em.createNamedQuery("Facility.listCollectingFacilitiesByCompany", Facility.class)
+				.setParameter("companyId", companyId)
+				.getResultList();
+
+		return facilities.stream().map(f -> FacilityMapper.toApiFacility(f)).collect(Collectors.toList());
+
+	}
 
 }

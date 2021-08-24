@@ -24,7 +24,12 @@ import javax.persistence.Table;
 	@NamedQuery(name = "Facility.listFacilitiesByCompany", 
 				query = "SELECT DISTINCT f FROM Facility f "
 						+ "INNER JOIN f.company c "
-						+ "WHERE c.id = :companyId") 
+						+ "WHERE c.id = :companyId"),
+	@NamedQuery(name = "Facility.listCollectingFacilitiesByCompany", 
+				query = "SELECT DISTINCT f FROM Facility f "
+						+ "INNER JOIN f.company c "
+						+ "WHERE c.id = :companyId "
+						+ "AND f.isCollectionFacility = 1")
 })
 public class Facility extends TimestampEntity {
 
