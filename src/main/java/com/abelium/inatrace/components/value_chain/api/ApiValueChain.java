@@ -29,19 +29,19 @@ public class ApiValueChain extends ApiBaseEntity {
 	@ApiModelProperty(value = "value chain status", position = 4)
 	private ValueChainStatus valueChainStatus;
 
-	@ApiModelProperty(value = "list of supported facility types")
+	@ApiModelProperty(value = "list of supported facility types", position = 5)
 	private List<ApiFacilityType> facilityTypes;
 
-	@ApiModelProperty(value = "list of supported measuring unit types")
+	@ApiModelProperty(value = "list of supported measuring unit types", position = 6)
 	private List<ApiMeasureUnitType> measureUnitTypes;
 
-	@ApiModelProperty(value = "list of supported grade abbreviations")
+	@ApiModelProperty(value = "list of supported grade abbreviations", position = 7)
 	private List<ApiGradeAbbreviation> gradeAbbreviations;
 
-	@ApiModelProperty(value = "list of supported processing evidence types")
+	@ApiModelProperty(value = "list of supported processing evidence types", position = 8)
 	private List<ApiProcessingEvidenceType> processingEvidenceTypes;
 
-	@ApiModelProperty(value = "list of supported semi-products")
+	@ApiModelProperty(value = "list of supported semi-products", position = 9)
 	private List<ApiSemiProduct> semiProducts;
 
 	public String getName() {
