@@ -14,12 +14,32 @@ public final class MeasureUnitTypeMapper {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static ApiMeasureUnitType toApiMeasureUnitType(MeasureUnitType entity) {
+	/**
+	 * Mapping the base entity attributes - no associations are included.
+	 *
+	 * @param entity DB entity.
+	 * @return API model entity.
+	 */
+	public static ApiMeasureUnitType toApiMeasureUnitTypeBase(MeasureUnitType entity) {
 
 		ApiMeasureUnitType apiMeasureUnitType = new ApiMeasureUnitType();
 		apiMeasureUnitType.setId(entity.getId());
 		apiMeasureUnitType.setCode(entity.getCode());
 		apiMeasureUnitType.setLabel(entity.getLabel());
+
+		return apiMeasureUnitType;
+	}
+
+	/**
+	 * Mapping of the base attributes and all the associations.
+	 *
+	 * @param entity DB entity.
+	 * @return API model entity.
+	 */
+	public static ApiMeasureUnitType toApiMeasureUnitType(MeasureUnitType entity) {
+
+		ApiMeasureUnitType apiMeasureUnitType = MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(entity);
+
 		apiMeasureUnitType.setWeight(entity.getWeight());
 
 		if (entity.getUnderlyingMeasurementUnitType() != null) {

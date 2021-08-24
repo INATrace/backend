@@ -19,7 +19,6 @@ public class ApiListCompaniesRequest extends ApiPaginatedRequest {
 	
 	@ApiParam(value = "Company name (start of name), sortable")
 	public String name;
-
 	
 	public Language getLanguage() {
 		return language;
