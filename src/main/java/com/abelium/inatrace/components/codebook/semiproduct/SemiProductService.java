@@ -39,6 +39,12 @@ public class SemiProductService extends BaseService {
 
 	public ApiPaginatedList<ApiSemiProduct> getSemiProductList(ApiPaginatedRequest request) {
 
+		return PaginationTools.createPaginatedResponse(em, request, () -> semiProductQueryObject(request),
+				SemiProductMapper::toApiSemiProduct);
+	}
+
+	private SemiProduct semiProductQueryObject(ApiPaginatedRequest request) {
+
 		SemiProduct semiProductProxy = Torpedo.from(SemiProduct.class);
 
 		switch (request.sortBy) {
@@ -55,7 +61,7 @@ public class SemiProductService extends BaseService {
 				QueryTools.orderBy(request.sort, semiProductProxy.getId());
 		}
 
-		return PaginationTools.createPaginatedResponse(em, request, () -> semiProductProxy, SemiProductMapper::toApiSemiProduct);
+		return semiProductProxy;
 	}
 
 	public ApiSemiProduct getSemiProduct(Long id) throws ApiException {
