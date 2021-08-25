@@ -45,7 +45,7 @@ public class FacilityController {
 
 	}
 	
-	@GetMapping("list/organization/{id}")
+	@GetMapping("list/company/{id}")
 	@ApiOperation("Get a list of facilities by company ID.")
 	public List<ApiFacility> listFacilitiesByCompany(@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId) throws ApiException {
 
@@ -53,7 +53,7 @@ public class FacilityController {
 
 	}
 	
-	@GetMapping("list/collecting/organization/{id}")
+	@GetMapping("list/collecting/company/{id}")
 	@ApiOperation("Get a list of collecting facilities by company ID.")
 	public List<ApiFacility> listCollectingFacilitiesByCompany(@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId) throws ApiException {
 

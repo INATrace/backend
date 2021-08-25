@@ -140,9 +140,9 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	 * facilities
 	 */
 	@OneToMany(mappedBy = "company")
-  private List<Facility> facilities = new ArrayList<>();
-  
-  public CompanyStatus getStatus() {
+	private List<Facility> facilities = new ArrayList<>();
+
+	public CompanyStatus getStatus() {
 		return status;
 	}
 
@@ -271,11 +271,11 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	}
 	
 	public List<Facility> getFacilities() {
-    return facilities;
-  }
+		return facilities;
+	}
 
-  public void setFacilities(List<Facility> facilities) {
-    this.facilities = facilities;
-  }
+	public void setFacilities(List<Facility> facilities) {
+		this.facilities = facilities;
+	}
   
 }
