@@ -63,45 +63,41 @@ public class FacilityService extends BaseService {
 	public ApiBaseEntity createOrUpdateFacility(ApiFacility apiFacility) throws ApiException {
 
 		Facility entity;
+		FacilityLocation facilityLocation = null;
+		Address address = null;
+
 		if (apiFacility.getId() != null) {
-
 			entity = fetchFacility(apiFacility.getId());
-
+			facilityLocation = entity.getFacilityLocation();
+			address = entity.getFacilityLocation().getAddress();
 		} else {
-
 			entity = new Facility();
-
-			entity.setName(apiFacility.getName());
-			entity.setIsCollectionFacility(apiFacility.getIsCollectionFacility());
-			entity.setIsPublic(apiFacility.getIsPublic());
-
-			FacilityLocation facilityLocation = new FacilityLocation();
-			facilityLocation.setLatitude(apiFacility.getFacilityLocation().getLatitude());
-			facilityLocation.setLongitude(apiFacility.getFacilityLocation().getLongitude());
-			facilityLocation.setNumberOfFarmers(apiFacility.getFacilityLocation().getNumberOfFarmers());
-			facilityLocation.setPinName(apiFacility.getFacilityLocation().getPinName());
-
-			Address address = new Address();
-			address.setAddress(apiFacility.getFacilityLocation().getAddress().getAddress());
-			address.setCity(apiFacility.getFacilityLocation().getAddress().getCity());
-			address.setState(apiFacility.getFacilityLocation().getAddress().getState());
-			address.setZip(apiFacility.getFacilityLocation().getAddress().getZip());
-
-			Country country = new Country();
-			country.setCode(apiFacility.getFacilityLocation().getAddress().getCountry().getCode());
-			country.setName(apiFacility.getFacilityLocation().getAddress().getCountry().getName());
-
-			address.setCountry(country);
-			facilityLocation.setAddress(address);
-
-			FacilityType facilityType = new FacilityType();
-			facilityType.setCode(apiFacility.getFacilityType().getCode());
-			facilityType.setLabel(apiFacility.getFacilityType().getLabel());
-
-			entity.setFacilityLocation(facilityLocation);
-			entity.setFacilityType(facilityType);
-
+			facilityLocation = new FacilityLocation();
+			address = new Address();
 		}
+
+		entity.setName(apiFacility.getName());
+		entity.setIsCollectionFacility(apiFacility.getIsCollectionFacility());
+		entity.setIsPublic(apiFacility.getIsPublic());
+
+		facilityLocation.setLatitude(apiFacility.getFacilityLocation().getLatitude());
+		facilityLocation.setLongitude(apiFacility.getFacilityLocation().getLongitude());
+		facilityLocation.setNumberOfFarmers(apiFacility.getFacilityLocation().getNumberOfFarmers());
+		facilityLocation.setPinName(apiFacility.getFacilityLocation().getPinName());
+
+		address.setAddress(apiFacility.getFacilityLocation().getAddress().getAddress());
+		address.setCity(apiFacility.getFacilityLocation().getAddress().getCity());
+		address.setState(apiFacility.getFacilityLocation().getAddress().getState());
+		address.setZip(apiFacility.getFacilityLocation().getAddress().getZip());
+
+		Country country = Queries.get(em, Country.class, apiFacility.getFacilityLocation().getAddress().getCountry().getId());
+		address.setCountry(country);
+		facilityLocation.setAddress(address);
+
+		FacilityType facilityType = Queries.get(em, FacilityType.class, apiFacility.getFacilityType().getId());
+		entity.setFacilityType(facilityType);
+		
+		entity.setFacilityLocation(facilityLocation);
 
 		if (entity.getId() == null) {
 			em.persist(entity);

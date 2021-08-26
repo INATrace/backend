@@ -45,13 +45,13 @@ public class Facility extends TimestampEntity {
 	@Column
 	private Boolean isPublic;
 
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	private FacilityLocation facilityLocation;
 
 	@ManyToOne
 	private Company company;
 
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	private FacilityType facilityType;
 
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL)
