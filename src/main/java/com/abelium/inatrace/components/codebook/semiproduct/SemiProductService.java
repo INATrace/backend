@@ -91,7 +91,8 @@ public class SemiProductService extends BaseService {
 				(semiProduct.getMeasurementUnitType() == null ||
 						!Objects.equals(semiProduct.getMeasurementUnitType().getId(),
 								apiSemiProduct.getApiMeasureUnitType().getId()))) {
-			MeasureUnitType measureUnitType = measureUnitTypeService.fetchMeasureUnitType(apiSemiProduct.getId());
+			MeasureUnitType measureUnitType = measureUnitTypeService.fetchMeasureUnitType(
+					apiSemiProduct.getApiMeasureUnitType().getId());
 			semiProduct.setMeasurementUnitType(measureUnitType);
 		} else if (apiSemiProduct.getApiMeasureUnitType() == null || apiSemiProduct.getApiMeasureUnitType().getId() == null) {
 			semiProduct.setMeasurementUnitType(null);
