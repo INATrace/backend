@@ -74,11 +74,19 @@ public class UserService extends BaseService {
     
     @Autowired
     private TokenService tokenEngine;
-
     
 	@Transactional
 	public User fetchUserByEmail(String email) {
 		return Queries.getUniqueBy(em, User.class, User::getEmail, email);
+	}
+
+	public User fetchUserById(Long id) throws ApiException {
+		User user = Queries.get(em, User.class, id);
+		if (user == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user ID");
+		}
+
+		return user;
 	}
 
 	@Transactional

@@ -7,9 +7,11 @@ import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChainListRequest;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -47,9 +49,11 @@ public class ValueChainController {
 
 	@PutMapping
 	@ApiOperation("Create or update value chain. If ID is provided, the entity with the provided ID is updated.")
-	public ApiResponse<ApiBaseEntity> createOrUpdateValueChain(@Valid @RequestBody ApiValueChain apiValueChain) {
+	public ApiResponse<ApiBaseEntity> createOrUpdateValueChain(
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid @RequestBody ApiValueChain apiValueChain) throws ApiException {
 
-		return new ApiResponse<>(valueChainService.createOrUpdateValueChain(apiValueChain));
+		return new ApiResponse<>(valueChainService.createOrUpdateValueChain(authUser.getUserId(), apiValueChain));
 	}
 
 	@PostMapping("{id}/enable")
