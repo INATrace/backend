@@ -1,4 +1,4 @@
-package com.abelium.inatrace.components.codebook.facility.api;
+package com.abelium.inatrace.components.facility.api;
 
 import com.abelium.inatrace.components.product.api.ApiLocation;
 

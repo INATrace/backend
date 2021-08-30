@@ -1,7 +1,7 @@
-package com.abelium.inatrace.components.codebook.facility;
+package com.abelium.inatrace.components.facility;
 
-import com.abelium.inatrace.components.codebook.facility.api.ApiFacility;
-import com.abelium.inatrace.components.codebook.facility.api.ApiFacilityLocation;
+import com.abelium.inatrace.components.facility.api.ApiFacility;
+import com.abelium.inatrace.components.facility.api.ApiFacilityLocation;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
 import com.abelium.inatrace.components.common.api.ApiCountry;
 import com.abelium.inatrace.components.company.api.ApiAddress;

@@ -1,4 +1,4 @@
-package com.abelium.inatrace.components.codebook.facility.api;
+package com.abelium.inatrace.components.facility.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;

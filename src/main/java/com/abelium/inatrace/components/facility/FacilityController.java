@@ -1,8 +1,8 @@
-package com.abelium.inatrace.components.codebook.facility;
+package com.abelium.inatrace.components.facility;
 
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.codebook.facility.api.ApiFacility;
+import com.abelium.inatrace.components.facility.api.ApiFacility;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
