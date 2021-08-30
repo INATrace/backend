@@ -23,6 +23,16 @@ public class ValueChainSemiProduct extends BaseEntity {
 	@ManyToOne(optional = false)
 	private SemiProduct semiProduct;
 
+	public ValueChainSemiProduct() {
+		super();
+	}
+
+	public ValueChainSemiProduct(ValueChain valueChain, SemiProduct semiProduct) {
+		super();
+		this.valueChain = valueChain;
+		this.semiProduct = semiProduct;
+	}
+
 	public ValueChain getValueChain() {
 		return valueChain;
 	}

@@ -23,6 +23,16 @@ public class ValueChainProcEvidenceType extends BaseEntity {
 	@ManyToOne(optional = false)
 	private ProcessingEvidenceType processingEvidenceType;
 
+	public ValueChainProcEvidenceType() {
+		super();
+	}
+
+	public ValueChainProcEvidenceType(ValueChain valueChain, ProcessingEvidenceType processingEvidenceType) {
+		super();
+		this.valueChain = valueChain;
+		this.processingEvidenceType = processingEvidenceType;
+	}
+
 	public ValueChain getValueChain() {
 		return valueChain;
 	}

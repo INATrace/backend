@@ -112,7 +112,7 @@ public class SemiProductService extends BaseService {
 		em.remove(semiProduct);
 	}
 
-	private SemiProduct fetchSemiProduct(Long id) throws ApiException {
+	public SemiProduct fetchSemiProduct(Long id) throws ApiException {
 
 		SemiProduct semiProduct = Queries.get(em, SemiProduct.class, id);
 		if (semiProduct == null) {

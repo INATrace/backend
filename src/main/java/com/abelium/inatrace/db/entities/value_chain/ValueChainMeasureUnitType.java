@@ -23,6 +23,16 @@ public class ValueChainMeasureUnitType extends BaseEntity {
 	@ManyToOne(optional = false)
 	private MeasureUnitType measureUnitType;
 
+	public ValueChainMeasureUnitType() {
+		super();
+	}
+
+	public ValueChainMeasureUnitType(ValueChain valueChain, MeasureUnitType measureUnitType) {
+		super();
+		this.valueChain = valueChain;
+		this.measureUnitType = measureUnitType;
+	}
+
 	public ValueChain getValueChain() {
 		return valueChain;
 	}

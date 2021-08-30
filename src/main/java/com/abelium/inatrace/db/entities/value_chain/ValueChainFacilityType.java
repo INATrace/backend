@@ -23,6 +23,16 @@ public class ValueChainFacilityType extends BaseEntity {
 	@ManyToOne(optional = false)
 	private FacilityType facilityType;
 
+	public ValueChainFacilityType() {
+		super();
+	}
+
+	public ValueChainFacilityType(ValueChain valueChain, FacilityType facilityType) {
+		super();
+		this.valueChain = valueChain;
+		this.facilityType = facilityType;
+	}
+
 	public ValueChain getValueChain() {
 		return valueChain;
 	}

@@ -23,6 +23,16 @@ public class ValueChainGradeAbbreviation extends BaseEntity {
 	@ManyToOne(optional = false)
 	private GradeAbbreviationType gradeAbbreviationType;
 
+	public ValueChainGradeAbbreviation() {
+		super();
+	}
+
+	public ValueChainGradeAbbreviation(ValueChain valueChain, GradeAbbreviationType gradeAbbreviationType) {
+		super();
+		this.valueChain = valueChain;
+		this.gradeAbbreviationType = gradeAbbreviationType;
+	}
+
 	public ValueChain getValueChain() {
 		return valueChain;
 	}
