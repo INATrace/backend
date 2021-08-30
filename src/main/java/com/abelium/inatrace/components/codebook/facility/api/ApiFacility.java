@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.codebook.facility.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
+import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.product.api.ApiLocation;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -21,7 +22,7 @@ public class ApiFacility extends ApiBaseEntity {
 	private ApiFacilityLocation facilityLocation;
 
 	@ApiModelProperty(value = "Facility company")
-	private ApiFacilityCompany company;
+	private ApiCompanyBase company;
 
 	@ApiModelProperty(value = "Facility type")
 	private ApiFacilityType facilityType;
@@ -58,11 +59,11 @@ public class ApiFacility extends ApiBaseEntity {
 		this.facilityLocation = facilityLocation;
 	}
 
-	public ApiFacilityCompany getCompany() {
+	public ApiCompanyBase getCompany() {
 		return company;
 	}
 
-	public void setCompany(ApiFacilityCompany company) {
+	public void setCompany(ApiCompanyBase company) {
 		this.company = company;
 	}
 
@@ -79,7 +80,7 @@ public class ApiFacility extends ApiBaseEntity {
 	}
 
 	public ApiFacility(String name, Boolean isCollectionFacility, Boolean isPublic,
-			ApiFacilityLocation facilityLocation, ApiFacilityCompany company, ApiFacilityType facilityType) {
+			ApiFacilityLocation facilityLocation, ApiCompanyBase company, ApiFacilityType facilityType) {
 		super();
 		this.name = name;
 		this.isCollectionFacility = isCollectionFacility;

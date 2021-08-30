@@ -27,7 +27,6 @@ public final class FacilityMapper {
 		apiFacility.setIsCollectionFacility(entity.getIsCollectionFacility());
 		apiFacility.setIsPublic(entity.getIsPublic());
 
-		// This goes deep, is that correct?
 		ApiFacilityLocation apiFacilityLocation = new ApiFacilityLocation();
 		ApiAddress apiAddress = new ApiAddress();
 		ApiCountry apiCountry = new ApiCountry();
@@ -53,9 +52,6 @@ public final class FacilityMapper {
 		apiFacilityType.setCode(entity.getFacilityType().getCode());
 		apiFacilityType.setLabel(entity.getFacilityType().getLabel());
 		apiFacility.setFacilityType(apiFacilityType);
-
-		// TODO: Skip for now... should we include it?
-		apiFacility.setCompany(null);
 
 		return apiFacility;
 	}

@@ -22,14 +22,6 @@ public class FacilitySemiProduct extends TimestampEntity {
 	@NotNull
 	private SemiProduct semiProduct;
 
-	public long getEntityVersion() {
-		return entityVersion;
-	}
-
-	public void setEntityVersion(long entityVersion) {
-		this.entityVersion = entityVersion;
-	}
-
 	public Facility getFacility() {
 		return facility;
 	}
@@ -50,9 +42,8 @@ public class FacilitySemiProduct extends TimestampEntity {
 		super();
 	}
 
-	public FacilitySemiProduct(long entityVersion, @NotNull Facility facility, @NotNull SemiProduct semiProduct) {
+	public FacilitySemiProduct(@NotNull Facility facility, @NotNull SemiProduct semiProduct) {
 		super();
-		this.entityVersion = entityVersion;
 		this.facility = facility;
 		this.semiProduct = semiProduct;
 	}

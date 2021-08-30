@@ -15,15 +15,14 @@ import com.abelium.inatrace.db.entities.facility.FacilityLocation;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
-
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
 
+import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.transaction.Transactional;
 
 /**
  * Service for facility entity.
@@ -43,13 +42,10 @@ public class FacilityService extends BaseService {
 	private Facility facilityQueryObject(ApiPaginatedRequest request) {
 
 		Facility facilityProxy = Torpedo.from(Facility.class);
-		switch (request.sortBy) {
-			case "name":
-				QueryTools.orderBy(request.sort, facilityProxy.getName());
-				break;
-			default:
-				QueryTools.orderBy(request.sort, facilityProxy.getId());
-				break;
+		if ("name".equals(request.sortBy)) {
+			QueryTools.orderBy(request.sort, facilityProxy.getName());
+		} else {
+			QueryTools.orderBy(request.sort, facilityProxy.getId());
 		}
 
 		return facilityProxy;
@@ -63,8 +59,8 @@ public class FacilityService extends BaseService {
 	public ApiBaseEntity createOrUpdateFacility(ApiFacility apiFacility) throws ApiException {
 
 		Facility entity;
-		FacilityLocation facilityLocation = null;
-		Address address = null;
+		FacilityLocation facilityLocation;
+		Address address;
 
 		if (apiFacility.getId() != null) {
 			entity = fetchFacility(apiFacility.getId());
@@ -125,26 +121,37 @@ public class FacilityService extends BaseService {
 
 	}
 	
-	public List<ApiFacility> listFacilitiesByCompany(Long companyId) {
+	public ApiPaginatedList<ApiFacility> listFacilitiesByCompany(Long companyId, ApiPaginatedRequest request) {
 
-		List<Facility> facilities = 
-			em.createNamedQuery("Facility.listFacilitiesByCompany", Facility.class)
+		TypedQuery<Facility> facilitiesQuery = em.createNamedQuery("Facility.listFacilitiesByCompany", Facility.class)
 				.setParameter("companyId", companyId)
-				.getResultList();
+				.setFirstResult(request.getOffset())
+				.setMaxResults(request.getLimit());
 
-		return facilities.stream().map(f -> FacilityMapper.toApiFacility(f)).collect(Collectors.toList());
+		List<Facility> facilities = facilitiesQuery.getResultList();
 
+		Long count = em.createNamedQuery("Facility.countFacilitiesByCompany", Long.class)
+				.setParameter("companyId", companyId).getSingleResult();
+
+		return new ApiPaginatedList<>(
+				facilities.stream().map(FacilityMapper::toApiFacility).collect(Collectors.toList()), count);
 	}
 	
-	public List<ApiFacility> listCollectingFacilitiesByCompany(Long companyId) {
+	public ApiPaginatedList<ApiFacility> listCollectingFacilitiesByCompany(Long companyId, ApiPaginatedRequest request) {
 
-		List<Facility> facilities = 
-			em.createNamedQuery("Facility.listCollectingFacilitiesByCompany", Facility.class)
+		TypedQuery<Facility> collectingFacilitiesQuery = em.createNamedQuery("Facility.listCollectingFacilitiesByCompany",
+						Facility.class)
 				.setParameter("companyId", companyId)
-				.getResultList();
+				.setFirstResult(request.getOffset())
+				.setMaxResults(request.getLimit());
 
-		return facilities.stream().map(f -> FacilityMapper.toApiFacility(f)).collect(Collectors.toList());
+		List<Facility> facilities = collectingFacilitiesQuery.getResultList();
 
+		Long count = em.createNamedQuery("Facility.countCollectingFacilitiesByCompany", Long.class)
+				.setParameter("companyId", companyId).getSingleResult();
+
+		return new ApiPaginatedList<>(
+				facilities.stream().map(FacilityMapper::toApiFacility).collect(Collectors.toList()), count);
 	}
 
 }

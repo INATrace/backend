@@ -1,29 +1,14 @@
 package com.abelium.inatrace.components.codebook.facility;
 
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiDefaultResponse;
-import com.abelium.inatrace.api.ApiPaginatedRequest;
-import com.abelium.inatrace.api.ApiPaginatedResponse;
-import com.abelium.inatrace.api.ApiResponse;
+import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.facility.api.ApiFacility;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.validation.Valid;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * REST controller for facility entity.
@@ -34,31 +19,34 @@ import io.swagger.annotations.ApiParam;
 @RequestMapping("/chain/facility")
 public class FacilityController {
 
+	private final FacilityService facilityService;
+
 	@Autowired
-	private FacilityService facilityService;
+	public FacilityController(FacilityService facilityService) {
+		this.facilityService = facilityService;
+	}
 
 	@GetMapping("list")
 	@ApiOperation("Get a paginated list of facilities.")
 	public ApiPaginatedResponse<ApiFacility> getFacilityList(@Valid ApiPaginatedRequest request) {
 
 		return new ApiPaginatedResponse<>(facilityService.getFacilityList(request));
-
 	}
 	
 	@GetMapping("list/company/{id}")
 	@ApiOperation("Get a list of facilities by company ID.")
-	public List<ApiFacility> listFacilitiesByCompany(@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId) throws ApiException {
+	public ApiPaginatedResponse<ApiFacility> listFacilitiesByCompany(
+			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId, @Valid ApiPaginatedRequest request) {
 
-		return new ArrayList<ApiFacility>(facilityService.listFacilitiesByCompany(companyId));
-
+		return new ApiPaginatedResponse<>(facilityService.listFacilitiesByCompany(companyId, request));
 	}
 	
 	@GetMapping("list/collecting/company/{id}")
 	@ApiOperation("Get a list of collecting facilities by company ID.")
-	public List<ApiFacility> listCollectingFacilitiesByCompany(@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId) throws ApiException {
+	public ApiPaginatedResponse<ApiFacility> listCollectingFacilitiesByCompany(
+			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId, @Valid ApiPaginatedRequest request) {
 
-		return new ArrayList<ApiFacility>(facilityService.listCollectingFacilitiesByCompany(companyId));
-
+		return new ApiPaginatedResponse<>(facilityService.listCollectingFacilitiesByCompany(companyId, request));
 	}
 
 	@GetMapping("{id}")
@@ -71,7 +59,7 @@ public class FacilityController {
 
 	@PutMapping
 	@ApiOperation("Create or update facility. If ID is provided, then the entity with the provided ID is updated.")
-	public ApiResponse<ApiBaseEntity> createOrUpdateFacilityType(@Valid @RequestBody ApiFacility apiFacility) throws ApiException {
+	public ApiResponse<ApiBaseEntity> createOrUpdateFacility(@Valid @RequestBody ApiFacility apiFacility) throws ApiException {
 
 		return new ApiResponse<>(facilityService.createOrUpdateFacility(apiFacility));
 
@@ -79,7 +67,7 @@ public class FacilityController {
 
 	@DeleteMapping("{id}")
 	@ApiOperation("Deletes a facility with the provided ID.")
-	public ApiDefaultResponse deleteFacilityType(@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) throws ApiException {
+	public ApiDefaultResponse deleteFacility(@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		facilityService.deleteFacility(id);
 		return new ApiDefaultResponse();
