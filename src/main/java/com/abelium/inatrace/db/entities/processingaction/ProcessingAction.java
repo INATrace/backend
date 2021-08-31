@@ -55,7 +55,7 @@ public class ProcessingAction extends TimestampEntity {
 	
 	// TODO: requiredFields?: FieldDefinition[] - seems quite a mess in nodejs
 	
-	// TODO: are doctypesidsrequired? 
+	// TODO: are requireddoctypesidwithrequired? - seems to be a class with 4 properties
 	
 	// TODO: I assume next properties are enums?
 //	@OneToOne
