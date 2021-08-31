@@ -6,6 +6,7 @@ import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.common.Address;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.facility.Facility;
+import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.types.CompanyStatus;
 
 import java.util.ArrayList;
@@ -141,6 +142,12 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	 */
 	@OneToMany(mappedBy = "company")
 	private List<Facility> facilities = new ArrayList<>();
+	
+	/**
+	 * processing actions
+	 */
+	@OneToMany(mappedBy = "company")
+	private List<ProcessingAction> processingActions = new ArrayList<>();
 
 	public CompanyStatus getStatus() {
 		return status;
@@ -276,6 +283,14 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 
 	public void setFacilities(List<Facility> facilities) {
 		this.facilities = facilities;
+	}
+	
+	public List<ProcessingAction> getProcessingActions() {
+		return processingActions;
+	}
+
+	public void setProcessingActions(List<ProcessingAction> processingActions) {
+		this.processingActions = processingActions;
 	}
   
 }
