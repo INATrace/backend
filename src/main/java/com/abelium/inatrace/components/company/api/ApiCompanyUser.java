@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 public class ApiCompanyUser extends ApiUserBase {
 
-	
 	@ApiModelProperty(value = "company role")
 	public CompanyUserRole companyRole;
 

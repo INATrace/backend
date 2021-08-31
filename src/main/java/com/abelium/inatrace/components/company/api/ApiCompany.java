@@ -1,15 +1,13 @@
 package com.abelium.inatrace.components.company.api;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.hibernate.validator.constraints.Length;
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.validator.constraints.Length;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.Valid;
+import java.util.List;
 
 @Validated
 public class ApiCompany extends ApiCompanyBase {
@@ -27,8 +25,7 @@ public class ApiCompany extends ApiCompanyBase {
 
 	@ApiModelProperty(value = "company certifications", position = 13)
 	@Valid
-	public List<ApiCertification> certifications;	
-
+	public List<ApiCertification> certifications;
 	
 	public ApiDocument getLogo() {
 		return logo;
