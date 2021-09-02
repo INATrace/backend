@@ -47,7 +47,7 @@ public class ProcessingActionController {
 	
 	@GetMapping("list/company/{id}")
 	@ApiOperation("Get a list of processing actions by company ID.")
-	public ApiPaginatedResponse<ApiProcessingAction> listFacilitiesByCompany(
+	public ApiPaginatedResponse<ApiProcessingAction> listProcessingActionsByCompany(
 		@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId, 
 		@Valid ApiPaginatedRequest request) {
 
@@ -56,7 +56,7 @@ public class ProcessingActionController {
 	
 	@GetMapping("{id}")
 	@ApiOperation("Get a single processing action with the provided ID.")
-	public ApiResponse<ApiProcessingAction> getProcessingAction(@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) throws ApiException {
+	public ApiResponse<ApiProcessingAction> getProcessingAction(@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		return new ApiResponse<>(processingActionService.getProcessingAction(id));
 	}
