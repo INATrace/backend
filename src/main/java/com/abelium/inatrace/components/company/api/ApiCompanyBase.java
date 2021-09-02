@@ -1,13 +1,13 @@
 package com.abelium.inatrace.components.company.api;
 
-import java.util.Map;
-
-import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import org.hibernate.validator.constraints.Length;
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.types.Lengths;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import java.util.Map;
 
 public class ApiCompanyBase extends ApiBaseEntity {
 
@@ -46,7 +46,6 @@ public class ApiCompanyBase extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "social media URL links (Facebook, Instagram, Twitter, YouTube, ...)", position = 10)
 	public Map<String, String> mediaLinks;
-
 	
 	public String getName() {
 		return name;

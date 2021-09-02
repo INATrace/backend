@@ -165,6 +165,14 @@ public class CompanyService extends BaseService {
 		return companyApiTools.toApiCompanyGet(authUser.getUserId(), c, language, actions, users);
 	}
 
+	public List<ApiCompanyUser> getCompanyUsers(Long id) throws ApiException {
+
+		// Validate that company exists with the provided ID
+		companyQueries.fetchCompany(id);
+
+		return companyQueries.fetchUsersForCompany(id);
+	}
+
 	@Transactional
 	public ApiCompanyPublic getCompanyPublic(long id, Language language) throws ApiException {
 		Company c = companyQueries.fetchCompany(id);
