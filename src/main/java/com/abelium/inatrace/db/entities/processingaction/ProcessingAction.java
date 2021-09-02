@@ -18,6 +18,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -25,9 +26,14 @@ import javax.persistence.Version;
 
 @Entity
 @Table(indexes = { @Index(columnList = "name") })
-// TODO: NamedQueries
 @NamedQueries({
-
+	@NamedQuery(name = "ProcessingAction.listProcessingActionsByCompany", 
+			query = "SELECT pa FROM ProcessingAction pa "
+					+ "INNER JOIN pa.company c "
+					+ "WHERE c.id = :companyId"),
+	@NamedQuery(name = "ProcessingAction.countProcessingActionsByCompany",
+			query = "SELECT COUNT(pa) FROM ProcessingAction pa "
+					+ "WHERE pa.company.id = :companyId"),
 })
 public class ProcessingAction extends TimestampEntity {
 
@@ -70,7 +76,7 @@ public class ProcessingAction extends TimestampEntity {
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
-	private PublicTimelineIconType publicTimelineIcon;
+	private PublicTimelineIconType publicTimelineIconType;
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL)
 	private List<ProcessingActionProcessingEvidenceType> requiredDocumentTypes = new ArrayList<>();
@@ -166,12 +172,12 @@ public class ProcessingAction extends TimestampEntity {
 		this.type = type;
 	}
 
-	public PublicTimelineIconType getPublicTimelineIcon() {
-		return publicTimelineIcon;
+	public PublicTimelineIconType getPublicTimelineIconType() {
+		return publicTimelineIconType;
 	}
 
-	public void setPublicTimelineIcon(PublicTimelineIconType publicTimelineIcon) {
-		this.publicTimelineIcon = publicTimelineIcon;
+	public void setPublicTimelineIconType(PublicTimelineIconType publicTimelineIconType) {
+		this.publicTimelineIconType = publicTimelineIconType;
 	}
 
 	public List<ProcessingActionProcessingEvidenceType> getRequiredDocumentTypes() {
@@ -199,7 +205,7 @@ public class ProcessingAction extends TimestampEntity {
 		this.publicTimelineLabel = publicTimelineLabel;
 		this.publicTimelineLocation = publicTimelineLocation;
 		this.type = type;
-		this.publicTimelineIcon = publicTimelineIcon;
+		this.publicTimelineIconType = publicTimelineIcon;
 		this.requiredDocumentTypes = requiredDocumentTypes;
 	}
 
