@@ -28,7 +28,7 @@ import io.swagger.annotations.ApiParam;
  * @author Rene Flores, Sunesis d.o.o.
  */
 @RestController
-@RequestMapping("/chain/processingaction")
+@RequestMapping("/chain/processing-action")
 public class ProcessingActionController {
 
 	private final ProcessingActionService processingActionService;

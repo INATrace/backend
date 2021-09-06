@@ -5,7 +5,7 @@ import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingActionProcessingEvidenceType;
+import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public final class ProcessingActionMapper {
 		List<ApiProcessingEvidenceType> apiRequiredDocumentTypes = new ArrayList<>();
 		
 		// Get list of association entities
-		List<ProcessingActionProcessingEvidenceType> processingActionProcessingEvidenceTypes = entity.getRequiredDocumentTypes();
+		List<ProcessingActionPET> processingActionProcessingEvidenceTypes = entity.getRequiredDocumentTypes();
 		processingActionProcessingEvidenceTypes.forEach(
 			processingActionProcessingEvidenceType -> {
 				

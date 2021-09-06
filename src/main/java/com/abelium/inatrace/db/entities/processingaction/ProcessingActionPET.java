@@ -1,18 +1,14 @@
 package com.abelium.inatrace.db.entities.processingaction;
 
-import com.abelium.inatrace.db.base.TimestampEntity;
+import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceType;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
 @Entity
-public class ProcessingActionProcessingEvidenceType extends TimestampEntity {
-
-	@Version
-	private long entityVersion;
+public class ProcessingActionPET extends BaseEntity {
 
 	@ManyToOne
 	@NotNull
@@ -38,7 +34,7 @@ public class ProcessingActionProcessingEvidenceType extends TimestampEntity {
 		this.processingEvidenceType = processingEvidenceType;
 	}
 
-	public ProcessingActionProcessingEvidenceType(
+	public ProcessingActionPET(
 		@NotNull ProcessingAction processingAction,
 		@NotNull ProcessingEvidenceType processingEvidenceType) {
 		super();
@@ -46,7 +42,7 @@ public class ProcessingActionProcessingEvidenceType extends TimestampEntity {
 		this.processingEvidenceType = processingEvidenceType;
 	}
 
-	public ProcessingActionProcessingEvidenceType() {
+	public ProcessingActionPET() {
 		super();
 	}
 	

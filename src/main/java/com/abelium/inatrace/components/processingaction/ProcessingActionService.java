@@ -13,7 +13,7 @@ import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingActionProcessingEvidenceType;
+import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -107,7 +107,7 @@ public class ProcessingActionService extends BaseService {
 		apiProcessingAction.getRequiredDocumentTypes().forEach(
 			
 			requiredDocumentType -> {
-				ProcessingActionProcessingEvidenceType processingActionProcessingEvidenceType = new ProcessingActionProcessingEvidenceType();
+				ProcessingActionPET processingActionProcessingEvidenceType = new ProcessingActionPET();
 				try {
 					processingActionProcessingEvidenceType.setProcessingEvidenceType(
 						processingEvidenceTypeService.fetchProcessingEvidenceType(requiredDocumentType.getId()));

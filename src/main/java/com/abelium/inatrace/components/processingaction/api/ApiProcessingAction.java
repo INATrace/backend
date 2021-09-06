@@ -7,6 +7,7 @@ import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	private Boolean repackedOutputs;
 	
 	@ApiModelProperty(value = "Processing action maximum output weight")
-	private Float maxOutputWeight;
+	private BigDecimal maxOutputWeight;
 	
 	@ApiModelProperty(value = "Processing action public timeline label")
 	private String publicTimelineLabel;
@@ -90,11 +91,11 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		this.repackedOutputs = repackedOutputs;
 	}
 
-	public Float getMaxOutputWeight() {
+	public BigDecimal getMaxOutputWeight() {
 		return maxOutputWeight;
 	}
 
-	public void setMaxOutputWeight(Float maxOutputWeight) {
+	public void setMaxOutputWeight(BigDecimal maxOutputWeight) {
 		this.maxOutputWeight = maxOutputWeight;
 	}
 
@@ -167,7 +168,7 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	}
 
 	public ApiProcessingAction(String name, String description, String prefix, Boolean repackedOutputs,
-			Float maxOutputWeight, String publicTimelineLabel, String publicTimelineLocation, ApiCompanyBase company,
+			BigDecimal maxOutputWeight, String publicTimelineLabel, String publicTimelineLocation, ApiCompanyBase company,
 			ApiSemiProduct inputSemiProduct, ApiSemiProduct outputSemiProduct, ProcessingActionType type,
 			PublicTimelineIconType publicTimelineIconType) {
 		super();

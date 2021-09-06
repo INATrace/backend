@@ -7,6 +7,7 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class ProcessingAction extends TimestampEntity {
 	private Boolean repackedOutputs;
 
 	@Column
-	private Float maxOutputWeight;
+	private BigDecimal maxOutputWeight;
 	
 	@ManyToOne
 	private Company company;
@@ -79,7 +80,7 @@ public class ProcessingAction extends TimestampEntity {
 	private PublicTimelineIconType publicTimelineIconType;
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL)
-	private List<ProcessingActionProcessingEvidenceType> requiredDocumentTypes = new ArrayList<>();
+	private List<ProcessingActionPET> requiredDocumentTypes = new ArrayList<>();
 	
 	// TODO: requiredFields?: FieldDefinition[] - many to many - API needed - 
 	// Get better definition from Boris and Claudia. Keep it out for now.
@@ -116,11 +117,11 @@ public class ProcessingAction extends TimestampEntity {
 		this.repackedOutputs = repackedOutputs;
 	}
 
-	public Float getMaxOutputWeight() {
+	public BigDecimal getMaxOutputWeight() {
 		return maxOutputWeight;
 	}
 
-	public void setMaxOutputWeight(Float maxOutputWeight) {
+	public void setMaxOutputWeight(BigDecimal maxOutputWeight) {
 		this.maxOutputWeight = maxOutputWeight;
 	}
 
@@ -180,19 +181,19 @@ public class ProcessingAction extends TimestampEntity {
 		this.publicTimelineIconType = publicTimelineIconType;
 	}
 
-	public List<ProcessingActionProcessingEvidenceType> getRequiredDocumentTypes() {
+	public List<ProcessingActionPET> getRequiredDocumentTypes() {
 		return requiredDocumentTypes;
 	}
 
-	public void setRequiredDocumentTypes(List<ProcessingActionProcessingEvidenceType> requiredDocumentTypes) {
+	public void setRequiredDocumentTypes(List<ProcessingActionPET> requiredDocumentTypes) {
 		this.requiredDocumentTypes = requiredDocumentTypes;
 	}
 
 	public ProcessingAction(String name, String description, String prefix, Boolean repackedOutputs,
-			Float maxOutputWeight, Company company, SemiProduct inputSemiProduct, SemiProduct outputSemiProduct,
+			BigDecimal maxOutputWeight, Company company, SemiProduct inputSemiProduct, SemiProduct outputSemiProduct,
 			String publicTimelineLabel, String publicTimelineLocation, ProcessingActionType type,
 			PublicTimelineIconType publicTimelineIcon,
-			List<ProcessingActionProcessingEvidenceType> requiredDocumentTypes) {
+			List<ProcessingActionPET> requiredDocumentTypes) {
 		super();
 		this.name = name;
 		this.description = description;
