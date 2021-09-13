@@ -1,6 +1,6 @@
 package com.abelium.inatrace.types;
 
-public enum FieldDefinitionType {
+public enum ProcessingEvidenceFieldType {
     STRING,
     TEXT,
     NUMBER,
