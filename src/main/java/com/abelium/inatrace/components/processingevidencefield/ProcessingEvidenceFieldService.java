@@ -81,18 +81,20 @@ public class ProcessingEvidenceFieldService extends BaseService {
 
 		// Get list of files infos
 		List<ApiFileInfo> apiFilesInfos = apiProcessingEvidenceField.getFiles();
-		apiFilesInfos.forEach(
-			apiFileInfo -> {
-				
-				FileInfo fileInfo = new FileInfo();
-				fileInfo.setStorageKey(apiFileInfo.getStorageKey());
-				fileInfo.setName(apiFileInfo.getName());
-				fileInfo.setContentType(apiFileInfo.getContentType());
-				fileInfo.setSize(apiFileInfo.getSize());
-				
-				filesInfos.add(fileInfo);
-			}
-		);
+		if (apiFilesInfos != null && !apiFilesInfos.isEmpty()) {
+			apiFilesInfos.forEach(
+					apiFileInfo -> {
+						
+						FileInfo fileInfo = new FileInfo();
+						fileInfo.setStorageKey(apiFileInfo.getStorageKey());
+						fileInfo.setName(apiFileInfo.getName());
+						fileInfo.setContentType(apiFileInfo.getContentType());
+						fileInfo.setSize(apiFileInfo.getSize());
+						
+						filesInfos.add(fileInfo);
+					}
+			);
+		}
 		
 		entity.setFiles(filesInfos);
 
