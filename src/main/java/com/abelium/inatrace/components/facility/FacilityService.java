@@ -10,6 +10,7 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
 import com.abelium.inatrace.db.entities.common.Address;
 import com.abelium.inatrace.db.entities.common.Country;
+import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.facility.FacilityLocation;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -61,15 +62,18 @@ public class FacilityService extends BaseService {
 		Facility entity;
 		FacilityLocation facilityLocation;
 		Address address;
+		Company company;
 
 		if (apiFacility.getId() != null) {
 			entity = fetchFacility(apiFacility.getId());
 			facilityLocation = entity.getFacilityLocation();
 			address = entity.getFacilityLocation().getAddress();
+			company = entity.getCompany();
 		} else {
 			entity = new Facility();
 			facilityLocation = new FacilityLocation();
 			address = new Address();
+			company = (Company) em.createNamedQuery("Company.getCompanyById").setParameter("companyId", apiFacility.getCompany().getId()).getSingleResult();
 		}
 
 		entity.setName(apiFacility.getName());
@@ -85,6 +89,9 @@ public class FacilityService extends BaseService {
 		address.setCity(apiFacility.getFacilityLocation().getAddress().getCity());
 		address.setState(apiFacility.getFacilityLocation().getAddress().getState());
 		address.setZip(apiFacility.getFacilityLocation().getAddress().getZip());
+		address.setCell(apiFacility.getFacilityLocation().getAddress().getCell());
+		address.setSector(apiFacility.getFacilityLocation().getAddress().getSector());
+		address.setVillage(apiFacility.getFacilityLocation().getAddress().getVillage());
 
 		Country country = Queries.get(em, Country.class, apiFacility.getFacilityLocation().getAddress().getCountry().getId());
 		address.setCountry(country);
@@ -94,6 +101,8 @@ public class FacilityService extends BaseService {
 		entity.setFacilityType(facilityType);
 		
 		entity.setFacilityLocation(facilityLocation);
+
+		entity.setCompany(company);
 
 		if (entity.getId() == null) {
 			em.persist(entity);

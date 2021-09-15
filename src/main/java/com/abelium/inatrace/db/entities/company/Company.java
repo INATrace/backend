@@ -30,9 +30,15 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
 @Entity
 @Table(indexes = { @Index(columnList = "name") })
+@NamedQueries({
+		@NamedQuery(name = "Company.getCompanyById",
+					query = "SELECT c FROM Company c WHERE c.id = :companyId")
+})
 public class Company extends BaseEntity implements CompanyTranslatables {
 	
 	@Version

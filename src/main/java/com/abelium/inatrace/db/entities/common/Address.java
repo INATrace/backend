@@ -34,6 +34,24 @@ public class Address {
 	 */
 	@Column(length = Lengths.ZIPCODE)
 	private String zip;
+
+	/**
+	 * Village cell
+	 */
+	@Column(length = Lengths.CELL)
+	private String cell;
+
+	/**
+	 * Village sector
+	 */
+	@Column(length = Lengths.SECTOR)
+	private String sector;
+
+	/**
+	 * Village name
+	 */
+	@Column(length = Lengths.VILLAGE)
+	private String village;
 	
 	/**
 	 * country
@@ -71,6 +89,30 @@ public class Address {
 
 	public void setZip(String zip) {
 		this.zip = zip;
+	}
+
+	public String getCell() {
+		return cell;
+	}
+
+	public void setCell(String cell) {
+		this.cell = cell;
+	}
+
+	public String getSector() {
+		return sector;
+	}
+
+	public void setSector(String sector) {
+		this.sector = sector;
+	}
+
+	public String getVillage() {
+		return village;
+	}
+
+	public void setVillage(String village) {
+		this.village = village;
 	}
 
 	public Country getCountry() {

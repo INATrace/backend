@@ -55,7 +55,14 @@ public class Lengths
     public static final int CITY = DEFAULT;	
     public static final int STATE = DEFAULT;	
     public static final int ZIPCODE = 50;
-	
+
+    /**
+     * Cell, sector, village
+     */
+    public static final int CELL = DEFAULT;
+    public static final int SECTOR = DEFAULT;
+    public static final int VILLAGE = DEFAULT;
+
     // users
     public static final int NAME = DEFAULT;
     public static final int SURNAME = DEFAULT;

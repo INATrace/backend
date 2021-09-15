@@ -26,6 +26,18 @@ public class ApiAddress {
 	@Length(max = Lengths.ZIPCODE)
     @ApiModelProperty(value = "ZIP / postal code / p.p. box", position = 4)
 	public String zip;
+
+	@Length(max = Lengths.CELL)
+	@ApiModelProperty(value = "Village cell", position = 5)
+	public String cell;
+
+	@Length(max = Lengths.SECTOR)
+	@ApiModelProperty(value = "Village sector", position = 6)
+	public String sector;
+
+	@Length(max = Lengths.VILLAGE)
+	@ApiModelProperty(value = "Village name", position = 7)
+	public String village;
 	
     @ApiModelProperty(value = "country", position = 5)
 	public ApiCountry country;
@@ -61,6 +73,30 @@ public class ApiAddress {
 
 	public void setZip(String zip) {
 		this.zip = zip;
+	}
+
+	public String getCell() {
+		return cell;
+	}
+
+	public void setCell(String cell) {
+		this.cell = cell;
+	}
+
+	public String getSector() {
+		return sector;
+	}
+
+	public void setSector(String sector) {
+		this.sector = sector;
+	}
+
+	public String getVillage() {
+		return village;
+	}
+
+	public void setVillage(String village) {
+		this.village = village;
 	}
 
 	public ApiCountry getCountry() {
