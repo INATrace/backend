@@ -48,7 +48,7 @@ public class ProcessingEvidenceFieldController {
 	@GetMapping("list/value-chain/{id}")
 	@ApiOperation("Get a list of processing evidence fields by value chain ID.")
 	public ApiPaginatedResponse<ApiProcessingEvidenceField> listProcessingEvidenceFieldsByValueChain(
-		@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long valueChainId, 
+		@Valid @ApiParam(value = "Value chain ID", required = true) @PathVariable("id") Long valueChainId, 
 		@Valid ApiPaginatedRequest request) {
 
 		return new ApiPaginatedResponse<>(processingEvidenceFieldService.listProcessingEvidenceFieldsByValueChain(valueChainId, request));
