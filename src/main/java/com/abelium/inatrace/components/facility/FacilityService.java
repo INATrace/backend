@@ -7,12 +7,15 @@ import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.common.BaseService;
+import com.abelium.inatrace.components.facility.api.ApiFacilitySemiProduct;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
+import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.Address;
 import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.facility.FacilityLocation;
+import com.abelium.inatrace.db.entities.facility.FacilitySemiProduct;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -84,6 +87,7 @@ public class FacilityService extends BaseService {
 		facilityLocation.setLongitude(apiFacility.getFacilityLocation().getLongitude());
 		facilityLocation.setNumberOfFarmers(apiFacility.getFacilityLocation().getNumberOfFarmers());
 		facilityLocation.setPinName(apiFacility.getFacilityLocation().getPinName());
+		facilityLocation.setPubliclyVisible(apiFacility.getFacilityLocation().getPubliclyVisible());
 
 		address.setAddress(apiFacility.getFacilityLocation().getAddress().getAddress());
 		address.setCity(apiFacility.getFacilityLocation().getAddress().getCity());
@@ -108,6 +112,18 @@ public class FacilityService extends BaseService {
 			em.persist(entity);
 		}
 
+		entity.getFacilitySemiProducts().removeIf(facilitySemiProduct -> apiFacility.getFacilitySemiProductList().stream().noneMatch(apiFacilitySemiProduct -> apiFacilitySemiProduct.getId().equals(facilitySemiProduct.getId())));
+
+		for (ApiFacilitySemiProduct apiFacilitySemiProduct : apiFacility.getFacilitySemiProductList()) {
+			if (apiFacilitySemiProduct.getId() == null) {
+				FacilitySemiProduct facilitySemiProduct = new FacilitySemiProduct();
+				SemiProduct semiProduct = fetchSemiProduct(apiFacilitySemiProduct.getApiSemiProduct().getId());
+				facilitySemiProduct.setFacility(entity);
+				facilitySemiProduct.setSemiProduct(semiProduct);
+				entity.getFacilitySemiProducts().add(facilitySemiProduct);
+			}
+		}
+
 		return new ApiBaseEntity(entity);
 	}
 
@@ -128,6 +144,14 @@ public class FacilityService extends BaseService {
 
 		return facility;
 
+	}
+
+	public SemiProduct fetchSemiProduct(Long id) throws ApiException {
+		SemiProduct semiProduct = Queries.get(em, SemiProduct.class, id);
+		if (semiProduct == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid semi-product ID");
+		}
+		return semiProduct;
 	}
 	
 	public ApiPaginatedList<ApiFacility> listFacilitiesByCompany(Long companyId, ApiPaginatedRequest request) {
