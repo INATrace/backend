@@ -41,6 +41,9 @@ public final class FacilityMapper {
 		apiAddress.setCity(entity.getFacilityLocation().getAddress().getCity());
 		apiAddress.setState(entity.getFacilityLocation().getAddress().getState());
 		apiAddress.setZip(entity.getFacilityLocation().getAddress().getZip());
+		apiAddress.setCell(entity.getFacilityLocation().getAddress().getCell());
+		apiAddress.setSector(entity.getFacilityLocation().getAddress().getSector());
+		apiAddress.setVillage(entity.getFacilityLocation().getAddress().getVillage());
 
 		apiCountry.setId(entity.getFacilityLocation().getAddress().getCountry().getId());
 		apiCountry.setCode(entity.getFacilityLocation().getAddress().getCountry().getCode());
