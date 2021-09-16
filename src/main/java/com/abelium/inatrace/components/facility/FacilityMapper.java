@@ -1,5 +1,7 @@
 package com.abelium.inatrace.components.facility;
 
+import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
+import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.facility.api.ApiFacilityLocation;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
@@ -62,11 +64,11 @@ public final class FacilityMapper {
 		apiFacilityType.setLabel(entity.getFacilityType().getLabel());
 		apiFacility.setFacilityType(apiFacilityType);
 
-		List<Long> apiFacilitySemiProductList = new ArrayList<>();
+		List<ApiSemiProduct> apiSemiProductList = new ArrayList<>();
 		for (FacilitySemiProduct facilitySemiProduct : entity.getFacilitySemiProducts()) {
-			apiFacilitySemiProductList.add(facilitySemiProduct.getSemiProduct().getId());
+			apiSemiProductList.add(SemiProductMapper.toApiSemiProductIdName(facilitySemiProduct.getSemiProduct()));
 		}
-		apiFacility.setFacilitySemiProductList(apiFacilitySemiProductList);
+		apiFacility.setFacilitySemiProductList(apiSemiProductList);
 
 		return apiFacility;
 	}

@@ -16,6 +16,21 @@ public final class SemiProductMapper {
 	}
 
 	/**
+	 * Mapping ID and name to API entity
+	 *
+	 * @param entity DB entity
+	 * @return API model entity with ID and name
+	 */
+	public static ApiSemiProduct toApiSemiProductIdName(SemiProduct entity) {
+
+		ApiSemiProduct apiSemiProduct = new ApiSemiProduct();
+		apiSemiProduct.setId(entity.getId());
+		apiSemiProduct.setName(entity.getName());
+
+		return apiSemiProduct;
+	}
+
+	/**
 	 * Mapping the base entity attributes - no associations are included.
 	 *
 	 * @param entity DB entity.

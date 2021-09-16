@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.facility.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
+import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -29,7 +30,7 @@ public class ApiFacility extends ApiBaseEntity {
 	private ApiFacilityType facilityType;
 
 	@ApiModelProperty(value = "List of semi product ID's for this facility")
-	private List<Long> facilitySemiProductList;
+	private List<ApiSemiProduct> facilitySemiProductList;
 
 	public String getName() {
 		return name;
@@ -79,11 +80,11 @@ public class ApiFacility extends ApiBaseEntity {
 		this.facilityType = facilityType;
 	}
 
-	public List<Long> getFacilitySemiProductList() {
+	public List<ApiSemiProduct> getFacilitySemiProductList() {
 		return facilitySemiProductList;
 	}
 
-	public void setFacilitySemiProductList(List<Long> facilitySemiProductList) {
+	public void setFacilitySemiProductList(List<ApiSemiProduct> facilitySemiProductList) {
 		this.facilitySemiProductList = facilitySemiProductList;
 	}
 

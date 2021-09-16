@@ -6,6 +6,7 @@ import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
+import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
@@ -116,11 +117,11 @@ public class FacilityService extends BaseService {
 			em.persist(entity);
 		}
 
-		entity.getFacilitySemiProducts().removeIf(facilitySemiProduct -> apiFacility.getFacilitySemiProductList().stream().noneMatch(apiFacilitySemiProduct -> apiFacilitySemiProduct.equals(facilitySemiProduct.getId())));
+		entity.getFacilitySemiProducts().removeIf(facilitySemiProduct -> apiFacility.getFacilitySemiProductList().stream().noneMatch(apiFacilitySemiProduct -> apiFacilitySemiProduct.getId().equals(facilitySemiProduct.getId())));
 
-		for (Long apiFacilitySemiProductId: apiFacility.getFacilitySemiProductList()) {
+		for (ApiSemiProduct apiSemiProduct : apiFacility.getFacilitySemiProductList()) {
 			FacilitySemiProduct facilitySemiProduct = new FacilitySemiProduct();
-			SemiProduct semiProduct = semiProductService.fetchSemiProduct(apiFacilitySemiProductId);
+			SemiProduct semiProduct = semiProductService.fetchSemiProduct(apiSemiProduct.getId());
 			facilitySemiProduct.setFacility(entity);
 			facilitySemiProduct.setSemiProduct(semiProduct);
 			entity.getFacilitySemiProducts().add(facilitySemiProduct);
