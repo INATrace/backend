@@ -5,6 +5,7 @@ import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.facility.api.ApiFacilitySemiProduct;
@@ -19,6 +20,7 @@ import com.abelium.inatrace.db.entities.facility.FacilitySemiProduct;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
@@ -36,6 +38,9 @@ import java.util.stream.Collectors;
 @Lazy
 @Service
 public class FacilityService extends BaseService {
+
+	@Autowired
+	private SemiProductService semiProductService;
 
 	public ApiPaginatedList<ApiFacility> getFacilityList(ApiPaginatedRequest request) {
 
@@ -117,7 +122,7 @@ public class FacilityService extends BaseService {
 		for (ApiFacilitySemiProduct apiFacilitySemiProduct : apiFacility.getFacilitySemiProductList()) {
 			if (apiFacilitySemiProduct.getId() == null) {
 				FacilitySemiProduct facilitySemiProduct = new FacilitySemiProduct();
-				SemiProduct semiProduct = fetchSemiProduct(apiFacilitySemiProduct.getApiSemiProduct().getId());
+				SemiProduct semiProduct = semiProductService.fetchSemiProduct(apiFacilitySemiProduct.getApiSemiProduct().getId());
 				facilitySemiProduct.setFacility(entity);
 				facilitySemiProduct.setSemiProduct(semiProduct);
 				entity.getFacilitySemiProducts().add(facilitySemiProduct);
@@ -144,14 +149,6 @@ public class FacilityService extends BaseService {
 
 		return facility;
 
-	}
-
-	public SemiProduct fetchSemiProduct(Long id) throws ApiException {
-		SemiProduct semiProduct = Queries.get(em, SemiProduct.class, id);
-		if (semiProduct == null) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid semi-product ID");
-		}
-		return semiProduct;
 	}
 	
 	public ApiPaginatedList<ApiFacility> listFacilitiesByCompany(Long companyId, ApiPaginatedRequest request) {
