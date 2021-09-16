@@ -1,12 +1,10 @@
 package com.abelium.inatrace.components.facility;
 
-import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.facility.api.ApiFacilityLocation;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
 import com.abelium.inatrace.components.common.api.ApiCountry;
 import com.abelium.inatrace.components.company.api.ApiAddress;
-import com.abelium.inatrace.components.facility.api.ApiFacilitySemiProduct;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.facility.FacilitySemiProduct;
 
@@ -64,19 +62,9 @@ public final class FacilityMapper {
 		apiFacilityType.setLabel(entity.getFacilityType().getLabel());
 		apiFacility.setFacilityType(apiFacilityType);
 
-		List<ApiFacilitySemiProduct> apiFacilitySemiProductList = new ArrayList<>();
-
+		List<Long> apiFacilitySemiProductList = new ArrayList<>();
 		for (FacilitySemiProduct facilitySemiProduct : entity.getFacilitySemiProducts()) {
-			ApiFacilitySemiProduct apiFacilitySemiProduct = new ApiFacilitySemiProduct();
-
-			ApiSemiProduct apiSemiProduct = new ApiSemiProduct();
-			apiSemiProduct.setId(facilitySemiProduct.getSemiProduct().getId());
-			apiSemiProduct.setName(facilitySemiProduct.getSemiProduct().getName());
-
-			apiFacilitySemiProduct.setId(facilitySemiProduct.getId());
-			apiFacilitySemiProduct.setApiSemiProduct(apiSemiProduct);
-
-			apiFacilitySemiProductList.add(apiFacilitySemiProduct);
+			apiFacilitySemiProductList.add(facilitySemiProduct.getSemiProduct().getId());
 		}
 		apiFacility.setFacilitySemiProductList(apiFacilitySemiProductList);
 

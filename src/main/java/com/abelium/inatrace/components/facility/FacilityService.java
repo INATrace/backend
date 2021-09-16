@@ -8,7 +8,6 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.common.BaseService;
-import com.abelium.inatrace.components.facility.api.ApiFacilitySemiProduct;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.Address;
@@ -117,16 +116,14 @@ public class FacilityService extends BaseService {
 			em.persist(entity);
 		}
 
-		entity.getFacilitySemiProducts().removeIf(facilitySemiProduct -> apiFacility.getFacilitySemiProductList().stream().noneMatch(apiFacilitySemiProduct -> apiFacilitySemiProduct.getId().equals(facilitySemiProduct.getId())));
+		entity.getFacilitySemiProducts().removeIf(facilitySemiProduct -> apiFacility.getFacilitySemiProductList().stream().noneMatch(apiFacilitySemiProduct -> apiFacilitySemiProduct.equals(facilitySemiProduct.getId())));
 
-		for (ApiFacilitySemiProduct apiFacilitySemiProduct : apiFacility.getFacilitySemiProductList()) {
-			if (apiFacilitySemiProduct.getId() == null) {
-				FacilitySemiProduct facilitySemiProduct = new FacilitySemiProduct();
-				SemiProduct semiProduct = semiProductService.fetchSemiProduct(apiFacilitySemiProduct.getApiSemiProduct().getId());
-				facilitySemiProduct.setFacility(entity);
-				facilitySemiProduct.setSemiProduct(semiProduct);
-				entity.getFacilitySemiProducts().add(facilitySemiProduct);
-			}
+		for (Long apiFacilitySemiProductId: apiFacility.getFacilitySemiProductList()) {
+			FacilitySemiProduct facilitySemiProduct = new FacilitySemiProduct();
+			SemiProduct semiProduct = semiProductService.fetchSemiProduct(apiFacilitySemiProductId);
+			facilitySemiProduct.setFacility(entity);
+			facilitySemiProduct.setSemiProduct(semiProduct);
+			entity.getFacilitySemiProducts().add(facilitySemiProduct);
 		}
 
 		return new ApiBaseEntity(entity);

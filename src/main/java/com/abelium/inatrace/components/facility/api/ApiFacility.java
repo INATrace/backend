@@ -28,8 +28,8 @@ public class ApiFacility extends ApiBaseEntity {
 	@ApiModelProperty(value = "Facility type")
 	private ApiFacilityType facilityType;
 
-	@ApiModelProperty(value = "List of semi products for this facility")
-	private List<ApiFacilitySemiProduct> facilitySemiProductList;
+	@ApiModelProperty(value = "List of semi product ID's for this facility")
+	private List<Long> facilitySemiProductList;
 
 	public String getName() {
 		return name;
@@ -79,11 +79,11 @@ public class ApiFacility extends ApiBaseEntity {
 		this.facilityType = facilityType;
 	}
 
-	public List<ApiFacilitySemiProduct> getFacilitySemiProductList() {
+	public List<Long> getFacilitySemiProductList() {
 		return facilitySemiProductList;
 	}
 
-	public void setFacilitySemiProductList(List<ApiFacilitySemiProduct> facilitySemiProductList) {
+	public void setFacilitySemiProductList(List<Long> facilitySemiProductList) {
 		this.facilitySemiProductList = facilitySemiProductList;
 	}
 
