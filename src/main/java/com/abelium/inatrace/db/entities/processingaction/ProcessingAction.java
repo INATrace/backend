@@ -7,23 +7,10 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Index;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Version;
 
 @Entity
 @Table(indexes = { @Index(columnList = "name") })
@@ -79,7 +66,7 @@ public class ProcessingAction extends TimestampEntity {
 	@Column(length = Lengths.ENUM)
 	private PublicTimelineIconType publicTimelineIconType;
 	
-	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionPET> requiredDocumentTypes = new ArrayList<>();
 	
 	// TODO: requiredFields?: FieldDefinition[] - many to many - API needed - 

@@ -18,6 +18,12 @@ public class ProcessingActionPET extends BaseEntity {
 	@NotNull
 	private ProcessingEvidenceType processingEvidenceType;
 
+	private Boolean mandatory;
+
+	private Boolean requiredOnQuote;
+
+	private String requiredOneOfGroupIdForQuote;
+
 	public ProcessingAction getProcessingAction() {
 		return processingAction;
 	}
@@ -34,12 +40,42 @@ public class ProcessingActionPET extends BaseEntity {
 		this.processingEvidenceType = processingEvidenceType;
 	}
 
+	public Boolean getMandatory() {
+		return mandatory;
+	}
+
+	public void setMandatory(Boolean mandatory) {
+		this.mandatory = mandatory;
+	}
+
+	public Boolean getRequiredOnQuote() {
+		return requiredOnQuote;
+	}
+
+	public void setRequiredOnQuote(Boolean requiredOnQuote) {
+		this.requiredOnQuote = requiredOnQuote;
+	}
+
+	public String getRequiredOneOfGroupIdForQuote() {
+		return requiredOneOfGroupIdForQuote;
+	}
+
+	public void setRequiredOneOfGroupIdForQuote(String requiredOneOfGroupIdForQuote) {
+		this.requiredOneOfGroupIdForQuote = requiredOneOfGroupIdForQuote;
+	}
+
 	public ProcessingActionPET(
 		@NotNull ProcessingAction processingAction,
-		@NotNull ProcessingEvidenceType processingEvidenceType) {
+		@NotNull ProcessingEvidenceType processingEvidenceType,
+		Boolean mandatory,
+		Boolean requiredOnQuote,
+		String requiredOneOfGroupIdForQuote) {
 		super();
 		this.processingAction = processingAction;
 		this.processingEvidenceType = processingEvidenceType;
+		this.mandatory = mandatory;
+		this.requiredOnQuote = requiredOnQuote;
+		this.requiredOneOfGroupIdForQuote = requiredOneOfGroupIdForQuote;
 	}
 
 	public ProcessingActionPET() {

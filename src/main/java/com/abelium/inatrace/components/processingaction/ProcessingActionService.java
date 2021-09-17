@@ -17,17 +17,15 @@ import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service for processing action entity.
@@ -98,19 +96,43 @@ public class ProcessingActionService extends BaseService {
 		if (inputSemiProduct != null) {
 			entity.setInputSemiProduct(inputSemiProduct);
 		}
-		
-		SemiProduct outputSemiProduct = semiProductService.fetchSemiProduct(apiProcessingAction.getOutputSemiProduct().getId());
-		if (outputSemiProduct != null) {
-			entity.setOutputSemiProduct(outputSemiProduct);
+
+		if (apiProcessingAction.getOutputSemiProduct() != null && apiProcessingAction.getOutputSemiProduct().getId() != null) {
+			SemiProduct outputSemiProduct = semiProductService.fetchSemiProduct(apiProcessingAction.getOutputSemiProduct().getId());
+			if (outputSemiProduct != null) {
+				entity.setOutputSemiProduct(outputSemiProduct);
+			}
 		}
-		
+
+		// Delete requiredDocumentTypes that are not present in the request
+		entity.getRequiredDocumentTypes().removeAll(
+			entity.getRequiredDocumentTypes()
+					.stream()
+					.filter(p -> apiProcessingAction.getRequiredDocumentTypes()
+							.stream()
+							.noneMatch(rdt -> rdt.getId().equals(p.getProcessingEvidenceType().getId())))
+					.collect(Collectors.toList())
+		);
+
+		// Update or add requiredDocumentTypes
 		apiProcessingAction.getRequiredDocumentTypes().forEach(
 			
 			requiredDocumentType -> {
-				ProcessingActionPET processingActionProcessingEvidenceType = new ProcessingActionPET();
+
+				ProcessingActionPET processingActionProcessingEvidenceType = entity.getRequiredDocumentTypes()
+						.stream()
+						.filter(p -> p.getProcessingEvidenceType().getId().equals(requiredDocumentType.getId()))
+						.findFirst()
+						.orElse(new ProcessingActionPET());
+
 				try {
 					processingActionProcessingEvidenceType.setProcessingEvidenceType(
 						processingEvidenceTypeService.fetchProcessingEvidenceType(requiredDocumentType.getId()));
+					processingActionProcessingEvidenceType.setMandatory(
+							requiredDocumentType.getMandatory() != null && requiredDocumentType.getMandatory());
+					processingActionProcessingEvidenceType.setRequiredOnQuote(
+							requiredDocumentType.getRequiredOnQuote() != null && requiredDocumentType.getRequiredOnQuote());
+					processingActionProcessingEvidenceType.setRequiredOneOfGroupIdForQuote(requiredDocumentType.getRequiredOneOfGroupIdForQuote());
 					processingActionProcessingEvidenceType.setProcessingAction(entity);
 				} catch (ApiException e) {
 					e.printStackTrace();
@@ -161,5 +183,4 @@ public class ProcessingActionService extends BaseService {
 				.map(ProcessingActionMapper::toApiProcessingAction)
 				.collect(Collectors.toList()), count);
 	}
-	
 }

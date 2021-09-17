@@ -43,10 +43,12 @@ public final class ProcessingActionMapper {
 		ApiSemiProduct apiInputSemiProduct = new ApiSemiProduct();
 		apiInputSemiProduct.setId(entity.getInputSemiProduct().getId());
 		apiInputSemiProduct.setName(entity.getInputSemiProduct().getName());
-		
+
 		ApiSemiProduct apiOutputSemiProduct = new ApiSemiProduct();
-		apiOutputSemiProduct.setId(entity.getOutputSemiProduct().getId());
-		apiOutputSemiProduct.setName(entity.getOutputSemiProduct().getName());
+		if(entity.getOutputSemiProduct() != null) {
+			apiOutputSemiProduct.setId(entity.getOutputSemiProduct().getId());
+			apiOutputSemiProduct.setName(entity.getOutputSemiProduct().getName());
+		}
 		
 		List<ApiProcessingEvidenceType> apiRequiredDocumentTypes = new ArrayList<>();
 		
@@ -58,6 +60,9 @@ public final class ProcessingActionMapper {
 				ApiProcessingEvidenceType apiRequiredDocumentType = new ApiProcessingEvidenceType();
 				apiRequiredDocumentType.setId(processingActionProcessingEvidenceType.getProcessingEvidenceType().getId());
 				apiRequiredDocumentType.setLabel(processingActionProcessingEvidenceType.getProcessingEvidenceType().getLabel());
+				apiRequiredDocumentType.setMandatory(processingActionProcessingEvidenceType.getMandatory());
+				apiRequiredDocumentType.setRequiredOnQuote(processingActionProcessingEvidenceType.getRequiredOnQuote());
+				apiRequiredDocumentType.setRequiredOneOfGroupIdForQuote(processingActionProcessingEvidenceType.getRequiredOneOfGroupIdForQuote());
 				apiRequiredDocumentTypes.add(apiRequiredDocumentType);
 				
 			}

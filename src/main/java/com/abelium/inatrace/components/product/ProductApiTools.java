@@ -9,6 +9,8 @@ import com.abelium.inatrace.components.company.CompanyApiTools;
 import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.product.api.*;
+import com.abelium.inatrace.components.value_chain.ValueChainApiTools;
+import com.abelium.inatrace.components.value_chain.ValueChainQueries;
 import com.abelium.inatrace.db.entities.common.Location;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
@@ -41,7 +43,14 @@ public class ProductApiTools {
 	private CompanyApiTools companyApiTools;	
 
 	@Autowired
-	private CompanyQueries companyQueries;	
+	private CompanyQueries companyQueries;
+
+	@Autowired
+	private ValueChainApiTools valueChainApiTools;
+
+	@Autowired
+	private ValueChainQueries valueChainQueries;
+
 
 	public static ApiProductListResponse toApiProductListResponse(long userId, Product product) {
 		if (product == null) return null;
@@ -61,6 +70,7 @@ public class ProductApiTools {
 		
 		ap.origin.locations = p.getOriginLocations().stream().map(ProductApiTools::toApiLocation).collect(Collectors.toList());
 		ap.company = companyApiTools.toApiCompany(userId, p.getCompany(), null);
+		ap.valueChain = valueChainApiTools.toApiValueChain(p.getValueChain());
 		ap.associatedCompanies = p.getAssociatedCompanies().stream().map(ProductApiTools::toApiProductCompany).collect(Collectors.toList());
 		return ap;
 	}
@@ -246,6 +256,7 @@ public class ProductApiTools {
 			if (pu.origin.locations != null) updateOriginLocations(p, p.getOriginLocations(), pu.origin.locations);
 		}
 		if (pu.company != null) p.setCompany(companyQueries.fetchCompany(pu.company.id));
+		if (pu.valueChain != null) p.setValueChain(valueChainQueries.fetchValueChain(pu.valueChain.getId()));
 		if (pu.associatedCompanies != null) updateProductCompanies(p, p.getAssociatedCompanies(), pu.associatedCompanies);
 	}
 

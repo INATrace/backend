@@ -1,14 +1,12 @@
 package com.abelium.inatrace.components.product.api;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
+import com.abelium.inatrace.components.company.api.ApiCompany;
+import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
+import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
-import com.abelium.inatrace.components.company.api.ApiCompany;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.Valid;
+import java.util.List;
 
 @Validated
 public class ApiProduct extends ApiProductContent {
@@ -24,6 +22,8 @@ public class ApiProduct extends ApiProductContent {
 	@ApiModelProperty(value = "labels", position = 15)
 	public List<ApiProductLabelValues> labels;
 
+	@ApiModelProperty(value = "valueChain")
+	public ApiValueChain valueChain;
 	
 	public List<ApiProductCompany> getAssociatedCompanies() {
 		return associatedCompanies;
@@ -41,4 +41,11 @@ public class ApiProduct extends ApiProductContent {
 		this.labels = labels;
 	}
 
+	public ApiValueChain getValueChain() {
+		return valueChain;
+	}
+
+	public void setValueChain(ApiValueChain valueChain) {
+		this.valueChain = valueChain;
+	}
 }
