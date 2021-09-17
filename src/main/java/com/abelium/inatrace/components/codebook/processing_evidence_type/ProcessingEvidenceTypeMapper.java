@@ -45,9 +45,6 @@ public final class ProcessingEvidenceTypeMapper {
 		apiProcessingEvidenceType.setProvenance(entity.getProvenance());
 		apiProcessingEvidenceType.setFairness(entity.getFairness());
 		apiProcessingEvidenceType.setQuality(entity.getQuality());
-		apiProcessingEvidenceType.setRequired(entity.getRequired());
-		apiProcessingEvidenceType.setRequiredOnQuote(entity.getRequiredOnQuote());
-		apiProcessingEvidenceType.setRequiredOneOfGroupIdForQuote(entity.getRequiredOneOfGroupIdForQuote());
 
 		return apiProcessingEvidenceType;
 	}

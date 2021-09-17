@@ -47,23 +47,10 @@ public class ProcessingEvidenceField extends TimestampEntity {
 	private ProcessingEvidenceFieldType type = ProcessingEvidenceFieldType.STRING;
 	
 	@Column
-	private Boolean required;
-	
-	@Column
-	private Boolean mandatory;
-	
-	@Column
-	private Boolean requiredOnQuote;
-	
-	@Column
 	private String stringValue;
 	
 	@Column
 	private Integer numericValue;
-	
-	// TODO: Not possible to map ab object column, any ideas?
-//	@Column
-//	private Object objectValue;
 	
 	@Column
 	private Integer fileMultiplicity;
@@ -90,30 +77,6 @@ public class ProcessingEvidenceField extends TimestampEntity {
 		this.type = type;
 	}
 
-	public Boolean getRequired() {
-		return required;
-	}
-
-	public void setRequired(Boolean required) {
-		this.required = required;
-	}
-
-	public Boolean getMandatory() {
-		return mandatory;
-	}
-
-	public void setMandatory(Boolean mandatory) {
-		this.mandatory = mandatory;
-	}
-
-	public Boolean getRequiredOnQuote() {
-		return requiredOnQuote;
-	}
-
-	public void setRequiredOnQuote(Boolean requiredOnQuote) {
-		this.requiredOnQuote = requiredOnQuote;
-	}
-
 	public String getStringValue() {
 		return stringValue;
 	}
@@ -129,14 +92,6 @@ public class ProcessingEvidenceField extends TimestampEntity {
 	public void setNumericValue(Integer numericValue) {
 		this.numericValue = numericValue;
 	}
-
-//	public Object getObjectValue() {
-//		return objectValue;
-//	}
-//
-//	public void setObjectValue(Object objectValue) {
-//		this.objectValue = objectValue;
-//	}
 
 	public Integer getFileMultiplicity() {
 		return fileMultiplicity;
@@ -154,18 +109,13 @@ public class ProcessingEvidenceField extends TimestampEntity {
 		this.files = files;
 	}
 
-	public ProcessingEvidenceField(String label, ProcessingEvidenceFieldType type, Boolean required, Boolean mandatory,
-			Boolean requiredOnQuote, Integer numericValue, String stringValue,
+	public ProcessingEvidenceField(String label, ProcessingEvidenceFieldType type, Integer numericValue, String stringValue,
 			Integer fileMultiplicity, List<FileInfo> files) {
 		super();
 		this.label = label;
 		this.type = type;
-		this.required = required;
-		this.mandatory = mandatory;
-		this.requiredOnQuote = requiredOnQuote;
 		this.stringValue = stringValue;
 		this.numericValue = numericValue;
-//		this.objectValue = objectValue;
 		this.fileMultiplicity = fileMultiplicity;
 		this.files = files;
 	}

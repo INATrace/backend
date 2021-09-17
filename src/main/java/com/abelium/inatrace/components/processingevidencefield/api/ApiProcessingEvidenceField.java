@@ -33,9 +33,6 @@ public class ApiProcessingEvidenceField extends ApiBaseEntity {
 	@ApiModelProperty(value = "Processing evidence field string value")
 	private String stringValue;
 	
-//	@ApiModelProperty(value = "Processing evidence field object value")
-//	private Object objectValue;
-	
 	@ApiModelProperty(value = "Processing evidence field file multiplicity")
 	private Integer fileMultiplicity;
 	

@@ -68,12 +68,8 @@ public class ProcessingEvidenceFieldService extends BaseService {
 
 		// ApiProcessingEvidenceField object
 		entity.setLabel(apiProcessingEvidenceField.getLabel());
-		entity.setRequired(apiProcessingEvidenceField.getRequired());
-		entity.setMandatory(apiProcessingEvidenceField.getMandatory());
-		entity.setRequiredOnQuote(apiProcessingEvidenceField.getRequiredOnQuote());
 		entity.setNumericValue(apiProcessingEvidenceField.getNumericValue());
 		entity.setStringValue(apiProcessingEvidenceField.getStringValue());
-//		entity.setObjectValue(apiProcessingEvidenceField.getObjectValue());
 		entity.setFileMultiplicity(apiProcessingEvidenceField.getFileMultiplicity());
 		entity.setType(apiProcessingEvidenceField.getType());
 		

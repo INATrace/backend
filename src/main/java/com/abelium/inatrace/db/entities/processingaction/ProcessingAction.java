@@ -69,6 +69,9 @@ public class ProcessingAction extends TimestampEntity {
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionPET> requiredDocumentTypes = new ArrayList<>();
 	
+	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProcessingActionPEF> processingEvidenceFields = new ArrayList<>();
+	
 	// TODO: requiredFields?: FieldDefinition[] - many to many - API needed - 
 	// Get better definition from Boris and Claudia. Keep it out for now.
 
