@@ -3,6 +3,7 @@ package com.abelium.inatrace.db.entities.processingaction;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceType;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
@@ -18,10 +19,13 @@ public class ProcessingActionPET extends BaseEntity {
 	@NotNull
 	private ProcessingEvidenceType processingEvidenceType;
 
+	@Column
 	private Boolean mandatory;
 
+	@Column
 	private Boolean requiredOnQuote;
 
+	@Column
 	private String requiredOneOfGroupIdForQuote;
 
 	public ProcessingAction getProcessingAction() {
