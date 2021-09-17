@@ -71,9 +71,6 @@ public class ProcessingAction extends TimestampEntity {
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionPEF> processingEvidenceFields = new ArrayList<>();
-	
-	// TODO: requiredFields?: FieldDefinition[] - many to many - API needed - 
-	// Get better definition from Boris and Claudia. Keep it out for now.
 
 	public String getName() {
 		return name;
@@ -178,12 +175,21 @@ public class ProcessingAction extends TimestampEntity {
 	public void setRequiredDocumentTypes(List<ProcessingActionPET> requiredDocumentTypes) {
 		this.requiredDocumentTypes = requiredDocumentTypes;
 	}
+	
+	public List<ProcessingActionPEF> getProcessingEvidenceFields() {
+		return processingEvidenceFields;
+	}
+
+	public void setProcessingEvidenceFields(List<ProcessingActionPEF> processingEvidenceFields) {
+		this.processingEvidenceFields = processingEvidenceFields;
+	}
 
 	public ProcessingAction(String name, String description, String prefix, Boolean repackedOutputs,
 			BigDecimal maxOutputWeight, Company company, SemiProduct inputSemiProduct, SemiProduct outputSemiProduct,
 			String publicTimelineLabel, String publicTimelineLocation, ProcessingActionType type,
 			PublicTimelineIconType publicTimelineIcon,
-			List<ProcessingActionPET> requiredDocumentTypes) {
+			List<ProcessingActionPET> requiredDocumentTypes,
+			List<ProcessingActionPEF> processingEvidenceFields) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -198,6 +204,7 @@ public class ProcessingAction extends TimestampEntity {
 		this.type = type;
 		this.publicTimelineIconType = publicTimelineIcon;
 		this.requiredDocumentTypes = requiredDocumentTypes;
+		this.processingEvidenceFields = processingEvidenceFields;
 	}
 
 	public ProcessingAction() {
