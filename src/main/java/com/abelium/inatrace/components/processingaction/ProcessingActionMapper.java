@@ -1,14 +1,16 @@
 package com.abelium.inatrace.components.processingaction;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
+import com.abelium.inatrace.components.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
+import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Mapper for ProcessingAction entity.
@@ -67,6 +69,20 @@ public final class ProcessingActionMapper {
 			apiOutputSemiProduct.setId(entity.getOutputSemiProduct().getId());
 			apiOutputSemiProduct.setName(entity.getOutputSemiProduct().getName());
 		}
+		
+		List<ApiProcessingEvidenceField> apiRequiredEvidenceFields = new ArrayList<>();
+		List<ProcessingActionPEF> processingActionProcessingEvidenceFields = entity.getProcessingEvidenceFields();
+		processingActionProcessingEvidenceFields.forEach(
+			processingActionProcessingEvidenceField -> {
+
+				ApiProcessingEvidenceField apiProcessingEvidenceField = new ApiProcessingEvidenceField();
+				apiProcessingEvidenceField.setId(processingActionProcessingEvidenceField.getProcessingEvidenceField().getId());
+				apiProcessingEvidenceField.setLabel(processingActionProcessingEvidenceField.getProcessingEvidenceField().getLabel());
+				apiProcessingEvidenceField.setMandatory(processingActionProcessingEvidenceField.getMandatory());
+				apiProcessingEvidenceField.setRequiredOnQuote(processingActionProcessingEvidenceField.getRequiredOnQuote());
+				apiRequiredEvidenceFields.add(apiProcessingEvidenceField);
+			}
+		);
 		
 		List<ApiProcessingEvidenceType> apiRequiredDocumentTypes = new ArrayList<>();
 		

@@ -1,6 +1,13 @@
 package com.abelium.inatrace.components.processingaction;
 
-import javax.validation.Valid;
+import com.abelium.inatrace.api.ApiBaseEntity;
+import com.abelium.inatrace.api.ApiDefaultResponse;
+import com.abelium.inatrace.api.ApiPaginatedRequest;
+import com.abelium.inatrace.api.ApiPaginatedResponse;
+import com.abelium.inatrace.api.ApiResponse;
+import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
+import com.abelium.inatrace.types.Language;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,14 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiDefaultResponse;
-import com.abelium.inatrace.api.ApiPaginatedRequest;
-import com.abelium.inatrace.api.ApiPaginatedResponse;
-import com.abelium.inatrace.api.ApiResponse;
-import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
-import com.abelium.inatrace.types.Language;
+import javax.validation.Valid;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -52,7 +52,7 @@ public class ProcessingActionController {
 	@GetMapping("list/company/{id}")
 	@ApiOperation("Get a list of processing actions by company ID.")
 	public ApiPaginatedResponse<ApiProcessingAction> listProcessingActionsByCompany(
-		@Valid @ApiParam(value = "Processin action ID", required = true) @PathVariable("id") Long companyId,
+		@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long companyId,
 		@Valid @ApiParam(value = "language", required = false) @RequestParam(value = "language", defaultValue = "EN") String language, 
 		@Valid ApiPaginatedRequest request) {
 
