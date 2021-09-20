@@ -1,16 +1,14 @@
 package com.abelium.inatrace.components.processingaction;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
-import com.abelium.inatrace.components.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Mapper for ProcessingAction entity.
@@ -22,14 +20,32 @@ public final class ProcessingActionMapper {
 	private ProcessingActionMapper() {
 		throw new IllegalStateException("Utility class");
 	}
-
+	
 	public static ApiProcessingAction toApiProcessingAction(ProcessingAction entity) {
+
+		System.out.println("@@@Translations size: " + entity.getProcessingActionTranslations().size());
 
 		// Simplest apiProcessingAction object
 		ApiProcessingAction apiProcessingAction = new ApiProcessingAction();
 		apiProcessingAction.setId(entity.getId());
-		apiProcessingAction.setName(entity.getName());
-		apiProcessingAction.setDescription(entity.getDescription());
+		apiProcessingAction.setName(entity
+				.getProcessingActionTranslations()
+				.stream()
+				.findFirst()
+				.orElse(null)
+				.getName());
+		apiProcessingAction.setDescription(entity
+				.getProcessingActionTranslations()
+				.stream()
+				.findFirst()
+				.orElse(null)
+				.getDescription());
+		apiProcessingAction.setLanguage(entity
+				.getProcessingActionTranslations()
+				.stream()
+				.findFirst()
+				.orElse(null)
+				.getLanguage());
 		apiProcessingAction.setPrefix(entity.getPrefix());
 		apiProcessingAction.setRepackedOutputs(entity.getRepackedOutputs());
 		apiProcessingAction.setMaxOutputWeight(entity.getMaxOutputWeight());
@@ -51,21 +67,7 @@ public final class ProcessingActionMapper {
 			apiOutputSemiProduct.setId(entity.getOutputSemiProduct().getId());
 			apiOutputSemiProduct.setName(entity.getOutputSemiProduct().getName());
 		}
-
-		List<ApiProcessingEvidenceField> apiRequiredEvidenceFields = new ArrayList<>();
-		List<ProcessingActionPEF> processingActionProcessingEvidenceFields = entity.getProcessingEvidenceFields();
-		processingActionProcessingEvidenceFields.forEach(
-				processingActionProcessingEvidenceField -> {
-
-					ApiProcessingEvidenceField apiProcessingEvidenceField = new ApiProcessingEvidenceField();
-					apiProcessingEvidenceField.setId(processingActionProcessingEvidenceField.getProcessingEvidenceField().getId());
-					apiProcessingEvidenceField.setLabel(processingActionProcessingEvidenceField.getProcessingEvidenceField().getLabel());
-					apiProcessingEvidenceField.setMandatory(processingActionProcessingEvidenceField.getMandatory());
-					apiProcessingEvidenceField.setRequiredOnQuote(processingActionProcessingEvidenceField.getRequiredOnQuote());
-					apiRequiredEvidenceFields.add(apiProcessingEvidenceField);
-				}
-		);
-
+		
 		List<ApiProcessingEvidenceType> apiRequiredDocumentTypes = new ArrayList<>();
 		
 		// Get list of association entities
@@ -89,8 +91,8 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setInputSemiProduct(apiInputSemiProduct);
 		apiProcessingAction.setOutputSemiProduct(apiOutputSemiProduct);
 		apiProcessingAction.setRequiredDocumentTypes(apiRequiredDocumentTypes);
-		apiProcessingAction.setRequiredEvidenceFields(apiRequiredEvidenceFields);
 
 		return apiProcessingAction;
 	}
+
 }

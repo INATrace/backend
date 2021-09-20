@@ -1,16 +1,16 @@
 package com.abelium.inatrace.components.processingaction.api;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
-import com.abelium.inatrace.components.processingevidencefield.api.ApiProcessingEvidenceField;
+import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -26,6 +26,9 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Processing action description")
 	private String description;
+	
+	@ApiModelProperty(value = "Processing action language")
+	private Language language;
 	
 	@ApiModelProperty(value = "Processing action prefix")
 	private String prefix;
@@ -60,9 +63,6 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	@ApiModelProperty(value = "Processing action required document types")
 	private List<ApiProcessingEvidenceType> requiredDocumentTypes = new ArrayList<>();
 
-	@ApiModelProperty(value = "Processing action required evidence fields")
-	private List<ApiProcessingEvidenceField> requiredEvidenceFields = new ArrayList<>();
-
 	public String getName() {
 		return name;
 	}
@@ -77,6 +77,14 @@ public class ApiProcessingAction extends ApiBaseEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public Language getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(Language language) {
+		this.language = language;
 	}
 
 	public String getPrefix() {
@@ -167,25 +175,19 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		this.requiredDocumentTypes = requiredDocumentTypes;
 	}
 
-	public List<ApiProcessingEvidenceField> getRequiredEvidenceFields() {
-		return requiredEvidenceFields;
-	}
-
-	public void setRequiredEvidenceFields(List<ApiProcessingEvidenceField> requiredEvidenceFields) {
-		this.requiredEvidenceFields = requiredEvidenceFields;
-	}
-
 	public ApiProcessingAction() {
 		super();
 	}
 
-	public ApiProcessingAction(String name, String description, String prefix, Boolean repackedOutputs,
-			BigDecimal maxOutputWeight, String publicTimelineLabel, String publicTimelineLocation, ApiCompanyBase company,
-			ApiSemiProduct inputSemiProduct, ApiSemiProduct outputSemiProduct, ProcessingActionType type,
-			PublicTimelineIconType publicTimelineIconType) {
+	public ApiProcessingAction(String name, String description, Language language, String prefix, Boolean repackedOutputs,
+			BigDecimal maxOutputWeight, String publicTimelineLabel, String publicTimelineLocation,
+			ApiCompanyBase company, ApiSemiProduct inputSemiProduct, ApiSemiProduct outputSemiProduct,
+			ProcessingActionType type, PublicTimelineIconType publicTimelineIconType,
+			List<ApiProcessingEvidenceType> requiredDocumentTypes) {
 		super();
 		this.name = name;
 		this.description = description;
+		this.language = language;
 		this.prefix = prefix;
 		this.repackedOutputs = repackedOutputs;
 		this.maxOutputWeight = maxOutputWeight;
@@ -196,6 +198,7 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		this.outputSemiProduct = outputSemiProduct;
 		this.type = type;
 		this.publicTimelineIconType = publicTimelineIconType;
+		this.requiredDocumentTypes = requiredDocumentTypes;
 	}
-	
+
 }

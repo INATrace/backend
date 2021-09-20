@@ -1,5 +1,15 @@
 package com.abelium.inatrace.components.processingaction;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
@@ -10,24 +20,13 @@ import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
-import com.abelium.inatrace.components.processingevidencefield.ProcessingEvidenceFieldService;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
-import com.abelium.inatrace.tools.PaginationTools;
+import com.abelium.inatrace.db.entities.processingaction.ProcessingActionTranslation;
 import com.abelium.inatrace.tools.Queries;
-import com.abelium.inatrace.tools.QueryTools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-import org.torpedoquery.jpa.Torpedo;
-
-import javax.persistence.TypedQuery;
-import javax.transaction.Transactional;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.abelium.inatrace.types.Language;
 
 /**
  * Service for processing action entity.
@@ -47,43 +46,74 @@ public class ProcessingActionService extends BaseService {
 	@Autowired
 	private ProcessingEvidenceTypeService processingEvidenceTypeService;
 
-	@Autowired
-	private ProcessingEvidenceFieldService processingEvidenceFieldService;
+	public ApiPaginatedList<ApiProcessingAction> listProcessingActions(ApiPaginatedRequest request, Language language) {
 
-	public ApiPaginatedList<ApiProcessingAction> getProcessingActionList(ApiPaginatedRequest request) {
+		TypedQuery<ProcessingAction> processingActionsQuery = 
+				em.createNamedQuery("ProcessingAction.listProcessingActions", ProcessingAction.class)
+					.setParameter("language", language)
+					.setFirstResult(request.getOffset())
+					.setMaxResults(request.getLimit());
 
-		return PaginationTools.createPaginatedResponse(em, request, () -> processingActionQueryObject(request), ProcessingActionMapper::toApiProcessingAction);
+		List<ProcessingAction> processingActions = processingActionsQuery.getResultList();
+
+		Long count = em.createNamedQuery("ProcessingAction.countProcessingActions", Long.class)
+			.setParameter("language", language)
+			.getSingleResult();
+
+		return new ApiPaginatedList<>(
+			processingActions
+				.stream()
+				.map(ProcessingActionMapper::toApiProcessingAction)
+				.collect(Collectors.toList()), count);
 	}
 
-	private ProcessingAction processingActionQueryObject(ApiPaginatedRequest request) {
 
-		ProcessingAction processingActionProxy = Torpedo.from(ProcessingAction.class);
-		if ("name".equals(request.sortBy)) {
-			QueryTools.orderBy(request.sort, processingActionProxy.getName());
-		} else {
-			QueryTools.orderBy(request.sort, processingActionProxy.getId());
-		}
-
-		return processingActionProxy;
-	}
-
-	public ApiProcessingAction getProcessingAction(Long id) throws ApiException {
-		return ProcessingActionMapper.toApiProcessingAction(fetchProcessingAction(id));
+	public ApiProcessingAction getProcessingAction(Long id, Language language) throws ApiException {
+		
+		ProcessingAction processingAction = fetchProcessingAction(id);
+		ProcessingActionTranslation translation = 
+				processingAction.getProcessingActionTranslations()
+					.stream()
+					.filter(l -> language.equals(l.getLanguage()))
+					.findAny()
+					.orElse(null);
+			processingAction.getProcessingActionTranslations().clear();
+			processingAction.getProcessingActionTranslations().add(translation);
+		return ProcessingActionMapper.toApiProcessingAction(processingAction);
 	}
 
 	@Transactional
 	public ApiBaseEntity createOrUpdateProcessingAction(ApiProcessingAction apiProcessingAction) throws ApiException {
 
 		ProcessingAction entity;
+		ProcessingActionTranslation translation = null;
 
 		if (apiProcessingAction.getId() != null) {
 			entity = fetchProcessingAction(apiProcessingAction.getId());
+			if (apiProcessingAction.getLanguage() == null) apiProcessingAction.setLanguage(Language.EN); 
+			translation = 
+				entity.getProcessingActionTranslations()
+					.stream()
+					.filter(l -> apiProcessingAction.getLanguage().equals(l.getLanguage()))
+					.findAny()
+					.orElse(null);
 		} else {
 			entity = new ProcessingAction();
 		}
+		
+		if (translation != null) {
+			translation.setLanguage(apiProcessingAction.getLanguage());
+		} else {
+			translation = new ProcessingActionTranslation();
+			translation.setLanguage(apiProcessingAction.getLanguage() == null ? Language.EN : apiProcessingAction.getLanguage());
+		}
+		
+		translation.setProcessingAction(entity);
+		translation.setName(apiProcessingAction.getName());
+		translation.setDescription(apiProcessingAction.getDescription());
+		translation.setLanguage(apiProcessingAction.getLanguage() == null ? Language.EN : apiProcessingAction.getLanguage());
 
-		entity.setName(apiProcessingAction.getName());
-		entity.setDescription(apiProcessingAction.getDescription());
+		entity.getProcessingActionTranslations().add(translation);
 		entity.setPrefix(apiProcessingAction.getPrefix());
 		entity.setRepackedOutputs(apiProcessingAction.getRepackedOutputs());
 		entity.setMaxOutputWeight(apiProcessingAction.getMaxOutputWeight());
@@ -108,42 +138,6 @@ public class ProcessingActionService extends BaseService {
 				entity.setOutputSemiProduct(outputSemiProduct);
 			}
 		}
-
-		// Delete requiredEvidenceFields that are not present in the request
-		entity.getProcessingEvidenceFields().removeAll(
-			entity.getProcessingEvidenceFields()
-					.stream()
-					.filter(field -> apiProcessingAction.getRequiredEvidenceFields()
-							.stream()
-							.noneMatch(ref -> ref.getId().equals(field.getProcessingEvidenceField().getId())))
-					.collect(Collectors.toList())
-		);
-
-		// Update or add requiredEvidenceFields
-		apiProcessingAction.getRequiredEvidenceFields().forEach(
-
-				requiredEvidenceField -> {
-
-					ProcessingActionPEF processingActionPEF = entity.getProcessingEvidenceFields()
-							.stream()
-							.filter(p -> p.getProcessingEvidenceField().getId().equals(requiredEvidenceField.getId()))
-							.findFirst()
-							.orElse(new ProcessingActionPEF());
-
-					try {
-						processingActionPEF.setProcessingEvidenceField(
-								processingEvidenceFieldService.fetchProcessingEvidenceField(requiredEvidenceField.getId()));
-						processingActionPEF.setMandatory(
-								requiredEvidenceField.getMandatory() != null && requiredEvidenceField.getMandatory());
-						processingActionPEF.setRequiredOnQuote(
-								requiredEvidenceField.getRequiredOnQuote() != null && requiredEvidenceField.getRequiredOnQuote());
-						processingActionPEF.setProcessingAction(entity);
-					} catch (ApiException e) {
-						e.printStackTrace();
-					}
-					entity.getProcessingEvidenceFields().add(processingActionPEF);
-				}
-		);
 
 		// Delete requiredDocumentTypes that are not present in the request
 		entity.getRequiredDocumentTypes().removeAll(
@@ -205,17 +199,20 @@ public class ProcessingActionService extends BaseService {
 		return processingAction;
 	}
 	
-	public ApiPaginatedList<ApiProcessingAction> listProcessingActionsByCompany(Long companyId, ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiProcessingAction> listProcessingActionsByCompany(Long companyId, Language language, ApiPaginatedRequest request) {
 
-		TypedQuery<ProcessingAction> processingActionsQuery = em.createNamedQuery("ProcessingAction.listProcessingActionsByCompany", ProcessingAction.class)
-			.setParameter("companyId", companyId)
-			.setFirstResult(request.getOffset())
-			.setMaxResults(request.getLimit());
+		TypedQuery<ProcessingAction> processingActionsQuery = 
+			em.createNamedQuery("ProcessingAction.listProcessingActionsByCompany", ProcessingAction.class)
+				.setParameter("companyId", companyId)
+				.setParameter("language", language)
+				.setFirstResult(request.getOffset())
+				.setMaxResults(request.getLimit());
 
 		List<ProcessingAction> processingActions = processingActionsQuery.getResultList();
 
 		Long count = em.createNamedQuery("ProcessingAction.countProcessingActionsByCompany", Long.class)
 			.setParameter("companyId", companyId)
+			.setParameter("language", language)
 			.getSingleResult();
 
 		return new ApiPaginatedList<>(
