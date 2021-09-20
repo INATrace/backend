@@ -48,7 +48,7 @@ public class Facility extends TimestampEntity {
 	@OneToOne(cascade = CascadeType.ALL)
 	private FacilityType facilityType;
 
-	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<FacilitySemiProduct> facilitySemiProducts = new ArrayList<>();
 
 	public String getName() {

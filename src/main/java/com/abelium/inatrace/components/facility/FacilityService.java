@@ -5,17 +5,22 @@ import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
+import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
+import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.Address;
 import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.facility.FacilityLocation;
+import com.abelium.inatrace.db.entities.facility.FacilitySemiProduct;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
@@ -33,6 +38,9 @@ import java.util.stream.Collectors;
 @Lazy
 @Service
 public class FacilityService extends BaseService {
+
+	@Autowired
+	private SemiProductService semiProductService;
 
 	public ApiPaginatedList<ApiFacility> getFacilityList(ApiPaginatedRequest request) {
 
@@ -84,6 +92,7 @@ public class FacilityService extends BaseService {
 		facilityLocation.setLongitude(apiFacility.getFacilityLocation().getLongitude());
 		facilityLocation.setNumberOfFarmers(apiFacility.getFacilityLocation().getNumberOfFarmers());
 		facilityLocation.setPinName(apiFacility.getFacilityLocation().getPinName());
+		facilityLocation.setPubliclyVisible(apiFacility.getFacilityLocation().getPubliclyVisible());
 
 		address.setAddress(apiFacility.getFacilityLocation().getAddress().getAddress());
 		address.setCity(apiFacility.getFacilityLocation().getAddress().getCity());
@@ -106,6 +115,16 @@ public class FacilityService extends BaseService {
 
 		if (entity.getId() == null) {
 			em.persist(entity);
+		}
+
+		entity.getFacilitySemiProducts().removeIf(facilitySemiProduct -> apiFacility.getFacilitySemiProductList().stream().noneMatch(apiFacilitySemiProduct -> apiFacilitySemiProduct.getId().equals(facilitySemiProduct.getId())));
+
+		for (ApiSemiProduct apiSemiProduct : apiFacility.getFacilitySemiProductList()) {
+			FacilitySemiProduct facilitySemiProduct = new FacilitySemiProduct();
+			SemiProduct semiProduct = semiProductService.fetchSemiProduct(apiSemiProduct.getId());
+			facilitySemiProduct.setFacility(entity);
+			facilitySemiProduct.setSemiProduct(semiProduct);
+			entity.getFacilitySemiProducts().add(facilitySemiProduct);
 		}
 
 		return new ApiBaseEntity(entity);

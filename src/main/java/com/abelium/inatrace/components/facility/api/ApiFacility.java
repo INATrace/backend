@@ -2,10 +2,12 @@ package com.abelium.inatrace.components.facility.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
+import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
-import com.abelium.inatrace.components.product.api.ApiLocation;
 
 import io.swagger.annotations.ApiModelProperty;
+
+import java.util.List;
 
 public class ApiFacility extends ApiBaseEntity {
 
@@ -26,6 +28,9 @@ public class ApiFacility extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "Facility type")
 	private ApiFacilityType facilityType;
+
+	@ApiModelProperty(value = "List of semi product ID's for this facility")
+	private List<ApiSemiProduct> facilitySemiProductList;
 
 	public String getName() {
 		return name;
@@ -51,7 +56,7 @@ public class ApiFacility extends ApiBaseEntity {
 		this.isPublic = isPublic;
 	}
 
-	public ApiLocation getFacilityLocation() {
+	public ApiFacilityLocation getFacilityLocation() {
 		return facilityLocation;
 	}
 
@@ -73,6 +78,14 @@ public class ApiFacility extends ApiBaseEntity {
 
 	public void setFacilityType(ApiFacilityType facilityType) {
 		this.facilityType = facilityType;
+	}
+
+	public List<ApiSemiProduct> getFacilitySemiProductList() {
+		return facilitySemiProductList;
+	}
+
+	public void setFacilitySemiProductList(List<ApiSemiProduct> facilitySemiProductList) {
+		this.facilitySemiProductList = facilitySemiProductList;
 	}
 
 	public ApiFacility() {
