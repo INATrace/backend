@@ -3,6 +3,7 @@ package com.abelium.inatrace.db.entities.product;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.types.ProductStatus;
 
 import javax.persistence.*;
@@ -37,7 +38,14 @@ public class Product extends ProductContent {
 	@NotNull
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Company company;
-	
+
+	/**
+	 * value chain
+	 */
+	@NotNull
+	@ManyToOne(fetch = FetchType.LAZY)
+	private ValueChain valueChain;
+
 	/**
 	 * a list of other companies associated with this product (buyers, producers, ...) 
 	 */
@@ -71,7 +79,15 @@ public class Product extends ProductContent {
 	public void setCompany(Company company) {
 		this.company = company;
 	}
-	
+
+	public ValueChain getValueChain() {
+		return valueChain;
+	}
+
+	public void setValueChain(ValueChain valueChain) {
+		this.valueChain = valueChain;
+	}
+
 	public List<ProductCompany> getAssociatedCompanies() {
 		return associatedCompanies;
 	}

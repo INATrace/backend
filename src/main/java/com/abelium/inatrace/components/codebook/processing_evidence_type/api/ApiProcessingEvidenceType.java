@@ -28,6 +28,9 @@ public class ApiProcessingEvidenceType extends ApiCodebookBaseEntity {
 	@ApiModelProperty(value = "whether the evidence is required")
 	private Boolean required;
 
+	@ApiModelProperty(value = "whether the evidence is mandatory")
+	private Boolean mandatory;
+
 	@ApiModelProperty(value = "whether the evidence is required on quote")
 	private Boolean requiredOnQuote;
 
@@ -72,6 +75,14 @@ public class ApiProcessingEvidenceType extends ApiCodebookBaseEntity {
 
 	public void setRequired(Boolean required) {
 		this.required = required;
+	}
+
+	public Boolean getMandatory() {
+		return mandatory;
+	}
+
+	public void setMandatory(Boolean mandatory) {
+		this.mandatory = mandatory;
 	}
 
 	public Boolean getRequiredOnQuote() {

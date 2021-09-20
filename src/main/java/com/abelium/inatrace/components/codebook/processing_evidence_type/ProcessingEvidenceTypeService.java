@@ -73,9 +73,6 @@ public class ProcessingEvidenceTypeService extends BaseService {
 		entity.setFairness(apiProcessingEvidenceType.getFairness());
 		entity.setProvenance(apiProcessingEvidenceType.getProvenance());
 		entity.setQuality(apiProcessingEvidenceType.getQuality());
-		entity.setRequired(apiProcessingEvidenceType.getRequired());
-		entity.setRequiredOneOfGroupIdForQuote(apiProcessingEvidenceType.getRequiredOneOfGroupIdForQuote());
-		entity.setRequiredOnQuote(apiProcessingEvidenceType.getRequiredOnQuote());
 
 		if (entity.getId() == null) {
 			em.persist(entity);

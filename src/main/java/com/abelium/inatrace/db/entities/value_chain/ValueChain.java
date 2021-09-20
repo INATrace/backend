@@ -59,6 +59,12 @@ public class ValueChain extends TimestampEntity {
 	 */
 	@OneToMany(mappedBy = "valueChain", orphanRemoval = true, cascade = CascadeType.ALL)
 	private List<ValueChainSemiProduct> semiProducts;
+	
+	/**
+	 * Holds a list of supported processing evidence fields by this value chain.
+	 */
+	@OneToMany(mappedBy = "valueChain", orphanRemoval = true, cascade = CascadeType.ALL)
+	private List<ValueChainProcessingEvidenceField> processingEvidenceFields;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	private User createdBy;
@@ -135,6 +141,17 @@ public class ValueChain extends TimestampEntity {
 
 	public void setSemiProducts(List<ValueChainSemiProduct> semiProducts) {
 		this.semiProducts = semiProducts;
+	}
+	
+	public List<ValueChainProcessingEvidenceField> getProcessingEvidenceFields() {
+		if (processingEvidenceFields == null) {
+			processingEvidenceFields = new ArrayList<>();
+		}
+		return processingEvidenceFields;
+	}
+
+	public void setProcessingEvidenceFields(List<ValueChainProcessingEvidenceField> processingEvidenceFields) {
+		this.processingEvidenceFields = processingEvidenceFields;
 	}
 
 	public List<ValueChainProcEvidenceType> getProcEvidenceTypes() {

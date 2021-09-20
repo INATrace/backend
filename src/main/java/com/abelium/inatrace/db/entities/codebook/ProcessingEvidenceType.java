@@ -39,32 +39,20 @@ public class ProcessingEvidenceType extends TimestampEntity {
 	/**
 	 * Whether the evidence is of fairness type.
 	 */
+	@Column
 	private Boolean fairness;
 
 	/**
 	 * Whether the evidence is of provenance type.
 	 */
+	@Column
 	private Boolean provenance;
 
 	/**
 	 * Whether the evidence is of quality type.
 	 */
+	@Column
 	private Boolean quality;
-
-	/**
-	 * Whether the evidence is required (not used for settings, just in transformations).
-	 */
-	private Boolean required;
-
-	/**
-	 * Whether the evidence is required on quote (not used for settings, just in transformations).
-	 */
-	private Boolean requiredOnQuote;
-
-	/**
-	 * Defines a group in which at least one document has to be provided (is required).
-	 */
-	private String requiredOneOfGroupIdForQuote;
 
 	public String getCode() {
 		return code;
@@ -114,27 +102,4 @@ public class ProcessingEvidenceType extends TimestampEntity {
 		this.quality = quality;
 	}
 
-	public Boolean getRequired() {
-		return required;
-	}
-
-	public void setRequired(Boolean required) {
-		this.required = required;
-	}
-
-	public Boolean getRequiredOnQuote() {
-		return requiredOnQuote;
-	}
-
-	public void setRequiredOnQuote(Boolean requiredOnQuote) {
-		this.requiredOnQuote = requiredOnQuote;
-	}
-
-	public String getRequiredOneOfGroupIdForQuote() {
-		return requiredOneOfGroupIdForQuote;
-	}
-
-	public void setRequiredOneOfGroupIdForQuote(String requiredOneOfGroupIdForQuote) {
-		this.requiredOneOfGroupIdForQuote = requiredOneOfGroupIdForQuote;
-	}
 }
