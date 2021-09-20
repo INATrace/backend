@@ -10,9 +10,11 @@ import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
+import com.abelium.inatrace.components.processingevidencefield.ProcessingEvidenceFieldService;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
+import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
@@ -44,6 +46,9 @@ public class ProcessingActionService extends BaseService {
 
 	@Autowired
 	private ProcessingEvidenceTypeService processingEvidenceTypeService;
+
+	@Autowired
+	private ProcessingEvidenceFieldService processingEvidenceFieldService;
 
 	public ApiPaginatedList<ApiProcessingAction> getProcessingActionList(ApiPaginatedRequest request) {
 
@@ -103,6 +108,42 @@ public class ProcessingActionService extends BaseService {
 				entity.setOutputSemiProduct(outputSemiProduct);
 			}
 		}
+
+		// Delete requiredEvidenceFields that are not present in the request
+		entity.getProcessingEvidenceFields().removeAll(
+			entity.getProcessingEvidenceFields()
+					.stream()
+					.filter(field -> apiProcessingAction.getRequiredEvidenceFields()
+							.stream()
+							.noneMatch(ref -> ref.getId().equals(field.getProcessingEvidenceField().getId())))
+					.collect(Collectors.toList())
+		);
+
+		// Update or add requiredEvidenceFields
+		apiProcessingAction.getRequiredEvidenceFields().forEach(
+
+				requiredEvidenceField -> {
+
+					ProcessingActionPEF processingActionPEF = entity.getProcessingEvidenceFields()
+							.stream()
+							.filter(p -> p.getProcessingEvidenceField().getId().equals(requiredEvidenceField.getId()))
+							.findFirst()
+							.orElse(new ProcessingActionPEF());
+
+					try {
+						processingActionPEF.setProcessingEvidenceField(
+								processingEvidenceFieldService.fetchProcessingEvidenceField(requiredEvidenceField.getId()));
+						processingActionPEF.setMandatory(
+								requiredEvidenceField.getMandatory() != null && requiredEvidenceField.getMandatory());
+						processingActionPEF.setRequiredOnQuote(
+								requiredEvidenceField.getRequiredOnQuote() != null && requiredEvidenceField.getRequiredOnQuote());
+						processingActionPEF.setProcessingAction(entity);
+					} catch (ApiException e) {
+						e.printStackTrace();
+					}
+					entity.getProcessingEvidenceFields().add(processingActionPEF);
+				}
+		);
 
 		// Delete requiredDocumentTypes that are not present in the request
 		entity.getRequiredDocumentTypes().removeAll(

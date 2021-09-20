@@ -33,12 +33,12 @@ public class ProcessingActionPEF extends BaseEntity {
 		this.processingAction = processingAction;
 	}
 
-	public ProcessingEvidenceField getProcessingEvidenceType() {
+	public ProcessingEvidenceField getProcessingEvidenceField() {
 		return processingEvidenceField;
 	}
 
-	public void setProcessingEvidenceType(ProcessingEvidenceField processingEvidenceType) {
-		this.processingEvidenceField = processingEvidenceType;
+	public void setProcessingEvidenceField(ProcessingEvidenceField processingEvidenceField) {
+		this.processingEvidenceField = processingEvidenceField;
 	}
 
 	public Boolean getMandatory() {
@@ -59,12 +59,12 @@ public class ProcessingActionPEF extends BaseEntity {
 
 	public ProcessingActionPEF(
 		@NotNull ProcessingAction processingAction,
-		@NotNull ProcessingEvidenceField processingEvidenceType,
+		@NotNull ProcessingEvidenceField processingEvidenceField,
 		Boolean mandatory,
 		Boolean requiredOnQuote) {
 		super();
 		this.processingAction = processingAction;
-		this.processingEvidenceField = processingEvidenceType;
+		this.processingEvidenceField = processingEvidenceField;
 		this.mandatory = mandatory;
 		this.requiredOnQuote = requiredOnQuote;
 	}

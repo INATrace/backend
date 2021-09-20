@@ -4,6 +4,7 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
+import com.abelium.inatrace.components.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
 
@@ -58,6 +59,9 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Processing action required document types")
 	private List<ApiProcessingEvidenceType> requiredDocumentTypes = new ArrayList<>();
+
+	@ApiModelProperty(value = "Processing action required evidence fields")
+	private List<ApiProcessingEvidenceField> requiredEvidenceFields = new ArrayList<>();
 
 	public String getName() {
 		return name;
@@ -161,6 +165,14 @@ public class ApiProcessingAction extends ApiBaseEntity {
 
 	public void setRequiredDocumentTypes(List<ApiProcessingEvidenceType> requiredDocumentTypes) {
 		this.requiredDocumentTypes = requiredDocumentTypes;
+	}
+
+	public List<ApiProcessingEvidenceField> getRequiredEvidenceFields() {
+		return requiredEvidenceFields;
+	}
+
+	public void setRequiredEvidenceFields(List<ApiProcessingEvidenceField> requiredEvidenceFields) {
+		this.requiredEvidenceFields = requiredEvidenceFields;
 	}
 
 	public ApiProcessingAction() {
