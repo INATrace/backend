@@ -107,6 +107,7 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setInputSemiProduct(apiInputSemiProduct);
 		apiProcessingAction.setOutputSemiProduct(apiOutputSemiProduct);
 		apiProcessingAction.setRequiredDocumentTypes(apiRequiredDocumentTypes);
+		apiProcessingAction.setRequiredEvidenceFields(apiRequiredEvidenceFields);
 
 		return apiProcessingAction;
 	}
