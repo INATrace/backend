@@ -6,7 +6,6 @@ import com.abelium.inatrace.components.currencies.api.ApiCurrencyRatesResponse;
 import com.abelium.inatrace.components.currencies.api.ApiCurrencySymbolsResponse;
 import com.abelium.inatrace.db.entities.codebook.CurrencyType;
 import com.abelium.inatrace.db.entities.currencies.CurrencyPair;
-import com.abelium.inatrace.db.enums.CurrencyEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -29,40 +28,40 @@ public class CurrencyService extends BaseService {
     @Autowired
     public CurrencyTypeService currencyTypeService;
 
-    public BigDecimal convertFromEur(CurrencyEnum to, BigDecimal value) {
-        return value.multiply(em.createNamedQuery("CurrencyPair.latestRate", BigDecimal.class).setParameter("currency", to.toString()).getResultList().get(0));
+    public BigDecimal convertFromEur(String to, BigDecimal value) {
+        return value.multiply(em.createNamedQuery("CurrencyPair.latestRate", BigDecimal.class).setParameter("currency", to).getResultList().get(0));
     }
 
-    public BigDecimal convertToEur(CurrencyEnum from, BigDecimal value) {
-        return value.divide(em.createNamedQuery("CurrencyPair.latestRate", BigDecimal.class).setParameter("currency", from.toString()).getResultList().get(0), 6, RoundingMode.HALF_UP);
+    public BigDecimal convertToEur(String from, BigDecimal value) {
+        return value.divide(em.createNamedQuery("CurrencyPair.latestRate", BigDecimal.class).setParameter("currency", from).getResultList().get(0), 6, RoundingMode.HALF_UP);
     }
 
-    public BigDecimal convertFromEurAtDate(CurrencyEnum to, BigDecimal value, Date date) {
-        return value.multiply(em.createNamedQuery("CurrencyPair.rateAtDate", BigDecimal.class).setParameter("currency", to.toString()).setParameter("date", date).getSingleResult());
+    public BigDecimal convertFromEurAtDate(String to, BigDecimal value, Date date) {
+        return value.multiply(em.createNamedQuery("CurrencyPair.rateAtDate", BigDecimal.class).setParameter("currency", to).setParameter("date", date).getSingleResult());
     }
 
-    public BigDecimal convertToEurAtDate(CurrencyEnum from, BigDecimal value, Date date) {
-        return value.divide(em.createNamedQuery("CurrencyPair.rateAtDate", BigDecimal.class).setParameter("currency", from.toString()).setParameter("date", date).getSingleResult(), 6, RoundingMode.HALF_UP);
+    public BigDecimal convertToEurAtDate(String from, BigDecimal value, Date date) {
+        return value.divide(em.createNamedQuery("CurrencyPair.rateAtDate", BigDecimal.class).setParameter("currency", from).setParameter("date", date).getSingleResult(), 6, RoundingMode.HALF_UP);
     }
 
-    public BigDecimal convert(CurrencyEnum from, CurrencyEnum to, BigDecimal value) {
-        if (from == to) {
+    public BigDecimal convert(String from, String to, BigDecimal value) {
+        if (from.equals(to)) {
             return value;
-        } else if (from.equals(CurrencyEnum.EUR)) {
+        } else if ("EUR".equals(from)) {
             return this.convertFromEur(to, value);
-        } else if (to.equals(CurrencyEnum.EUR)) {
+        } else if ("EUR".equals(to)) {
             return this.convertToEur(from, value);
         } else {
             return this.convertFromEur(to, this.convertToEur(from, value));
         }
     }
 
-    public BigDecimal convertAtDate(CurrencyEnum from, CurrencyEnum to, BigDecimal value, Date date) {
-        if (from == to) {
+    public BigDecimal convertAtDate(String from, String to, BigDecimal value, Date date) {
+        if (from.equals(to)) {
             return value;
-        } else if (from.equals(CurrencyEnum.EUR)) {
+        } else if ("EUR".equals(from)) {
             return this.convertFromEurAtDate(to, value, date);
-        } else if (to.equals(CurrencyEnum.EUR)) {
+        } else if ("EUR".equals(to)) {
             return this.convertToEurAtDate(from, value, date);
         } else {
             return this.convertFromEurAtDate(to, this.convertToEurAtDate(from, value, date), date);

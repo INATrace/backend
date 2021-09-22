@@ -1,6 +1,6 @@
 package com.abelium.inatrace.components.currencies;
 
-import com.abelium.inatrace.db.enums.CurrencyEnum;
+import com.abelium.inatrace.api.errors.ApiException;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,7 +21,7 @@ public class CurrencyController {
 
     @GetMapping(path = "/convert/{value}/{from}/to/{to}")
     @ApiOperation("Convert a value between supported currencies")
-    public BigDecimal convert(@PathVariable("from") CurrencyEnum from, @PathVariable("to") CurrencyEnum to, @PathVariable("value") BigDecimal value) {
+    public BigDecimal convert(@PathVariable("from") String from, @PathVariable("to") String to, @PathVariable("value") BigDecimal value) throws ApiException {
         return currencyService.convert(from, to, value);
     }
 
@@ -29,8 +29,8 @@ public class CurrencyController {
     @ApiOperation("Convert a value between supported currencies at the specified date")
     public BigDecimal convertAtDate(
             @PathVariable("value") BigDecimal value,
-            @PathVariable("from") CurrencyEnum from,
-            @PathVariable("to") CurrencyEnum to,
+            @PathVariable("from") String from,
+            @PathVariable("to") String to,
             @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
         return currencyService.convertAtDate(from, to, value, date);
     }
