@@ -133,3 +133,6 @@ INATrace.maxmindDB.path =
 
 # "Secret" token for logging request
 INATrace.requestLog.token = eee222
+
+# Exchange rate API key
+INAtrace.exchangerate.apiKey =

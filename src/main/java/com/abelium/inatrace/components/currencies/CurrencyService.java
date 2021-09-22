@@ -7,6 +7,7 @@ import com.abelium.inatrace.components.currencies.api.ApiCurrencySymbolsResponse
 import com.abelium.inatrace.db.entities.codebook.CurrencyType;
 import com.abelium.inatrace.db.entities.currencies.CurrencyPair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.MediaType;
@@ -26,7 +27,10 @@ import java.util.stream.Collectors;
 public class CurrencyService extends BaseService {
 
     @Autowired
-    public CurrencyTypeService currencyTypeService;
+    private CurrencyTypeService currencyTypeService;
+
+    @Value("${INAtrace.exchangerate.apiKey}")
+    private String apiKey;
 
     public BigDecimal convertFromEur(String to, BigDecimal value) {
         return value.multiply(em.createNamedQuery("CurrencyPair.latestRate", BigDecimal.class).setParameter("currency", to).getResultList().get(0));
@@ -72,7 +76,7 @@ public class CurrencyService extends BaseService {
     @Scheduled(cron = "0 1 0 * * *")
     @EventListener(ApplicationReadyEvent.class)
     public void updateCurrencies() {
-        WebClient webClientSymbols = WebClient.create("http://api.exchangeratesapi.io/v1/symbols?access_key=9feb56cf0094065ba5264c593105fc41");
+        WebClient webClientSymbols = WebClient.create("http://api.exchangeratesapi.io/v1/symbols?access_key=" + apiKey);
         ApiCurrencySymbolsResponse apiCurrencySymbolsResponse = webClientSymbols
                 .get()
                 .accept(MediaType.APPLICATION_JSON)
@@ -93,7 +97,7 @@ public class CurrencyService extends BaseService {
             }
         }
 
-        WebClient webClientRates = WebClient.create("http://api.exchangeratesapi.io/v1/latest?access_key=9feb56cf0094065ba5264c593105fc41&base=EUR");
+        WebClient webClientRates = WebClient.create("http://api.exchangeratesapi.io/v1/latest?access_key=" + apiKey + "&base=EUR");
         ApiCurrencyRatesResponse apiCurrencyResponse = webClientRates
                 .get()
                 .accept(MediaType.APPLICATION_JSON)
