@@ -16,13 +16,12 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
-import com.abelium.inatrace.tools.PaginationTools;
+import com.abelium.inatrace.db.entities.processingaction.ProcessingActionTranslation;
 import com.abelium.inatrace.tools.Queries;
-import com.abelium.inatrace.tools.QueryTools;
+import com.abelium.inatrace.types.Language;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.torpedoquery.jpa.Torpedo;
 
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
@@ -46,44 +45,95 @@ public class ProcessingActionService extends BaseService {
 
 	@Autowired
 	private ProcessingEvidenceTypeService processingEvidenceTypeService;
-
+	
 	@Autowired
 	private ProcessingEvidenceFieldService processingEvidenceFieldService;
 
-	public ApiPaginatedList<ApiProcessingAction> getProcessingActionList(ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiProcessingAction> listProcessingActions(ApiPaginatedRequest request, Language language) {
 
-		return PaginationTools.createPaginatedResponse(em, request, () -> processingActionQueryObject(request), ProcessingActionMapper::toApiProcessingAction);
+		TypedQuery<ProcessingAction> processingActionsQuery = 
+				em.createNamedQuery("ProcessingAction.listProcessingActions", ProcessingAction.class)
+					.setParameter("language", language)
+					.setFirstResult(request.getOffset())
+					.setMaxResults(request.getLimit());
+
+		List<ProcessingAction> processingActions = processingActionsQuery.getResultList();
+
+		Long count = em.createNamedQuery("ProcessingAction.countProcessingActions", Long.class)
+			.setParameter("language", language)
+			.getSingleResult();
+
+		return new ApiPaginatedList<>(
+			processingActions
+				.stream()
+				.map(ProcessingActionMapper::toApiProcessingAction)
+				.collect(Collectors.toList()), count);
 	}
 
-	private ProcessingAction processingActionQueryObject(ApiPaginatedRequest request) {
 
-		ProcessingAction processingActionProxy = Torpedo.from(ProcessingAction.class);
-		if ("name".equals(request.sortBy)) {
-			QueryTools.orderBy(request.sort, processingActionProxy.getName());
-		} else {
-			QueryTools.orderBy(request.sort, processingActionProxy.getId());
-		}
-
-		return processingActionProxy;
+	public ApiProcessingAction getProcessingAction(Long id, Language language) throws ApiException {
+		
+		ProcessingAction processingAction = fetchProcessingAction(id);
+		ProcessingActionTranslation translation = processingAction.getProcessingActionTranslations()
+					.stream()
+					.filter(l -> language.equals(l.getLanguage()))
+					.findAny()
+					.orElse(null);
+		processingAction.getProcessingActionTranslations().clear();
+		if(translation != null)
+			processingAction.getProcessingActionTranslations().add(translation);
+		return ProcessingActionMapper.toApiProcessingAction(processingAction);
 	}
 
-	public ApiProcessingAction getProcessingAction(Long id) throws ApiException {
-		return ProcessingActionMapper.toApiProcessingAction(fetchProcessingAction(id));
+	public ApiProcessingAction getProcessingActionDetail(Long id, Language language) throws ApiException {
+
+		ProcessingAction processingAction = fetchProcessingAction(id);
+		return ProcessingActionMapper.toApiProcessingActionDetail(processingAction);
 	}
 
 	@Transactional
 	public ApiBaseEntity createOrUpdateProcessingAction(ApiProcessingAction apiProcessingAction) throws ApiException {
 
-		ProcessingAction entity;
+		ProcessingAction entity = apiProcessingAction.getId() != null
+				? fetchProcessingAction(apiProcessingAction.getId())
+				: new ProcessingAction();
 
-		if (apiProcessingAction.getId() != null) {
-			entity = fetchProcessingAction(apiProcessingAction.getId());
-		} else {
-			entity = new ProcessingAction();
-		}
+		// Make sure English translation is present
+		apiProcessingAction.getTranslations()
+				.stream()
+				.filter(t -> t != null
+						&& Language.EN.equals(t.getLanguage())
+						&& t.getDescription() != null
+						&& t.getName() != null)
+				.findFirst()
+				.orElseThrow(() -> new ApiException(ApiStatus.INVALID_REQUEST, "English translation is required!"));
 
-		entity.setName(apiProcessingAction.getName());
-		entity.setDescription(apiProcessingAction.getDescription());
+		// Remove translations that are not part of the request
+		entity.getProcessingActionTranslations().removeAll(
+				entity.getProcessingActionTranslations()
+						.stream()
+						.filter(translation -> apiProcessingAction.getTranslations()
+								.stream()
+								.noneMatch(t -> t.getLanguage().equals(translation.getLanguage())))
+						.collect(Collectors.toList())
+		);
+
+		// Update or add translations
+		apiProcessingAction.getTranslations().forEach(
+				translation -> {
+					ProcessingActionTranslation pat = entity.getProcessingActionTranslations()
+							.stream()
+							.filter(t -> t.getLanguage().equals(translation.getLanguage()))
+							.findFirst()
+							.orElse(new ProcessingActionTranslation());
+						pat.setName(translation.getName());
+						pat.setDescription(translation.getDescription());
+						pat.setLanguage(translation.getLanguage());
+						pat.setProcessingAction(entity);
+					entity.getProcessingActionTranslations().add(pat);
+				}
+		);
+
 		entity.setPrefix(apiProcessingAction.getPrefix());
 		entity.setRepackedOutputs(apiProcessingAction.getRepackedOutputs());
 		entity.setMaxOutputWeight(apiProcessingAction.getMaxOutputWeight());
@@ -108,41 +158,41 @@ public class ProcessingActionService extends BaseService {
 				entity.setOutputSemiProduct(outputSemiProduct);
 			}
 		}
-
+		
 		// Delete requiredEvidenceFields that are not present in the request
 		entity.getProcessingEvidenceFields().removeAll(
 			entity.getProcessingEvidenceFields()
-					.stream()
-					.filter(field -> apiProcessingAction.getRequiredEvidenceFields()
-							.stream()
-							.noneMatch(ref -> ref.getId().equals(field.getProcessingEvidenceField().getId())))
-					.collect(Collectors.toList())
+				.stream()
+				.filter(field -> apiProcessingAction.getRequiredEvidenceFields()
+						.stream()
+						.noneMatch(ref -> ref.getId().equals(field.getProcessingEvidenceField().getId())))
+				.collect(Collectors.toList())
 		);
 
 		// Update or add requiredEvidenceFields
 		apiProcessingAction.getRequiredEvidenceFields().forEach(
 
-				requiredEvidenceField -> {
+			requiredEvidenceField -> {
 
-					ProcessingActionPEF processingActionPEF = entity.getProcessingEvidenceFields()
-							.stream()
-							.filter(p -> p.getProcessingEvidenceField().getId().equals(requiredEvidenceField.getId()))
-							.findFirst()
-							.orElse(new ProcessingActionPEF());
+				ProcessingActionPEF processingActionPEF = entity.getProcessingEvidenceFields()
+					.stream()
+					.filter(p -> p.getProcessingEvidenceField().getId().equals(requiredEvidenceField.getId()))
+					.findFirst()
+					.orElse(new ProcessingActionPEF());
 
-					try {
-						processingActionPEF.setProcessingEvidenceField(
-								processingEvidenceFieldService.fetchProcessingEvidenceField(requiredEvidenceField.getId()));
-						processingActionPEF.setMandatory(
-								requiredEvidenceField.getMandatory() != null && requiredEvidenceField.getMandatory());
-						processingActionPEF.setRequiredOnQuote(
-								requiredEvidenceField.getRequiredOnQuote() != null && requiredEvidenceField.getRequiredOnQuote());
-						processingActionPEF.setProcessingAction(entity);
-					} catch (ApiException e) {
-						e.printStackTrace();
-					}
-					entity.getProcessingEvidenceFields().add(processingActionPEF);
+				try {
+					processingActionPEF.setProcessingEvidenceField(
+							processingEvidenceFieldService.fetchProcessingEvidenceField(requiredEvidenceField.getId()));
+					processingActionPEF.setMandatory(
+							requiredEvidenceField.getMandatory() != null && requiredEvidenceField.getMandatory());
+					processingActionPEF.setRequiredOnQuote(
+							requiredEvidenceField.getRequiredOnQuote() != null && requiredEvidenceField.getRequiredOnQuote());
+					processingActionPEF.setProcessingAction(entity);
+				} catch (ApiException e) {
+					e.printStackTrace();
 				}
+				entity.getProcessingEvidenceFields().add(processingActionPEF);
+			}
 		);
 
 		// Delete requiredDocumentTypes that are not present in the request
@@ -205,17 +255,20 @@ public class ProcessingActionService extends BaseService {
 		return processingAction;
 	}
 	
-	public ApiPaginatedList<ApiProcessingAction> listProcessingActionsByCompany(Long companyId, ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiProcessingAction> listProcessingActionsByCompany(Long companyId, Language language, ApiPaginatedRequest request) {
 
-		TypedQuery<ProcessingAction> processingActionsQuery = em.createNamedQuery("ProcessingAction.listProcessingActionsByCompany", ProcessingAction.class)
-			.setParameter("companyId", companyId)
-			.setFirstResult(request.getOffset())
-			.setMaxResults(request.getLimit());
+		TypedQuery<ProcessingAction> processingActionsQuery = 
+			em.createNamedQuery("ProcessingAction.listProcessingActionsByCompany", ProcessingAction.class)
+				.setParameter("companyId", companyId)
+				.setParameter("language", language)
+				.setFirstResult(request.getOffset())
+				.setMaxResults(request.getLimit());
 
 		List<ProcessingAction> processingActions = processingActionsQuery.getResultList();
 
 		Long count = em.createNamedQuery("ProcessingAction.countProcessingActionsByCompany", Long.class)
 			.setParameter("companyId", companyId)
+			.setParameter("language", language)
 			.getSingleResult();
 
 		return new ApiPaginatedList<>(

@@ -16,9 +16,23 @@ import com.abelium.inatrace.types.Language;
 @MappedSuperclass
 public class TranslatedEntity extends BaseEntity {
 	
-	public static final EnumSet<Language> ALLOWED_TRANSLATIONS = EnumSet.of(Language.DE, Language.RW);
+	public static final EnumSet<Language> ALLOWED_TRANSLATIONS = EnumSet.of(Language.EN, Language.DE, Language.RW, Language.ES);
+	
+	@Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = Lengths.ENUM)
+    private Language language;
+	
+	public Language getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(Language language) {
+		if (!ALLOWED_TRANSLATIONS.contains(language)) throw new IllegalArgumentException("Language '" + language + "' is not allowed.");
+		this.language = language;
+	}
 	
 	protected TranslatedEntity() {
+		
 	}
 
 	public TranslatedEntity(Language language) {
@@ -26,16 +40,4 @@ public class TranslatedEntity extends BaseEntity {
 		this.setLanguage(language);
 	}
 	
-	@Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = Lengths.ENUM)
-    private Language language;
-
-	public Language getLanguage() {
-		return language;
-	}
-
-	protected void setLanguage(Language language) {
-		if (!ALLOWED_TRANSLATIONS.contains(language)) throw new IllegalArgumentException("Language '" + language + "' is not allowed.");
-		this.language = language;
-	}
 }
