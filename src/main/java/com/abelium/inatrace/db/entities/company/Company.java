@@ -3,6 +3,7 @@ package com.abelium.inatrace.db.entities.company;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.components.company.types.CompanyTranslatables;
 import com.abelium.inatrace.db.base.BaseEntity;
+import com.abelium.inatrace.db.entities.codebook.CurrencyType;
 import com.abelium.inatrace.db.entities.common.Address;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.facility.Facility;
@@ -25,6 +26,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -155,6 +157,9 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	@OneToMany(mappedBy = "company")
 	private List<ProcessingAction> processingActions = new ArrayList<>();
 
+	@ManyToOne()
+	private CurrencyType currency;
+
 	public CompanyStatus getStatus() {
 		return status;
 	}
@@ -226,7 +231,7 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	public void setWebPage(String webPage) {
 		this.webPage = webPage;
 	}
-	
+
 	public String getEmail() {
 		return email;
 	}
@@ -298,5 +303,12 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	public void setProcessingActions(List<ProcessingAction> processingActions) {
 		this.processingActions = processingActions;
 	}
-  
+
+	public CurrencyType getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(CurrencyType currency) {
+		this.currency = currency;
+	}
 }

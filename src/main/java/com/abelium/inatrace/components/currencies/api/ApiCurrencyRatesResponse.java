@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
-public class ApiCurrencyResponse {
+public class ApiCurrencyRatesResponse {
 
     private boolean success;
     private String base;

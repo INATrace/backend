@@ -18,9 +18,12 @@ public final class CurrencyTypeMapper {
 
     public static ApiCurrencyType toApiCurrencyType(CurrencyType currencyType) {
         ApiCurrencyType apiCurrencyType = new ApiCurrencyType();
-        apiCurrencyType.setId(currencyType.getId());
-        apiCurrencyType.setCode(currencyType.getCode());
-        apiCurrencyType.setLabel(currencyType.getLabel());
+        if (currencyType != null) {
+            apiCurrencyType.setId(currencyType.getId());
+            apiCurrencyType.setCode(currencyType.getCode());
+            apiCurrencyType.setLabel(currencyType.getLabel());
+            apiCurrencyType.setEnabled(currencyType.getEnabled());
+        }
         return apiCurrencyType;
     }
 }

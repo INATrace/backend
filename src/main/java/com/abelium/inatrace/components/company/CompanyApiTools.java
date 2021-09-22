@@ -2,6 +2,9 @@ package com.abelium.inatrace.components.company;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.codebook.currencies.CurrencyTypeMapper;
+import com.abelium.inatrace.components.codebook.currencies.CurrencyTypeService;
+import com.abelium.inatrace.components.codebook.currencies.api.ApiCurrencyType;
 import com.abelium.inatrace.components.common.CommonApiTools;
 import com.abelium.inatrace.components.common.CommonService;
 import com.abelium.inatrace.components.common.api.ApiCertification;
@@ -37,6 +40,9 @@ public class CompanyApiTools {
 
 	@Autowired
 	private CompanyQueries companyQueries;
+
+	@Autowired
+	private CurrencyTypeService currencyTypeService;
 	
 	public static ApiCompanyListResponse toApiCompanyListResponse(Company company) {
 		if (company == null) return null;
@@ -60,6 +66,8 @@ public class CompanyApiTools {
 		ac.manager = c.getManager();
 		ac.email = c.getEmail();
 		ac.phone = c.getPhone();
+		ac.currency = new ApiCurrencyType();
+		ac.setCurrency(CurrencyTypeMapper.toApiCurrencyType(c.getCurrency()));
 	}
 
 	public void updateApiCompanyPublic(ApiCompanyPublic ac, Company c, Language language) {
@@ -111,6 +119,7 @@ public class CompanyApiTools {
 		c.setHeadquarters(commonApiTools.toAddress(ac.headquarters));
 		c.setEmail(ac.email);
 		c.setPhone(ac.phone);
+		c.setCurrency(currencyTypeService.getCurrencyType(ac.getCurrency().getId()));
 	}
 	
 	

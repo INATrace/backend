@@ -2,7 +2,8 @@ package com.abelium.inatrace.components.currencies;
 
 import com.abelium.inatrace.components.codebook.currencies.CurrencyTypeService;
 import com.abelium.inatrace.components.common.BaseService;
-import com.abelium.inatrace.components.currencies.api.ApiCurrencyResponse;
+import com.abelium.inatrace.components.currencies.api.ApiCurrencyRatesResponse;
+import com.abelium.inatrace.components.currencies.api.ApiCurrencySymbolsResponse;
 import com.abelium.inatrace.db.entities.codebook.CurrencyType;
 import com.abelium.inatrace.db.entities.currencies.CurrencyPair;
 import com.abelium.inatrace.db.enums.CurrencyEnum;
@@ -13,30 +14,20 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.UnknownHostException;
-import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class CurrencyService extends BaseService {
 
     @Autowired
     public CurrencyTypeService currencyTypeService;
-
-    public Date latestDate() {
-        List<Date> dateList = em.createNamedQuery("CurrencyPair.getLatestDate", Date.class).getResultList();
-        if (dateList.isEmpty()) {
-            return null;
-        }
-        return dateList.get(0);
-    }
 
     public BigDecimal convertFromEur(CurrencyEnum to, BigDecimal value) {
         return value.multiply(em.createNamedQuery("CurrencyPair.latestRate", BigDecimal.class).setParameter("currency", to.toString()).getResultList().get(0));
@@ -82,31 +73,57 @@ public class CurrencyService extends BaseService {
     @Scheduled(cron = "0 1 0 * * *")
     @EventListener(ApplicationReadyEvent.class)
     public void updateCurrencies() {
-        WebClient webClient = WebClient.create("http://api.exchangeratesapi.io/v1/latest?access_key=b4bea045495a28eb7dd88eeee312e981&base=EUR&symbols=USD,GBP,RWF,HNL");
-        ApiCurrencyResponse apiCurrencyResponse = webClient
+        WebClient webClientSymbols = WebClient.create("http://api.exchangeratesapi.io/v1/symbols?access_key=9feb56cf0094065ba5264c593105fc41");
+        ApiCurrencySymbolsResponse apiCurrencySymbolsResponse = webClientSymbols
                 .get()
                 .accept(MediaType.APPLICATION_JSON)
-                .retrieve().bodyToMono(ApiCurrencyResponse.class)
+                .retrieve().bodyToMono(ApiCurrencySymbolsResponse.class)
                 .doOnError(Throwable::printStackTrace)
-                .onErrorReturn(new ApiCurrencyResponse())
+                .onErrorReturn(new ApiCurrencySymbolsResponse())
                 .block();
-        if (apiCurrencyResponse == null || !apiCurrencyResponse.isSuccess()) {
-            return;
-        }
-        Map<String, BigDecimal> rates = apiCurrencyResponse.getRates();
-        Date current = apiCurrencyResponse.getDate();
-        Date latest = this.latestDate();
-        if (latest == null || current.after(latest)) {
-            for (String code : rates.keySet()) {
-                CurrencyPair currencyPair = new CurrencyPair();
-                CurrencyType from = currencyTypeService.getCurrencyTypeByCode("EUR");
-                CurrencyType to = currencyTypeService.getCurrencyTypeByCode(code);
-                currencyPair.setFrom(from);
-                currencyPair.setTo(to);
-                currencyPair.setDate(current);
-                currencyPair.setValue(rates.get(code));
-                em.persist(currencyPair);
+        if (apiCurrencySymbolsResponse != null && apiCurrencySymbolsResponse.isSuccess()) {
+            Map<String, String> symbols = apiCurrencySymbolsResponse.getSymbols();
+            for (String code : symbols.keySet()) {
+                if (em.createNamedQuery("CurrencyType.getCurrencyTypeByCode").setParameter("code", code).getResultList().isEmpty()) {
+                    CurrencyType currencyType = new CurrencyType();
+                    currencyType.setCode(code);
+                    currencyType.setLabel(symbols.get(code));
+                    currencyType.setEnabled(Boolean.FALSE);
+                    em.persist(currencyType);
+                }
             }
         }
+
+        WebClient webClientRates = WebClient.create("http://api.exchangeratesapi.io/v1/latest?access_key=9feb56cf0094065ba5264c593105fc41&base=EUR");
+        ApiCurrencyRatesResponse apiCurrencyResponse = webClientRates
+                .get()
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve().bodyToMono(ApiCurrencyRatesResponse.class)
+                .doOnError(Throwable::printStackTrace)
+                .onErrorReturn(new ApiCurrencyRatesResponse())
+                .block();
+        if (apiCurrencyResponse != null && apiCurrencyResponse.isSuccess()) {
+            Map<String, BigDecimal> rates = apiCurrencyResponse.getRates();
+            Date current = apiCurrencyResponse.getDate();
+
+            List<String> enabled = getEnabledCurrencyCodes();
+
+            for (String code : rates.keySet()) {
+                if (enabled.contains(code) && em.createNamedQuery("CurrencyPair.rateAtDate").setParameter("currency", code).setParameter("date", current).getResultList().isEmpty()) {
+                    CurrencyPair currencyPair = new CurrencyPair();
+                    CurrencyType from = currencyTypeService.getCurrencyTypeByCode("EUR");
+                    CurrencyType to = currencyTypeService.getCurrencyTypeByCode(code);
+                    currencyPair.setFrom(from);
+                    currencyPair.setTo(to);
+                    currencyPair.setDate(current);
+                    currencyPair.setValue(rates.get(code));
+                    em.persist(currencyPair);
+                }
+            }
+        }
+    }
+
+    private List<String> getEnabledCurrencyCodes() {
+        return em.createNamedQuery("CurrencyType.getEnabledCurrencyTypes", CurrencyType.class).getResultList().stream().map(CurrencyType::getCode).collect(Collectors.toList());
     }
 }
