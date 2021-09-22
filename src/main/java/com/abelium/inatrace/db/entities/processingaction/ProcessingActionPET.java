@@ -19,6 +19,8 @@ public class ProcessingActionPET extends BaseEntity {
 	@NotNull
 	private ProcessingEvidenceType processingEvidenceType;
 
+	private Boolean required = true;
+
 	@Column
 	private Boolean mandatory;
 

@@ -63,7 +63,7 @@ public class ProcessingActionController {
 	@ApiOperation("Get a single processing action with the provided ID.")
 	public ApiResponse<ApiProcessingAction> getProcessingAction(
 			@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long id,
-			@Valid @ApiParam(value = "language", required = false) @RequestParam(value = "language", defaultValue = "EN") String language) throws ApiException {
+			@Valid @ApiParam(value = "language") @RequestParam(value = "language", defaultValue = "EN") String language) throws ApiException {
 
 		return new ApiResponse<>(processingActionService.getProcessingAction(id, Language.valueOf(language)));
 	}
@@ -71,10 +71,8 @@ public class ProcessingActionController {
 	@GetMapping("{id}/detail")
 	@ApiOperation("Get a single processing action by the provided ID with all translations.")
 	public ApiResponse<ApiProcessingAction> getProcessingActionDetail(
-			@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long id,
-			@Valid @ApiParam(value = "language", required = false) @RequestParam(value = "language", defaultValue = "EN") String language) throws ApiException {
-
-		return new ApiResponse<>(processingActionService.getProcessingActionDetail(id, Language.valueOf(language)));
+			@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long id) throws ApiException {
+		return new ApiResponse<>(processingActionService.getProcessingActionDetail(id));
 	}
 
 	@PutMapping
