@@ -68,6 +68,15 @@ public class ProcessingActionController {
 		return new ApiResponse<>(processingActionService.getProcessingAction(id, Language.valueOf(language)));
 	}
 
+	@GetMapping("{id}/detail")
+	@ApiOperation("Get a single processing action by the provided ID with all translations.")
+	public ApiResponse<ApiProcessingAction> getProcessingActionDetail(
+			@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long id,
+			@Valid @ApiParam(value = "language", required = false) @RequestParam(value = "language", defaultValue = "EN") String language) throws ApiException {
+
+		return new ApiResponse<>(processingActionService.getProcessingActionDetail(id, Language.valueOf(language)));
+	}
+
 	@PutMapping
 	@ApiOperation("Create or update processing action. If ID is provided, then the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateProcessingAction(@Valid @RequestBody ApiProcessingAction apiProcessingAction) throws ApiException {

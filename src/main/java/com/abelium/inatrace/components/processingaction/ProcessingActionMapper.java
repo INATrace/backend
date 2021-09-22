@@ -4,13 +4,16 @@ import com.abelium.inatrace.components.codebook.processing_evidence_type.api.Api
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
+import com.abelium.inatrace.components.processingactiontranslation.ProcessingActionTranslationMapper;
 import com.abelium.inatrace.components.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
+import com.abelium.inatrace.db.entities.processingaction.ProcessingActionTranslation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Mapper for ProcessingAction entity.
@@ -30,24 +33,14 @@ public final class ProcessingActionMapper {
 		// Simplest apiProcessingAction object
 		ApiProcessingAction apiProcessingAction = new ApiProcessingAction();
 		apiProcessingAction.setId(entity.getId());
-		apiProcessingAction.setName(entity
-				.getProcessingActionTranslations()
-				.stream()
-				.findFirst()
-				.orElse(null)
-				.getName());
-		apiProcessingAction.setDescription(entity
-				.getProcessingActionTranslations()
-				.stream()
-				.findFirst()
-				.orElse(null)
-				.getDescription());
-		apiProcessingAction.setLanguage(entity
-				.getProcessingActionTranslations()
-				.stream()
-				.findFirst()
-				.orElse(null)
-				.getLanguage());
+
+		ProcessingActionTranslation translation = !entity.getProcessingActionTranslations().isEmpty()
+				? entity.getProcessingActionTranslations().get(0)
+				: new ProcessingActionTranslation();
+
+		apiProcessingAction.setName(translation.getName());
+		apiProcessingAction.setDescription(translation.getDescription());
+		apiProcessingAction.setLanguage(translation.getLanguage());
 		apiProcessingAction.setPrefix(entity.getPrefix());
 		apiProcessingAction.setRepackedOutputs(entity.getRepackedOutputs());
 		apiProcessingAction.setMaxOutputWeight(entity.getMaxOutputWeight());
@@ -108,6 +101,15 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setOutputSemiProduct(apiOutputSemiProduct);
 		apiProcessingAction.setRequiredDocumentTypes(apiRequiredDocumentTypes);
 
+		return apiProcessingAction;
+	}
+
+	public static ApiProcessingAction toApiProcessingActionDetail(ProcessingAction entity) {
+		ApiProcessingAction apiProcessingAction = toApiProcessingAction(entity);
+		apiProcessingAction.setTranslations(entity.getProcessingActionTranslations()
+				.stream()
+				.map(ProcessingActionTranslationMapper::toApiProcessingActionTranslation)
+				.collect(Collectors.toList()));
 		return apiProcessingAction;
 	}
 

@@ -4,6 +4,7 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
+import com.abelium.inatrace.components.processingactiontranslation.api.ApiProcessingActionTranslation;
 import com.abelium.inatrace.components.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
@@ -66,6 +67,9 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Processing action required evidence fields")
 	private List<ApiProcessingEvidenceField> requiredEvidenceFields = new ArrayList<>();
+
+	@ApiModelProperty(value = "Processing action translations")
+	private List<ApiProcessingActionTranslation> translations = new ArrayList<>();
 
 	public String getName() {
 		return name;
@@ -185,6 +189,14 @@ public class ApiProcessingAction extends ApiBaseEntity {
 
 	public void setRequiredEvidenceFields(List<ApiProcessingEvidenceField> requiredEvidenceFields) {
 		this.requiredEvidenceFields = requiredEvidenceFields;
+	}
+
+	public List<ApiProcessingActionTranslation> getTranslations() {
+		return translations;
+	}
+
+	public void setTranslations(List<ApiProcessingActionTranslation> translations) {
+		this.translations = translations;
 	}
 
 	public ApiProcessingAction() {

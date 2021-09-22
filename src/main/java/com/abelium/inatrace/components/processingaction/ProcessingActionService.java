@@ -19,16 +19,14 @@ import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionTranslation;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service for processing action entity.
@@ -76,49 +74,66 @@ public class ProcessingActionService extends BaseService {
 	public ApiProcessingAction getProcessingAction(Long id, Language language) throws ApiException {
 		
 		ProcessingAction processingAction = fetchProcessingAction(id);
-		ProcessingActionTranslation translation = 
-				processingAction.getProcessingActionTranslations()
+		ProcessingActionTranslation translation = processingAction.getProcessingActionTranslations()
 					.stream()
 					.filter(l -> language.equals(l.getLanguage()))
 					.findAny()
 					.orElse(null);
-			processingAction.getProcessingActionTranslations().clear();
+		processingAction.getProcessingActionTranslations().clear();
+		if(translation != null)
 			processingAction.getProcessingActionTranslations().add(translation);
 		return ProcessingActionMapper.toApiProcessingAction(processingAction);
+	}
+
+	public ApiProcessingAction getProcessingActionDetail(Long id, Language language) throws ApiException {
+
+		ProcessingAction processingAction = fetchProcessingAction(id);
+		return ProcessingActionMapper.toApiProcessingActionDetail(processingAction);
 	}
 
 	@Transactional
 	public ApiBaseEntity createOrUpdateProcessingAction(ApiProcessingAction apiProcessingAction) throws ApiException {
 
-		ProcessingAction entity;
-		ProcessingActionTranslation translation = null;
+		ProcessingAction entity = apiProcessingAction.getId() != null
+				? fetchProcessingAction(apiProcessingAction.getId())
+				: new ProcessingAction();
 
-		if (apiProcessingAction.getId() != null) {
-			entity = fetchProcessingAction(apiProcessingAction.getId());
-			if (apiProcessingAction.getLanguage() == null) apiProcessingAction.setLanguage(Language.EN); 
-			translation = 
+		// Make sure English translation is present
+		apiProcessingAction.getTranslations()
+				.stream()
+				.filter(t -> t != null
+						&& Language.EN.equals(t.getLanguage())
+						&& t.getDescription() != null
+						&& t.getName() != null)
+				.findFirst()
+				.orElseThrow(() -> new ApiException(ApiStatus.INVALID_REQUEST, "English translation is required!"));
+
+		// Remove translations that are not part of the request
+		entity.getProcessingActionTranslations().removeAll(
 				entity.getProcessingActionTranslations()
-					.stream()
-					.filter(l -> apiProcessingAction.getLanguage().equals(l.getLanguage()))
-					.findAny()
-					.orElse(null);
-		} else {
-			entity = new ProcessingAction();
-		}
-		
-		if (translation != null) {
-			translation.setLanguage(apiProcessingAction.getLanguage());
-		} else {
-			translation = new ProcessingActionTranslation();
-			translation.setLanguage(apiProcessingAction.getLanguage() == null ? Language.EN : apiProcessingAction.getLanguage());
-		}
-		
-		translation.setProcessingAction(entity);
-		translation.setName(apiProcessingAction.getName());
-		translation.setDescription(apiProcessingAction.getDescription());
-		translation.setLanguage(apiProcessingAction.getLanguage() == null ? Language.EN : apiProcessingAction.getLanguage());
+						.stream()
+						.filter(translation -> apiProcessingAction.getTranslations()
+								.stream()
+								.noneMatch(t -> t.getLanguage().equals(translation.getLanguage())))
+						.collect(Collectors.toList())
+		);
 
-		entity.getProcessingActionTranslations().add(translation);
+		// Update or add translations
+		apiProcessingAction.getTranslations().forEach(
+				translation -> {
+					ProcessingActionTranslation pat = entity.getProcessingActionTranslations()
+							.stream()
+							.filter(t -> t.getLanguage().equals(translation.getLanguage()))
+							.findFirst()
+							.orElse(new ProcessingActionTranslation());
+						pat.setName(translation.getName());
+						pat.setDescription(translation.getDescription());
+						pat.setLanguage(translation.getLanguage());
+						pat.setProcessingAction(entity);
+					entity.getProcessingActionTranslations().add(pat);
+				}
+		);
+
 		entity.setPrefix(apiProcessingAction.getPrefix());
 		entity.setRepackedOutputs(apiProcessingAction.getRepackedOutputs());
 		entity.setMaxOutputWeight(apiProcessingAction.getMaxOutputWeight());
