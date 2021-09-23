@@ -119,7 +119,7 @@ public class CompanyApiTools {
 		c.setHeadquarters(commonApiTools.toAddress(ac.headquarters));
 		c.setEmail(ac.email);
 		c.setPhone(ac.phone);
-		c.setCurrency(currencyTypeService.getCurrencyType(ac.getCurrency().getId()));
+		c.setCurrency(ac.getCurrency() == null ? null : currencyTypeService.getCurrencyType(ac.getCurrency().getId()));
 	}
 	
 	
