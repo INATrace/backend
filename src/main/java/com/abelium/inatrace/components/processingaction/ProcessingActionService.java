@@ -85,7 +85,7 @@ public class ProcessingActionService extends BaseService {
 		return ProcessingActionMapper.toApiProcessingAction(processingAction);
 	}
 
-	public ApiProcessingAction getProcessingActionDetail(Long id, Language language) throws ApiException {
+	public ApiProcessingAction getProcessingActionDetail(Long id) throws ApiException {
 
 		ProcessingAction processingAction = fetchProcessingAction(id);
 		return ProcessingActionMapper.toApiProcessingActionDetail(processingAction);
