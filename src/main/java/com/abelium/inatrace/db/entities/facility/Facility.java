@@ -3,6 +3,7 @@ package com.abelium.inatrace.db.entities.facility;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
 import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -50,6 +51,9 @@ public class Facility extends TimestampEntity {
 
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<FacilitySemiProduct> facilitySemiProducts = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "facility")
+	private List<StockOrder> stockOrders = new ArrayList<>();
 
 	public String getName() {
 		return name;
@@ -106,6 +110,14 @@ public class Facility extends TimestampEntity {
 	public void setFacilitySemiProducts(List<FacilitySemiProduct> facilitySemiProducts) {
 		this.facilitySemiProducts = facilitySemiProducts;
 	}
+	
+	public List<StockOrder> getStockOrders() {
+		return stockOrders;
+	}
+
+	public void setStockOrders(List<StockOrder> stockOrders) {
+		this.stockOrders = stockOrders;
+	}
 
 	public Facility() {
 		super();
@@ -113,7 +125,7 @@ public class Facility extends TimestampEntity {
 
 	public Facility(String name, Boolean isCollectionFacility, Boolean isPublic,
 			FacilityLocation facilityLocation, Company company, FacilityType facilityType,
-			List<FacilitySemiProduct> facilitySemiProducts) {
+			List<FacilitySemiProduct> facilitySemiProducts, List<StockOrder> stockOrders) {
 		super();
 		this.name = name;
 		this.isCollectionFacility = isCollectionFacility;
@@ -122,6 +134,7 @@ public class Facility extends TimestampEntity {
 		this.company = company;
 		this.facilityType = facilityType;
 		this.facilitySemiProducts = facilitySemiProducts;
+		this.stockOrders = stockOrders;
 	}
 
 }

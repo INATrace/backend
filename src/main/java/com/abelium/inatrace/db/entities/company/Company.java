@@ -7,6 +7,7 @@ import com.abelium.inatrace.db.entities.common.Address;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
+import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.types.CompanyStatus;
 
 import java.util.ArrayList;
@@ -26,12 +27,12 @@ import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.Lob;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 
 @Entity
 @Table(indexes = { @Index(columnList = "name") })
@@ -154,6 +155,12 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	 */
 	@OneToMany(mappedBy = "company")
 	private List<ProcessingAction> processingActions = new ArrayList<>();
+	
+	/**
+	 * stock orders
+	 */
+	@OneToMany(mappedBy = "company")
+	private List<StockOrder> stockOrders = new ArrayList<>();
 
 	public CompanyStatus getStatus() {
 		return status;
@@ -297,6 +304,14 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 
 	public void setProcessingActions(List<ProcessingAction> processingActions) {
 		this.processingActions = processingActions;
+	}
+	
+	public List<StockOrder> getStockOrders() {
+		return stockOrders;
+	}
+
+	public void setStockOrders(List<StockOrder> stockOrders) {
+		this.stockOrders = stockOrders;
 	}
   
 }

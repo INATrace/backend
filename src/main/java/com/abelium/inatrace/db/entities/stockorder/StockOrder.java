@@ -3,11 +3,14 @@ package com.abelium.inatrace.db.entities.stockorder;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.ActionType;
+import com.abelium.inatrace.db.entities.codebook.GradeAbbreviationType;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
+import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.Location;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 
@@ -34,25 +37,22 @@ public class StockOrder extends TimestampEntity {
 	private Long entityVersion;
 
 	@Column
-    private Instant updateTimestamp;
+	private Long creatorId; // logged-in user? 
 	
-	@Column
-	private Long creatorId; // logged user? 
+	@OneToOne
+	private UserCustomer representativeOfProducerCustomer; // farmer representative
 	
-	@Column
-	private UserCustomer representativeOfProducerCustomer; // farmer?
+	@OneToOne
+	private UserCustomer producerUserCustomer; // farmer
 	
-	@Column
-	private UserCustomer producerUserCustomer; // farmer?
-	
-	@Column
+	@OneToOne
 	private Location productionLocation;
 	
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Certification> certifications = new ArrayList<>();
+	private List<Certification> certifications = new ArrayList<>(); // probably not used for purchase
 	
-//	TODO: define relationship
-//	private CompanyCustomer consumerCompanyCustomer;
+	@OneToOne
+	private CompanyCustomer consumerCompanyCustomer; // probably not used for purchase
 	
 	@ManyToOne
 	private SemiProduct semiProduct;
@@ -64,7 +64,7 @@ public class StockOrder extends TimestampEntity {
 	private Company company;
 	
 	@ManyToOne
-	private MeasureUnitType measurementUnitType;
+	private MeasureUnitType measurementUnitType; // verify this in detail
 	
 	@Column
 	private Integer totalQuantity;
@@ -91,13 +91,13 @@ public class StockOrder extends TimestampEntity {
 	private Instant deliveryTime;
 	
 	@Column
-	private Long orderId;
+	private Long orderId; // is this the id on the base entity? probably
 	
 	@Column
 	private Long globalOrderId;
 	
-//	@OneToMany
-//	private List<ProcessingEvidenceType> documentRequirements; // Check with Pece if this is correct, might be some other type of document
+	@OneToMany
+	private List<ProcessingEvidenceType> documentRequirements; // Check with Pece if this is correct, might be some other type of document
 
 	@Column
 	private Float pricePerUnit;
@@ -118,8 +118,8 @@ public class StockOrder extends TimestampEntity {
 	@Column(length = Lengths.ENUM)
 	private OrderType orderType;
 	
-//	@Column
-//	private GradeAbbreviationType gradeAbbreviation; // Seems to be an empty class?
+	@OneToOne
+	private GradeAbbreviationType gradeAbbreviation;
 	
 	@Column
 	private String internalLotNumber;
@@ -139,6 +139,8 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private Boolean isWomenShare;
 	
+	// CALCULATED section
+	
 	@Column
 	private Float cost;
 	
@@ -148,12 +150,11 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private Float balance;
 	
-//	TODO: Create Transaction class
-//	@OneToMany
-//	private List<Transaction> inputTransactions = new ArrayList<>();
+	@OneToMany // Verify relationship
+	private List<Transaction> inputTransactions = new ArrayList<>();
 	
-//	@OneToMany
-//	private List<Transaction> outputTransactions = new ArrayList<>();
+	@OneToMany // Verify relationship
+	private List<Transaction> outputTransactions = new ArrayList<>();
 
 	@Column
 	private String lotLabel;
@@ -170,8 +171,8 @@ public class StockOrder extends TimestampEntity {
 	@ManyToOne
 	private ProcessingAction processingAction;
 	
-//	TODO class
-//	private ProcessingOrder processingOrder; 
+	@OneToOne // Verify relationship
+	private ProcessingOrder processingOrder; 
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
@@ -180,7 +181,7 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private Integer sacNumber;
 	
-//	TODO: one to many self referencing
+//	TODO: one to many self referencing?
 //	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 //	private List<StockOrder> triggerOrders = new ArrayList<>();
 	
@@ -241,8 +242,8 @@ public class StockOrder extends TimestampEntity {
 	@Column
     private String portOfDischarge;
 	
-//	TODO: define relationship
-//    private Location locationOfEndDelivery;
+	@OneToOne
+    private Location locationOfEndDelivery;
 	
 	@Column
     private Instant dateOfEndDelivery;
@@ -250,14 +251,573 @@ public class StockOrder extends TimestampEntity {
 	@Column
     private Boolean requiredWomensCoffee;
 	
-//	TODO: define relationship
-//    private GradeAbbreviationType requiredQuality;
+	@ManyToOne // verify relationship
+    private GradeAbbreviationType requiredQuality;
 	
 	@Column
     private Instant shippedAtDateFromOriginPort;
 	
 	@Column
     private Instant arrivedAtDateToDestinationPort;
-	
+
+	public Long getCreatorId() {
+		return creatorId;
+	}
+
+	public void setCreatorId(Long creatorId) {
+		this.creatorId = creatorId;
+	}
+
+	public UserCustomer getRepresentativeOfProducerCustomer() {
+		return representativeOfProducerCustomer;
+	}
+
+	public void setRepresentativeOfProducerCustomer(UserCustomer representativeOfProducerCustomer) {
+		this.representativeOfProducerCustomer = representativeOfProducerCustomer;
+	}
+
+	public UserCustomer getProducerUserCustomer() {
+		return producerUserCustomer;
+	}
+
+	public void setProducerUserCustomer(UserCustomer producerUserCustomer) {
+		this.producerUserCustomer = producerUserCustomer;
+	}
+
+	public Location getProductionLocation() {
+		return productionLocation;
+	}
+
+	public void setProductionLocation(Location productionLocation) {
+		this.productionLocation = productionLocation;
+	}
+
+	public List<Certification> getCertifications() {
+		return certifications;
+	}
+
+	public void setCertifications(List<Certification> certifications) {
+		this.certifications = certifications;
+	}
+
+	public CompanyCustomer getConsumerCompanyCustomer() {
+		return consumerCompanyCustomer;
+	}
+
+	public void setConsumerCompanyCustomer(CompanyCustomer consumerCompanyCustomer) {
+		this.consumerCompanyCustomer = consumerCompanyCustomer;
+	}
+
+	public SemiProduct getSemiProduct() {
+		return semiProduct;
+	}
+
+	public void setSemiProduct(SemiProduct semiProduct) {
+		this.semiProduct = semiProduct;
+	}
+
+	public Facility getFacility() {
+		return facility;
+	}
+
+	public void setFacility(Facility facility) {
+		this.facility = facility;
+	}
+
+	public Company getCompany() {
+		return company;
+	}
+
+	public void setCompany(Company company) {
+		this.company = company;
+	}
+
+	public MeasureUnitType getMeasurementUnitType() {
+		return measurementUnitType;
+	}
+
+	public void setMeasurementUnitType(MeasureUnitType measurementUnitType) {
+		this.measurementUnitType = measurementUnitType;
+	}
+
+	public Integer getTotalQuantity() {
+		return totalQuantity;
+	}
+
+	public void setTotalQuantity(Integer totalQuantity) {
+		this.totalQuantity = totalQuantity;
+	}
+
+	public Integer getFullfilledQuantity() {
+		return fullfilledQuantity;
+	}
+
+	public void setFullfilledQuantity(Integer fullfilledQuantity) {
+		this.fullfilledQuantity = fullfilledQuantity;
+	}
+
+	public Integer getAvailableQuantity() {
+		return availableQuantity;
+	}
+
+	public void setAvailableQuantity(Integer availableQuantity) {
+		this.availableQuantity = availableQuantity;
+	}
+
+	public Boolean getIsAvailable() {
+		return isAvailable;
+	}
+
+	public void setIsAvailable(Boolean isAvailable) {
+		this.isAvailable = isAvailable;
+	}
+
+	public Instant getProductionDate() {
+		return productionDate;
+	}
+
+	public void setProductionDate(Instant productionDate) {
+		this.productionDate = productionDate;
+	}
+
+	public Instant getExpiryDate() {
+		return expiryDate;
+	}
+
+	public void setExpiryDate(Instant expiryDate) {
+		this.expiryDate = expiryDate;
+	}
+
+	public Instant getEstimatedDeliveryDate() {
+		return estimatedDeliveryDate;
+	}
+
+	public void setEstimatedDeliveryDate(Instant estimatedDeliveryDate) {
+		this.estimatedDeliveryDate = estimatedDeliveryDate;
+	}
+
+	public Instant getDeliveryTime() {
+		return deliveryTime;
+	}
+
+	public void setDeliveryTime(Instant deliveryTime) {
+		this.deliveryTime = deliveryTime;
+	}
+
+	public Long getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(Long orderId) {
+		this.orderId = orderId;
+	}
+
+	public Long getGlobalOrderId() {
+		return globalOrderId;
+	}
+
+	public void setGlobalOrderId(Long globalOrderId) {
+		this.globalOrderId = globalOrderId;
+	}
+
+	public List<ProcessingEvidenceType> getDocumentRequirements() {
+		return documentRequirements;
+	}
+
+	public void setDocumentRequirements(List<ProcessingEvidenceType> documentRequirements) {
+		this.documentRequirements = documentRequirements;
+	}
+
+	public Float getPricePerUnit() {
+		return pricePerUnit;
+	}
+
+	public void setPricePerUnit(Float pricePerUnit) {
+		this.pricePerUnit = pricePerUnit;
+	}
+
+	public Float getSalesPricePerUnit() {
+		return salesPricePerUnit;
+	}
+
+	public void setSalesPricePerUnit(Float salesPricePerUnit) {
+		this.salesPricePerUnit = salesPricePerUnit;
+	}
+
+	public String getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
+
+	public String getSalesCurrency() {
+		return salesCurrency;
+	}
+
+	public void setSalesCurrency(String salesCurrency) {
+		this.salesCurrency = salesCurrency;
+	}
+
+	public Boolean getIsPurchaseOrder() {
+		return isPurchaseOrder;
+	}
+
+	public void setIsPurchaseOrder(Boolean isPurchaseOrder) {
+		this.isPurchaseOrder = isPurchaseOrder;
+	}
+
+	public OrderType getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(OrderType orderType) {
+		this.orderType = orderType;
+	}
+
+	public GradeAbbreviationType getGradeAbbreviation() {
+		return gradeAbbreviation;
+	}
+
+	public void setGradeAbbreviation(GradeAbbreviationType gradeAbbreviation) {
+		this.gradeAbbreviation = gradeAbbreviation;
+	}
+
+	public String getInternalLotNumber() {
+		return internalLotNumber;
+	}
+
+	public void setInternalLotNumber(String internalLotNumber) {
+		this.internalLotNumber = internalLotNumber;
+	}
+
+	public String getLotNumber() {
+		return lotNumber;
+	}
+
+	public void setLotNumber(String lotNumber) {
+		this.lotNumber = lotNumber;
+	}
+
+	public String getScreenSize() {
+		return screenSize;
+	}
+
+	public void setScreenSize(String screenSize) {
+		this.screenSize = screenSize;
+	}
+
+	public String getComments() {
+		return comments;
+	}
+
+	public void setComments(String comments) {
+		this.comments = comments;
+	}
+
+	public ActionType getActionType() {
+		return actionType;
+	}
+
+	public void setActionType(ActionType actionType) {
+		this.actionType = actionType;
+	}
+
+	public Boolean getIsWomenShare() {
+		return isWomenShare;
+	}
+
+	public void setIsWomenShare(Boolean isWomenShare) {
+		this.isWomenShare = isWomenShare;
+	}
+
+	public Float getCost() {
+		return cost;
+	}
+
+	public void setCost(Float cost) {
+		this.cost = cost;
+	}
+
+	public Float getPaid() {
+		return paid;
+	}
+
+	public void setPaid(Float paid) {
+		this.paid = paid;
+	}
+
+	public Float getBalance() {
+		return balance;
+	}
+
+	public void setBalance(Float balance) {
+		this.balance = balance;
+	}
+
+	public List<Transaction> getInputTransactions() {
+		return inputTransactions;
+	}
+
+	public void setInputTransactions(List<Transaction> inputTransactions) {
+		this.inputTransactions = inputTransactions;
+	}
+
+	public List<Transaction> getOutputTransactions() {
+		return outputTransactions;
+	}
+
+	public void setOutputTransactions(List<Transaction> outputTransactions) {
+		this.outputTransactions = outputTransactions;
+	}
+
+	public String getLotLabel() {
+		return lotLabel;
+	}
+
+	public void setLotLabel(String lotLabel) {
+		this.lotLabel = lotLabel;
+	}
+
+	public Instant getStartOfDrying() {
+		return startOfDrying;
+	}
+
+	public void setStartOfDrying(Instant startOfDrying) {
+		this.startOfDrying = startOfDrying;
+	}
+
+	public Company getClient() {
+		return client;
+	}
+
+	public void setClient(Company client) {
+		this.client = client;
+	}
+
+	public String getFlavourProfile() {
+		return flavourProfile;
+	}
+
+	public void setFlavourProfile(String flavourProfile) {
+		this.flavourProfile = flavourProfile;
+	}
+
+	public ProcessingAction getProcessingAction() {
+		return processingAction;
+	}
+
+	public void setProcessingAction(ProcessingAction processingAction) {
+		this.processingAction = processingAction;
+	}
+
+	public ProcessingOrder getProcessingOrder() {
+		return processingOrder;
+	}
+
+	public void setProcessingOrder(ProcessingOrder processingOrder) {
+		this.processingOrder = processingOrder;
+	}
+
+	public OrderType getPreferredWayOfPayment() {
+		return preferredWayOfPayment;
+	}
+
+	public void setPreferredWayOfPayment(OrderType preferredWayOfPayment) {
+		this.preferredWayOfPayment = preferredWayOfPayment;
+	}
+
+	public Integer getSacNumber() {
+		return sacNumber;
+	}
+
+	public void setSacNumber(Integer sacNumber) {
+		this.sacNumber = sacNumber;
+	}
+
+	public Boolean getIsOpenOrder() {
+		return isOpenOrder;
+	}
+
+	public void setIsOpenOrder(Boolean isOpenOrder) {
+		this.isOpenOrder = isOpenOrder;
+	}
+
+	public Facility getQuoteFacility() {
+		return quoteFacility;
+	}
+
+	public void setQuoteFacility(Facility quoteFacility) {
+		this.quoteFacility = quoteFacility;
+	}
+
+	public Company getQuoteCompany() {
+		return quoteCompany;
+	}
+
+	public void setQuoteCompany(Company quoteCompany) {
+		this.quoteCompany = quoteCompany;
+	}
+
+	public Float getPricePerUnitForOwner() {
+		return pricePerUnitForOwner;
+	}
+
+	public void setPricePerUnitForOwner(Float pricePerUnitForOwner) {
+		this.pricePerUnitForOwner = pricePerUnitForOwner;
+	}
+
+	public Float getPricePerUnitForBuyer() {
+		return pricePerUnitForBuyer;
+	}
+
+	public void setPricePerUnitForBuyer(Float pricePerUnitForBuyer) {
+		this.pricePerUnitForBuyer = pricePerUnitForBuyer;
+	}
+
+	public Float getExchangeRateAtBuyer() {
+		return exchangeRateAtBuyer;
+	}
+
+	public void setExchangeRateAtBuyer(Float exchangeRateAtBuyer) {
+		this.exchangeRateAtBuyer = exchangeRateAtBuyer;
+	}
+
+	public Float getPricePerUnitForEndCustomer() {
+		return pricePerUnitForEndCustomer;
+	}
+
+	public void setPricePerUnitForEndCustomer(Float pricePerUnitForEndCustomer) {
+		this.pricePerUnitForEndCustomer = pricePerUnitForEndCustomer;
+	}
+
+	public Float getExchangeRateAtEndCustomer() {
+		return exchangeRateAtEndCustomer;
+	}
+
+	public void setExchangeRateAtEndCustomer(Float exchangeRateAtEndCustomer) {
+		this.exchangeRateAtEndCustomer = exchangeRateAtEndCustomer;
+	}
+
+	public String getCuppingResult() {
+		return cuppingResult;
+	}
+
+	public void setCuppingResult(String cuppingResult) {
+		this.cuppingResult = cuppingResult;
+	}
+
+	public String getCuppingGrade() {
+		return cuppingGrade;
+	}
+
+	public void setCuppingGrade(String cuppingGrade) {
+		this.cuppingGrade = cuppingGrade;
+	}
+
+	public String getCuppingFlavour() {
+		return cuppingFlavour;
+	}
+
+	public void setCuppingFlavour(String cuppingFlavour) {
+		this.cuppingFlavour = cuppingFlavour;
+	}
+
+	public Instant getRoastingDate() {
+		return roastingDate;
+	}
+
+	public void setRoastingDate(Instant roastingDate) {
+		this.roastingDate = roastingDate;
+	}
+
+	public String getRoastingProfile() {
+		return roastingProfile;
+	}
+
+	public void setRoastingProfile(String roastingProfile) {
+		this.roastingProfile = roastingProfile;
+	}
+
+	public String getShipperDetails() {
+		return shipperDetails;
+	}
+
+	public void setShipperDetails(String shipperDetails) {
+		this.shipperDetails = shipperDetails;
+	}
+
+	public String getCarrierDetails() {
+		return carrierDetails;
+	}
+
+	public void setCarrierDetails(String carrierDetails) {
+		this.carrierDetails = carrierDetails;
+	}
+
+	public String getPortOfLoading() {
+		return portOfLoading;
+	}
+
+	public void setPortOfLoading(String portOfLoading) {
+		this.portOfLoading = portOfLoading;
+	}
+
+	public String getPortOfDischarge() {
+		return portOfDischarge;
+	}
+
+	public void setPortOfDischarge(String portOfDischarge) {
+		this.portOfDischarge = portOfDischarge;
+	}
+
+	public Location getLocationOfEndDelivery() {
+		return locationOfEndDelivery;
+	}
+
+	public void setLocationOfEndDelivery(Location locationOfEndDelivery) {
+		this.locationOfEndDelivery = locationOfEndDelivery;
+	}
+
+	public Instant getDateOfEndDelivery() {
+		return dateOfEndDelivery;
+	}
+
+	public void setDateOfEndDelivery(Instant dateOfEndDelivery) {
+		this.dateOfEndDelivery = dateOfEndDelivery;
+	}
+
+	public Boolean getRequiredWomensCoffee() {
+		return requiredWomensCoffee;
+	}
+
+	public void setRequiredWomensCoffee(Boolean requiredWomensCoffee) {
+		this.requiredWomensCoffee = requiredWomensCoffee;
+	}
+
+	public GradeAbbreviationType getRequiredQuality() {
+		return requiredQuality;
+	}
+
+	public void setRequiredQuality(GradeAbbreviationType requiredQuality) {
+		this.requiredQuality = requiredQuality;
+	}
+
+	public Instant getShippedAtDateFromOriginPort() {
+		return shippedAtDateFromOriginPort;
+	}
+
+	public void setShippedAtDateFromOriginPort(Instant shippedAtDateFromOriginPort) {
+		this.shippedAtDateFromOriginPort = shippedAtDateFromOriginPort;
+	}
+
+	public Instant getArrivedAtDateToDestinationPort() {
+		return arrivedAtDateToDestinationPort;
+	}
+
+	public void setArrivedAtDateToDestinationPort(Instant arrivedAtDateToDestinationPort) {
+		this.arrivedAtDateToDestinationPort = arrivedAtDateToDestinationPort;
+	}
 	
 }
