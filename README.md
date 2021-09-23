@@ -139,9 +139,11 @@ Database entities are listed [here](https://github.com/INATrace/backend/tree/mai
 
 2. Import as maven project to your prefered IDE
 
-3. Prepare environment, including database, as suggested in file `application.properties.template`
+3. Create an account and get an API key at https://exchangeratesapi.io/
 
-4. Run `INATraceBackendApplication.java` 
+4. Prepare environment, including database, as suggested in file `application.properties.template`
+
+5. Run `INATraceBackendApplication.java` 
 
 ## Contribution
 
