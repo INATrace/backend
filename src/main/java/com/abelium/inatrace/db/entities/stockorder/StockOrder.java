@@ -5,9 +5,7 @@ import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.ActionType;
 import com.abelium.inatrace.db.entities.codebook.GradeAbbreviationType;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
-import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
-import com.abelium.inatrace.db.entities.common.Location;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
@@ -98,8 +96,8 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private Long globalOrderId;
 	
-	@OneToMany
-	private List<ProcessingEvidenceType> documentRequirements; // Check with Pece if this is correct, might be some other type of document
+	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<DocumentRequirement> documentRequirements; // Check with Pece if this is correct, might be some other type of document
 
 	@Column
 	private Float pricePerUnit;
@@ -414,11 +412,11 @@ public class StockOrder extends TimestampEntity {
 		this.globalOrderId = globalOrderId;
 	}
 
-	public List<ProcessingEvidenceType> getDocumentRequirements() {
+	public List<DocumentRequirement> getDocumentRequirements() {
 		return documentRequirements;
 	}
 
-	public void setDocumentRequirements(List<ProcessingEvidenceType> documentRequirements) {
+	public void setDocumentRequirements(List<DocumentRequirement> documentRequirements) {
 		this.documentRequirements = documentRequirements;
 	}
 
