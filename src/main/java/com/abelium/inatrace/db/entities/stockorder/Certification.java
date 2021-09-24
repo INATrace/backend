@@ -3,18 +3,17 @@ package com.abelium.inatrace.db.entities.stockorder;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.common.Document;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Version;
+import java.time.Instant;
+
+import javax.persistence.*;
 
 @Entity
 public class Certification extends TimestampEntity {
 	
 	@Version
 	private Long entityVersion;
-	
-	@Column
+
+	@OneToOne
 	private Document certificate;
 	
 	@Column
@@ -24,7 +23,7 @@ public class Certification extends TimestampEntity {
 	private String type;
 	
 	@Column
-	private String validity;
+	private Instant validity;
 	
 	@ManyToOne
 	private StockOrder stockOrder;
@@ -53,15 +52,15 @@ public class Certification extends TimestampEntity {
 		this.type = type;
 	}
 
-	public String getValidity() {
+	public Instant getValidity() {
 		return validity;
 	}
 
-	public void setValidity(String validity) {
+	public void setValidity(Instant validity) {
 		this.validity = validity;
 	}
 
-	public Certification(Document certificate, String description, String type, String validity) {
+	public Certification(Document certificate, String description, String type, Instant validity) {
 		super();
 		this.certificate = certificate;
 		this.description = description;

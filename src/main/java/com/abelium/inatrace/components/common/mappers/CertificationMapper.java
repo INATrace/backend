@@ -22,7 +22,7 @@ public class CertificationMapper {
         apiCertification.setCertificate(DocumentMapper.toApiDocument(entity.getCertificate()));
         apiCertification.setType(entity.getType());
         apiCertification.setDescription(entity.getDescription());
-        apiCertification.setValidity(LocalDate.parse(entity.getValidity()));
+        apiCertification.setValidity(LocalDate.from(entity.getValidity()));
         return apiCertification;
     }
 }

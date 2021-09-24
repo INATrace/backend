@@ -3,13 +3,18 @@ package com.abelium.inatrace.db.entities.stockorder;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.ActionType;
+import com.abelium.inatrace.db.entities.codebook.GradeAbbreviationType;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
+import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.Location;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
+import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
+import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -34,25 +39,22 @@ public class StockOrder extends TimestampEntity {
 	private Long entityVersion;
 
 	@Column
-    private Instant updateTimestamp;
+	private Long creatorId; // logged-in user?
 	
-	@Column
-	private Long creatorId; // logged user? 
+	@ManyToOne
+	private UserCustomer representativeOfProducerCustomer; // farmer representative
 	
-	@Column
-	private UserCustomer representativeOfProducerCustomer; // farmer?
+	@ManyToOne
+	private UserCustomer producerUserCustomer; // farmer
 	
-	@Column
-	private UserCustomer producerUserCustomer; // farmer?
-	
-	@Column
-	private Location productionLocation;
+	@OneToOne
+	private StockOrderLocation productionLocation;
 	
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Certification> certifications = new ArrayList<>();
+	private List<Certification> certifications = new ArrayList<>(); // probably not used for purchase
 	
-//	TODO: define relationship
-//	private CompanyCustomer consumerCompanyCustomer;
+	@OneToOne
+	private CompanyCustomer consumerCompanyCustomer; // probably not used for purchase
 	
 	@ManyToOne
 	private SemiProduct semiProduct;
@@ -64,7 +66,7 @@ public class StockOrder extends TimestampEntity {
 	private Company company;
 	
 	@ManyToOne
-	private MeasureUnitType measurementUnitType;
+	private MeasureUnitType measurementUnitType; // verify this in detail
 	
 	@Column
 	private Integer totalQuantity;
@@ -91,13 +93,13 @@ public class StockOrder extends TimestampEntity {
 	private Instant deliveryTime;
 	
 	@Column
-	private Long orderId;
+	private Long orderId; // is this the id on the base entity? probably
 	
 	@Column
 	private Long globalOrderId;
 	
-//	@OneToMany
-//	private List<ProcessingEvidenceType> documentRequirements; // Check with Pece if this is correct, might be some other type of document
+	@OneToMany
+	private List<ProcessingEvidenceType> documentRequirements; // Check with Pece if this is correct, might be some other type of document
 
 	@Column
 	private Float pricePerUnit;
@@ -118,8 +120,8 @@ public class StockOrder extends TimestampEntity {
 	@Column(length = Lengths.ENUM)
 	private OrderType orderType;
 	
-//	@Column
-//	private GradeAbbreviationType gradeAbbreviation; // Seems to be an empty class?
+	@OneToOne
+	private GradeAbbreviationType gradeAbbreviation;
 	
 	@Column
 	private String internalLotNumber;
@@ -139,6 +141,8 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private Boolean isWomenShare;
 	
+	// CALCULATED section
+
 	@Column
 	private Float cost;
 	
@@ -148,12 +152,11 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private Float balance;
 	
-//	TODO: Create Transaction class
-//	@OneToMany
-//	private List<Transaction> inputTransactions = new ArrayList<>();
+	@OneToMany // Verify relationship
+	private List<Transaction> inputTransactions = new ArrayList<>();
 	
-//	@OneToMany
-//	private List<Transaction> outputTransactions = new ArrayList<>();
+	@OneToMany // Verify relationship
+	private List<Transaction> outputTransactions = new ArrayList<>();
 
 	@Column
 	private String lotLabel;
@@ -161,7 +164,7 @@ public class StockOrder extends TimestampEntity {
 	@Column
     private Instant startOfDrying;
 	
-	@Column 
+	@ManyToOne
 	private Company client;
 	
 	@Column
@@ -170,17 +173,17 @@ public class StockOrder extends TimestampEntity {
 	@ManyToOne
 	private ProcessingAction processingAction;
 	
-//	TODO class
-//	private ProcessingOrder processingOrder; 
+	@OneToOne // Verify relationship
+	private ProcessingOrder processingOrder;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
-	private OrderType preferredWayOfPayment;
+	private PreferredWayOfPayment preferredWayOfPayment;
 	
 	@Column
 	private Integer sacNumber;
 	
-//	TODO: one to many self referencing
+//	TODO: one to many self referencing?
 //	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 //	private List<StockOrder> triggerOrders = new ArrayList<>();
 	
@@ -241,8 +244,8 @@ public class StockOrder extends TimestampEntity {
 	@Column
     private String portOfDischarge;
 	
-//	TODO: define relationship
-//    private Location locationOfEndDelivery;
+	@OneToOne
+    private StockOrderLocation locationOfEndDelivery;
 	
 	@Column
     private Instant dateOfEndDelivery;
@@ -250,23 +253,14 @@ public class StockOrder extends TimestampEntity {
 	@Column
     private Boolean requiredWomensCoffee;
 	
-//	TODO: define relationship
-//    private GradeAbbreviationType requiredQuality;
+	@ManyToOne // verify relationship
+    private GradeAbbreviationType requiredQuality;
 	
 	@Column
     private Instant shippedAtDateFromOriginPort;
 	
 	@Column
     private Instant arrivedAtDateToDestinationPort;
-
-	@Override
-	public Instant getUpdateTimestamp() {
-		return updateTimestamp;
-	}
-
-	public void setUpdateTimestamp(Instant updateTimestamp) {
-		this.updateTimestamp = updateTimestamp;
-	}
 
 	public Long getCreatorId() {
 		return creatorId;
@@ -292,20 +286,20 @@ public class StockOrder extends TimestampEntity {
 		this.producerUserCustomer = producerUserCustomer;
 	}
 
-	public Location getProductionLocation() {
-		return productionLocation;
-	}
-
-	public void setProductionLocation(Location productionLocation) {
-		this.productionLocation = productionLocation;
-	}
-
 	public List<Certification> getCertifications() {
 		return certifications;
 	}
 
 	public void setCertifications(List<Certification> certifications) {
 		this.certifications = certifications;
+	}
+
+	public CompanyCustomer getConsumerCompanyCustomer() {
+		return consumerCompanyCustomer;
+	}
+
+	public void setConsumerCompanyCustomer(CompanyCustomer consumerCompanyCustomer) {
+		this.consumerCompanyCustomer = consumerCompanyCustomer;
 	}
 
 	public SemiProduct getSemiProduct() {
@@ -420,6 +414,14 @@ public class StockOrder extends TimestampEntity {
 		this.globalOrderId = globalOrderId;
 	}
 
+	public List<ProcessingEvidenceType> getDocumentRequirements() {
+		return documentRequirements;
+	}
+
+	public void setDocumentRequirements(List<ProcessingEvidenceType> documentRequirements) {
+		this.documentRequirements = documentRequirements;
+	}
+
 	public Float getPricePerUnit() {
 		return pricePerUnit;
 	}
@@ -466,6 +468,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setOrderType(OrderType orderType) {
 		this.orderType = orderType;
+	}
+
+	public GradeAbbreviationType getGradeAbbreviation() {
+		return gradeAbbreviation;
+	}
+
+	public void setGradeAbbreviation(GradeAbbreviationType gradeAbbreviation) {
+		this.gradeAbbreviation = gradeAbbreviation;
 	}
 
 	public String getInternalLotNumber() {
@@ -540,6 +550,22 @@ public class StockOrder extends TimestampEntity {
 		this.balance = balance;
 	}
 
+	public List<Transaction> getInputTransactions() {
+		return inputTransactions;
+	}
+
+	public void setInputTransactions(List<Transaction> inputTransactions) {
+		this.inputTransactions = inputTransactions;
+	}
+
+	public List<Transaction> getOutputTransactions() {
+		return outputTransactions;
+	}
+
+	public void setOutputTransactions(List<Transaction> outputTransactions) {
+		this.outputTransactions = outputTransactions;
+	}
+
 	public String getLotLabel() {
 		return lotLabel;
 	}
@@ -580,11 +606,19 @@ public class StockOrder extends TimestampEntity {
 		this.processingAction = processingAction;
 	}
 
-	public OrderType getPreferredWayOfPayment() {
+	public ProcessingOrder getProcessingOrder() {
+		return processingOrder;
+	}
+
+	public void setProcessingOrder(ProcessingOrder processingOrder) {
+		this.processingOrder = processingOrder;
+	}
+
+	public PreferredWayOfPayment getPreferredWayOfPayment() {
 		return preferredWayOfPayment;
 	}
 
-	public void setPreferredWayOfPayment(OrderType preferredWayOfPayment) {
+	public void setPreferredWayOfPayment(PreferredWayOfPayment preferredWayOfPayment) {
 		this.preferredWayOfPayment = preferredWayOfPayment;
 	}
 
@@ -732,6 +766,22 @@ public class StockOrder extends TimestampEntity {
 		this.portOfDischarge = portOfDischarge;
 	}
 
+	public StockOrderLocation getProductionLocation() {
+		return productionLocation;
+	}
+
+	public void setProductionLocation(StockOrderLocation productionLocation) {
+		this.productionLocation = productionLocation;
+	}
+
+	public StockOrderLocation getLocationOfEndDelivery() {
+		return locationOfEndDelivery;
+	}
+
+	public void setLocationOfEndDelivery(StockOrderLocation locationOfEndDelivery) {
+		this.locationOfEndDelivery = locationOfEndDelivery;
+	}
+
 	public Instant getDateOfEndDelivery() {
 		return dateOfEndDelivery;
 	}
@@ -746,6 +796,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setRequiredWomensCoffee(Boolean requiredWomensCoffee) {
 		this.requiredWomensCoffee = requiredWomensCoffee;
+	}
+
+	public GradeAbbreviationType getRequiredQuality() {
+		return requiredQuality;
+	}
+
+	public void setRequiredQuality(GradeAbbreviationType requiredQuality) {
+		this.requiredQuality = requiredQuality;
 	}
 
 	public Instant getShippedAtDateFromOriginPort() {

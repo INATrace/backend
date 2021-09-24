@@ -6,6 +6,7 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 public class UserCustomerMapper {
 
     public static ApiUserCustomer toApiUserCustomer(UserCustomer entity) {
+        if(entity == null) return null;
         ApiUserCustomer apiUserCustomer = new ApiUserCustomer();
         apiUserCustomer.setId(entity.getId());
         apiUserCustomer.setName(entity.getName());
