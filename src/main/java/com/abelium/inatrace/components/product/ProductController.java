@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.product;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.ApiDefaultResponse;
+import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiPaginatedResponse;
 import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
@@ -199,6 +200,16 @@ public class ProductController {
     public ResponseEntity<byte[]> getProductLabelInstructions(@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @ApiParam(value = "Label id", required = true) @PathVariable("id") Long id) throws ApiException {
         return productDocumentEngine.createLabelsAndHowToUseInstructions(authUser, id).toResponseEntity();
+    }
+
+    @GetMapping(value = "/userCustomers/list/{companyId}/{type}")
+    @ApiOperation(value = "List user customers for a company and role")
+    public ApiPaginatedResponse<ApiUserCustomer> getUserCustomerListForCompanyAndType(
+            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @ApiParam(value = "Type (collector, farmer)", required = true) @PathVariable("type") String type,
+            @Valid ApiPaginatedRequest request
+            ) throws ApiException {
+        return new ApiPaginatedResponse<>(productEngine.listUserCustomersForCompanyAndType(companyId, type, request));
     }
     
     @GetMapping(value = "/userCustomers/list/{productId}")
