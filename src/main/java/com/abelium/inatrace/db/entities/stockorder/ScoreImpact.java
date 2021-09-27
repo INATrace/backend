@@ -23,4 +23,19 @@ public class ScoreImpact extends BaseEntity {
 	@ManyToOne
 	private DocumentRequirement documentRequirement;
 
+	public Float getScore() {
+		return score;
+	}
+
+	public void setScore(Float score) {
+		this.score = score;
+	}
+
+	public ScoreImpactType getType() {
+		return type;
+	}
+
+	public void setType(ScoreImpactType type) {
+		this.type = type;
+	}
 }

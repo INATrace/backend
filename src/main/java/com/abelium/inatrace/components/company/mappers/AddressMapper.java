@@ -7,6 +7,7 @@ import com.abelium.inatrace.db.entities.common.Address;
 public class AddressMapper {
 
     public static ApiAddress toApiAddress(Address entity) {
+        if(entity == null) return null;
         ApiAddress apiAddress = new ApiAddress();
         apiAddress.setAddress(entity.getAddress());
         apiAddress.setCell(entity.getCell());

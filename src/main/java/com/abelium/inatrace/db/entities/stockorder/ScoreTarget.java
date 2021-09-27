@@ -22,10 +22,11 @@ public class ScoreTarget extends BaseEntity {
 	
 	@Column
 	private Boolean womenShare;
-	
+
+	// Order cannot be the name of column, as it is reserved word in MySQL
 	@Column
-	private Integer order;
-	
+	private Integer orderId;
+
 	@Column
 	private Integer payment;
 
@@ -69,12 +70,12 @@ public class ScoreTarget extends BaseEntity {
 		this.womenShare = womenShare;
 	}
 
-	public Integer getOrder() {
-		return order;
+	public Integer getOrderId() {
+		return orderId;
 	}
 
-	public void setOrder(Integer order) {
-		this.order = order;
+	public void setOrderId(Integer orderId) {
+		this.orderId = orderId;
 	}
 
 	public Integer getPayment() {
@@ -84,5 +85,4 @@ public class ScoreTarget extends BaseEntity {
 	public void setPayment(Integer payment) {
 		this.payment = payment;
 	}
-	
 }

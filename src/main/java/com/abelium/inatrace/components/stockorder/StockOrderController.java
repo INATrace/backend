@@ -30,11 +30,29 @@ public class StockOrderController {
         return new ApiResponse<>(stockOrderService.getStockOrder(id));
     }
 
-    @GetMapping("list")
+    @GetMapping("/list")
     @ApiOperation("Get a paginated list of stock orders.")
     public ApiPaginatedResponse<ApiStockOrder> getStockOrderList(@Valid ApiPaginatedRequest request) {
 
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request));
+    }
+
+    @GetMapping("list/facility/{facilityId}")
+    @ApiOperation("Get a paginated list of stock orders by Facility ID.")
+    public ApiPaginatedResponse<ApiStockOrder> getStockOrderListByFacilityId(
+            @Valid ApiPaginatedRequest request,
+            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("facilityId") Long facilityId) {
+
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderListByFacilityId(request, facilityId));
+    }
+
+    @GetMapping("list/company/{companyId}")
+    @ApiOperation("Get a paginated list of stock orders by company ID.")
+    public ApiPaginatedResponse<ApiStockOrder> getStockOrderListByCompanyId(
+            @Valid ApiPaginatedRequest request,
+            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId) {
+
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderListByCompanyId(request, companyId));
     }
 
     @PutMapping

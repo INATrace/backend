@@ -4,20 +4,18 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
-import com.abelium.inatrace.components.product.api.ApiLocation;
 import com.abelium.inatrace.components.product.api.ApiUserCustomer;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.PrePersist;
 import java.time.Instant;
+import java.util.List;
 
 @Validated
 public class ApiStockOrder extends ApiBaseEntity {
 
-    // Pre-persist
     @ApiModelProperty(value = "Timestamp indicates when stock order have been updated", position = 1)
     public Instant updateTimestamp;
 
@@ -34,7 +32,7 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     // Relevant only for order type: PURCHASE_ORDER
     @ApiModelProperty(value = "Production location", position = 5)
-    public ApiLocation productionLocation;
+    public ApiStockOrderLocation productionLocation;
 
 //    @ApiModelProperty(value = "Certification", position = 6)
 //    @Valid
@@ -81,6 +79,9 @@ public class ApiStockOrder extends ApiBaseEntity {
 
 //    @ApiModelProperty(value = "Global order ID", position = 20)
 //    public Long globalOrderId;
+
+    @ApiModelProperty(value = "Document requirements", position = 20)
+    public List<ApiDocumentRequirement> documentRequirements;
 
     @ApiModelProperty(value = "Price per unit", position = 21)
     public Float pricePerUnit;
@@ -248,11 +249,11 @@ public class ApiStockOrder extends ApiBaseEntity {
         this.producerUserCustomer = producerUserCustomer;
     }
 
-    public ApiLocation getProductionLocation() {
+    public ApiStockOrderLocation getProductionLocation() {
         return productionLocation;
     }
 
-    public void setProductionLocation(ApiLocation productionLocation) {
+    public void setProductionLocation(ApiStockOrderLocation productionLocation) {
         this.productionLocation = productionLocation;
     }
 
@@ -320,6 +321,14 @@ public class ApiStockOrder extends ApiBaseEntity {
         this.productionDate = productionDate;
     }
 
+    public List<ApiDocumentRequirement> getDocumentRequirements() {
+        return documentRequirements;
+    }
+
+    public void setDocumentRequirements(List<ApiDocumentRequirement> documentRequirements) {
+        this.documentRequirements = documentRequirements;
+    }
+
     public Float getPricePerUnit() {
         return pricePerUnit;
     }
@@ -382,10 +391,5 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setPreferredWayOfPayment(PreferredWayOfPayment preferredWayOfPayment) {
         this.preferredWayOfPayment = preferredWayOfPayment;
-    }
-
-    @PrePersist
-    private void prePersist(){
-        this.updateTimestamp = Instant.now();
     }
 }

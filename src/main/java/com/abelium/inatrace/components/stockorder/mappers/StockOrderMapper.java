@@ -1,12 +1,13 @@
-package com.abelium.inatrace.components.stockorder;
+package com.abelium.inatrace.components.stockorder.mappers;
 
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.facility.FacilityMapper;
-import com.abelium.inatrace.components.product.mapper.LocationMapper;
 import com.abelium.inatrace.components.product.mapper.UserCustomerMapper;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+
+import java.util.stream.Collectors;
 
 public class StockOrderMapper {
 
@@ -16,7 +17,7 @@ public class StockOrderMapper {
         apiStockOrder.setCreatorId(entity.getCreatorId());
         apiStockOrder.setRepresentativeOfProducerCustomer(UserCustomerMapper.toApiUserCustomer(entity.getRepresentativeOfProducerCustomer()));
         apiStockOrder.setProducerUserCustomer(UserCustomerMapper.toApiUserCustomer(entity.getProducerUserCustomer()));
-        apiStockOrder.setProductionLocation(LocationMapper.toApiLocation(entity.getProductionLocation()));
+        apiStockOrder.setProductionLocation(StockOrderLocationMapper.toApiStockOrderLocation(entity.getProductionLocation()));
 //        apiStockOrder.setCertifications(entity.getCertifications()
 //                .stream()
 //                .map(CertificationMapper::toApiCertification)
@@ -36,6 +37,7 @@ public class StockOrderMapper {
 //        apiStockOrder.setDeliveryTime(entity.getDeliveryTime());
 //        apiStockOrder.setOrderId(entity.getOrderId());
 //        apiStockOrder.setGlobalOrderId(entity.getGlobalOrderId());
+        apiStockOrder.setDocumentRequirements(entity.getDocumentRequirements().stream().map(DocumentRequirementMapper::toApiDocumentRequirement).collect(Collectors.toList()));
         apiStockOrder.setPricePerUnit(entity.getPricePerUnit());
 //        apiStockOrder.setSalesPricePerUnit(entity.getSalesPricePerUnit());
         apiStockOrder.setCurrency(entity.getCurrency());
