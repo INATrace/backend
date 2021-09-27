@@ -35,7 +35,7 @@ public class StockOrder extends TimestampEntity {
 	@ManyToOne
 	private UserCustomer producerUserCustomer; // farmer
 	
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	private StockOrderLocation productionLocation;
 	
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
