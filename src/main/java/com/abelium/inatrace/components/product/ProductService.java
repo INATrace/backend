@@ -75,6 +75,7 @@ import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.tools.TorpedoProjector;
 import com.abelium.inatrace.types.ProductLabelStatus;
 import com.abelium.inatrace.types.RequestLogType;
+import com.abelium.inatrace.types.UserCustomerType;
 import com.abelium.inatrace.types.UserRole;
 
 
@@ -599,6 +600,12 @@ public class ProductService extends BaseService {
     	return PaginationTools.createPaginatedResponse(em, request, () -> collectorListQueryObject(authUser.getUserId(), productId, request), 
     			ProductApiTools::toApiUserCustomer); 
 	}    
+
+	@Transactional
+	public List<ApiUserCustomer> listUserCustomers(Long companyId, String type) throws ApiException {
+		List<UserCustomer> userCustomerList = em.createNamedQuery("UserCustomer.getUserCustomerByCompanyIdAndType", UserCustomer.class).setParameter("companyId", companyId).setParameter("type", UserCustomerType.valueOf(type)).getResultList();
+		return ProductApiTools.toApiUserCustomerList(userCustomerList);
+	}
 
     @Transactional
 	public ApiPaginatedList<ApiCompanyCustomer> listCompanyCustomers(CustomUserDetails authUser, Long productId, ApiListCustomersRequest request) throws ApiException {

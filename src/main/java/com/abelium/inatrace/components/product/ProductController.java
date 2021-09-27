@@ -200,6 +200,15 @@ public class ProductController {
     		@Valid @ApiParam(value = "Label id", required = true) @PathVariable("id") Long id) throws ApiException {
         return productDocumentEngine.createLabelsAndHowToUseInstructions(authUser, id).toResponseEntity();
     }
+
+    @GetMapping(value = "/userCustomers/list/{companyId}/{type}")
+    @ApiOperation(value = "List user customers for a company and role")
+    public ApiResponse<List<ApiUserCustomer>> getUserCustomerListForCompanyAndType(
+            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @ApiParam(value = "Type (collector, farmer)", required = true) @PathVariable("type") String type
+    ) throws ApiException {
+        return new ApiResponse<>(productEngine.listUserCustomers(companyId, type));
+    }
     
     @GetMapping(value = "/userCustomers/list/{productId}")
     @ApiOperation(value = "List user customers for a product")
