@@ -12,6 +12,8 @@ import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+
+import com.abelium.inatrace.api.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -20,10 +22,6 @@ import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiDefaultResponse;
-import com.abelium.inatrace.api.ApiPaginatedList;
-import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.analytics.AnalyticsEngine;
 import com.abelium.inatrace.components.analytics.RequestLogService;
@@ -545,6 +543,17 @@ public class ProductService extends BaseService {
     	productApiTools.updateKnowledgeBlog(authUser.getUserId(), kb, request);
     	em.persist(kb);
 	}
+
+	private UserCustomer userCustomerListQueryObject(Long companyId, UserCustomerType type, ApiPaginatedRequest request) {
+		UserCustomer proxy = Torpedo.from(UserCustomer.class);
+
+		OnGoingLogicalCondition condition = Torpedo.condition();
+		condition = condition.and(proxy.getCompany().getId()).eq(companyId).and(proxy.getType()).eq(type);
+
+		Torpedo.where(condition);
+
+		return proxy;
+	}
     
     private UserCustomer collectorListQueryObject(Long userId, Long productId, ApiListCollectorsRequest request) {
     	UserCustomer pcProxy = Torpedo.from(UserCustomer.class);
@@ -602,9 +611,8 @@ public class ProductService extends BaseService {
 	}    
 
 	@Transactional
-	public List<ApiUserCustomer> listUserCustomers(Long companyId, String type) throws ApiException {
-		List<UserCustomer> userCustomerList = em.createNamedQuery("UserCustomer.getUserCustomerByCompanyIdAndType", UserCustomer.class).setParameter("companyId", companyId).setParameter("type", UserCustomerType.valueOf(type)).getResultList();
-		return ProductApiTools.toApiUserCustomerList(userCustomerList);
+	public ApiPaginatedList<ApiUserCustomer> listUserCustomersForCompanyAndType(Long companyId, String type, ApiPaginatedRequest request) throws ApiException {
+		return PaginationTools.createPaginatedResponse(em, request, () -> userCustomerListQueryObject(companyId, UserCustomerType.valueOf(type), request), ProductApiTools::toApiUserCustomer);
 	}
 
     @Transactional
