@@ -171,8 +171,8 @@ public class StockOrderService extends BaseService {
                 entity.setPurchaseOrder(true);
 
                 // Optional
-                if(apiStockOrder.getRepresentativeOfProducerCustomer() != null)
-                    entity.setRepresentativeOfProducerCustomer(fetchUserCustomer(apiStockOrder.getRepresentativeOfProducerCustomer().getId()));
+                if(apiStockOrder.getRepresentativeOfProducerUserCustomer() != null)
+                    entity.setRepresentativeOfProducerUserCustomer(fetchUserCustomer(apiStockOrder.getRepresentativeOfProducerUserCustomer().getId()));
 
                 break;
             case SALES_ORDER:

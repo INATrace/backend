@@ -33,7 +33,7 @@ public class StockOrder extends TimestampEntity {
 	private Long creatorId; // logged-in user?
 	
 	@ManyToOne
-	private UserCustomer representativeOfProducerCustomer; // farmer representative
+	private UserCustomer representativeOfProducerUserCustomer; // farmer representative
 	
 	@ManyToOne
 	private UserCustomer producerUserCustomer; // farmer
@@ -269,12 +269,12 @@ public class StockOrder extends TimestampEntity {
 		this.creatorId = creatorId;
 	}
 
-	public UserCustomer getRepresentativeOfProducerCustomer() {
-		return representativeOfProducerCustomer;
+	public UserCustomer getRepresentativeOfProducerUserCustomer() {
+		return representativeOfProducerUserCustomer;
 	}
 
-	public void setRepresentativeOfProducerCustomer(UserCustomer representativeOfProducerCustomer) {
-		this.representativeOfProducerCustomer = representativeOfProducerCustomer;
+	public void setRepresentativeOfProducerUserCustomer(UserCustomer representativeOfProducerCustomer) {
+		this.representativeOfProducerUserCustomer = representativeOfProducerCustomer;
 	}
 
 	public UserCustomer getProducerUserCustomer() {

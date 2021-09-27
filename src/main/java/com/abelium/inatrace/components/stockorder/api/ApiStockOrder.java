@@ -27,7 +27,7 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     // Relevant only for order type: PURCHASE_ORDER
     @ApiModelProperty(value = "Representative of producer user customer. E.g. collector.", position = 4)
-    public ApiUserCustomer representativeOfProducerCustomer;
+    public ApiUserCustomer representativeOfProducerUserCustomer;
 
     // Relevant only for order type: PURCHASE_ORDER
     @ApiModelProperty(value = "Id of the person who has produced the entry.", position = 5)
@@ -243,12 +243,12 @@ public class ApiStockOrder extends ApiBaseEntity {
         this.creatorId = creatorId;
     }
 
-    public ApiUserCustomer getRepresentativeOfProducerCustomer() {
-        return representativeOfProducerCustomer;
+    public ApiUserCustomer getRepresentativeOfProducerUserCustomer() {
+        return representativeOfProducerUserCustomer;
     }
 
-    public void setRepresentativeOfProducerCustomer(ApiUserCustomer representativeOfProducerCustomer) {
-        this.representativeOfProducerCustomer = representativeOfProducerCustomer;
+    public void setRepresentativeOfProducerUserCustomer(ApiUserCustomer representativeOfProducerUserCustomer) {
+        this.representativeOfProducerUserCustomer = representativeOfProducerUserCustomer;
     }
 
     public ApiUserCustomer getProducerUserCustomer() {
