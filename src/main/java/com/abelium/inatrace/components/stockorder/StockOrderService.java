@@ -109,6 +109,7 @@ public class StockOrderService extends BaseService {
         entity.setFacility(facilityService.fetchFacility(apiStockOrder.getFacility().getId()));
         entity.setCompany(entity.getFacility().getCompany());
 
+        entity.setIdentifier(apiStockOrder.getIdentifier());
         entity.setAvailableQuantity(apiStockOrder.getAvailableQuantity());
         entity.setFulfilledQuantity(apiStockOrder.getFulfilledQuantity());
         entity.setTotalQuantity(apiStockOrder.getTotalQuantity());

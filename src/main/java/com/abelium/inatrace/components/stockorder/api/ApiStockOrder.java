@@ -16,22 +16,25 @@ import java.util.List;
 @Validated
 public class ApiStockOrder extends ApiBaseEntity {
 
-    @ApiModelProperty(value = "Timestamp indicates when stock order have been updated", position = 1)
+    @ApiModelProperty(value = "Stock order identifier", position = 1)
+    public String identifier;
+
+    @ApiModelProperty(value = "Timestamp indicates when stock order have been updated", position = 2)
     public Instant updateTimestamp;
 
-    @ApiModelProperty(value = "ID of the user who has created the stock order", position = 2)
+    @ApiModelProperty(value = "ID of the user who has created the stock order", position = 3)
     public Long creatorId;
 
     // Relevant only for order type: PURCHASE_ORDER
-    @ApiModelProperty(value = "Representative of producer user customer. E.g. collector.", position = 3)
+    @ApiModelProperty(value = "Representative of producer user customer. E.g. collector.", position = 4)
     public ApiUserCustomer representativeOfProducerCustomer;
 
     // Relevant only for order type: PURCHASE_ORDER
-    @ApiModelProperty(value = "Id of the person who has produced the entry.", position = 4)
+    @ApiModelProperty(value = "Id of the person who has produced the entry.", position = 5)
     public ApiUserCustomer producerUserCustomer;
 
     // Relevant only for order type: PURCHASE_ORDER
-    @ApiModelProperty(value = "Production location", position = 5)
+    @ApiModelProperty(value = "Production location", position = 6)
     public ApiStockOrderLocation productionLocation;
 
 //    @ApiModelProperty(value = "Certification", position = 6)
@@ -216,6 +219,13 @@ public class ApiStockOrder extends ApiBaseEntity {
 //    @ApiModelProperty(value = "Arrived at date to destination port", position = 63)
 //    private Instant arrivedAtDateToDestinationPort;
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 
     public Instant getUpdateTimestamp() {
         return updateTimestamp;

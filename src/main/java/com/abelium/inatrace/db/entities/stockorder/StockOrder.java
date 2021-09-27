@@ -27,6 +27,9 @@ public class StockOrder extends TimestampEntity {
 	private Long entityVersion;
 
 	@Column
+	private String identifier;
+
+	@Column
 	private Long creatorId; // logged-in user?
 	
 	@ManyToOne
@@ -249,6 +252,14 @@ public class StockOrder extends TimestampEntity {
 	
 	@Column
     private Instant arrivedAtDateToDestinationPort;
+
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
+	}
 
 	public Long getCreatorId() {
 		return creatorId;
