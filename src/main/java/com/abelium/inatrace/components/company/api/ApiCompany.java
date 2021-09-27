@@ -1,5 +1,6 @@
 package com.abelium.inatrace.components.company.api;
 
+import com.abelium.inatrace.components.codebook.currencies.api.ApiCurrencyType;
 import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import io.swagger.annotations.ApiModelProperty;
@@ -26,6 +27,10 @@ public class ApiCompany extends ApiCompanyBase {
 	@ApiModelProperty(value = "company certifications", position = 13)
 	@Valid
 	public List<ApiCertification> certifications;
+
+	@ApiModelProperty(value = "Preffered currency of the company")
+	@Valid
+	public ApiCurrencyType currency;
 	
 	public ApiDocument getLogo() {
 		return logo;
@@ -57,5 +62,13 @@ public class ApiCompany extends ApiCompanyBase {
 
 	public void setCertifications(List<ApiCertification> certifications) {
 		this.certifications = certifications;
+	}
+
+	public ApiCurrencyType getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(ApiCurrencyType currency) {
+		this.currency = currency;
 	}
 }
