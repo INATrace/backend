@@ -4,12 +4,16 @@ package com.abelium.inatrace.components.stockorder;
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
+import com.abelium.inatrace.components.stockorder.converters.SimpleDateConverter;
+import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Date;
 
 @RestController
 @RequestMapping("/chain/stock-order")
@@ -33,26 +37,52 @@ public class StockOrderController {
     @GetMapping("/list")
     @ApiOperation("Get a paginated list of stock orders.")
     public ApiPaginatedResponse<ApiStockOrder> getStockOrderList(@Valid ApiPaginatedRequest request) {
-
-        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request));
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request, null, null, null, null,null,null,null));
     }
 
     @GetMapping("list/facility/{facilityId}")
-    @ApiOperation("Get a paginated list of stock orders by Facility ID.")
+    @ApiOperation("Get a paginated list of stock orders by facility ID.")
     public ApiPaginatedResponse<ApiStockOrder> getStockOrderListByFacilityId(
             @Valid ApiPaginatedRequest request,
-            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("facilityId") Long facilityId) {
+            @Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("facilityId") Long facilityId,
+            @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
+            @Valid @ApiParam(value = "Way of payment") @RequestParam(value = "wayOfPayment", required = false) PreferredWayOfPayment wayOfPayment,
+            @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
+            @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
+            @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName) {
 
-        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderListByFacilityId(request, facilityId));
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
+                request,
+                null,
+                facilityId,
+                isWomenShare,
+                wayOfPayment,
+                productionDateStart != null ? productionDateStart.toInstant() : null ,
+                productionDateEnd != null ? productionDateEnd.toInstant() : null,
+                producerUserCustomerName));
     }
 
     @GetMapping("list/company/{companyId}")
     @ApiOperation("Get a paginated list of stock orders by company ID.")
     public ApiPaginatedResponse<ApiStockOrder> getStockOrderListByCompanyId(
             @Valid ApiPaginatedRequest request,
-            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId) {
+            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
+            @Valid @ApiParam(value = "Way of payment") @RequestParam(value = "wayOfPayment", required = false) PreferredWayOfPayment wayOfPayment,
+            @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
+            @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
+            @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName
 
-        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderListByCompanyId(request, companyId));
+    ) {
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
+                request,
+                companyId,
+                null,
+                isWomenShare,
+                wayOfPayment,
+                productionDateStart != null ? productionDateStart.toInstant() : null ,
+                productionDateEnd != null ? productionDateEnd.toInstant() : null,
+                producerUserCustomerName));
     }
 
     @PutMapping

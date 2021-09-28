@@ -128,7 +128,7 @@ public class ApiStockOrder extends ApiBaseEntity {
 //    public ApiActionType actionType;
 
     @ApiModelProperty(value = "Is women share", position = 33)
-    public Boolean isWomenShare;
+    private Boolean womenShare;
 
     @ApiModelProperty(value = "Cost", position = 34)
     public Float cost;
@@ -377,11 +377,11 @@ public class ApiStockOrder extends ApiBaseEntity {
     }
 
     public Boolean getWomenShare() {
-        return isWomenShare;
+        return womenShare;
     }
 
     public void setWomenShare(Boolean womenShare) {
-        isWomenShare = womenShare;
+        this.womenShare = womenShare;
     }
 
     public Float getCost() {

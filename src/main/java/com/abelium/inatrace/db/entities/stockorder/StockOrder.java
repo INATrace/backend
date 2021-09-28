@@ -130,7 +130,7 @@ public class StockOrder extends TimestampEntity {
 	private ActionType actionType;
 	
 	@Column
-	private Boolean isWomenShare;
+	private Boolean womenShare;
 	
 	// CALCULATED section
 
@@ -518,11 +518,11 @@ public class StockOrder extends TimestampEntity {
 	}
 
 	public Boolean getWomenShare() {
-		return isWomenShare;
+		return womenShare;
 	}
 
 	public void setWomenShare(Boolean womenShare) {
-		isWomenShare = womenShare;
+		this.womenShare = womenShare;
 	}
 
 	public Float getCost() {

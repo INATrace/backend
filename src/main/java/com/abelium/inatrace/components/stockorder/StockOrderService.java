@@ -15,6 +15,7 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.stockorder.DocumentRequirement;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderLocation;
+import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -25,6 +26,7 @@ import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -39,53 +41,64 @@ public class StockOrderService extends BaseService {
         return StockOrderMapper.toApiStockOrder(fetchEntity(id, StockOrder.class));
     }
 
-    public ApiPaginatedList<ApiStockOrder> getStockOrderList(ApiPaginatedRequest request) {
-        return PaginationTools.createPaginatedResponse(em, request, () -> stockOrderQueryObject(request), StockOrderMapper::toApiStockOrder);
+    public ApiPaginatedList<ApiStockOrder> getStockOrderList(ApiPaginatedRequest request,
+                                                             Long companyId,
+                                                             Long facilityId,
+                                                             Boolean isWomenShare,
+                                                             PreferredWayOfPayment wayOfPayment,
+                                                             Instant productionDateStart,
+                                                             Instant productionDateEnd,
+                                                             String producerUserCustomerName) {
+        return PaginationTools.createPaginatedResponse(em, request,
+                () -> stockOrderQueryObject(
+                        request,
+                        companyId,
+                        facilityId,
+                        isWomenShare,
+                        wayOfPayment,
+                        productionDateStart,
+                        productionDateEnd,
+                        producerUserCustomerName
+                ), StockOrderMapper::toApiStockOrder);
     }
 
-    public ApiPaginatedList<ApiStockOrder> getStockOrderListByCompanyId(ApiPaginatedRequest request, Long companyId) {
-        return PaginationTools.createPaginatedResponse(em, request, () -> stockOrderByCompanyIdQueryObject(request, companyId), StockOrderMapper::toApiStockOrder);
-    }
-
-    public ApiPaginatedList<ApiStockOrder> getStockOrderListByFacilityId(ApiPaginatedRequest request, Long facilityId) {
-        return PaginationTools.createPaginatedResponse(em, request, () -> stockOrderByFacilityIdQueryObject(request, facilityId), StockOrderMapper::toApiStockOrder);
-    }
-
-    private StockOrder stockOrderQueryObject(ApiPaginatedRequest request) {
+    private StockOrder stockOrderQueryObject(ApiPaginatedRequest request,
+                                             Long companyId,
+                                             Long facilityId,
+                                             Boolean isWomenShare,
+                                             PreferredWayOfPayment wayOfPayment,
+                                             Instant productionDateStart,
+                                             Instant productionDateEnd,
+                                             String producerUserCustomerName) {
 
         StockOrder stockOrderProxy = Torpedo.from(StockOrder.class);
+        OnGoingLogicalCondition condition = Torpedo.condition();
 
-        // -> FILTERS
+        // Only present when listing by facility or company
+        if(companyId != null)
+            condition = condition.and(stockOrderProxy.getCompany().getId()).eq(companyId);
+        else if (facilityId != null)
+            condition = condition.and(stockOrderProxy.getFacility().getId()).eq(facilityId);
 
+
+        // Query parameter filters
+        if(isWomenShare != null)
+            condition.and(stockOrderProxy.getWomenShare()).eq(isWomenShare);
+        if(wayOfPayment != null)
+            condition.and(stockOrderProxy.getPreferredWayOfPayment()).eq(wayOfPayment);
+        if(productionDateStart != null)
+            condition.and(stockOrderProxy.getProductionDate()).gte(productionDateStart);
+        if(productionDateEnd != null)
+            condition.and(stockOrderProxy.getProductionDate()).lte(productionDateEnd);
+        if(producerUserCustomerName != null) // Search by farmers name (query)
+            condition.and(stockOrderProxy.getProducerUserCustomer().getName()).like().startsWith(producerUserCustomerName);
+
+        Torpedo.where(condition);
+
+        // Order by
         QueryTools.orderBy(request.sort, stockOrderProxy.getId());
 
         return stockOrderProxy;
-    }
-
-    private StockOrder stockOrderByCompanyIdQueryObject(ApiPaginatedRequest request, Long companyId){
-        StockOrder soProxy = Torpedo.from(StockOrder.class);
-        OnGoingLogicalCondition condition = Torpedo.condition();
-        condition = condition.and(soProxy.getCompany().getId()).eq(companyId);
-        Torpedo.where(condition);
-
-        // -> FILTERS
-
-        QueryTools.orderBy(request.sort, soProxy.getId());
-
-        return soProxy;
-    }
-
-    private StockOrder stockOrderByFacilityIdQueryObject(ApiPaginatedRequest request, Long facilityId){
-        StockOrder soProxy = Torpedo.from(StockOrder.class);
-        OnGoingLogicalCondition condition = Torpedo.condition();
-        condition = condition.and(soProxy.getFacility().getId()).eq(facilityId);
-        Torpedo.where(condition);
-
-        // -> FILTERS
-
-        QueryTools.orderBy(request.sort, soProxy.getId());
-
-        return soProxy;
     }
 
     @Transactional
