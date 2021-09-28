@@ -1,6 +1,7 @@
 package com.abelium.inatrace.components.stockorder.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
+import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
@@ -54,8 +55,8 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Company", position = 9)
     public ApiCompany company;
 
-//    @ApiModelProperty(value = "Measurement unit", position = 10)
-//    public ApiMeasureUnitType measureUnitType;
+    @ApiModelProperty(value = "Measurement unit", position = 10)
+    public ApiMeasureUnitType measureUnitType;
 
     @ApiModelProperty(value = "Total quantity", position = 11)
     public Integer totalQuantity;
@@ -80,8 +81,8 @@ public class ApiStockOrder extends ApiBaseEntity {
 //    @ApiModelProperty(value = "Estimated delivery date", position = 17)
 //    public Instant estimatedDeliveryDate;
 
-//    @ApiModelProperty(value = "Delivery time", position = 18)
-//    public Instant deliveryTime;
+    @ApiModelProperty(value = "Delivery time", position = 18)
+    public Instant deliveryTime;
 
 //    @ApiModelProperty(value = "Order ID", position = 19)
 //    public Long orderId;
@@ -297,6 +298,14 @@ public class ApiStockOrder extends ApiBaseEntity {
         this.company = company;
     }
 
+    public ApiMeasureUnitType getMeasureUnitType() {
+        return measureUnitType;
+    }
+
+    public void setMeasureUnitType(ApiMeasureUnitType measureUnitType) {
+        this.measureUnitType = measureUnitType;
+    }
+
     public Integer getTotalQuantity() {
         return totalQuantity;
     }
@@ -335,6 +344,14 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setProductionDate(Instant productionDate) {
         this.productionDate = productionDate;
+    }
+
+    public Instant getDeliveryTime() {
+        return deliveryTime;
+    }
+
+    public void setDeliveryTime(Instant deliveryTime) {
+        this.deliveryTime = deliveryTime;
     }
 
     public List<ApiDocumentRequirement> getDocumentRequirements() {

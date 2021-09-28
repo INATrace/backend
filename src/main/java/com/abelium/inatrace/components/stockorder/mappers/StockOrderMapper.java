@@ -1,5 +1,6 @@
 package com.abelium.inatrace.components.stockorder.mappers;
 
+import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.facility.FacilityMapper;
@@ -28,7 +29,7 @@ public class StockOrderMapper {
             apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct()));
         apiStockOrder.setFacility(FacilityMapper.toApiFacility(entity.getFacility()));
         apiStockOrder.setCompany(CompanyMapper.toApiCompany(entity.getCompany()));
-//        apiStockOrder.setMeasureUnitType(MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getMeasurementUnitType()));
+        apiStockOrder.setMeasureUnitType(MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getMeasurementUnitType()));
         apiStockOrder.setTotalQuantity(entity.getTotalQuantity());
         apiStockOrder.setFulfilledQuantity(entity.getFulfilledQuantity());
         apiStockOrder.setAvailableQuantity(entity.getAvailableQuantity());
@@ -36,7 +37,7 @@ public class StockOrderMapper {
         apiStockOrder.setProductionDate(entity.getProductionDate());
 //        apiStockOrder.setExpiryDate(entity.getExpiryDate());
 //        apiStockOrder.setEstimatedDeliveryDate(entity.getEstimatedDeliveryDate());
-//        apiStockOrder.setDeliveryTime(entity.getDeliveryTime());
+        apiStockOrder.setDeliveryTime(entity.getDeliveryTime());
 //        apiStockOrder.setOrderId(entity.getOrderId());
 //        apiStockOrder.setGlobalOrderId(entity.getGlobalOrderId());
         apiStockOrder.setDocumentRequirements(entity.getDocumentRequirements().stream().map(DocumentRequirementMapper::toApiDocumentRequirement).collect(Collectors.toList()));
