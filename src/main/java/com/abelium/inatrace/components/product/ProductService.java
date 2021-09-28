@@ -12,10 +12,11 @@ import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+
+import com.abelium.inatrace.db.entities.common.Document;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
@@ -56,13 +57,12 @@ import com.abelium.inatrace.components.product.api.ApiProductListResponse;
 import com.abelium.inatrace.components.product.types.ProductLabelAction;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.product.ComparisonOfPrice;
-import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.product.KnowledgeBlog;
 import com.abelium.inatrace.db.entities.product.Product;
-import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
+import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.product.ProductLabel;
 import com.abelium.inatrace.db.entities.product.ProductLabelBatch;
 import com.abelium.inatrace.db.entities.product.ProductLabelContent;
@@ -93,7 +93,9 @@ public class ProductService extends BaseService {
 	
 	@Autowired
 	private AnalyticsEngine analyticsEngine;
-	
+
+	@Autowired
+	private ProductMapper productMapper;
 	
     private Product productListQueryObject(ApiListProductsRequest request) {
         Product pProxy = Torpedo.from(Product.class);
@@ -130,7 +132,7 @@ public class ProductService extends BaseService {
         if (StringUtils.isNotBlank(request.name)) {
             condition = condition.and(pProxy.getName()).like().any(request.name);
         }
-        Document dProxy = Torpedo.leftJoin(pProxy.getPhoto());        
+        Document dProxy = Torpedo.leftJoin(pProxy.getPhoto());
         Torpedo.where(condition);
         switch (request.sortBy) {
 	        case "name": QueryTools.orderBy(request.sort, pProxy.getName()); break;

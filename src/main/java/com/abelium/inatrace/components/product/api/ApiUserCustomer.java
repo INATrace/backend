@@ -10,11 +10,16 @@ import com.abelium.inatrace.types.UserCustomerType;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.List;
+
 @Validated
 public class ApiUserCustomer extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "Company id", position = 1)
-	public Long companyId;	
+	public Long companyId;
+
+	@ApiModelProperty(value = "Product id", position = 1)
+	public Long productId;
 	
 	@ApiModelProperty(value = "Type", position = 2)
 	public UserCustomerType type;
@@ -34,14 +39,27 @@ public class ApiUserCustomer extends ApiBaseEntity {
 	@ApiModelProperty(value = "Email", position = 6)
 	@Length(max = Lengths.EMAIL)
 	public String email;
+
+	@ApiModelProperty(value = "Has smartphone", position = 7)
+	public Boolean hasSmartphone;
 	
-	@ApiModelProperty(value = "Location", position = 7)
-	@Length(max = Lengths.DEFAULT)
-	public String location;
+	@ApiModelProperty(value = "Location", position = 8)
+	public ApiUserCustomerLocation location;
 	
-	@ApiModelProperty(value = "Gender", position = 8)
+	@ApiModelProperty(value = "Gender", position = 9)
 	public Gender gender;
-	
+
+	@ApiModelProperty(value = "Bank information", position = 10)
+	public ApiBankInformation bank;
+
+	@ApiModelProperty(value = "Farm information", position = 11)
+	public ApiFarmInformation farm;
+
+	@ApiModelProperty(value = "List of associations", position = 12)
+	public List<ApiUserCustomerAssociation> associations;
+
+	@ApiModelProperty(value = "List of cooperatives", position = 13)
+	public List<ApiUserCustomerCooperative> cooperatives;
 
 	public Long getCompanyId() {
 		return companyId;
@@ -49,6 +67,14 @@ public class ApiUserCustomer extends ApiBaseEntity {
 
 	public void setCompanyId(Long companyId) {
 		this.companyId = companyId;
+	}
+
+	public Long getProductId() {
+		return productId;
+	}
+
+	public void setProductId(Long productId) {
+		this.productId = productId;
 	}
 
 	public UserCustomerType getType() {
@@ -91,11 +117,19 @@ public class ApiUserCustomer extends ApiBaseEntity {
 		this.email = email;
 	}
 
-	public String getLocation() {
+	public Boolean getHasSmartphone() {
+		return hasSmartphone;
+	}
+
+	public void setHasSmartphone(Boolean hasSmartphone) {
+		this.hasSmartphone = hasSmartphone;
+	}
+
+	public ApiUserCustomerLocation getLocation() {
 		return location;
 	}
 
-	public void setLocation(String location) {
+	public void setLocation(ApiUserCustomerLocation location) {
 		this.location = location;
 	}
 
@@ -105,5 +139,37 @@ public class ApiUserCustomer extends ApiBaseEntity {
 
 	public void setGender(Gender gender) {
 		this.gender = gender;
+	}
+
+	public ApiBankInformation getBank() {
+		return bank;
+	}
+
+	public void setBank(ApiBankInformation bank) {
+		this.bank = bank;
+	}
+
+	public ApiFarmInformation getFarm() {
+		return farm;
+	}
+
+	public void setFarm(ApiFarmInformation farm) {
+		this.farm = farm;
+	}
+
+	public List<ApiUserCustomerAssociation> getAssociations() {
+		return associations;
+	}
+
+	public void setAssociations(List<ApiUserCustomerAssociation> associations) {
+		this.associations = associations;
+	}
+
+	public List<ApiUserCustomerCooperative> getCooperatives() {
+		return cooperatives;
+	}
+
+	public void setCooperatives(List<ApiUserCustomerCooperative> cooperatives) {
+		this.cooperatives = cooperatives;
 	}
 }

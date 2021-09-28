@@ -38,8 +38,24 @@ public class ApiAddress {
 	@Length(max = Lengths.VILLAGE)
 	@ApiModelProperty(value = "Village name", position = 7)
 	public String village;
-	
-    @ApiModelProperty(value = "country", position = 5)
+
+	@Length(max = Lengths.DEFAULT)
+	@ApiModelProperty(value = "Honduras farm name", position = 8)
+	public String hondurasFarm;
+
+	@Length(max = Lengths.VILLAGE)
+	@ApiModelProperty(value = "Honduras village name", position = 9)
+	public String hondurasVillage;
+
+	@Length(max = Lengths.DEFAULT)
+	@ApiModelProperty(value = "Honduras municipality name", position = 10)
+	public String hondurasMunicipality;
+
+	@Length(max = Lengths.DEFAULT)
+	@ApiModelProperty(value = "Honduras department name", position = 11)
+	public String hondurasDepartment;
+
+    @ApiModelProperty(value = "country", position = 12)
 	public ApiCountry country;
 
 
@@ -97,6 +113,38 @@ public class ApiAddress {
 
 	public void setVillage(String village) {
 		this.village = village;
+	}
+
+	public String getHondurasFarm() {
+		return hondurasFarm;
+	}
+
+	public void setHondurasFarm(String hondurasFarm) {
+		this.hondurasFarm = hondurasFarm;
+	}
+
+	public String getHondurasVillage() {
+		return hondurasVillage;
+	}
+
+	public void setHondurasVillage(String hondurasVillage) {
+		this.hondurasVillage = hondurasVillage;
+	}
+
+	public String getHondurasMunicipality() {
+		return hondurasMunicipality;
+	}
+
+	public void setHondurasMunicipality(String hondurasMunicipality) {
+		this.hondurasMunicipality = hondurasMunicipality;
+	}
+
+	public String getHondurasDepartment() {
+		return hondurasDepartment;
+	}
+
+	public void setHondurasDepartment(String hondurasDepartment) {
+		this.hondurasDepartment = hondurasDepartment;
 	}
 
 	public ApiCountry getCountry() {
