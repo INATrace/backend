@@ -66,7 +66,7 @@ public class ApiStockOrder extends ApiBaseEntity {
     public Boolean isAvailable;
 
     @ApiModelProperty(value = "Production date", position = 15)
-    public Instant productionDate;
+    public String productionDate;
 
 //    @ApiModelProperty(value = "Expiry date", position = 16)
 //    public Instant expiryDate;
@@ -323,11 +323,11 @@ public class ApiStockOrder extends ApiBaseEntity {
         isAvailable = available;
     }
 
-    public Instant getProductionDate() {
+    public String getProductionDate() {
         return productionDate;
     }
 
-    public void setProductionDate(Instant productionDate) {
+    public void setProductionDate(String productionDate) {
         this.productionDate = productionDate;
     }
 
