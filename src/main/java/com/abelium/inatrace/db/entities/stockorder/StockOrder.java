@@ -15,6 +15,7 @@ import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,10 +94,10 @@ public class StockOrder extends TimestampEntity {
 	private List<DocumentRequirement> documentRequirements; // Check with Pece if this is correct, might be some other type of document
 
 	@Column
-	private Float pricePerUnit;
+	private BigDecimal pricePerUnit;
 	
 	@Column
-	private Float salesPricePerUnit;
+	private BigDecimal salesPricePerUnit;
 	
 	@Column
 	private String currency;
@@ -135,13 +136,13 @@ public class StockOrder extends TimestampEntity {
 	// CALCULATED section
 
 	@Column
-	private Float cost;
+	private BigDecimal cost;
 	
 	@Column
-	private Float paid;
+	private BigDecimal paid;
 
 	@Column
-	private Float balance;
+	private BigDecimal balance;
 	
 	@OneToMany // Verify relationship
 	private List<Transaction> inputTransactions = new ArrayList<>();
@@ -194,19 +195,19 @@ public class StockOrder extends TimestampEntity {
 	private Company quoteCompany;
 	
 	@Column
-    private Float pricePerUnitForOwner;
+    private BigDecimal pricePerUnitForOwner;
 	
 	@Column
-    private Float pricePerUnitForBuyer;
+    private BigDecimal pricePerUnitForBuyer;
 	
 	@Column
-    private Float exchangeRateAtBuyer;
+    private BigDecimal exchangeRateAtBuyer;
 	
 	@Column
-    private Float pricePerUnitForEndCustomer;
+    private BigDecimal pricePerUnitForEndCustomer;
 	
 	@Column
-    private Float exchangeRateAtEndCustomer;
+    private BigDecimal exchangeRateAtEndCustomer;
 	
 	@Column
     private String cuppingResult;
@@ -421,19 +422,19 @@ public class StockOrder extends TimestampEntity {
 		this.documentRequirements = documentRequirements;
 	}
 
-	public Float getPricePerUnit() {
+	public BigDecimal getPricePerUnit() {
 		return pricePerUnit;
 	}
 
-	public void setPricePerUnit(Float pricePerUnit) {
+	public void setPricePerUnit(BigDecimal pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
 	}
 
-	public Float getSalesPricePerUnit() {
+	public BigDecimal getSalesPricePerUnit() {
 		return salesPricePerUnit;
 	}
 
-	public void setSalesPricePerUnit(Float salesPricePerUnit) {
+	public void setSalesPricePerUnit(BigDecimal salesPricePerUnit) {
 		this.salesPricePerUnit = salesPricePerUnit;
 	}
 
@@ -525,27 +526,27 @@ public class StockOrder extends TimestampEntity {
 		this.womenShare = womenShare;
 	}
 
-	public Float getCost() {
+	public BigDecimal getCost() {
 		return cost;
 	}
 
-	public void setCost(Float cost) {
+	public void setCost(BigDecimal cost) {
 		this.cost = cost;
 	}
 
-	public Float getPaid() {
+	public BigDecimal getPaid() {
 		return paid;
 	}
 
-	public void setPaid(Float paid) {
+	public void setPaid(BigDecimal paid) {
 		this.paid = paid;
 	}
 
-	public Float getBalance() {
+	public BigDecimal getBalance() {
 		return balance;
 	}
 
-	public void setBalance(Float balance) {
+	public void setBalance(BigDecimal balance) {
 		this.balance = balance;
 	}
 
@@ -653,43 +654,43 @@ public class StockOrder extends TimestampEntity {
 		this.quoteCompany = quoteCompany;
 	}
 
-	public Float getPricePerUnitForOwner() {
+	public BigDecimal getPricePerUnitForOwner() {
 		return pricePerUnitForOwner;
 	}
 
-	public void setPricePerUnitForOwner(Float pricePerUnitForOwner) {
+	public void setPricePerUnitForOwner(BigDecimal pricePerUnitForOwner) {
 		this.pricePerUnitForOwner = pricePerUnitForOwner;
 	}
 
-	public Float getPricePerUnitForBuyer() {
+	public BigDecimal getPricePerUnitForBuyer() {
 		return pricePerUnitForBuyer;
 	}
 
-	public void setPricePerUnitForBuyer(Float pricePerUnitForBuyer) {
+	public void setPricePerUnitForBuyer(BigDecimal pricePerUnitForBuyer) {
 		this.pricePerUnitForBuyer = pricePerUnitForBuyer;
 	}
 
-	public Float getExchangeRateAtBuyer() {
+	public BigDecimal getExchangeRateAtBuyer() {
 		return exchangeRateAtBuyer;
 	}
 
-	public void setExchangeRateAtBuyer(Float exchangeRateAtBuyer) {
+	public void setExchangeRateAtBuyer(BigDecimal exchangeRateAtBuyer) {
 		this.exchangeRateAtBuyer = exchangeRateAtBuyer;
 	}
 
-	public Float getPricePerUnitForEndCustomer() {
+	public BigDecimal getPricePerUnitForEndCustomer() {
 		return pricePerUnitForEndCustomer;
 	}
 
-	public void setPricePerUnitForEndCustomer(Float pricePerUnitForEndCustomer) {
+	public void setPricePerUnitForEndCustomer(BigDecimal pricePerUnitForEndCustomer) {
 		this.pricePerUnitForEndCustomer = pricePerUnitForEndCustomer;
 	}
 
-	public Float getExchangeRateAtEndCustomer() {
+	public BigDecimal getExchangeRateAtEndCustomer() {
 		return exchangeRateAtEndCustomer;
 	}
 
-	public void setExchangeRateAtEndCustomer(Float exchangeRateAtEndCustomer) {
+	public void setExchangeRateAtEndCustomer(BigDecimal exchangeRateAtEndCustomer) {
 		this.exchangeRateAtEndCustomer = exchangeRateAtEndCustomer;
 	}
 

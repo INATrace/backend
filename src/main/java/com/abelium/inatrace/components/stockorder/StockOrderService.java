@@ -26,6 +26,7 @@ import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -44,6 +45,7 @@ public class StockOrderService extends BaseService {
     public ApiPaginatedList<ApiStockOrder> getStockOrderList(ApiPaginatedRequest request,
                                                              Long companyId,
                                                              Long facilityId,
+                                                             Boolean isOpenBalanceOnly,
                                                              Boolean isWomenShare,
                                                              PreferredWayOfPayment wayOfPayment,
                                                              Instant productionDateStart,
@@ -54,6 +56,7 @@ public class StockOrderService extends BaseService {
                         request,
                         companyId,
                         facilityId,
+                        isOpenBalanceOnly,
                         isWomenShare,
                         wayOfPayment,
                         productionDateStart,
@@ -65,6 +68,7 @@ public class StockOrderService extends BaseService {
     private StockOrder stockOrderQueryObject(ApiPaginatedRequest request,
                                              Long companyId,
                                              Long facilityId,
+                                             Boolean isOpenBalanceOnly,
                                              Boolean isWomenShare,
                                              PreferredWayOfPayment wayOfPayment,
                                              Instant productionDateStart,
@@ -82,6 +86,12 @@ public class StockOrderService extends BaseService {
 
 
         // Query parameter filters
+        if(isOpenBalanceOnly != null) {
+            if (isOpenBalanceOnly)
+                condition.and(stockOrderProxy.getCost() == null ? BigDecimal.ZERO : stockOrderProxy.getCost().subtract(stockOrderProxy.getPaid())).gt(BigDecimal.ZERO);
+            else
+                condition.and(stockOrderProxy.getCost() == null ? BigDecimal.ZERO : stockOrderProxy.getCost().subtract(stockOrderProxy.getPaid())).eq(BigDecimal.ZERO);
+        }
         if(isWomenShare != null)
             condition.and(stockOrderProxy.getWomenShare()).eq(isWomenShare);
         if(wayOfPayment != null)

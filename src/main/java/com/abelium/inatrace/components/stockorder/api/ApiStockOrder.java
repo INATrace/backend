@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
@@ -92,7 +93,7 @@ public class ApiStockOrder extends ApiBaseEntity {
     public List<ApiDocumentRequirement> documentRequirements;
 
     @ApiModelProperty(value = "Price per unit", position = 21)
-    public Float pricePerUnit;
+    public BigDecimal pricePerUnit;
 
 //    @ApiModelProperty(value = "Sales price per unit", position = 22)
 //    public Float salesPricePerUnit;
@@ -131,13 +132,13 @@ public class ApiStockOrder extends ApiBaseEntity {
     private Boolean womenShare;
 
     @ApiModelProperty(value = "Cost", position = 34)
-    public Float cost;
+    public BigDecimal cost;
 
 //    @ApiModelProperty(value = "Paid", position = 35)
-//    public Float paid;
+//    public BigDecimal paid;
 
     @ApiModelProperty(value = "Balance", position = 36)
-    public Float balance;
+    public BigDecimal balance;
 
     // Relevant only for order type: STOCK_ORDER
 //    @ApiModelProperty(value = "Input transactions for stock order. Read only.")
@@ -171,19 +172,19 @@ public class ApiStockOrder extends ApiBaseEntity {
 //    private Company quoteCompany;
 
 //    @ApiModelProperty(value = "Price per unit for owner", position = 46)
-//    private Float pricePerUnitForOwner;
+//    private BigDecimal pricePerUnitForOwner;
 
 //    @ApiModelProperty(value = "Price per unit for buyer", position = 47)
-//    private Float pricePerUnitForBuyer;
+//    private BigDecimal pricePerUnitForBuyer;
 
 //    @ApiModelProperty(value = "Exchange rate at buyer", position = 48)
-//    private Float exchangeRateAtBuyer;
+//    private BigDecimal exchangeRateAtBuyer;
 
 //    @ApiModelProperty(value = "Price per unit for end customer", position = 49)
-//    private Float pricePerUnitForEndCustomer;
+//    private BigDecimal pricePerUnitForEndCustomer;
 
 //    @ApiModelProperty(value = "Exchange rate at end customer", position = 50)
-//    private Float exchangeRateAtEndCustomer;
+//    private BigDecimal exchangeRateAtEndCustomer;
 
 //    @ApiModelProperty(value = "Cupping result", position = 51)
 //    private String cuppingResult;
@@ -344,11 +345,11 @@ public class ApiStockOrder extends ApiBaseEntity {
         this.documentRequirements = documentRequirements;
     }
 
-    public Float getPricePerUnit() {
+    public BigDecimal getPricePerUnit() {
         return pricePerUnit;
     }
 
-    public void setPricePerUnit(Float pricePerUnit) {
+    public void setPricePerUnit(BigDecimal pricePerUnit) {
         this.pricePerUnit = pricePerUnit;
     }
 
@@ -384,19 +385,19 @@ public class ApiStockOrder extends ApiBaseEntity {
         this.womenShare = womenShare;
     }
 
-    public Float getCost() {
+    public BigDecimal getCost() {
         return cost;
     }
 
-    public void setCost(Float cost) {
+    public void setCost(BigDecimal cost) {
         this.cost = cost;
     }
 
-    public Float getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(Float balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 

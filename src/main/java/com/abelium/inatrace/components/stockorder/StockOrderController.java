@@ -37,7 +37,7 @@ public class StockOrderController {
     @GetMapping("/list")
     @ApiOperation("Get a paginated list of stock orders.")
     public ApiPaginatedResponse<ApiStockOrder> getStockOrderList(@Valid ApiPaginatedRequest request) {
-        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request, null, null, null, null,null,null,null));
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request, null, null, null, null, null,null,null,null));
     }
 
     @GetMapping("list/facility/{facilityId}")
@@ -45,6 +45,7 @@ public class StockOrderController {
     public ApiPaginatedResponse<ApiStockOrder> getStockOrderListByFacilityId(
             @Valid ApiPaginatedRequest request,
             @Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("facilityId") Long facilityId,
+            @Valid @ApiParam(value = "Is open balance only") @RequestParam(value = "isOpenBalanceOnly", required = false) Boolean isOpenBalanceOnly,
             @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
             @Valid @ApiParam(value = "Way of payment") @RequestParam(value = "wayOfPayment", required = false) PreferredWayOfPayment wayOfPayment,
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
@@ -55,6 +56,7 @@ public class StockOrderController {
                 request,
                 null,
                 facilityId,
+                isOpenBalanceOnly,
                 isWomenShare,
                 wayOfPayment,
                 productionDateStart != null ? productionDateStart.toInstant() : null ,
@@ -67,6 +69,7 @@ public class StockOrderController {
     public ApiPaginatedResponse<ApiStockOrder> getStockOrderListByCompanyId(
             @Valid ApiPaginatedRequest request,
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @ApiParam(value = "Is open balance only") @RequestParam(value = "isOpenBalanceOnly", required = false) Boolean isOpenBalanceOnly,
             @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
             @Valid @ApiParam(value = "Way of payment") @RequestParam(value = "wayOfPayment", required = false) PreferredWayOfPayment wayOfPayment,
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
@@ -78,6 +81,7 @@ public class StockOrderController {
                 request,
                 companyId,
                 null,
+                isOpenBalanceOnly,
                 isWomenShare,
                 wayOfPayment,
                 productionDateStart != null ? productionDateStart.toInstant() : null ,
