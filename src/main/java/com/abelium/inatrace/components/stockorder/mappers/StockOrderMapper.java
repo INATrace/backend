@@ -13,6 +13,7 @@ public class StockOrderMapper {
 
     public static ApiStockOrder toApiStockOrder(StockOrder entity) {
         ApiStockOrder apiStockOrder = new ApiStockOrder();
+        apiStockOrder.setId(entity.getId());
         apiStockOrder.setIdentifier(entity.getIdentifier());
         apiStockOrder.setUpdateTimestamp(entity.getUpdateTimestamp());
         apiStockOrder.setCreatorId(entity.getCreatorId());
