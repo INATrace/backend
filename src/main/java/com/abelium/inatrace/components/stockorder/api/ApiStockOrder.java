@@ -134,8 +134,8 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Cost", position = 34)
     public BigDecimal cost;
 
-//    @ApiModelProperty(value = "Paid", position = 35)
-//    public BigDecimal paid;
+    @ApiModelProperty(value = "Paid", position = 35)
+    public BigDecimal paid;
 
     @ApiModelProperty(value = "Balance", position = 36)
     public BigDecimal balance;
@@ -391,6 +391,14 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setCost(BigDecimal cost) {
         this.cost = cost;
+    }
+
+    public BigDecimal getPaid() {
+        return paid;
+    }
+
+    public void setPaid(BigDecimal paid) {
+        this.paid = paid;
     }
 
     public BigDecimal getBalance() {

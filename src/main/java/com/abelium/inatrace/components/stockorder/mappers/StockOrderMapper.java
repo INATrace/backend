@@ -53,7 +53,7 @@ public class StockOrderMapper {
 //        apiStockOrder.setActionType(ActionTypeMapper.toApiActionType(entity.getActionType()));
         apiStockOrder.setWomenShare(entity.getWomenShare());
         apiStockOrder.setCost(entity.getCost());
-//        apiStockOrder.setPaid(entity.getPaid());
+        apiStockOrder.setPaid(entity.getPaid());
         apiStockOrder.setBalance(entity.getBalance());
 //        apiStockOrder.setStartOfDrying(entity.getStartOfDrying());
 //        apiStockOrder.setClient(CompanyMapper.toApiCompany(entity.getClient()));

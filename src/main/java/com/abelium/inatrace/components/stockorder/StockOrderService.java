@@ -86,12 +86,10 @@ public class StockOrderService extends BaseService {
 
 
         // Query parameter filters
-        if(isOpenBalanceOnly != null) {
-            if (isOpenBalanceOnly)
-                condition.and(stockOrderProxy.getCost() == null ? BigDecimal.ZERO : stockOrderProxy.getCost().subtract(stockOrderProxy.getPaid())).gt(BigDecimal.ZERO);
-            else
-                condition.and(stockOrderProxy.getCost() == null ? BigDecimal.ZERO : stockOrderProxy.getCost().subtract(stockOrderProxy.getPaid())).eq(BigDecimal.ZERO);
-        }
+        if(isOpenBalanceOnly != null && isOpenBalanceOnly)
+            condition.and(stockOrderProxy.getCost()).isNotNull()
+                    .and(stockOrderProxy.getPaid()).isNotNull()
+                    .and(stockOrderProxy.getCost()).gt(stockOrderProxy.getPaid());
         if(isWomenShare != null)
             condition.and(stockOrderProxy.getWomenShare()).eq(isWomenShare);
         if(wayOfPayment != null)
@@ -138,6 +136,7 @@ public class StockOrderService extends BaseService {
         entity.setFulfilledQuantity(apiStockOrder.getFulfilledQuantity());
         entity.setTotalQuantity(apiStockOrder.getTotalQuantity());
         entity.setBalance(apiStockOrder.getBalance());
+        entity.setPaid(apiStockOrder.getPaid());
         entity.setCost(apiStockOrder.getCost());
         entity.setCurrency(apiStockOrder.getCurrency());
         entity.setPreferredWayOfPayment(apiStockOrder.getPreferredWayOfPayment());
