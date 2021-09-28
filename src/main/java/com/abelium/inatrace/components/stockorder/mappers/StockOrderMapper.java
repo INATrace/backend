@@ -1,7 +1,6 @@
 package com.abelium.inatrace.components.stockorder.mappers;
 
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
-import com.abelium.inatrace.components.common.TimeDateUtil;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.facility.FacilityMapper;
 import com.abelium.inatrace.components.product.mapper.UserCustomerMapper;
@@ -33,7 +32,7 @@ public class StockOrderMapper {
         apiStockOrder.setFulfilledQuantity(entity.getFulfilledQuantity());
         apiStockOrder.setAvailableQuantity(entity.getAvailableQuantity());
         apiStockOrder.setAvailable(entity.getAvailable());
-        apiStockOrder.setProductionDate(TimeDateUtil.fromInstant(entity.getProductionDate(), TimeDateUtil.SIMPLE_DATE_FORMAT));
+        apiStockOrder.setProductionDate(entity.getProductionDate());
 //        apiStockOrder.setExpiryDate(entity.getExpiryDate());
 //        apiStockOrder.setEstimatedDeliveryDate(entity.getEstimatedDeliveryDate());
 //        apiStockOrder.setDeliveryTime(entity.getDeliveryTime());

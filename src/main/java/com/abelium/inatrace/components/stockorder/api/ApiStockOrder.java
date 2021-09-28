@@ -5,8 +5,11 @@ import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.product.api.ApiUserCustomer;
+import com.abelium.inatrace.components.stockorder.converters.SimpleDateConverter;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
@@ -66,7 +69,9 @@ public class ApiStockOrder extends ApiBaseEntity {
     public Boolean isAvailable;
 
     @ApiModelProperty(value = "Production date", position = 15)
-    public String productionDate;
+    @JsonSerialize(converter = SimpleDateConverter.Serialize.class)
+    @JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
+    public Instant productionDate;
 
 //    @ApiModelProperty(value = "Expiry date", position = 16)
 //    public Instant expiryDate;
@@ -323,11 +328,11 @@ public class ApiStockOrder extends ApiBaseEntity {
         isAvailable = available;
     }
 
-    public String getProductionDate() {
+    public Instant getProductionDate() {
         return productionDate;
     }
 
-    public void setProductionDate(String productionDate) {
+    public void setProductionDate(Instant productionDate) {
         this.productionDate = productionDate;
     }
 

@@ -6,7 +6,6 @@ import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
-import com.abelium.inatrace.components.common.TimeDateUtil;
 import com.abelium.inatrace.components.facility.FacilityService;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrderLocation;
@@ -118,7 +117,7 @@ public class StockOrderService extends BaseService {
         entity.setCost(apiStockOrder.getCost());
         entity.setCurrency(apiStockOrder.getCurrency());
         entity.setPreferredWayOfPayment(apiStockOrder.getPreferredWayOfPayment());
-        entity.setProductionDate(TimeDateUtil.toInstant(apiStockOrder.getProductionDate(), TimeDateUtil.SIMPLE_DATE_FORMAT));
+        entity.setProductionDate(apiStockOrder.getProductionDate());
         entity.setSemiProduct(entity.getSemiProduct());
         entity.setWomenShare(apiStockOrder.getWomenShare());
 
