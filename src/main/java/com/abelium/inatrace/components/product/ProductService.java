@@ -603,6 +603,10 @@ public class ProductService extends BaseService {
         return pcProxy;
     }	
 
+	public ApiUserCustomer getUserCustomer(Long id) throws ApiException {
+		return ProductApiTools.toApiUserCustomer(em.find(UserCustomer.class, id));
+	}
+
     @Transactional
 	public ApiPaginatedList<ApiUserCustomer> listUserCustomers(CustomUserDetails authUser, Long productId, ApiListCollectorsRequest request) throws ApiException {
     	checkProductPermission(authUser, productId);

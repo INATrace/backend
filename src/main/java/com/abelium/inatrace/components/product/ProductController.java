@@ -202,6 +202,14 @@ public class ProductController {
         return productDocumentEngine.createLabelsAndHowToUseInstructions(authUser, id).toResponseEntity();
     }
 
+    @GetMapping(value = "/userCustomers/{id}")
+    @ApiOperation(value = "Get user customer by id")
+    public ApiResponse<ApiUserCustomer> getUserCustomer(
+            @Valid @ApiParam(value = "User customer ID", required = true) @PathVariable("id") Long id
+    ) throws ApiException {
+        return new ApiResponse<>(productEngine.getUserCustomer(id));
+    }
+
     @GetMapping(value = "/userCustomers/list/{companyId}/{type}")
     @ApiOperation(value = "List user customers for a company and role")
     public ApiPaginatedResponse<ApiUserCustomer> getUserCustomerListForCompanyAndType(
