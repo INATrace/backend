@@ -13,18 +13,15 @@ import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
-import com.abelium.inatrace.db.entities.common.Document;
+import com.abelium.inatrace.api.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiDefaultResponse;
-import com.abelium.inatrace.api.ApiPaginatedList;
-import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.analytics.AnalyticsEngine;
 import com.abelium.inatrace.components.analytics.RequestLogService;
@@ -57,12 +54,13 @@ import com.abelium.inatrace.components.product.api.ApiProductListResponse;
 import com.abelium.inatrace.components.product.types.ProductLabelAction;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.product.ComparisonOfPrice;
+import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.product.KnowledgeBlog;
 import com.abelium.inatrace.db.entities.product.Product;
+import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
-import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.product.ProductLabel;
 import com.abelium.inatrace.db.entities.product.ProductLabelBatch;
 import com.abelium.inatrace.db.entities.product.ProductLabelContent;
@@ -75,6 +73,7 @@ import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.tools.TorpedoProjector;
 import com.abelium.inatrace.types.ProductLabelStatus;
 import com.abelium.inatrace.types.RequestLogType;
+import com.abelium.inatrace.types.UserCustomerType;
 import com.abelium.inatrace.types.UserRole;
 
 
@@ -93,9 +92,7 @@ public class ProductService extends BaseService {
 	
 	@Autowired
 	private AnalyticsEngine analyticsEngine;
-
-	@Autowired
-	private ProductMapper productMapper;
+	
 	
     private Product productListQueryObject(ApiListProductsRequest request) {
         Product pProxy = Torpedo.from(Product.class);
@@ -132,7 +129,7 @@ public class ProductService extends BaseService {
         if (StringUtils.isNotBlank(request.name)) {
             condition = condition.and(pProxy.getName()).like().any(request.name);
         }
-        Document dProxy = Torpedo.leftJoin(pProxy.getPhoto());
+        Document dProxy = Torpedo.leftJoin(pProxy.getPhoto());        
         Torpedo.where(condition);
         switch (request.sortBy) {
 	        case "name": QueryTools.orderBy(request.sort, pProxy.getName()); break;
@@ -546,6 +543,17 @@ public class ProductService extends BaseService {
     	productApiTools.updateKnowledgeBlog(authUser.getUserId(), kb, request);
     	em.persist(kb);
 	}
+
+	private UserCustomer userCustomerListQueryObject(Long companyId, UserCustomerType type, ApiPaginatedRequest request) {
+		UserCustomer proxy = Torpedo.from(UserCustomer.class);
+
+		OnGoingLogicalCondition condition = Torpedo.condition();
+		condition = condition.and(proxy.getCompany().getId()).eq(companyId).and(proxy.getType()).eq(type);
+
+		Torpedo.where(condition);
+
+		return proxy;
+	}
     
     private UserCustomer collectorListQueryObject(Long userId, Long productId, ApiListCollectorsRequest request) {
     	UserCustomer pcProxy = Torpedo.from(UserCustomer.class);
@@ -595,12 +603,21 @@ public class ProductService extends BaseService {
         return pcProxy;
     }	
 
+	public ApiUserCustomer getUserCustomer(Long id) throws ApiException {
+		return ProductApiTools.toApiUserCustomer(em.find(UserCustomer.class, id));
+	}
+
     @Transactional
 	public ApiPaginatedList<ApiUserCustomer> listUserCustomers(CustomUserDetails authUser, Long productId, ApiListCollectorsRequest request) throws ApiException {
     	checkProductPermission(authUser, productId);
     	return PaginationTools.createPaginatedResponse(em, request, () -> collectorListQueryObject(authUser.getUserId(), productId, request), 
     			ProductApiTools::toApiUserCustomer); 
 	}    
+
+	@Transactional
+	public ApiPaginatedList<ApiUserCustomer> listUserCustomersForCompanyAndType(Long companyId, String type, ApiPaginatedRequest request) throws ApiException {
+		return PaginationTools.createPaginatedResponse(em, request, () -> userCustomerListQueryObject(companyId, UserCustomerType.valueOf(type), request), ProductApiTools::toApiUserCustomer);
+	}
 
     @Transactional
 	public ApiPaginatedList<ApiCompanyCustomer> listCompanyCustomers(CustomUserDetails authUser, Long productId, ApiListCustomersRequest request) throws ApiException {
