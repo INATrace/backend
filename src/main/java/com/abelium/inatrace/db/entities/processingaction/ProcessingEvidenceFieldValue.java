@@ -37,5 +37,53 @@ public class ProcessingEvidenceFieldValue extends TimestampEntity {
 	
 	@Column
 	private Instant instantValue;
+
+	public StockOrder getStockOrder() {
+		return stockOrder;
+	}
+
+	public void setStockOrder(StockOrder stockOrder) {
+		this.stockOrder = stockOrder;
+	}
+
+	public ProcessingEvidenceField getProcessingEvidenceField() {
+		return processingEvidenceField;
+	}
+
+	public void setProcessingEvidenceField(ProcessingEvidenceField processingEvidenceField) {
+		this.processingEvidenceField = processingEvidenceField;
+	}
+
+	public String getStringValue() {
+		return stringValue;
+	}
+
+	public void setStringValue(String stringValue) {
+		this.stringValue = stringValue;
+	}
+
+	public Float getNumericValue() {
+		return numericValue;
+	}
+
+	public void setNumericValue(Float numericValue) {
+		this.numericValue = numericValue;
+	}
+
+	public Boolean getBooleanValue() {
+		return booleanValue;
+	}
+
+	public void setBooleanValue(Boolean booleanValue) {
+		this.booleanValue = booleanValue;
+	}
+
+	public Instant getInstantValue() {
+		return instantValue;
+	}
+
+	public void setInstantValue(Instant instantValue) {
+		this.instantValue = instantValue;
+	}
 	
 }
