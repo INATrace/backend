@@ -87,9 +87,8 @@ public class StockOrderService extends BaseService {
 
         // Query parameter filters
         if(isOpenBalanceOnly != null && isOpenBalanceOnly)
-            condition.and(stockOrderProxy.getCost()).isNotNull()
-                    .and(stockOrderProxy.getPaid()).isNotNull()
-                    .and(stockOrderProxy.getCost()).gt(stockOrderProxy.getPaid());
+            condition.and(stockOrderProxy.getBalance()).isNotNull()
+                    .and(stockOrderProxy.getBalance()).gt(BigDecimal.ZERO);
         if(isWomenShare != null)
             condition.and(stockOrderProxy.getWomenShare()).eq(isWomenShare);
         if(wayOfPayment != null)
