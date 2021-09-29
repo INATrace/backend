@@ -140,12 +140,12 @@ public class StockOrderService extends BaseService {
         entity.setCurrency(apiStockOrder.getCurrency());
         entity.setPreferredWayOfPayment(apiStockOrder.getPreferredWayOfPayment());
         entity.setProductionDate(apiStockOrder.getProductionDate());
+        entity.setInternalLotNumber(apiStockOrder.getInternalLotNumber());
         entity.setWomenShare(apiStockOrder.getWomenShare());
         entity.setDeliveryTime(apiStockOrder.getDeliveryTime());
         entity.setAvailable(entity.getAvailableQuantity() > 0);
         entity.setSemiProduct(fetchEntity(apiStockOrder.getSemiProduct().getId(), SemiProduct.class));
 
-        // TODO: Check if it is OK to fetch measurement unit from SemiProduct
         if(entity.getSemiProduct() != null)
             entity.setMeasurementUnitType(entity.getSemiProduct().getMeasurementUnitType());
 

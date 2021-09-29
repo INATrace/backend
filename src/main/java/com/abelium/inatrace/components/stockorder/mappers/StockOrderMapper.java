@@ -47,7 +47,7 @@ public class StockOrderMapper {
 //        apiStockOrder.setSalesCurrency(entity.getSalesCurrency());
         apiStockOrder.setPurchaseOrder(entity.getPurchaseOrder());
         apiStockOrder.setOrderType(entity.getOrderType());
-//        apiStockOrder.setInternalLotNumber(entity.getInternalLotNumber());
+        apiStockOrder.setInternalLotNumber(entity.getInternalLotNumber());
 //        apiStockOrder.setLotNumber(entity.getLotNumber());
 //        apiStockOrder.setLotLabel(entity.getLotLabel());
 //        apiStockOrder.setScreenSize(entity.getScreenSize());

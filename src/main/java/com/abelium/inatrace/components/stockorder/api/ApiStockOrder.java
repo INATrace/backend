@@ -111,8 +111,8 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Order type", position = 26)
     public OrderType orderType;
 
-//    @ApiModelProperty(value = "Internal LOT number", position = 27)
-//    public String internalLotNumber;
+    @ApiModelProperty(value = "Internal LOT number", position = 27)
+    public String internalLotNumber;
 
 //    @ApiModelProperty(value = "LOT number", position = 28)
 //    public String lotNumber;
@@ -392,6 +392,14 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setOrderType(OrderType orderType) {
         this.orderType = orderType;
+    }
+
+    public String getInternalLotNumber() {
+        return internalLotNumber;
+    }
+
+    public void setInternalLotNumber(String internalLotNumber) {
+        this.internalLotNumber = internalLotNumber;
     }
 
     public Boolean getWomenShare() {
