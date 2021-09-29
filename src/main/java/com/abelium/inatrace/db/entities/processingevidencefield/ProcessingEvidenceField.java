@@ -2,6 +2,7 @@ package com.abelium.inatrace.db.entities.processingevidencefield;
 
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
+import com.abelium.inatrace.db.entities.processingaction.ProcessingEvidenceFieldValue;
 import com.abelium.inatrace.db.entities.stockorder.DocumentRequirement;
 import com.abelium.inatrace.db.entities.value_chain.ValueChainProcessingEvidenceField;
 import com.abelium.inatrace.types.ProcessingEvidenceFieldType;
@@ -49,12 +50,6 @@ public class ProcessingEvidenceField extends TimestampEntity {
 	private ProcessingEvidenceFieldType type = ProcessingEvidenceFieldType.STRING;
 	
 	@Column
-	private String stringValue;
-	
-	@Column
-	private Integer numericValue;
-	
-	@Column
 	private Integer fileMultiplicity;
 	
 	@OneToMany(mappedBy = "processingEvidenceField", cascade = CascadeType.ALL)
@@ -62,6 +57,9 @@ public class ProcessingEvidenceField extends TimestampEntity {
 	
 	@OneToMany(mappedBy = "processingEvidenceField", orphanRemoval = true, cascade = CascadeType.ALL)
 	private List<ValueChainProcessingEvidenceField> valueChains;
+	
+	@OneToMany(mappedBy = "processingEvidenceField", orphanRemoval = true, cascade = CascadeType.ALL)
+	private List<ProcessingEvidenceFieldValue> processingEFValues;
 	
 	@ManyToOne
 	private DocumentRequirement documentRequirement;
@@ -80,22 +78,6 @@ public class ProcessingEvidenceField extends TimestampEntity {
 
 	public void setType(ProcessingEvidenceFieldType type) {
 		this.type = type;
-	}
-
-	public String getStringValue() {
-		return stringValue;
-	}
-
-	public void setStringValue(String stringValue) {
-		this.stringValue = stringValue;
-	}
-
-	public Integer getNumericValue() {
-		return numericValue;
-	}
-
-	public void setNumericValue(Integer numericValue) {
-		this.numericValue = numericValue;
 	}
 
 	public Integer getFileMultiplicity() {
@@ -130,21 +112,4 @@ public class ProcessingEvidenceField extends TimestampEntity {
 		this.documentRequirement = documentRequirement;
 	}
 
-	public ProcessingEvidenceField(String label, ProcessingEvidenceFieldType type, Integer numericValue, String stringValue,
-			Integer fileMultiplicity, List<FileInfo> files, List<ValueChainProcessingEvidenceField> valueChains, DocumentRequirement documentRequirement) {
-		super();
-		this.label = label;
-		this.type = type;
-		this.stringValue = stringValue;
-		this.numericValue = numericValue;
-		this.fileMultiplicity = fileMultiplicity;
-		this.files = files;
-		this.valueChains = valueChains;
-		this.documentRequirement = documentRequirement;
-	}
-
-	public ProcessingEvidenceField() {
-		super();
-	}
-	
 }

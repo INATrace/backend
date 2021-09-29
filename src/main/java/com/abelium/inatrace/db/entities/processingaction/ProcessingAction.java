@@ -1,5 +1,13 @@
 package com.abelium.inatrace.db.entities.processingaction;
 
+import com.abelium.inatrace.api.types.Lengths;
+import com.abelium.inatrace.db.base.TimestampEntity;
+import com.abelium.inatrace.db.entities.codebook.SemiProduct;
+import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+import com.abelium.inatrace.types.ProcessingActionType;
+import com.abelium.inatrace.types.PublicTimelineIconType;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +24,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
-
-import com.abelium.inatrace.api.types.Lengths;
-import com.abelium.inatrace.db.base.TimestampEntity;
-import com.abelium.inatrace.db.entities.codebook.SemiProduct;
-import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.types.ProcessingActionType;
-import com.abelium.inatrace.types.PublicTimelineIconType;
 
 @Entity
 @Table
@@ -92,6 +93,9 @@ public class ProcessingAction extends TimestampEntity {
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionTranslation> processingActionTranslations = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<StockOrder> stockOrders = new ArrayList<>();
 
 	public String getPrefix() {
 		return prefix;
