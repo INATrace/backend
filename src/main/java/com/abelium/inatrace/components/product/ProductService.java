@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import com.abelium.inatrace.api.*;
+import com.abelium.inatrace.db.entities.common.UserCustomerLocation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -92,7 +93,7 @@ public class ProductService extends BaseService {
 	
 	@Autowired
 	private AnalyticsEngine analyticsEngine;
-	
+
 	
     private Product productListQueryObject(ApiListProductsRequest request) {
         Product pProxy = Torpedo.from(Product.class);
@@ -317,10 +318,16 @@ public class ProductService extends BaseService {
 		
 		if (!userCompanyIds.contains(companyId)) 
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid company id");
-		
+
+		// Save location
+		UserCustomerLocation userCustomerLocation = new UserCustomerLocation();
+		ProductApiTools.updateUserCustomerLocation(userCustomerLocation, request.getLocation());
+		em.persist(userCustomerLocation);
+		// Save user customer
 		UserCustomer pc = new UserCustomer();
 		pc.setProduct(p);
 		pc.setCompany(Queries.get(em, Company.class, companyId));
+		pc.setUserCustomerLocation(userCustomerLocation);
 		ProductApiTools.updateUserCustomer(pc, request);
 		em.persist(pc);
 		return new ApiBaseEntity(pc);
