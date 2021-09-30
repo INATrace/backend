@@ -4,13 +4,13 @@ import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.processingevidencefield.ProcessingEvidenceField;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 
-import java.time.Instant;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.time.Instant;
 
 @Entity
 public class ProcessingEvidenceFieldValue extends TimestampEntity {
@@ -30,7 +30,7 @@ public class ProcessingEvidenceFieldValue extends TimestampEntity {
 	private String stringValue;
 	
 	@Column
-	private Float numericValue;
+	private BigDecimal numericValue;
 	
 	@Column
 	private Boolean booleanValue;
@@ -62,11 +62,11 @@ public class ProcessingEvidenceFieldValue extends TimestampEntity {
 		this.stringValue = stringValue;
 	}
 
-	public Float getNumericValue() {
+	public BigDecimal getNumericValue() {
 		return numericValue;
 	}
 
-	public void setNumericValue(Float numericValue) {
+	public void setNumericValue(BigDecimal numericValue) {
 		this.numericValue = numericValue;
 	}
 

@@ -30,7 +30,6 @@ public class StockOrder extends TimestampEntity {
 	@Version
 	private Long entityVersion;
 
-
 	@ManyToOne(optional = false)
 	private User createdBy;
 
@@ -52,7 +51,7 @@ public class StockOrder extends TimestampEntity {
 	@OneToOne(cascade = CascadeType.ALL)
 	private StockOrderLocation productionLocation;
 	
-	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Certification> certifications; // probably not used for purchase
 	
 	@OneToOne
@@ -67,7 +66,7 @@ public class StockOrder extends TimestampEntity {
 	@ManyToOne
 	private ProcessingAction processingAction;
 	
-	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingEvidenceFieldValue> processingEFValues;
 	
 	@ManyToOne
@@ -106,8 +105,8 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private Long globalOrderId;
 	
-	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<DocumentRequirement> documentRequirements; // Check with Pece if this is correct, might be some other type of document
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<DocumentRequirement> documentRequirements;
 
 	@Column
 	private BigDecimal pricePerUnit;
@@ -316,7 +315,9 @@ public class StockOrder extends TimestampEntity {
 	}
 
 	public List<Certification> getCertifications() {
-		return (certifications == null) ? new ArrayList<>() : certifications;
+		if (certifications == null)
+			certifications = new ArrayList<>();
+		return certifications;
 	}
 
 	public void setCertifications(List<Certification> certifications) {
@@ -444,7 +445,9 @@ public class StockOrder extends TimestampEntity {
 	}
 
 	public List<DocumentRequirement> getDocumentRequirements() {
-		return documentRequirements == null ? new ArrayList<>() : documentRequirements;
+		if(documentRequirements == null)
+			documentRequirements = new ArrayList<>();
+		return documentRequirements;
 	}
 
 	public void setDocumentRequirements(List<DocumentRequirement> documentRequirements) {
@@ -580,7 +583,9 @@ public class StockOrder extends TimestampEntity {
 	}
 
 	public List<Transaction> getInputTransactions() {
-		return inputTransactions == null ? new ArrayList<>() : inputTransactions;
+		if (inputTransactions == null)
+			inputTransactions = new ArrayList<>();
+		return inputTransactions;
 	}
 
 	public void setInputTransactions(List<Transaction> inputTransactions) {
@@ -588,7 +593,9 @@ public class StockOrder extends TimestampEntity {
 	}
 
 	public List<Transaction> getOutputTransactions() {
-		return outputTransactions == null ? new ArrayList<>() : outputTransactions;
+		if(outputTransactions == null)
+			outputTransactions = new ArrayList<>();
+		return outputTransactions;
 	}
 
 	public void setOutputTransactions(List<Transaction> outputTransactions) {

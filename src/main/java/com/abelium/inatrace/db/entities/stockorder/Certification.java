@@ -24,9 +24,6 @@ public class Certification extends TimestampEntity {
 	
 	@Column
 	private Instant validity;
-	
-	@ManyToOne
-	private StockOrder stockOrder;
 
 	public Document getCertificate() {
 		return certificate;

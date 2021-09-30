@@ -11,6 +11,7 @@ public class DocumentRequirementMapper {
     public static ApiDocumentRequirement toApiDocumentRequirement(DocumentRequirement entity) {
         if(entity == null) return null;
         ApiDocumentRequirement apiDocumentRequirement = new ApiDocumentRequirement();
+        apiDocumentRequirement.setId(entity.getId());
         apiDocumentRequirement.setName(entity.getName());
         apiDocumentRequirement.setDescription(entity.getDescription());
         apiDocumentRequirement.setRequired(entity.getIsRequired());
