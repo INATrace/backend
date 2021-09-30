@@ -140,6 +140,7 @@ public class StockOrderService extends BaseService {
         entity.setPaid(apiStockOrder.getPaid());
         entity.setCost(apiStockOrder.getCost());
         entity.setCurrency(apiStockOrder.getCurrency());
+        entity.setPricePerUnit(apiStockOrder.getPricePerUnit());
         entity.setPreferredWayOfPayment(apiStockOrder.getPreferredWayOfPayment());
         entity.setProductionDate(apiStockOrder.getProductionDate());
         entity.setInternalLotNumber(apiStockOrder.getInternalLotNumber());
