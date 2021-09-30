@@ -16,6 +16,7 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.stockorder.DocumentRequirement;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderLocation;
+import com.abelium.inatrace.db.entities.stockorder.StockOrderPETypeValue;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
@@ -181,7 +182,7 @@ public class StockOrderService extends BaseService {
                 // Add or update other documents
                 apiStockOrder.getDocumentRequirements().forEach(apiDr -> {
 
-                    DocumentRequirement dr = fetchEntityOrDefault(apiDr.getId(), DocumentRequirement.class, new DocumentRequirement());
+                    StockOrderPETypeValue dr = fetchEntityOrDefault(apiDr.getId(), StockOrderPETypeValue.class, new StockOrderPETypeValue());
                     entity.getDocumentRequirements().remove(dr);
                     dr.setName(apiDr.getName());
                     dr.setDescription(apiDr.getDescription());

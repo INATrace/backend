@@ -67,7 +67,10 @@ public class StockOrder extends TimestampEntity {
 	private ProcessingAction processingAction;
 	
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProcessingEvidenceFieldValue> processingEFValues;
+	private List<ProcessingEvidenceFieldValue> processingEFValues; // same approach for the file documents
+	
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<StockOrderPETypeValue> documentRequirements;
 	
 	@ManyToOne
 	private Company company;
@@ -105,9 +108,6 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private Long globalOrderId;
 	
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<DocumentRequirement> documentRequirements;
-
 	@Column
 	private BigDecimal pricePerUnit;
 	
@@ -444,16 +444,14 @@ public class StockOrder extends TimestampEntity {
 		this.globalOrderId = globalOrderId;
 	}
 
-	public List<DocumentRequirement> getDocumentRequirements() {
-		if(documentRequirements == null)
-			documentRequirements = new ArrayList<>();
+	public List<StockOrderPETypeValue> getDocumentRequirements() {
 		return documentRequirements;
 	}
 
-	public void setDocumentRequirements(List<DocumentRequirement> documentRequirements) {
+	public void setDocumentRequirements(List<StockOrderPETypeValue> documentRequirements) {
 		this.documentRequirements = documentRequirements;
 	}
-
+	
 	public BigDecimal getPricePerUnit() {
 		return pricePerUnit;
 	}

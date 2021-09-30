@@ -1,17 +1,13 @@
 package com.abelium.inatrace.db.entities.processingevidencefield;
 
+import com.abelium.inatrace.db.base.BaseEntity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-
-import com.abelium.inatrace.db.base.BaseEntity;
 
 @Entity
 public class FileInfo extends BaseEntity {
 
-	@ManyToOne(optional = true)
-	private ProcessingEvidenceField processingEvidenceField;
-	
 	@Column
 	private String storageKey;
 	
@@ -23,14 +19,6 @@ public class FileInfo extends BaseEntity {
 	
 	@Column
 	private Integer size;
-	
-	public ProcessingEvidenceField getProcessingEvidenceField() {
-		return processingEvidenceField;
-	}
-
-	public void setProcessingEvidenceField(ProcessingEvidenceField processingEvidenceField) {
-		this.processingEvidenceField = processingEvidenceField;
-	}
 	
 	public String getStorageKey() {
 		return storageKey;

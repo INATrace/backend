@@ -1,8 +1,5 @@
 package com.abelium.inatrace.components.processingevidencefield.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.types.ProcessingEvidenceFieldType;
 
@@ -39,9 +36,6 @@ public class ApiProcessingEvidenceField extends ApiBaseEntity {
 	@ApiModelProperty(value = "Processing evidence field type")
 	private ProcessingEvidenceFieldType type;
 	
-	@ApiModelProperty(value = "Processing evidence field files info")
-	private List<ApiFileInfo> files = new ArrayList<>();
-
 	public String getLabel() {
 		return label;
 	}
@@ -114,17 +108,8 @@ public class ApiProcessingEvidenceField extends ApiBaseEntity {
 		this.type = type;
 	}
 
-	public List<ApiFileInfo> getFiles() {
-		return files;
-	}
-
-	public void setFiles(List<ApiFileInfo> files) {
-		this.files = files;
-	}
-
 	public ApiProcessingEvidenceField(String label, Boolean required, Boolean mandatory, Boolean requiredOnQuote,
-			Integer numericValue, String stringValue, Integer fileMultiplicity, ProcessingEvidenceFieldType type,
-			List<ApiFileInfo> files) {
+			Integer numericValue, String stringValue, Integer fileMultiplicity, ProcessingEvidenceFieldType type) {
 		super();
 		this.label = label;
 		this.required = required;
@@ -135,7 +120,6 @@ public class ApiProcessingEvidenceField extends ApiBaseEntity {
 //		this.objectValue = objectValue;
 		this.fileMultiplicity = fileMultiplicity;
 		this.type = type;
-		this.files = files;
 	}
 
 	public ApiProcessingEvidenceField() {

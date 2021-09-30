@@ -1,29 +1,26 @@
 package com.abelium.inatrace.components.processingevidencefield;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.persistence.TypedQuery;
-import javax.transaction.Transactional;
-
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-import org.torpedoquery.jpa.Torpedo;
-
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
-import com.abelium.inatrace.components.processingevidencefield.api.ApiFileInfo;
 import com.abelium.inatrace.components.processingevidencefield.api.ApiProcessingEvidenceField;
-import com.abelium.inatrace.db.entities.processingevidencefield.FileInfo;
 import com.abelium.inatrace.db.entities.processingevidencefield.ProcessingEvidenceField;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+import org.torpedoquery.jpa.Torpedo;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 
 /**
  * Service for processing evidence field entity.
@@ -71,27 +68,6 @@ public class ProcessingEvidenceFieldService extends BaseService {
 		entity.setFileMultiplicity(apiProcessingEvidenceField.getFileMultiplicity());
 		entity.setType(apiProcessingEvidenceField.getType());
 		
-		List<FileInfo> filesInfos = new ArrayList<>();
-
-		// Get list of files infos
-		List<ApiFileInfo> apiFilesInfos = apiProcessingEvidenceField.getFiles();
-		if (apiFilesInfos != null && !apiFilesInfos.isEmpty()) {
-			apiFilesInfos.forEach(
-					apiFileInfo -> {
-						
-						FileInfo fileInfo = new FileInfo();
-						fileInfo.setStorageKey(apiFileInfo.getStorageKey());
-						fileInfo.setName(apiFileInfo.getName());
-						fileInfo.setContentType(apiFileInfo.getContentType());
-						fileInfo.setSize(apiFileInfo.getSize());
-						
-						filesInfos.add(fileInfo);
-					}
-			);
-		}
-		
-		entity.setFiles(filesInfos);
-
 		if (entity.getId() == null) {
 			em.persist(entity);
 		}
