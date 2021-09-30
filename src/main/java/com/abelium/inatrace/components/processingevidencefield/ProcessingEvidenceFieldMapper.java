@@ -25,8 +25,6 @@ public final class ProcessingEvidenceFieldMapper {
 		ApiProcessingEvidenceField apiProcessingEvidenceField = new ApiProcessingEvidenceField();
 		apiProcessingEvidenceField.setId(entity.getId());
 		apiProcessingEvidenceField.setLabel(entity.getLabel());
-		apiProcessingEvidenceField.setNumericValue(entity.getNumericValue());
-		apiProcessingEvidenceField.setStringValue(entity.getStringValue());
 		apiProcessingEvidenceField.setFileMultiplicity(entity.getFileMultiplicity());
 		apiProcessingEvidenceField.setType(entity.getType());
 		
