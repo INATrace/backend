@@ -7,6 +7,7 @@ import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.product.api.ApiUserCustomer;
 import com.abelium.inatrace.components.stockorder.converters.SimpleDateConverter;
+import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -26,6 +27,12 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     @ApiModelProperty(value = "Timestamp indicates when stock order have been updated", position = 2)
     public Instant updateTimestamp;
+
+    @ApiModelProperty(value = "User that has created StockOrder")
+    public ApiUser createdBy;
+
+    @ApiModelProperty(value = "User that has last updated StockOrder")
+    public ApiUser updatedBy;
 
     @ApiModelProperty(value = "ID of the user who has created the stock order", position = 3)
     public Long creatorId;
@@ -240,6 +247,22 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setUpdateTimestamp(Instant updateTimestamp) {
         this.updateTimestamp = updateTimestamp;
+    }
+
+    public ApiUser getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(ApiUser createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public ApiUser getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(ApiUser updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
     public Long getCreatorId() {

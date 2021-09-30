@@ -6,6 +6,7 @@ import com.abelium.inatrace.db.entities.codebook.ActionType;
 import com.abelium.inatrace.db.entities.codebook.GradeAbbreviationType;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
+import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
@@ -20,16 +21,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Version;
+import javax.persistence.*;
 
 @Entity
 @Table
@@ -38,11 +30,18 @@ public class StockOrder extends TimestampEntity {
 	@Version
 	private Long entityVersion;
 
+
+	@ManyToOne(optional = false)
+	private User createdBy;
+
+	@ManyToOne
+	private User updatedBy;
+
 	@Column
 	private String identifier;
 
 	@Column
-	private Long creatorId; // logged-in user?
+	private Long creatorId; // Cooperative employee
 	
 	@ManyToOne
 	private UserCustomer representativeOfProducerUserCustomer; // farmer representative
@@ -54,7 +53,7 @@ public class StockOrder extends TimestampEntity {
 	private StockOrderLocation productionLocation;
 	
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Certification> certifications = new ArrayList<>(); // probably not used for purchase
+	private List<Certification> certifications; // probably not used for purchase
 	
 	@OneToOne
 	private CompanyCustomer consumerCompanyCustomer; // probably not used for purchase
@@ -69,7 +68,7 @@ public class StockOrder extends TimestampEntity {
 	private ProcessingAction processingAction;
 	
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProcessingEvidenceFieldValue> processingEFValues = new ArrayList<>();
+	private List<ProcessingEvidenceFieldValue> processingEFValues;
 	
 	@ManyToOne
 	private Company company;
@@ -162,10 +161,10 @@ public class StockOrder extends TimestampEntity {
 	private BigDecimal balance;
 	
 	@OneToMany // Verify relationship
-	private List<Transaction> inputTransactions = new ArrayList<>();
+	private List<Transaction> inputTransactions;
 	
 	@OneToMany // Verify relationship
-	private List<Transaction> outputTransactions = new ArrayList<>();
+	private List<Transaction> outputTransactions;
 
 	@Column
 	private String lotLabel;
@@ -268,6 +267,22 @@ public class StockOrder extends TimestampEntity {
 	@Column
     private Instant arrivedAtDateToDestinationPort;
 
+	public User getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(User createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public User getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(User updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
 	public String getIdentifier() {
 		return identifier;
 	}
@@ -301,7 +316,7 @@ public class StockOrder extends TimestampEntity {
 	}
 
 	public List<Certification> getCertifications() {
-		return certifications;
+		return (certifications == null) ? new ArrayList<>() : certifications;
 	}
 
 	public void setCertifications(List<Certification> certifications) {
@@ -429,7 +444,7 @@ public class StockOrder extends TimestampEntity {
 	}
 
 	public List<DocumentRequirement> getDocumentRequirements() {
-		return documentRequirements;
+		return documentRequirements == null ? new ArrayList<>() : documentRequirements;
 	}
 
 	public void setDocumentRequirements(List<DocumentRequirement> documentRequirements) {
@@ -565,7 +580,7 @@ public class StockOrder extends TimestampEntity {
 	}
 
 	public List<Transaction> getInputTransactions() {
-		return inputTransactions;
+		return inputTransactions == null ? new ArrayList<>() : inputTransactions;
 	}
 
 	public void setInputTransactions(List<Transaction> inputTransactions) {
@@ -573,7 +588,7 @@ public class StockOrder extends TimestampEntity {
 	}
 
 	public List<Transaction> getOutputTransactions() {
-		return outputTransactions;
+		return outputTransactions == null ? new ArrayList<>() : outputTransactions;
 	}
 
 	public void setOutputTransactions(List<Transaction> outputTransactions) {

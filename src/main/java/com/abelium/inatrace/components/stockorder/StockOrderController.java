@@ -6,10 +6,12 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.stockorder.converters.SimpleDateConverter;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -92,9 +94,10 @@ public class StockOrderController {
     @PutMapping
     @ApiOperation("Create or update stock order. If the ID is provided, then the entity with the provided ID is updated.")
     public ApiResponse<ApiBaseEntity> createOrUpdateStockOrder(
-            @Valid @RequestBody ApiStockOrder apiStockOrder) throws ApiException {
+            @Valid @RequestBody ApiStockOrder apiStockOrder,
+            @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-        return new ApiResponse<>(stockOrderService.createOrUpdateStockOrder(apiStockOrder));
+        return new ApiResponse<>(stockOrderService.createOrUpdateStockOrder(apiStockOrder, authUser.getUserId()));
     }
 
     @DeleteMapping("{id}")

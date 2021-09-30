@@ -11,8 +11,8 @@ import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrderLocation;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
+import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
-import com.abelium.inatrace.db.entities.stockorder.DocumentRequirement;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderLocation;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
@@ -28,8 +28,6 @@ import org.torpedoquery.jpa.Torpedo;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Lazy
 @Service
@@ -109,14 +107,19 @@ public class StockOrderService extends BaseService {
     }
 
     @Transactional
-    public ApiBaseEntity createOrUpdateStockOrder(ApiStockOrder apiStockOrder) throws ApiException {
+    public ApiBaseEntity createOrUpdateStockOrder(ApiStockOrder apiStockOrder, Long userId) throws ApiException {
+
+        User user = fetchEntity(userId, User.class);
+        System.out.println("User ID: " + user.getName());
 
         StockOrder entity;
 
         if (apiStockOrder.getId() != null) {
             entity = fetchEntity(apiStockOrder.getId(), StockOrder.class);
+            entity.setUpdatedBy(fetchEntity(userId, User.class));
         } else {
             entity = new StockOrder();
+            entity.setCreatedBy(fetchEntity(userId, User.class));
             entity.setCreatorId(apiStockOrder.getCreatorId());
         }
 
@@ -171,24 +174,25 @@ public class StockOrderService extends BaseService {
         switch (apiStockOrder.getOrderType()) {
             case PURCHASE_ORDER:
 
-                entity.setDocumentRequirements(apiStockOrder.documentRequirements
-                        .stream()
-                        .filter(Objects::nonNull)
-                        .map(apiDoc -> {
-                            DocumentRequirement doc;
-                            try {
-                                doc = fetchEntity(apiDoc.getId(), DocumentRequirement.class);
-                            } catch (ApiException e) {
-                                doc = new DocumentRequirement();
-                            }
-                            doc.setName(apiDoc.getName());
-                            doc.setDescription(apiDoc.getDescription());
-                            doc.setIsRequired(apiDoc.getRequired());
-                            // doc.setScoreTarget();
-                            // doc.setFields();
-                            // doc.setScoreTarget();
-                            return doc;
-                        }).collect(Collectors.toList()));
+
+//                entity.setDocumentRequirements(apiStockOrder.documentRequirements
+//                        .stream()
+//                        .filter(Objects::nonNull)
+//                        .map(apiDoc -> {
+//                            DocumentRequirement doc;
+//                            try {
+//                                doc = fetchEntity(apiDoc.getId(), DocumentRequirement.class);
+//                            } catch (ApiException e) {
+//                                doc = new DocumentRequirement();
+//                            }
+//                            doc.setName(apiDoc.getName());
+//                            doc.setDescription(apiDoc.getDescription());
+//                            doc.setIsRequired(apiDoc.getRequired());
+//                            // doc.setScoreTarget();
+//                            // doc.setFields();
+//                            // doc.setScoreTarget();
+//                            return doc;
+//                        }).collect(Collectors.toList()));
 
                 // Required
                 if(apiStockOrder.getProducerUserCustomer() == null)
@@ -203,9 +207,13 @@ public class StockOrderService extends BaseService {
 
                 break;
             case SALES_ORDER:
+                break;
             case GENERAL_ORDER:
+                break;
             case TRANSFER_ORDER:
+                break;
             case PROCESSING_ORDER:
+                break;
         }
 
 
