@@ -17,4 +17,28 @@ public class ApiUserCustomerCooperative extends ApiBaseEntity {
 
     @ApiModelProperty(value = "User customer type (collector, farmer)", position = 2)
     public UserCustomerType userCustomerType;
+
+    public ApiUserCustomer getUserCustomer() {
+        return userCustomer;
+    }
+
+    public void setUserCustomer(ApiUserCustomer userCustomer) {
+        this.userCustomer = userCustomer;
+    }
+
+    public ApiCompany getCompany() {
+        return company;
+    }
+
+    public void setCompany(ApiCompany company) {
+        this.company = company;
+    }
+
+    public UserCustomerType getUserCustomerType() {
+        return userCustomerType;
+    }
+
+    public void setUserCustomerType(UserCustomerType userCustomerType) {
+        this.userCustomerType = userCustomerType;
+    }
 }

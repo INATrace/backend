@@ -94,6 +94,8 @@ public class ProductService extends BaseService {
 	@Autowired
 	private AnalyticsEngine analyticsEngine;
 
+	@Autowired
+	private ProductMapper productMapper;
 	
     private Product productListQueryObject(ApiListProductsRequest request) {
         Product pProxy = Torpedo.from(Product.class);
@@ -302,7 +304,8 @@ public class ProductService extends BaseService {
     @Transactional
 	public void updateUserCustomer(CustomUserDetails authUser, ApiUserCustomer request) throws ApiException {
 		UserCustomer pc = fetchUserCustomer(authUser, request.id);
-		ProductApiTools.updateUserCustomer(pc, request);
+		productMapper.updateUserCustomerLocation(pc.getUserCustomerLocation(), request.getLocation());
+		productMapper.updateUserCustomer(pc, request);
 	}
 
     @Transactional
@@ -321,14 +324,14 @@ public class ProductService extends BaseService {
 
 		// Save location
 		UserCustomerLocation userCustomerLocation = new UserCustomerLocation();
-		ProductApiTools.updateUserCustomerLocation(userCustomerLocation, request.getLocation());
+		productMapper.updateUserCustomerLocation(userCustomerLocation, request.getLocation());
 		em.persist(userCustomerLocation);
 		// Save user customer
 		UserCustomer pc = new UserCustomer();
 		pc.setProduct(p);
 		pc.setCompany(Queries.get(em, Company.class, companyId));
 		pc.setUserCustomerLocation(userCustomerLocation);
-		ProductApiTools.updateUserCustomer(pc, request);
+		productMapper.updateUserCustomer(pc, request);
 		em.persist(pc);
 		return new ApiBaseEntity(pc);
 	}

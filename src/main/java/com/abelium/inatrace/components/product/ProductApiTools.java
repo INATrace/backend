@@ -7,11 +7,13 @@ import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.company.CompanyApiTools;
 import com.abelium.inatrace.components.company.CompanyQueries;
+import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.value_chain.ValueChainApiTools;
 import com.abelium.inatrace.components.value_chain.ValueChainQueries;
 import com.abelium.inatrace.db.entities.common.*;
+import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.process.Process;
 import com.abelium.inatrace.db.entities.process.ProcessDocument;
@@ -238,12 +240,77 @@ public class ProductApiTools {
 		apc.type = pc.getType();
 		apc.name = pc.getName();
 		apc.surname = pc.getSurname();
-//		apc.location = new ApiLocation();
 		apc.location = ProductApiTools.toApiUserCustomerLocation(pc.getUserCustomerLocation());
 		apc.phone = pc.getPhone();
 		apc.email = pc.getEmail();
 		apc.gender = pc.getGender();
+		apc.hasSmartphone = pc.getHasSmartphone();
+		apc.bank = ProductApiTools.toApiBankInformation(pc.getBank());
+		apc.farm = ProductApiTools.toApiFarmInformation(pc.getFarm());
+		apc.cooperatives = pc.getCooperatives().stream().map(ProductApiTools::toApiUserCustomerCooperative).collect(Collectors.toList());
+		apc.associations = pc.getAssociations().stream().map(ProductApiTools::toApiUserCustomerAssociation).collect(Collectors.toList());
 		return apc;
+	}
+
+	public static ApiBankInformation toApiBankInformation(BankInformation bankInformation) {
+		if (bankInformation == null) return null;
+
+		ApiBankInformation apiBankInformation = new ApiBankInformation();
+		apiBankInformation.setBankName(bankInformation.getBankName());
+		apiBankInformation.setAccountNumber(bankInformation.getAccountNumber());
+		apiBankInformation.setAccountHolderName(bankInformation.getAccountHolderName());
+		apiBankInformation.setAdditionalInformation(bankInformation.getAdditionalInformation());
+
+		return apiBankInformation;
+	}
+
+	public static ApiFarmInformation toApiFarmInformation(FarmInformation farmInformation) {
+		if (farmInformation == null) return null;
+
+		ApiFarmInformation apiFarmInformation = new ApiFarmInformation();
+		apiFarmInformation.setTotalCultivatedArea(farmInformation.getTotalCultivatedArea());
+		apiFarmInformation.setCoffeeCultivatedArea(farmInformation.getCoffeeCultivatedArea());
+		apiFarmInformation.setNumberOfTrees(farmInformation.getNumberOfTrees());
+		apiFarmInformation.setOrganic(farmInformation.getOrganic());
+		apiFarmInformation.setAreaOrganicCertified(farmInformation.getAreaOrganicCertified());
+		apiFarmInformation.setStartTransitionToOrganic(farmInformation.getStartTransitionToOrganic());
+
+		return apiFarmInformation;
+	}
+
+	public static ApiUserCustomerCooperative toApiUserCustomerCooperative(UserCustomerCooperative userCustomerCooperative) {
+		if (userCustomerCooperative == null) return null;
+
+		ApiUserCustomerCooperative apiUserCustomerCooperative = new ApiUserCustomerCooperative();
+		apiUserCustomerCooperative.setId(userCustomerCooperative.getId());
+		apiUserCustomerCooperative.setCompany(toApiCompany(userCustomerCooperative.getCompany()));
+		apiUserCustomerCooperative.setUserCustomer(new ApiUserCustomer());
+		apiUserCustomerCooperative.getUserCustomer().setId(userCustomerCooperative.getUserCustomer().getId());
+		apiUserCustomerCooperative.setUserCustomerType(userCustomerCooperative.getRole());
+
+		return apiUserCustomerCooperative;
+	}
+
+	public static ApiUserCustomerAssociation toApiUserCustomerAssociation(UserCustomerAssociation userCustomerAssociation) {
+		if (userCustomerAssociation == null) return null;
+
+		ApiUserCustomerAssociation apiUserCustomerAssociation = new ApiUserCustomerAssociation();
+		apiUserCustomerAssociation.setId(userCustomerAssociation.getId());
+		apiUserCustomerAssociation.setCompany(toApiCompany(userCustomerAssociation.getCompany()));
+		apiUserCustomerAssociation.setUserCustomer(new ApiUserCustomer());
+		apiUserCustomerAssociation.getUserCustomer().setId(userCustomerAssociation.getUserCustomer().getId());
+
+		return apiUserCustomerAssociation;
+	}
+
+	public static ApiCompany toApiCompany(Company company) {
+		if (company == null) return null;
+
+		ApiCompany apiCompany = new ApiCompany();
+		apiCompany.setId(company.getId());
+		apiCompany.setName(company.getName());
+
+		return apiCompany;
 	}
 	
 	public static ApiCompanyCustomer toApiCompanyCustomer(CompanyCustomer pc) {
