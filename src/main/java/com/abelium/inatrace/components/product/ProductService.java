@@ -584,6 +584,7 @@ public class ProductService extends BaseService {
 		}
         Torpedo.where(condition);
         switch (request.sortBy) {
+			case "id": QueryTools.orderBy(request.sort, pcProxy.getId()); break;
 	        case "name": QueryTools.orderBy(request.sort, pcProxy.getName()); break;
 	        case "surname": QueryTools.orderBy(request.sort, pcProxy.getSurname()); break;
 	        case "phone": QueryTools.orderBy(request.sort, pcProxy.getPhone()); break;
