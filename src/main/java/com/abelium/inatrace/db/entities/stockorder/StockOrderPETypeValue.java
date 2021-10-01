@@ -18,6 +18,9 @@ public class StockOrderPETypeValue extends TimestampEntity {
 	private Long entityVersion;
 	
 	@Column
+	private String identifier;
+	
+	@Column
 	private String name;
 	
 	@Column
@@ -36,6 +39,14 @@ public class StockOrderPETypeValue extends TimestampEntity {
 	@ManyToOne
 	@NotNull
 	private ProcessingEvidenceType processingEvidenceType;
+	
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
+	}
 
 	public String getName() {
 		return name;
