@@ -13,10 +13,8 @@ import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
-import com.abelium.inatrace.db.entities.stockorder.DocumentRequirement;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderLocation;
-import com.abelium.inatrace.db.entities.stockorder.StockOrderPETypeValue;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
@@ -30,7 +28,6 @@ import org.torpedoquery.jpa.Torpedo;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Objects;
 
 @Lazy
 @Service
@@ -176,22 +173,21 @@ public class StockOrderService extends BaseService {
             case PURCHASE_ORDER:
 
                 // Remove documents not present in API request
-                entity.getDocumentRequirements().removeIf(dr -> apiStockOrder.getDocumentRequirements()
-                                .stream().noneMatch(apiDr -> dr.getId().equals(apiDr.getId())));
+//                entity.getDocumentRequirements().removeIf(dr -> apiStockOrder.getDocumentRequirements()
+//                                .stream().noneMatch(apiDr -> dr.getId().equals(apiDr.getId())));
 
                 // Add or update other documents
-                apiStockOrder.getDocumentRequirements().forEach(apiDr -> {
-
-                    StockOrderPETypeValue dr = fetchEntityOrDefault(apiDr.getId(), StockOrderPETypeValue.class, new StockOrderPETypeValue());
-                    entity.getDocumentRequirements().remove(dr);
-                    dr.setName(apiDr.getName());
-                    dr.setDescription(apiDr.getDescription());
-                    dr.setIsRequired(apiDr.getRequired());
-                    // doc.setScoreTarget();
-                    // doc.setFields();
-                    // doc.setScoreTarget();
-                    entity.getDocumentRequirements().add(dr);
-                });
+//                apiStockOrder.getDocumentRequirements().forEach(apiDr -> {
+//
+//                    StockOrderPETypeValue dr = fetchEntityOrDefault(apiDr.getId(), StockOrderPETypeValue.class, new StockOrderPETypeValue());
+//                    entity.getDocumentRequirements().remove(dr);
+//                    dr.setName(apiDr.getName());
+//                    dr.setDescription(apiDr.getDescription());
+//                    // doc.setScoreTarget();
+//                    // doc.setFields();
+//                    // doc.setScoreTarget();
+//                    entity.getDocumentRequirements().add(dr);
+//                });
 
                 // Required
                 if(apiStockOrder.getProducerUserCustomer() == null)

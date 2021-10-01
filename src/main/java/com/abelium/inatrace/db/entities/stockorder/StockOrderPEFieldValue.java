@@ -1,8 +1,7 @@
-package com.abelium.inatrace.db.entities.processingaction;
+package com.abelium.inatrace.db.entities.stockorder;
 
 import com.abelium.inatrace.db.base.TimestampEntity;
-import com.abelium.inatrace.db.entities.processingevidencefield.ProcessingEvidenceField;
-import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceField;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +12,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
-public class ProcessingEvidenceFieldValue extends TimestampEntity {
+public class StockOrderPEFieldValue extends TimestampEntity {
 
 	@Version
 	private Long entityVersion;

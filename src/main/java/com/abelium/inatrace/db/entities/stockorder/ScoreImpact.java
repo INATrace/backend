@@ -8,7 +8,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.ManyToOne;
 
 @Entity
 public class ScoreImpact extends BaseEntity {
@@ -19,9 +18,6 @@ public class ScoreImpact extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
 	private ScoreImpactType type;
-	
-	@ManyToOne
-	private DocumentRequirement documentRequirement;
 
 	public Float getScore() {
 		return score;

@@ -1,7 +1,7 @@
 package com.abelium.inatrace.components.processingevidencefield;
 
 import com.abelium.inatrace.components.processingevidencefield.api.ApiProcessingEvidenceField;
-import com.abelium.inatrace.db.entities.processingevidencefield.ProcessingEvidenceField;
+import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceField;
 
 /**
  * Mapper for ProcessingEvidenceField entity.

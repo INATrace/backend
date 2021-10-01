@@ -2,12 +2,11 @@ package com.abelium.inatrace.db.entities.stockorder;
 
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceType;
-import com.abelium.inatrace.db.entities.processingevidencefield.FileInfo;
+import com.abelium.inatrace.db.entities.common.Document;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
@@ -18,19 +17,13 @@ public class StockOrderPETypeValue extends TimestampEntity {
 	private Long entityVersion;
 	
 	@Column
-	private String identifier;
-	
-	@Column
 	private String name;
 	
 	@Column
 	private String description;
-	
-	@Column
-	private Boolean isRequired;
 
-	@OneToOne
-	private FileInfo fileInfo;
+	@ManyToOne
+	private Document document;
 	
 	@ManyToOne
 	@NotNull
@@ -39,14 +32,6 @@ public class StockOrderPETypeValue extends TimestampEntity {
 	@ManyToOne
 	@NotNull
 	private ProcessingEvidenceType processingEvidenceType;
-	
-	public String getIdentifier() {
-		return identifier;
-	}
-
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
-	}
 
 	public String getName() {
 		return name;
@@ -64,20 +49,12 @@ public class StockOrderPETypeValue extends TimestampEntity {
 		this.description = description;
 	}
 
-	public Boolean getIsRequired() {
-		return isRequired;
+	public Document getDocument() {
+		return document;
 	}
 
-	public void setIsRequired(Boolean isRequired) {
-		this.isRequired = isRequired;
-	}
-
-	public FileInfo getFileInfo() {
-		return fileInfo;
-	}
-
-	public void setFileInfo(FileInfo fileInfo) {
-		this.fileInfo = fileInfo;
+	public void setDocument(Document document) {
+		this.document = document;
 	}
 
 	public StockOrder getStockOrder() {

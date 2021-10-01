@@ -23,7 +23,6 @@ public class ScoreTarget extends BaseEntity {
 	@Column
 	private Boolean womenShare;
 
-	// Order cannot be the name of column, as it is reserved word in MySQL
 	@Column
 	private Integer orderId;
 

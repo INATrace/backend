@@ -17,7 +17,6 @@ import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
 
 @Validated
 public class ApiStockOrder extends ApiBaseEntity {
@@ -96,9 +95,6 @@ public class ApiStockOrder extends ApiBaseEntity {
 
 //    @ApiModelProperty(value = "Global order ID", position = 20)
 //    public Long globalOrderId;
-
-    @ApiModelProperty(value = "Document requirements", position = 20)
-    public List<ApiDocumentRequirement> documentRequirements;
 
     @ApiModelProperty(value = "Price per unit", position = 21)
     public BigDecimal pricePerUnit;
@@ -375,14 +371,6 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setDeliveryTime(Instant deliveryTime) {
         this.deliveryTime = deliveryTime;
-    }
-
-    public List<ApiDocumentRequirement> getDocumentRequirements() {
-        return documentRequirements;
-    }
-
-    public void setDocumentRequirements(List<ApiDocumentRequirement> documentRequirements) {
-        this.documentRequirements = documentRequirements;
     }
 
     public BigDecimal getPricePerUnit() {

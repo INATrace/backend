@@ -9,8 +9,6 @@ import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.user.mappers.UserMapper;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 
-import java.util.stream.Collectors;
-
 public class StockOrderMapper {
 
     public static ApiStockOrder toApiStockOrder(StockOrder entity) {
@@ -43,7 +41,6 @@ public class StockOrderMapper {
         apiStockOrder.setDeliveryTime(entity.getDeliveryTime());
 //        apiStockOrder.setOrderId(entity.getOrderId());
 //        apiStockOrder.setGlobalOrderId(entity.getGlobalOrderId());
-        apiStockOrder.setDocumentRequirements(entity.getDocumentRequirements().stream().map(DocumentRequirementMapper::toApiDocumentRequirement).collect(Collectors.toList()));
         apiStockOrder.setPricePerUnit(entity.getPricePerUnit());
 //        apiStockOrder.setSalesPricePerUnit(entity.getSalesPricePerUnit());
         apiStockOrder.setCurrency(entity.getCurrency());

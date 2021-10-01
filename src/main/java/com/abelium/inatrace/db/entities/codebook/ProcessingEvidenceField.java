@@ -1,25 +1,12 @@
-package com.abelium.inatrace.db.entities.processingevidencefield;
+package com.abelium.inatrace.db.entities.codebook;
 
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
-import com.abelium.inatrace.db.entities.stockorder.DocumentRequirement;
 import com.abelium.inatrace.db.entities.value_chain.ValueChainProcessingEvidenceField;
 import com.abelium.inatrace.types.ProcessingEvidenceFieldType;
 
+import javax.persistence.*;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Index;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Version;
 
 @Entity
 @Table(indexes = { @Index(columnList = "label") })
@@ -49,12 +36,9 @@ public class ProcessingEvidenceField extends TimestampEntity {
 	
 	@Column
 	private Integer fileMultiplicity;
-	
+
 	@OneToMany(mappedBy = "processingEvidenceField", orphanRemoval = true, cascade = CascadeType.ALL)
 	private List<ValueChainProcessingEvidenceField> valueChains;
-	
-	@ManyToOne
-	private DocumentRequirement documentRequirement;
 
 	public String getLabel() {
 		return label;
@@ -86,14 +70,6 @@ public class ProcessingEvidenceField extends TimestampEntity {
 
 	public void setValueChains(List<ValueChainProcessingEvidenceField> valueChains) {
 		this.valueChains = valueChains;
-	}
-
-	public DocumentRequirement getDocumentRequirement() {
-		return documentRequirement;
-	}
-
-	public void setDocumentRequirement(DocumentRequirement documentRequirement) {
-		this.documentRequirement = documentRequirement;
 	}
 
 }

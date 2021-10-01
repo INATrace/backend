@@ -12,16 +12,14 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingEvidenceFieldValue;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.*;
 
 @Entity
 @Table
@@ -39,14 +37,17 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private String identifier;
 
+	// Cooperative employee
 	@Column
-	private Long creatorId; // Cooperative employee
-	
+	private Long creatorId;
+
+	// Farmer representative - collector
 	@ManyToOne
-	private UserCustomer representativeOfProducerUserCustomer; // farmer representative
-	
+	private UserCustomer representativeOfProducerUserCustomer;
+
+	// Farmer
 	@ManyToOne
-	private UserCustomer producerUserCustomer; // farmer
+	private UserCustomer producerUserCustomer;
 	
 	@OneToOne(cascade = CascadeType.ALL)
 	private StockOrderLocation productionLocation;
@@ -64,11 +65,15 @@ public class StockOrder extends TimestampEntity {
 	private Facility facility;
 	
 	@ManyToOne
-	private ProcessingAction processingAction;
-	
+	private ProcessingAction processingActionDef;
+
+	// The required processing evidence fields values - the available values are sourced from the
+	// selected Processing action definition;
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProcessingEvidenceFieldValue> processingEFValues; // same approach for the file documents
-	
+	private List<StockOrderPEFieldValue> processingEFValues;
+
+	// The required processing evidence documents - the available values are sourced from the
+	// selected Processing action definition;
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<StockOrderPETypeValue> documentRequirements;
 	
@@ -76,7 +81,7 @@ public class StockOrder extends TimestampEntity {
 	private Company company;
 	
 	@ManyToOne
-	private MeasureUnitType measurementUnitType; // verify this in detail
+	private MeasureUnitType measurementUnitType;
 	
 	@Column
 	private Integer totalQuantity;
@@ -103,7 +108,7 @@ public class StockOrder extends TimestampEntity {
 	private Instant deliveryTime;
 	
 	@Column
-	private Long orderId; // is this the id on the base entity? probably
+	private Long orderId;
 	
 	@Column
 	private Long globalOrderId;
@@ -444,6 +449,14 @@ public class StockOrder extends TimestampEntity {
 		this.globalOrderId = globalOrderId;
 	}
 
+	public List<StockOrderPEFieldValue> getProcessingEFValues() {
+		return processingEFValues;
+	}
+
+	public void setProcessingEFValues(List<StockOrderPEFieldValue> processingEFValues) {
+		this.processingEFValues = processingEFValues;
+	}
+
 	public List<StockOrderPETypeValue> getDocumentRequirements() {
 		return documentRequirements;
 	}
@@ -632,12 +645,12 @@ public class StockOrder extends TimestampEntity {
 		this.flavourProfile = flavourProfile;
 	}
 
-	public ProcessingAction getProcessingAction() {
-		return processingAction;
+	public ProcessingAction getProcessingActionDef() {
+		return processingActionDef;
 	}
 
-	public void setProcessingAction(ProcessingAction processingAction) {
-		this.processingAction = processingAction;
+	public void setProcessingActionDef(ProcessingAction processingAction) {
+		this.processingActionDef = processingAction;
 	}
 
 	public ProcessingOrder getProcessingOrder() {
