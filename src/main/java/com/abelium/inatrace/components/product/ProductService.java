@@ -579,6 +579,9 @@ public class ProductService extends BaseService {
         if (request.phone != null) {
             condition = condition.and(Torpedo.condition(pcProxy.getPhone()).like().startsWith(request.phone));
         }
+		if (request.userCustomerType != null) {
+			condition = condition.and(Torpedo.condition(pcProxy.getType()).eq(request.userCustomerType));
+		}
         Torpedo.where(condition);
         switch (request.sortBy) {
 	        case "name": QueryTools.orderBy(request.sort, pcProxy.getName()); break;
