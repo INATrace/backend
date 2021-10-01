@@ -76,7 +76,11 @@ public class StockOrder extends TimestampEntity {
 	// selected Processing action definition;
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<StockOrderPETypeValue> documentRequirements;
-	
+
+	// Activity proofs that were provided while creating or updating a purchase order
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<StockOrderActivityProof> activityProofs;
+
 	@ManyToOne
 	private Company company;
 	
@@ -450,21 +454,26 @@ public class StockOrder extends TimestampEntity {
 	}
 
 	public List<StockOrderPEFieldValue> getProcessingEFValues() {
+		if (processingEFValues == null) {
+			processingEFValues = new ArrayList<>();
+		}
 		return processingEFValues;
 	}
 
-	public void setProcessingEFValues(List<StockOrderPEFieldValue> processingEFValues) {
-		this.processingEFValues = processingEFValues;
-	}
-
 	public List<StockOrderPETypeValue> getDocumentRequirements() {
+		if (documentRequirements == null) {
+			documentRequirements = new ArrayList<>();
+		}
 		return documentRequirements;
 	}
 
-	public void setDocumentRequirements(List<StockOrderPETypeValue> documentRequirements) {
-		this.documentRequirements = documentRequirements;
+	public List<StockOrderActivityProof> getActivityProofs() {
+		if (activityProofs == null) {
+			activityProofs = new ArrayList<>();
+		}
+		return activityProofs;
 	}
-	
+
 	public BigDecimal getPricePerUnit() {
 		return pricePerUnit;
 	}
