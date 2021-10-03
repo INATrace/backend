@@ -17,9 +17,6 @@ public class ApiUserCustomer extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "Company id", position = 1)
 	public Long companyId;
-
-	@ApiModelProperty(value = "Product id", position = 1)
-	public Long productId;
 	
 	@ApiModelProperty(value = "Type", position = 2)
 	public UserCustomerType type;
@@ -67,14 +64,6 @@ public class ApiUserCustomer extends ApiBaseEntity {
 
 	public void setCompanyId(Long companyId) {
 		this.companyId = companyId;
-	}
-
-	public Long getProductId() {
-		return productId;
-	}
-
-	public void setProductId(Long productId) {
-		this.productId = productId;
 	}
 
 	public UserCustomerType getType() {

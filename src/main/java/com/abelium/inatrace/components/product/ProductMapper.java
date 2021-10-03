@@ -7,29 +7,12 @@ import com.abelium.inatrace.components.product.api.ApiUserCustomerCooperative;
 import com.abelium.inatrace.components.product.api.ApiUserCustomerLocation;
 import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.db.entities.product.Product;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
 @Component
 public class ProductMapper extends BaseService {
-
-    public UserCustomer toUserCustomer(ApiUserCustomer apiUserCustomer) {
-        UserCustomer userCustomer = new UserCustomer();
-        userCustomer.setCompany(getCompany(apiUserCustomer.getCompanyId()));
-        userCustomer.setProduct(getProduct(apiUserCustomer.getProductId()));
-        userCustomer.setUserCustomerLocation(new UserCustomerLocation());
-        userCustomer.getUserCustomerLocation().setPubliclyVisible(apiUserCustomer.getLocation().getPubliclyVisible());
-        return userCustomer;
-    }
-
-    public UserCustomerAssociation toUserCustomerAssociation(ApiUserCustomerAssociation apiUserCustomerAssociation) {
-        UserCustomerAssociation userCustomerAssociation = new UserCustomerAssociation();
-        userCustomerAssociation.setCompany(getCompany(apiUserCustomerAssociation.getCompany().getId()));
-        userCustomerAssociation.setUserCustomer(getUserCustomer(apiUserCustomerAssociation.getUserCustomer().getId()));
-        return userCustomerAssociation;
-    }
 
     public void updateUserCustomer(UserCustomer userCustomer, ApiUserCustomer apiUserCustomer) {
         userCustomer.setName(apiUserCustomer.getName());
@@ -130,11 +113,4 @@ public class ProductMapper extends BaseService {
         return em.find(Country.class, id);
     }
 
-    private UserCustomer getUserCustomer(Long id) {
-        return em.find(UserCustomer.class, id);
-    }
-
-    private Product getProduct(Long id) {
-        return em.find(Product.class, id);
-    }
 }

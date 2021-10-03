@@ -15,7 +15,6 @@ import java.util.List;
 @NamedQueries({
 		@NamedQuery(name = "UserCustomer.getUserCustomerByCompanyIdAndType", query = "SELECT u FROM UserCustomer u WHERE u.company.id = :companyId AND u.type = :type")
 })
-//@Table(indexes = { @Index(columnList = "product_id, phone", unique = true) } )
 public class UserCustomer extends BaseEntity {
 
 	/**
