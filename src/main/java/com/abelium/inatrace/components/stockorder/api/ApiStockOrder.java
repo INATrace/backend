@@ -3,6 +3,7 @@ package com.abelium.inatrace.components.stockorder.api;
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
+import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.product.api.ApiUserCustomer;
@@ -17,6 +18,8 @@ import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Validated
 public class ApiStockOrder extends ApiBaseEntity {
@@ -51,6 +54,9 @@ public class ApiStockOrder extends ApiBaseEntity {
 //    @ApiModelProperty(value = "Certification", position = 6)
 //    @Valid
 //    public List<ApiCertification> certifications;
+
+    @ApiModelProperty(value = "Activity proofs", position = 7)
+    public List<ApiActivityProof> activityProofs;
 
     @ApiModelProperty(value = "Semi product", position = 7)
     public ApiSemiProduct semiProduct;
@@ -291,6 +297,17 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setProductionLocation(ApiStockOrderLocation productionLocation) {
         this.productionLocation = productionLocation;
+    }
+
+    public List<ApiActivityProof> getActivityProofs() {
+        if (activityProofs == null) {
+            activityProofs = new ArrayList<>();
+        }
+        return activityProofs;
+    }
+
+    public void setActivityProofs(List<ApiActivityProof> activityProofs) {
+        this.activityProofs = activityProofs;
     }
 
     public ApiSemiProduct getSemiProduct() {

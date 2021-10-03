@@ -3,17 +3,23 @@ package com.abelium.inatrace.db.entities.stockorder;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.common.ActivityProof;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+/**
+ * Connecting entity that connects stock order with particular activity proof.
+ *
+ * @author Pece Adjievski, Sunesis d.o.o.
+ */
 @Entity
 public class StockOrderActivityProof extends BaseEntity {
 
 	@ManyToOne
 	private StockOrder stockOrder;
 
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
 	private ActivityProof activityProof;
 
 	public StockOrder getStockOrder() {

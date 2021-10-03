@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.stockorder.mappers;
 
 import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
+import com.abelium.inatrace.components.common.mappers.ActivityProofMapper;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.facility.FacilityMapper;
 import com.abelium.inatrace.components.product.mapper.UserCustomerMapper;
@@ -9,9 +10,12 @@ import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.user.mappers.UserMapper;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 
+import java.util.stream.Collectors;
+
 public class StockOrderMapper {
 
-    public static ApiStockOrder toApiStockOrder(StockOrder entity) {
+    public static ApiStockOrder toApiStockOrder(StockOrder entity, Long userId) {
+
         ApiStockOrder apiStockOrder = new ApiStockOrder();
         apiStockOrder.setId(entity.getId());
         apiStockOrder.setIdentifier(entity.getIdentifier());
@@ -22,14 +26,24 @@ public class StockOrderMapper {
         apiStockOrder.setRepresentativeOfProducerUserCustomer(UserCustomerMapper.toApiUserCustomer(entity.getRepresentativeOfProducerUserCustomer()));
         apiStockOrder.setProducerUserCustomer(UserCustomerMapper.toApiUserCustomer(entity.getProducerUserCustomer()));
         apiStockOrder.setProductionLocation(StockOrderLocationMapper.toApiStockOrderLocation(entity.getProductionLocation()));
+
 //        apiStockOrder.setCertifications(entity.getCertifications()
 //                .stream()
 //                .map(CertificationMapper::toApiCertification)
 //                .collect(Collectors.toList()));
-        if(entity.getSemiProduct() != null)
+
+        if (!entity.getActivityProofs().isEmpty()) {
+            apiStockOrder.setActivityProofs(entity.getActivityProofs().stream()
+                    .map(ap -> ActivityProofMapper.toApiActivityProof(ap.getActivityProof(), userId))
+                    .collect(Collectors.toList()));
+        }
+
+        if(entity.getSemiProduct() != null) {
             apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct()));
+        }
+
         apiStockOrder.setFacility(FacilityMapper.toApiFacility(entity.getFacility()));
-        apiStockOrder.setCompany(CompanyMapper.toApiCompany(entity.getCompany()));
+        apiStockOrder.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
         apiStockOrder.setMeasureUnitType(MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getMeasurementUnitType()));
         apiStockOrder.setTotalQuantity(entity.getTotalQuantity());
         apiStockOrder.setFulfilledQuantity(entity.getFulfilledQuantity());
@@ -84,6 +98,7 @@ public class StockOrderMapper {
 //        apiStockOrder.setRequiredWomensCoffee(entity.getRequiredWomensCoffee());
 //        apiStockOrder.setShippedAtDateFromOriginPort(entity.getShippedAtDateFromOriginPort());
 //        apiStockOrder.setArrivedAtDateToDestinationPort(entity.getArrivedAtDateToDestinationPort());
+
         return apiStockOrder;
     }
 

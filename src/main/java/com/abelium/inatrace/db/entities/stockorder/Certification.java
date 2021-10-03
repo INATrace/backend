@@ -3,9 +3,8 @@ package com.abelium.inatrace.db.entities.stockorder;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.common.Document;
 
-import java.time.Instant;
-
 import javax.persistence.*;
+import java.time.Instant;
 
 @Entity
 public class Certification extends TimestampEntity {
@@ -24,6 +23,9 @@ public class Certification extends TimestampEntity {
 	
 	@Column
 	private Instant validity;
+
+	@ManyToOne
+	private StockOrder stockOrder;
 
 	public Document getCertificate() {
 		return certificate;
@@ -55,6 +57,14 @@ public class Certification extends TimestampEntity {
 
 	public void setValidity(Instant validity) {
 		this.validity = validity;
+	}
+
+	public StockOrder getStockOrder() {
+		return stockOrder;
+	}
+
+	public void setStockOrder(StockOrder stockOrder) {
+		this.stockOrder = stockOrder;
 	}
 
 	public Certification(Document certificate, String description, String type, Instant validity) {

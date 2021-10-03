@@ -52,9 +52,6 @@ public class StockOrder extends TimestampEntity {
 	@OneToOne(cascade = CascadeType.ALL)
 	private StockOrderLocation productionLocation;
 	
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Certification> certifications; // probably not used for purchase
-	
 	@OneToOne
 	private CompanyCustomer consumerCompanyCustomer; // probably not used for purchase
 	
@@ -67,18 +64,21 @@ public class StockOrder extends TimestampEntity {
 	@ManyToOne
 	private ProcessingAction processingActionDef;
 
+	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Certification> certifications; // probably not used for purchase
+
 	// The required processing evidence fields values - the available values are sourced from the
 	// selected Processing action definition;
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<StockOrderPEFieldValue> processingEFValues;
 
 	// The required processing evidence documents - the available values are sourced from the
 	// selected Processing action definition;
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<StockOrderPETypeValue> documentRequirements;
 
 	// Activity proofs that were provided while creating or updating a purchase order
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<StockOrderActivityProof> activityProofs;
 
 	@ManyToOne
@@ -167,12 +167,6 @@ public class StockOrder extends TimestampEntity {
 
 	@Column
 	private BigDecimal balance;
-	
-	@OneToMany // Verify relationship
-	private List<Transaction> inputTransactions;
-	
-	@OneToMany // Verify relationship
-	private List<Transaction> outputTransactions;
 
 	@Column
 	private String lotLabel;
@@ -600,26 +594,6 @@ public class StockOrder extends TimestampEntity {
 
 	public void setBalance(BigDecimal balance) {
 		this.balance = balance;
-	}
-
-	public List<Transaction> getInputTransactions() {
-		if (inputTransactions == null)
-			inputTransactions = new ArrayList<>();
-		return inputTransactions;
-	}
-
-	public void setInputTransactions(List<Transaction> inputTransactions) {
-		this.inputTransactions = inputTransactions;
-	}
-
-	public List<Transaction> getOutputTransactions() {
-		if(outputTransactions == null)
-			outputTransactions = new ArrayList<>();
-		return outputTransactions;
-	}
-
-	public void setOutputTransactions(List<Transaction> outputTransactions) {
-		this.outputTransactions = outputTransactions;
 	}
 
 	public String getLotLabel() {

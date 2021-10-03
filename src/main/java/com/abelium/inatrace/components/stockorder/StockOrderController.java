@@ -31,15 +31,19 @@ public class StockOrderController {
     @GetMapping("{id}")
     @ApiOperation("Get a single stock order with the provided ID.")
     public ApiResponse<ApiStockOrder> getStockOrder(
-            @Valid @ApiParam(value = "StockOrder ID", required = true) @PathVariable("id") Long id) throws ApiException {
+            @Valid @ApiParam(value = "StockOrder ID", required = true) @PathVariable("id") Long id,
+            @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-        return new ApiResponse<>(stockOrderService.getStockOrder(id));
+        return new ApiResponse<>(stockOrderService.getStockOrder(id, authUser.getUserId()));
     }
 
     @GetMapping("/list")
     @ApiOperation("Get a paginated list of stock orders.")
-    public ApiPaginatedResponse<ApiStockOrder> getStockOrderList(@Valid ApiPaginatedRequest request) {
-        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request, null, null, null, null, null,null,null,null));
+    public ApiPaginatedResponse<ApiStockOrder> getStockOrderList(
+            @Valid ApiPaginatedRequest request,
+            @AuthenticationPrincipal CustomUserDetails authUser) {
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
+                request, null, null, null, null, null,null,null,null, authUser.getUserId()));
     }
 
     @GetMapping("list/facility/{facilityId}")
@@ -52,7 +56,8 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Way of payment") @RequestParam(value = "wayOfPayment", required = false) PreferredWayOfPayment wayOfPayment,
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
-            @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName) {
+            @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName,
+            @AuthenticationPrincipal CustomUserDetails authUser) {
 
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
                 request,
@@ -63,7 +68,7 @@ public class StockOrderController {
                 wayOfPayment,
                 productionDateStart != null ? productionDateStart.toInstant() : null ,
                 productionDateEnd != null ? productionDateEnd.toInstant() : null,
-                producerUserCustomerName));
+                producerUserCustomerName, authUser.getUserId()));
     }
 
     @GetMapping("list/company/{companyId}")
@@ -76,7 +81,8 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Way of payment") @RequestParam(value = "wayOfPayment", required = false) PreferredWayOfPayment wayOfPayment,
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
-            @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName
+            @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName,
+            @AuthenticationPrincipal CustomUserDetails authUser
 
     ) {
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
@@ -88,7 +94,7 @@ public class StockOrderController {
                 wayOfPayment,
                 productionDateStart != null ? productionDateStart.toInstant() : null ,
                 productionDateEnd != null ? productionDateEnd.toInstant() : null,
-                producerUserCustomerName));
+                producerUserCustomerName, authUser.getUserId()));
     }
 
     @PutMapping

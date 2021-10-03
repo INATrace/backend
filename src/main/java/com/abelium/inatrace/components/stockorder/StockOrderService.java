@@ -6,14 +6,18 @@ import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
+import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.facility.FacilityService;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrderLocation;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
+import com.abelium.inatrace.db.entities.common.ActivityProof;
+import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+import com.abelium.inatrace.db.entities.stockorder.StockOrderActivityProof;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderLocation;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -36,8 +40,8 @@ public class StockOrderService extends BaseService {
     @Autowired
     private FacilityService facilityService;
 
-    public ApiStockOrder getStockOrder(long id) throws ApiException {
-        return StockOrderMapper.toApiStockOrder(fetchEntity(id, StockOrder.class));
+    public ApiStockOrder getStockOrder(long id, Long userId) throws ApiException {
+        return StockOrderMapper.toApiStockOrder(fetchEntity(id, StockOrder.class), userId);
     }
 
     public ApiPaginatedList<ApiStockOrder> getStockOrderList(ApiPaginatedRequest request,
@@ -48,7 +52,8 @@ public class StockOrderService extends BaseService {
                                                              PreferredWayOfPayment wayOfPayment,
                                                              Instant productionDateStart,
                                                              Instant productionDateEnd,
-                                                             String producerUserCustomerName) {
+                                                             String producerUserCustomerName,
+                                                             Long userId) {
         return PaginationTools.createPaginatedResponse(em, request,
                 () -> stockOrderQueryObject(
                         request,
@@ -60,7 +65,7 @@ public class StockOrderService extends BaseService {
                         productionDateStart,
                         productionDateEnd,
                         producerUserCustomerName
-                ), StockOrderMapper::toApiStockOrder);
+                ), stockOrder -> StockOrderMapper.toApiStockOrder(stockOrder, userId));
     }
 
     private StockOrder stockOrderQueryObject(ApiPaginatedRequest request,
@@ -150,7 +155,6 @@ public class StockOrderService extends BaseService {
         if(entity.getSemiProduct() != null)
             entity.setMeasurementUnitType(entity.getSemiProduct().getMeasurementUnitType());
 
-
         // Production location
         ApiStockOrderLocation apiProdLocation = apiStockOrder.getProductionLocation();
         if(apiProdLocation != null) {
@@ -168,9 +172,37 @@ public class StockOrderService extends BaseService {
             entity.setProductionLocation(stockOrderLocation);
         }
 
-
         switch (apiStockOrder.getOrderType()) {
             case PURCHASE_ORDER:
+
+                // Required
+                if(apiStockOrder.getProducerUserCustomer() == null)
+                    throw new ApiException(ApiStatus.INVALID_REQUEST, "Producer user customer is required for purchase orders!");
+
+                entity.setProducerUserCustomer(fetchEntity(apiStockOrder.getProducerUserCustomer().getId(), UserCustomer.class));
+                entity.setPurchaseOrder(true);
+
+                // Optional
+                if(apiStockOrder.getRepresentativeOfProducerUserCustomer() != null)
+                    entity.setRepresentativeOfProducerUserCustomer(fetchEntity(apiStockOrder.getRepresentativeOfProducerUserCustomer().getId(), UserCustomer.class));
+
+                // Create or update activity proofs
+                entity.getActivityProofs().clear();
+
+                for (ApiActivityProof apiAP : apiStockOrder.getActivityProofs()) {
+
+                    Document activityProofDoc = fetchEntity(apiAP.getDocument().getId(), Document.class);
+
+                    StockOrderActivityProof stockOrderActivityProof = new StockOrderActivityProof();
+                    stockOrderActivityProof.setStockOrder(entity);
+                    stockOrderActivityProof.setActivityProof(new ActivityProof());
+                    stockOrderActivityProof.getActivityProof().setDocument(activityProofDoc);
+                    stockOrderActivityProof.getActivityProof().setFormalCreationDate(apiAP.getFormalCreationDate());
+                    stockOrderActivityProof.getActivityProof().setType(apiAP.getType());
+                    stockOrderActivityProof.getActivityProof().setValidUntil(apiAP.getValidUntil());
+
+                    entity.getActivityProofs().add(stockOrderActivityProof);
+                }
 
                 // Remove documents not present in API request
 //                entity.getDocumentRequirements().removeIf(dr -> apiStockOrder.getDocumentRequirements()
@@ -189,17 +221,6 @@ public class StockOrderService extends BaseService {
 //                    entity.getDocumentRequirements().add(dr);
 //                });
 
-                // Required
-                if(apiStockOrder.getProducerUserCustomer() == null)
-                    throw new ApiException(ApiStatus.INVALID_REQUEST, "Producer user customer is required for purchase orders!");
-
-                entity.setProducerUserCustomer(fetchEntity(apiStockOrder.getProducerUserCustomer().getId(), UserCustomer.class));
-                entity.setPurchaseOrder(true);
-
-                // Optional
-                if(apiStockOrder.getRepresentativeOfProducerUserCustomer() != null)
-                    entity.setRepresentativeOfProducerUserCustomer(fetchEntity(apiStockOrder.getRepresentativeOfProducerUserCustomer().getId(), UserCustomer.class));
-
                 break;
             case SALES_ORDER:
                 break;
@@ -210,7 +231,6 @@ public class StockOrderService extends BaseService {
             case PROCESSING_ORDER:
                 break;
         }
-
 
         if (entity.getId() == null) {
             em.persist(entity);

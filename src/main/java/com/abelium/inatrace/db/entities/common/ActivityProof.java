@@ -8,6 +8,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 import java.time.Instant;
 
+/**
+ * Activity proof entity which holds reference to document representing the proof of executing this activity.
+ *
+ * @author Pece Adjievski, Sunesis d.o.o.
+ */
 @Entity
 public class ActivityProof extends TimestampEntity {
 
