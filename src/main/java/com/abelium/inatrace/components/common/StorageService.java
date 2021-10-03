@@ -33,11 +33,13 @@ public class StorageService extends BaseService
 
     @Transactional
     public Document uploadDocument(byte[] file, String name, String contentType, Long size, DocumentType type) throws ApiException {
+
         if (file == null) {
         	throw new ApiException(ApiStatus.ERROR, "NULL file cannot be saved");
         }
-    	String storageKey = UUID.randomUUID().toString();        
+    	String storageKey = UUID.randomUUID().toString();
     	Path path = Paths.get(root, type.toString());
+
         if (Files.notExists(path)) {
             try {
                 Files.createDirectory(path);
@@ -54,6 +56,7 @@ public class StorageService extends BaseService
             logger.error("Error writing file", e);
             throw new ApiException(ApiStatus.ERROR, "Error saving file");
         }
+
         Document document = new Document();
         document.setName(name);
         document.setType(type);
@@ -61,6 +64,7 @@ public class StorageService extends BaseService
         document.setContentType(contentType);
         document.setSize(size);
         em.persist(document);
+
         return document;
     }
     
