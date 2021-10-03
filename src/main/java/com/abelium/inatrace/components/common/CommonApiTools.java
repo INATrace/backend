@@ -84,7 +84,14 @@ public class CommonApiTools {
         aa.city = address.getCity();
         aa.state = address.getState();
         aa.zip = address.getZip();
-        aa.country = toApiCountry(address.getCountry());    	
+        aa.country = toApiCountry(address.getCountry());
+        aa.cell = address.getCell();
+        aa.sector = address.getSector();
+        aa.village = address.getVillage();
+        aa.hondurasDepartment = address.getHondurasDepartment();
+        aa.hondurasFarm = address.getHondurasFarm();
+        aa.hondurasMunicipality = address.getHondurasMunicipality();
+        aa.hondurasVillage = address.getHondurasVillage();
     }
     
     public void updateAddress(Address a, ApiAddress aa) throws ApiException {

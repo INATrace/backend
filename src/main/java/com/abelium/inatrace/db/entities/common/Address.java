@@ -52,6 +52,30 @@ public class Address {
 	 */
 	@Column(length = Lengths.VILLAGE)
 	private String village;
+
+	/**
+	 * Honduras farm name
+	 */
+	@Column(length = Lengths.DEFAULT)
+	private String hondurasFarm;
+
+	/**
+	 * Honduras village name
+	 */
+	@Column(length = Lengths.DEFAULT)
+	private String hondurasVillage;
+
+	/**
+	 * Honduras municipality name
+	 */
+	@Column(length = Lengths.DEFAULT)
+	private String hondurasMunicipality;
+
+	/**
+	 * Honduras department name
+	 */
+	@Column(length = Lengths.DEFAULT)
+	private String hondurasDepartment;
 	
 	/**
 	 * country
@@ -121,5 +145,37 @@ public class Address {
 
 	public void setCountry(Country country) {
 		this.country = country;
+	}
+
+	public String getHondurasFarm() {
+		return hondurasFarm;
+	}
+
+	public void setHondurasFarm(String hondurasFarm) {
+		this.hondurasFarm = hondurasFarm;
+	}
+
+	public String getHondurasVillage() {
+		return hondurasVillage;
+	}
+
+	public void setHondurasVillage(String hondurasVillage) {
+		this.hondurasVillage = hondurasVillage;
+	}
+
+	public String getHondurasMunicipality() {
+		return hondurasMunicipality;
+	}
+
+	public void setHondurasMunicipality(String hondurasMunicipality) {
+		this.hondurasMunicipality = hondurasMunicipality;
+	}
+
+	public String getHondurasDepartment() {
+		return hondurasDepartment;
+	}
+
+	public void setHondurasDepartment(String hondurasDepartment) {
+		this.hondurasDepartment = hondurasDepartment;
 	}
 }

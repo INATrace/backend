@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import com.abelium.inatrace.api.*;
+import com.abelium.inatrace.db.entities.common.UserCustomerLocation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -92,7 +93,9 @@ public class ProductService extends BaseService {
 	
 	@Autowired
 	private AnalyticsEngine analyticsEngine;
-	
+
+	@Autowired
+	private ProductMapper productMapper;
 	
     private Product productListQueryObject(ApiListProductsRequest request) {
         Product pProxy = Torpedo.from(Product.class);
@@ -301,7 +304,8 @@ public class ProductService extends BaseService {
     @Transactional
 	public void updateUserCustomer(CustomUserDetails authUser, ApiUserCustomer request) throws ApiException {
 		UserCustomer pc = fetchUserCustomer(authUser, request.id);
-		ProductApiTools.updateUserCustomer(pc, request);
+		productMapper.updateUserCustomerLocation(pc.getUserCustomerLocation(), request.getLocation());
+		productMapper.updateUserCustomer(pc, request);
 	}
 
     @Transactional
@@ -317,11 +321,17 @@ public class ProductService extends BaseService {
 		
 		if (!userCompanyIds.contains(companyId)) 
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid company id");
-		
+
+		// Save location
+		UserCustomerLocation userCustomerLocation = new UserCustomerLocation();
+		productMapper.updateUserCustomerLocation(userCustomerLocation, request.getLocation());
+		em.persist(userCustomerLocation);
+		// Save user customer
 		UserCustomer pc = new UserCustomer();
 		pc.setProduct(p);
 		pc.setCompany(Queries.get(em, Company.class, companyId));
-		ProductApiTools.updateUserCustomer(pc, request);
+		pc.setUserCustomerLocation(userCustomerLocation);
+		productMapper.updateUserCustomer(pc, request);
 		em.persist(pc);
 		return new ApiBaseEntity(pc);
 	}
@@ -569,8 +579,12 @@ public class ProductService extends BaseService {
         if (request.phone != null) {
             condition = condition.and(Torpedo.condition(pcProxy.getPhone()).like().startsWith(request.phone));
         }
+		if (request.userCustomerType != null) {
+			condition = condition.and(Torpedo.condition(pcProxy.getType()).eq(request.userCustomerType));
+		}
         Torpedo.where(condition);
         switch (request.sortBy) {
+			case "id": QueryTools.orderBy(request.sort, pcProxy.getId()); break;
 	        case "name": QueryTools.orderBy(request.sort, pcProxy.getName()); break;
 	        case "surname": QueryTools.orderBy(request.sort, pcProxy.getSurname()); break;
 	        case "phone": QueryTools.orderBy(request.sort, pcProxy.getPhone()); break;
