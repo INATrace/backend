@@ -571,9 +571,15 @@ public class ProductService extends BaseService {
         OnGoingLogicalCondition condition = Torpedo.condition(); // .Torpedo conditions = new ArrayList<>();
         condition = condition.and(pcProxy.getProduct().getId()).eq(productId); 
         if (StringUtils.isNotBlank(request.query)) {
-        	OnGoingLogicalCondition queryCondition = 
-    				Torpedo.condition(pcProxy.getName()).like().any(request.query).
-        				   or(pcProxy.getSurname()).like().any(request.query);
+			OnGoingLogicalCondition queryCondition = Torpedo.condition();
+			switch (request.getSortBy()) {
+				case "BY_NAME":
+					queryCondition = Torpedo.condition(pcProxy.getName()).like().any(request.query);
+					break;
+				case "BY_SURNAME":
+					queryCondition = Torpedo.condition(pcProxy.getSurname()).like().any(request.query);
+					break;
+			}
         	condition = condition.and(queryCondition);
         }
         if (request.phone != null) {
