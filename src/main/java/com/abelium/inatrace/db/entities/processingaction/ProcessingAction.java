@@ -13,27 +13,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(indexes = { @Index(columnList = "name") })
+@Table
 @NamedQueries({
 	@NamedQuery(name = "ProcessingAction.listProcessingActionsByCompany", 
 			query = "SELECT pa FROM ProcessingAction pa "
+					+ "INNER JOIN FETCH pa.processingActionTranslations t "
 					+ "INNER JOIN pa.company c "
-					+ "WHERE c.id = :companyId"),
+					+ "WHERE c.id = :companyId "
+					+ "AND t.language = :language"),
 	@NamedQuery(name = "ProcessingAction.countProcessingActionsByCompany",
 			query = "SELECT COUNT(pa) FROM ProcessingAction pa "
-					+ "WHERE pa.company.id = :companyId"),
+					+ "INNER JOIN pa.processingActionTranslations t "
+					+ "WHERE pa.company.id = :companyId "
+					+ "AND t.language = :language"),
+	@NamedQuery(name = "ProcessingAction.listProcessingActions", 
+			query = "SELECT pa FROM ProcessingAction pa "
+					+ "INNER JOIN FETCH pa.processingActionTranslations t "
+					+ "WHERE t.language = :language"),
+	@NamedQuery(name = "ProcessingAction.countProcessingActions",
+			query = "SELECT COUNT(pa) FROM ProcessingAction pa "
+					+ "INNER JOIN pa.processingActionTranslations t "
+					+ "WHERE t.language = :language")
 })
 public class ProcessingAction extends TimestampEntity {
 
 	@Version
 	private Long entityVersion;
 
-	@Column
-	private String name;
-	
-	@Column
-	private String description;
-	
 	@Column
 	private String prefix;
 	
@@ -71,22 +77,9 @@ public class ProcessingAction extends TimestampEntity {
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionPEF> processingEvidenceFields = new ArrayList<>();
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
+	
+	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProcessingActionTranslation> processingActionTranslations = new ArrayList<>();
 
 	public String getPrefix() {
 		return prefix;
@@ -183,16 +176,21 @@ public class ProcessingAction extends TimestampEntity {
 	public void setProcessingEvidenceFields(List<ProcessingActionPEF> processingEvidenceFields) {
 		this.processingEvidenceFields = processingEvidenceFields;
 	}
+	
+	public List<ProcessingActionTranslation> getProcessingActionTranslations() {
+		return processingActionTranslations;
+	}
 
-	public ProcessingAction(String name, String description, String prefix, Boolean repackedOutputs,
-			BigDecimal maxOutputWeight, Company company, SemiProduct inputSemiProduct, SemiProduct outputSemiProduct,
-			String publicTimelineLabel, String publicTimelineLocation, ProcessingActionType type,
-			PublicTimelineIconType publicTimelineIcon,
-			List<ProcessingActionPET> requiredDocumentTypes,
-			List<ProcessingActionPEF> processingEvidenceFields) {
+	public void setProcessingActionTranslations(List<ProcessingActionTranslation> processingActionTranslations) {
+		this.processingActionTranslations = processingActionTranslations;
+	}
+
+	public ProcessingAction(String prefix, Boolean repackedOutputs, BigDecimal maxOutputWeight, Company company,
+			SemiProduct inputSemiProduct, SemiProduct outputSemiProduct, String publicTimelineLabel,
+			String publicTimelineLocation, ProcessingActionType type, PublicTimelineIconType publicTimelineIconType,
+			List<ProcessingActionPET> requiredDocumentTypes, List<ProcessingActionPEF> processingEvidenceFields,
+			List<ProcessingActionTranslation> processingActionTranslations) {
 		super();
-		this.name = name;
-		this.description = description;
 		this.prefix = prefix;
 		this.repackedOutputs = repackedOutputs;
 		this.maxOutputWeight = maxOutputWeight;
@@ -202,9 +200,10 @@ public class ProcessingAction extends TimestampEntity {
 		this.publicTimelineLabel = publicTimelineLabel;
 		this.publicTimelineLocation = publicTimelineLocation;
 		this.type = type;
-		this.publicTimelineIconType = publicTimelineIcon;
+		this.publicTimelineIconType = publicTimelineIconType;
 		this.requiredDocumentTypes = requiredDocumentTypes;
 		this.processingEvidenceFields = processingEvidenceFields;
+		this.processingActionTranslations = processingActionTranslations;
 	}
 
 	public ProcessingAction() {

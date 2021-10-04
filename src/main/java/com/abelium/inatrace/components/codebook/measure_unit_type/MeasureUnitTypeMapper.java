@@ -21,7 +21,7 @@ public final class MeasureUnitTypeMapper {
 	 * @return API model entity.
 	 */
 	public static ApiMeasureUnitType toApiMeasureUnitTypeBase(MeasureUnitType entity) {
-
+		if(entity == null) return null;
 		ApiMeasureUnitType apiMeasureUnitType = new ApiMeasureUnitType();
 		apiMeasureUnitType.setId(entity.getId());
 		apiMeasureUnitType.setCode(entity.getCode());
@@ -37,7 +37,7 @@ public final class MeasureUnitTypeMapper {
 	 * @return API model entity.
 	 */
 	public static ApiMeasureUnitType toApiMeasureUnitType(MeasureUnitType entity) {
-
+		if(entity == null) return null;
 		ApiMeasureUnitType apiMeasureUnitType = MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(entity);
 
 		apiMeasureUnitType.setWeight(entity.getWeight());

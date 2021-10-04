@@ -26,6 +26,7 @@ public final class SemiProductMapper {
 		ApiSemiProduct apiSemiProduct = new ApiSemiProduct();
 		apiSemiProduct.setId(entity.getId());
 		apiSemiProduct.setName(entity.getName());
+		apiSemiProduct.setBuyable(entity.getBuyable());
 
 		return apiSemiProduct;
 	}

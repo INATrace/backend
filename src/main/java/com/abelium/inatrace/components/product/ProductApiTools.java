@@ -7,12 +7,13 @@ import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.company.CompanyApiTools;
 import com.abelium.inatrace.components.company.CompanyQueries;
+import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.value_chain.ValueChainApiTools;
 import com.abelium.inatrace.components.value_chain.ValueChainQueries;
-import com.abelium.inatrace.db.entities.common.Location;
-import com.abelium.inatrace.db.entities.common.UserCustomer;
+import com.abelium.inatrace.db.entities.common.*;
+import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.process.Process;
 import com.abelium.inatrace.db.entities.process.ProcessDocument;
@@ -210,6 +211,18 @@ public class ProductApiTools {
 		al.pinName = l.getPinName();
 		return al;
 	}
+
+	public static ApiUserCustomerLocation toApiUserCustomerLocation(UserCustomerLocation userCustomerLocation) {
+		if (userCustomerLocation == null) return null;
+
+		ApiUserCustomerLocation apiUserCustomerLocation = new ApiUserCustomerLocation();
+		apiUserCustomerLocation.setAddress(CommonApiTools.toApiAddress(userCustomerLocation.getAddress()));
+		apiUserCustomerLocation.setLatitude(userCustomerLocation.getLatitude());
+		apiUserCustomerLocation.setLongitude(userCustomerLocation.getLongitude());
+		apiUserCustomerLocation.setPubliclyVisible(userCustomerLocation.getPubliclyVisible());
+
+		return apiUserCustomerLocation;
+	}
 	
 	public static ApiProductCompany toApiProductCompany(ProductCompany pc) {
 		ApiProductCompany apc = new ApiProductCompany();
@@ -227,11 +240,77 @@ public class ProductApiTools {
 		apc.type = pc.getType();
 		apc.name = pc.getName();
 		apc.surname = pc.getSurname();
-		apc.location = pc.getLocation();
+		apc.location = ProductApiTools.toApiUserCustomerLocation(pc.getUserCustomerLocation());
 		apc.phone = pc.getPhone();
 		apc.email = pc.getEmail();
 		apc.gender = pc.getGender();
+		apc.hasSmartphone = pc.getHasSmartphone();
+		apc.bank = ProductApiTools.toApiBankInformation(pc.getBank());
+		apc.farm = ProductApiTools.toApiFarmInformation(pc.getFarm());
+		apc.cooperatives = pc.getCooperatives().stream().map(ProductApiTools::toApiUserCustomerCooperative).collect(Collectors.toList());
+		apc.associations = pc.getAssociations().stream().map(ProductApiTools::toApiUserCustomerAssociation).collect(Collectors.toList());
 		return apc;
+	}
+
+	public static ApiBankInformation toApiBankInformation(BankInformation bankInformation) {
+		if (bankInformation == null) return null;
+
+		ApiBankInformation apiBankInformation = new ApiBankInformation();
+		apiBankInformation.setBankName(bankInformation.getBankName());
+		apiBankInformation.setAccountNumber(bankInformation.getAccountNumber());
+		apiBankInformation.setAccountHolderName(bankInformation.getAccountHolderName());
+		apiBankInformation.setAdditionalInformation(bankInformation.getAdditionalInformation());
+
+		return apiBankInformation;
+	}
+
+	public static ApiFarmInformation toApiFarmInformation(FarmInformation farmInformation) {
+		if (farmInformation == null) return null;
+
+		ApiFarmInformation apiFarmInformation = new ApiFarmInformation();
+		apiFarmInformation.setTotalCultivatedArea(farmInformation.getTotalCultivatedArea());
+		apiFarmInformation.setCoffeeCultivatedArea(farmInformation.getCoffeeCultivatedArea());
+		apiFarmInformation.setNumberOfTrees(farmInformation.getNumberOfTrees());
+		apiFarmInformation.setOrganic(farmInformation.getOrganic());
+		apiFarmInformation.setAreaOrganicCertified(farmInformation.getAreaOrganicCertified());
+		apiFarmInformation.setStartTransitionToOrganic(farmInformation.getStartTransitionToOrganic());
+
+		return apiFarmInformation;
+	}
+
+	public static ApiUserCustomerCooperative toApiUserCustomerCooperative(UserCustomerCooperative userCustomerCooperative) {
+		if (userCustomerCooperative == null) return null;
+
+		ApiUserCustomerCooperative apiUserCustomerCooperative = new ApiUserCustomerCooperative();
+		apiUserCustomerCooperative.setId(userCustomerCooperative.getId());
+		apiUserCustomerCooperative.setCompany(toApiCompany(userCustomerCooperative.getCompany()));
+		apiUserCustomerCooperative.setUserCustomer(new ApiUserCustomer());
+		apiUserCustomerCooperative.getUserCustomer().setId(userCustomerCooperative.getUserCustomer().getId());
+		apiUserCustomerCooperative.setUserCustomerType(userCustomerCooperative.getRole());
+
+		return apiUserCustomerCooperative;
+	}
+
+	public static ApiUserCustomerAssociation toApiUserCustomerAssociation(UserCustomerAssociation userCustomerAssociation) {
+		if (userCustomerAssociation == null) return null;
+
+		ApiUserCustomerAssociation apiUserCustomerAssociation = new ApiUserCustomerAssociation();
+		apiUserCustomerAssociation.setId(userCustomerAssociation.getId());
+		apiUserCustomerAssociation.setCompany(toApiCompany(userCustomerAssociation.getCompany()));
+		apiUserCustomerAssociation.setUserCustomer(new ApiUserCustomer());
+		apiUserCustomerAssociation.getUserCustomer().setId(userCustomerAssociation.getUserCustomer().getId());
+
+		return apiUserCustomerAssociation;
+	}
+
+	public static ApiCompany toApiCompany(Company company) {
+		if (company == null) return null;
+
+		ApiCompany apiCompany = new ApiCompany();
+		apiCompany.setId(company.getId());
+		apiCompany.setName(company.getName());
+
+		return apiCompany;
 	}
 	
 	public static ApiCompanyCustomer toApiCompanyCustomer(CompanyCustomer pc) {
@@ -556,7 +635,48 @@ public class ProductApiTools {
 		pc.setType(apc.type);
 		pc.setPhone(apc.phone);
 		pc.setEmail(apc.email);
-		pc.setLocation(apc.location);
+		pc.setHasSmartphone(apc.getHasSmartphone());
+		// Bank
+		if (pc.getBank() == null) {
+			pc.setBank(new BankInformation());
+		}
+		pc.getBank().setBankName(apc.getBank().getBankName());
+		pc.getBank().setAdditionalInformation(apc.getBank().getAdditionalInformation());
+		pc.getBank().setAccountNumber(apc.getBank().getAccountNumber());
+		pc.getBank().setAccountHolderName(apc.getBank().getAccountHolderName());
+		// Farm
+		if (pc.getFarm() == null) {
+			pc.setFarm(new FarmInformation());
+		}
+		pc.getFarm().setTotalCultivatedArea(apc.getFarm().getTotalCultivatedArea());
+		pc.getFarm().setCoffeeCultivatedArea(apc.getFarm().getCoffeeCultivatedArea());
+		pc.getFarm().setNumberOfTrees(apc.getFarm().getNumberOfTrees());
+		pc.getFarm().setOrganic(apc.getFarm().getOrganic());
+		pc.getFarm().setAreaOrganicCertified(apc.getFarm().getAreaOrganicCertified());
+		pc.getFarm().setStartTransitionToOrganic(apc.getFarm().getStartTransitionToOrganic());
+		// Location
+//		UserCustomerLocation userCustomerLocation = new UserCustomerLocation();
+//		Address address = new Address();
+//		address.setAddress(apc.getLocation().getAddress().getAddress());
+//		address.setCell(apc.getLocation().getAddress().getCell());
+//		address.setCity(apc.getLocation().getAddress().getCity());
+//		address.setHondurasDepartment(apc.getLocation().getAddress().getHondurasDepartment());
+//		address.setHondurasFarm(apc.getLocation().getAddress().getHondurasFarm());
+//		address.setHondurasMunicipality(apc.getLocation().getAddress().getHondurasMunicipality());
+//		address.setHondurasVillage(apc.getLocation().getAddress().getHondurasVillage());
+//		address.setSector(apc.getLocation().getAddress().getSector());
+//		address.setState(apc.getLocation().getAddress().getState());
+//		address.setVillage(apc.getLocation().getAddress().getVillage());
+//		address.setZip(apc.getLocation().getAddress().getZip());
+//		Country addressCountry = new Country();
+//		addressCountry.setId(apc.getLocation().getAddress().getCountry().getId());
+//		address.setCountry(addressCountry);
+//		userCustomerLocation.setLatitude(apc.getLocation().getLatitude());
+//		userCustomerLocation.setLongitude(apc.getLocation().getLongitude());
+//		userCustomerLocation.setPubliclyVisible(apc.getLocation().getPubliclyVisible());
+//		userCustomerLocation.setAddress(address);
+
+//		pc.setUserCustomerLocation(userCustomerLocation);
 	}
 
 	public void updateCompanyCustomer(CompanyCustomer pc, ApiCompanyCustomer apc) throws ApiException {

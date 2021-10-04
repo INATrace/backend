@@ -4,7 +4,9 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
+import com.abelium.inatrace.components.processingactiontranslation.api.ApiProcessingActionTranslation;
 import com.abelium.inatrace.components.processingevidencefield.api.ApiProcessingEvidenceField;
+import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
 
@@ -26,6 +28,9 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Processing action description")
 	private String description;
+	
+	@ApiModelProperty(value = "Processing action language")
+	private Language language;
 	
 	@ApiModelProperty(value = "Processing action prefix")
 	private String prefix;
@@ -59,9 +64,12 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Processing action required document types")
 	private List<ApiProcessingEvidenceType> requiredDocumentTypes = new ArrayList<>();
-
+	
 	@ApiModelProperty(value = "Processing action required evidence fields")
 	private List<ApiProcessingEvidenceField> requiredEvidenceFields = new ArrayList<>();
+
+	@ApiModelProperty(value = "Processing action translations")
+	private List<ApiProcessingActionTranslation> translations = new ArrayList<>();
 
 	public String getName() {
 		return name;
@@ -77,6 +85,14 @@ public class ApiProcessingAction extends ApiBaseEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public Language getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(Language language) {
+		this.language = language;
 	}
 
 	public String getPrefix() {
@@ -166,7 +182,7 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	public void setRequiredDocumentTypes(List<ApiProcessingEvidenceType> requiredDocumentTypes) {
 		this.requiredDocumentTypes = requiredDocumentTypes;
 	}
-
+	
 	public List<ApiProcessingEvidenceField> getRequiredEvidenceFields() {
 		return requiredEvidenceFields;
 	}
@@ -175,17 +191,28 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		this.requiredEvidenceFields = requiredEvidenceFields;
 	}
 
+	public List<ApiProcessingActionTranslation> getTranslations() {
+		return translations;
+	}
+
+	public void setTranslations(List<ApiProcessingActionTranslation> translations) {
+		this.translations = translations;
+	}
+
 	public ApiProcessingAction() {
 		super();
 	}
 
-	public ApiProcessingAction(String name, String description, String prefix, Boolean repackedOutputs,
-			BigDecimal maxOutputWeight, String publicTimelineLabel, String publicTimelineLocation, ApiCompanyBase company,
-			ApiSemiProduct inputSemiProduct, ApiSemiProduct outputSemiProduct, ProcessingActionType type,
-			PublicTimelineIconType publicTimelineIconType) {
+	public ApiProcessingAction(String name, String description, Language language, String prefix,
+			Boolean repackedOutputs, BigDecimal maxOutputWeight, String publicTimelineLabel,
+			String publicTimelineLocation, ApiCompanyBase company, ApiSemiProduct inputSemiProduct,
+			ApiSemiProduct outputSemiProduct, ProcessingActionType type, PublicTimelineIconType publicTimelineIconType,
+			List<ApiProcessingEvidenceType> requiredDocumentTypes,
+			List<ApiProcessingEvidenceField> requiredEvidenceFields) {
 		super();
 		this.name = name;
 		this.description = description;
+		this.language = language;
 		this.prefix = prefix;
 		this.repackedOutputs = repackedOutputs;
 		this.maxOutputWeight = maxOutputWeight;
@@ -196,6 +223,8 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		this.outputSemiProduct = outputSemiProduct;
 		this.type = type;
 		this.publicTimelineIconType = publicTimelineIconType;
+		this.requiredDocumentTypes = requiredDocumentTypes;
+		this.requiredEvidenceFields = requiredEvidenceFields;
 	}
-	
+
 }
