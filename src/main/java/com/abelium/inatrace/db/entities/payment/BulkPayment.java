@@ -3,6 +3,7 @@ package com.abelium.inatrace.db.entities.payment;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.common.ActivityProof;
+import com.abelium.inatrace.db.entities.common.BankInformation;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
@@ -36,6 +37,9 @@ public class BulkPayment extends BaseEntity {
 	
 	@Column
     private Instant formalCreationTime;
+	
+	@Column
+	private BankInformation bankInfo;
 	
 	@Column
 	private Long receiptNumber;
