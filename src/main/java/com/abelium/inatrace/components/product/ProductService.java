@@ -317,10 +317,10 @@ public class ProductService extends BaseService {
     @Transactional
 	public ApiBaseEntity addUserCustomer(CustomUserDetails authUser, Long productId, Long companyId, ApiUserCustomer request) throws ApiException {
 		Product p = fetchProduct(authUser, productId);
-		List<Long> userCompanyIds = userCompanies(authUser, productId);
+//		List<Long> userCompanyIds = userCompanies(authUser, productId);
 		
-		if (!userCompanyIds.contains(companyId)) 
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid company id");
+//		if (!userCompanyIds.contains(companyId))
+//			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid company id");
 
 		// Save location
 		UserCustomerLocation userCustomerLocation = new UserCustomerLocation();
