@@ -8,9 +8,12 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
+import com.abelium.inatrace.components.product.api.ApiUserCustomer;
 import com.abelium.inatrace.components.user.UserQueries;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
+import com.abelium.inatrace.db.entities.common.UserCustomer;
+import com.abelium.inatrace.db.entities.common.UserCustomerLocation;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.security.service.CustomUserDetails;
@@ -22,6 +25,7 @@ import com.abelium.inatrace.types.CompanyStatus;
 import com.abelium.inatrace.types.CompanyUserRole;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserRole;
+import com.abelium.inatrace.types.UserCustomerType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -212,6 +216,47 @@ public class CompanyService extends BaseService {
 		}
 	}
 
+	public ApiUserCustomer getUserCustomer(Long id) {
+		return companyApiTools.toApiUserCustomer(em.find(UserCustomer.class, id));
+	}
+
+	public ApiPaginatedList<ApiUserCustomer> getUserCustomersForCompanyAndType(Long companyId, UserCustomerType type, ApiListFarmersRequest request) {
+		return PaginationTools.createPaginatedResponse(em, request, () -> userCustomerListQueryObject(companyId, type, request), companyApiTools::toApiUserCustomer);
+	}
+
+	@Transactional
+	public ApiUserCustomer addUserCustomer(Long companyId, ApiUserCustomer apiUserCustomer) {
+		Company company = em.find(Company.class, companyId);
+
+		UserCustomer userCustomer = new UserCustomer();
+		userCustomer.setCompany(company);
+
+		UserCustomerLocation userCustomerLocation = new UserCustomerLocation();
+
+		return new ApiUserCustomer();
+	}
+
+	@Transactional
+	public ApiUserCustomer updateUserCustomer(ApiUserCustomer apiUserCustomer) {
+		if (apiUserCustomer == null) return null;
+
+		UserCustomer userCustomer = em.find(UserCustomer.class, apiUserCustomer.getId());
+
+		userCustomer.setName(apiUserCustomer.getName());
+		userCustomer.setSurname(apiUserCustomer.getSurname());
+		userCustomer.setEmail(apiUserCustomer.getEmail());
+		userCustomer.setPhone(apiUserCustomer.getPhone());
+		userCustomer.setHasSmartphone(apiUserCustomer.getHasSmartphone());
+
+		return companyApiTools.toApiUserCustomer(userCustomer);
+	}
+
+	@Transactional
+	public void deleteUserCustomer(Long id) {
+		UserCustomer userCustomer = em.find(UserCustomer.class, id);
+		em.remove(userCustomer);
+	}
+
 	private void mergeToCompany(Company c, Long otherCompanyId) throws ApiException {
 		Company other = companyQueries.fetchCompany(otherCompanyId);
 		if (other.getStatus() != CompanyStatus.ACTIVE) {
@@ -267,6 +312,44 @@ public class CompanyService extends BaseService {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid status");
 		}
 		company.setStatus(CompanyStatus.DEACTIVATED);
+	}
+
+	private UserCustomer userCustomerListQueryObject(Long companyId, UserCustomerType type, ApiListFarmersRequest request) {
+		UserCustomer userCustomer = Torpedo.from(UserCustomer.class);
+
+		OnGoingLogicalCondition condition = Torpedo.condition();
+
+		condition = condition.and(userCustomer.getCompany().getId()).eq(companyId);
+		condition = condition.and(userCustomer.getType()).eq(type);
+
+		if (request.getQuery() != null && !request.getQuery().equals("")) {
+			OnGoingLogicalCondition queryCondition = Torpedo.condition();
+			switch (request.getSearchBy()) {
+				case "BY_NAME":
+					queryCondition = Torpedo.condition(userCustomer.getName()).like().any(request.getQuery());
+					break;
+				case "BY_SURNAME":
+					queryCondition = Torpedo.condition(userCustomer.getSurname()).like().any(request.getQuery());
+					break;
+			}
+			condition = condition.and(queryCondition);
+		}
+
+		Torpedo.where(condition);
+
+		switch (request.getSortBy()) {
+			case "BY_ID":
+				QueryTools.orderBy(request.getSort(), userCustomer.getId());
+				break;
+			case "BY_NAME":
+				QueryTools.orderBy(request.getSort(), userCustomer.getName());
+				break;
+			case "BY_SURNAME":
+				QueryTools.orderBy(request.getSort(), userCustomer.getSurname());
+				break;
+		}
+
+		return userCustomer;
 	}
 
 }

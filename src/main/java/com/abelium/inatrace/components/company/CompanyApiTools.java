@@ -11,8 +11,10 @@ import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.company.types.CompanyTranslatables;
+import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.user.UserApiTools;
 import com.abelium.inatrace.components.user.UserQueries;
+import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.*;
 import com.abelium.inatrace.tools.ListTools;
 import com.abelium.inatrace.types.Language;
@@ -104,6 +106,16 @@ public class CompanyApiTools {
 		ApiCompany ac = new ApiCompany();
 		updateApiCompany(userId, ac, c, language);
 		return ac;
+	}
+
+	public ApiCompany toApiCompany(Company company) {
+		if (company == null) return null;
+
+		ApiCompany apiCompany = new ApiCompany();
+		apiCompany.setId(company.getId());
+		apiCompany.setName(company.getName());
+
+		return apiCompany;
 	}
 	
 
@@ -239,6 +251,81 @@ public class CompanyApiTools {
 		UserApiTools.updateApiUserBase(acu, cu.getUser());
 		acu.companyRole = cu.getRole();
 		return acu;
+	}
+
+	public ApiUserCustomer toApiUserCustomer(UserCustomer userCustomer) {
+		if (userCustomer == null) return null;
+
+		ApiUserCustomer apiUserCustomer = new ApiUserCustomer();
+		apiUserCustomer.setId(userCustomer.getId());
+		apiUserCustomer.setName(userCustomer.getName());
+		apiUserCustomer.setSurname(userCustomer.getSurname());
+		apiUserCustomer.setType(userCustomer.getType());
+		apiUserCustomer.setPhone(userCustomer.getPhone());
+		apiUserCustomer.setEmail(userCustomer.getEmail());
+		apiUserCustomer.setGender(userCustomer.getGender());
+		apiUserCustomer.setHasSmartphone(userCustomer.getHasSmartphone());
+		// Bank
+		apiUserCustomer.setBank(toApiBankInformation(userCustomer.getBank()));
+		// Farm
+		apiUserCustomer.setFarm(toApiFarmInformation(userCustomer.getFarm()));
+		// Associations
+		apiUserCustomer.setAssociations(userCustomer.getAssociations().stream().map(this::toApiUserCustomerAssociation).collect(Collectors.toList()));
+		// Cooperatives
+		apiUserCustomer.setCooperatives(userCustomer.getCooperatives().stream().map(this::toApiUserCustomerCooperative).collect(Collectors.toList()));
+
+		return apiUserCustomer;
+	}
+
+	public ApiBankInformation toApiBankInformation(BankInformation bankInformation) {
+		if (bankInformation == null) return null;
+
+		ApiBankInformation apiBankInformation = new ApiBankInformation();
+		apiBankInformation.setAccountHolderName(bankInformation.getAccountHolderName());
+		apiBankInformation.setAccountNumber(bankInformation.getAccountNumber());
+		apiBankInformation.setAdditionalInformation(bankInformation.getAdditionalInformation());
+		apiBankInformation.setBankName(bankInformation.getBankName());
+
+		return apiBankInformation;
+	}
+
+	public ApiFarmInformation toApiFarmInformation(FarmInformation farmInformation) {
+		if (farmInformation == null) return null;
+
+		ApiFarmInformation apiFarmInformation = new ApiFarmInformation();
+		apiFarmInformation.setAreaOrganicCertified(farmInformation.getAreaOrganicCertified());
+		apiFarmInformation.setCoffeeCultivatedArea(farmInformation.getCoffeeCultivatedArea());
+		apiFarmInformation.setNumberOfTrees(farmInformation.getNumberOfTrees());
+		apiFarmInformation.setOrganic(farmInformation.getOrganic());
+		apiFarmInformation.setStartTransitionToOrganic(farmInformation.getStartTransitionToOrganic());
+		apiFarmInformation.setTotalCultivatedArea(farmInformation.getTotalCultivatedArea());
+
+		return apiFarmInformation;
+	}
+
+	public ApiUserCustomerAssociation toApiUserCustomerAssociation(UserCustomerAssociation userCustomerAssociation) {
+		if (userCustomerAssociation == null) return null;
+
+		ApiUserCustomerAssociation apiUserCustomerAssociation = new ApiUserCustomerAssociation();
+		apiUserCustomerAssociation.setId(userCustomerAssociation.getId());
+		apiUserCustomerAssociation.setCompany(toApiCompany(userCustomerAssociation.getCompany()));
+		apiUserCustomerAssociation.setUserCustomer(new ApiUserCustomer());
+		apiUserCustomerAssociation.getUserCustomer().setId(userCustomerAssociation.getUserCustomer().getId());
+
+		return apiUserCustomerAssociation;
+	}
+
+	public ApiUserCustomerCooperative toApiUserCustomerCooperative(UserCustomerCooperative userCustomerCooperative) {
+		if (userCustomerCooperative == null) return null;
+
+		ApiUserCustomerCooperative apiUserCustomerCooperative = new ApiUserCustomerCooperative();
+		apiUserCustomerCooperative.setId(userCustomerCooperative.getId());
+		apiUserCustomerCooperative.setCompany(toApiCompany(userCustomerCooperative.getCompany()));
+		apiUserCustomerCooperative.setUserCustomer(new ApiUserCustomer());
+		apiUserCustomerCooperative.getUserCustomer().setId(userCustomerCooperative.getUserCustomer().getId());
+		apiUserCustomerCooperative.setUserCustomerType(userCustomerCooperative.getRole());
+
+		return apiUserCustomerCooperative;
 	}
 				
 }
