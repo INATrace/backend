@@ -10,7 +10,11 @@ import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.api.ApiUserCustomer;
 import com.abelium.inatrace.components.user.UserQueries;
+import com.abelium.inatrace.db.entities.common.Address;
+import com.abelium.inatrace.db.entities.common.BankInformation;
+import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.common.Document;
+import com.abelium.inatrace.db.entities.common.FarmInformation;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.common.UserCustomerLocation;
@@ -230,8 +234,57 @@ public class CompanyService extends BaseService {
 
 		UserCustomer userCustomer = new UserCustomer();
 		userCustomer.setCompany(company);
+		userCustomer.setGender(apiUserCustomer.getGender());
+		userCustomer.setType(UserCustomerType.FARMER);
+		userCustomer.setEmail(apiUserCustomer.getEmail());
+		userCustomer.setName(apiUserCustomer.getName());
+		userCustomer.setSurname(apiUserCustomer.getSurname());
+		userCustomer.setPhone(apiUserCustomer.getPhone());
+		userCustomer.setHasSmartphone(apiUserCustomer.getHasSmartphone());
+
+		if (apiUserCustomer.getBank() != null) {
+			userCustomer.setBank(new BankInformation());
+			userCustomer.getBank().setAccountHolderName(apiUserCustomer.getBank().getAccountHolderName());
+			userCustomer.getBank().setAccountNumber(apiUserCustomer.getBank().getAccountNumber());
+			userCustomer.getBank().setAdditionalInformation(apiUserCustomer.getBank().getAdditionalInformation());
+			userCustomer.getBank().setBankName(apiUserCustomer.getBank().getBankName());
+		}
+
+		if (apiUserCustomer.getFarm() != null) {
+			userCustomer.setFarm(new FarmInformation());
+			userCustomer.getFarm().setAreaOrganicCertified(apiUserCustomer.getFarm().getAreaOrganicCertified());
+			userCustomer.getFarm().setCoffeeCultivatedArea(apiUserCustomer.getFarm().getCoffeeCultivatedArea());
+			userCustomer.getFarm().setNumberOfTrees(apiUserCustomer.getFarm().getNumberOfTrees());
+			userCustomer.getFarm().setOrganic(apiUserCustomer.getFarm().getOrganic());
+			userCustomer.getFarm().setStartTransitionToOrganic(apiUserCustomer.getFarm().getStartTransitionToOrganic());
+			userCustomer.getFarm().setTotalCultivatedArea(apiUserCustomer.getFarm().getTotalCultivatedArea());
+		}
 
 		UserCustomerLocation userCustomerLocation = new UserCustomerLocation();
+		if (apiUserCustomer.getLocation() != null) {
+			userCustomerLocation.setLatitude(apiUserCustomer.getLocation().getLatitude());
+			userCustomerLocation.setLongitude(apiUserCustomer.getLocation().getLongitude());
+			userCustomerLocation.setPubliclyVisible(apiUserCustomer.getLocation().getPubliclyVisible());
+			if (apiUserCustomer.getLocation().getAddress() != null) {
+				userCustomerLocation.setAddress(new Address());
+				userCustomerLocation.getAddress().setAddress(apiUserCustomer.getLocation().getAddress().getAddress());
+				userCustomerLocation.getAddress().setCell(apiUserCustomer.getLocation().getAddress().getCell());
+				userCustomerLocation.getAddress().setCity(apiUserCustomer.getLocation().getAddress().getCity());
+				userCustomerLocation.getAddress().setCountry(getCountry(apiUserCustomer.getLocation().getAddress().getCountry().getId()));
+				userCustomerLocation.getAddress().setSector(apiUserCustomer.getLocation().getAddress().getSector());
+				userCustomerLocation.getAddress().setState(apiUserCustomer.getLocation().getAddress().getState());
+				userCustomerLocation.getAddress().setVillage(apiUserCustomer.getLocation().getAddress().getVillage());
+				userCustomerLocation.getAddress().setZip(apiUserCustomer.getLocation().getAddress().getZip());
+				userCustomerLocation.getAddress().setHondurasDepartment(apiUserCustomer.getLocation().getAddress().getHondurasDepartment());
+				userCustomerLocation.getAddress().setHondurasFarm(apiUserCustomer.getLocation().getAddress().getHondurasFarm());
+				userCustomerLocation.getAddress().setHondurasMunicipality(apiUserCustomer.getLocation().getAddress().getHondurasMunicipality());
+				userCustomerLocation.getAddress().setHondurasVillage(apiUserCustomer.getLocation().getAddress().getHondurasVillage());
+			}
+		}
+		em.persist(userCustomerLocation);
+
+		userCustomer.setUserCustomerLocation(userCustomerLocation);
+		em.persist(userCustomer);
 
 		return new ApiUserCustomer();
 	}
@@ -350,6 +403,10 @@ public class CompanyService extends BaseService {
 		}
 
 		return userCustomer;
+	}
+
+	private Country getCountry(Long id) {
+		return em.find(Country.class, id);
 	}
 
 }

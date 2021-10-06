@@ -8,6 +8,7 @@ import com.abelium.inatrace.components.codebook.currencies.api.ApiCurrencyType;
 import com.abelium.inatrace.components.common.CommonApiTools;
 import com.abelium.inatrace.components.common.CommonService;
 import com.abelium.inatrace.components.common.api.ApiCertification;
+import com.abelium.inatrace.components.common.api.ApiCountry;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.company.types.CompanyTranslatables;
@@ -265,6 +266,10 @@ public class CompanyApiTools {
 		apiUserCustomer.setEmail(userCustomer.getEmail());
 		apiUserCustomer.setGender(userCustomer.getGender());
 		apiUserCustomer.setHasSmartphone(userCustomer.getHasSmartphone());
+		// Company
+		apiUserCustomer.setCompanyId(userCustomer.getCompany().getId());
+		// Location
+		apiUserCustomer.setLocation(toApiUserCustomerLocation(userCustomer.getUserCustomerLocation()));
 		// Bank
 		apiUserCustomer.setBank(toApiBankInformation(userCustomer.getBank()));
 		// Farm
@@ -326,6 +331,43 @@ public class CompanyApiTools {
 		apiUserCustomerCooperative.setUserCustomerType(userCustomerCooperative.getRole());
 
 		return apiUserCustomerCooperative;
+	}
+
+	public ApiUserCustomerLocation toApiUserCustomerLocation(UserCustomerLocation userCustomerLocation) {
+		ApiUserCustomerLocation apiUserCustomerLocation = new ApiUserCustomerLocation();
+		apiUserCustomerLocation.setAddress(toApiAddress(userCustomerLocation.getAddress()));
+		apiUserCustomerLocation.setLatitude(userCustomerLocation.getLatitude());
+		apiUserCustomerLocation.setLongitude(userCustomerLocation.getLongitude());
+		apiUserCustomerLocation.setPubliclyVisible(userCustomerLocation.getPubliclyVisible());
+
+		return apiUserCustomerLocation;
+	}
+
+	public ApiAddress toApiAddress(Address address) {
+		ApiAddress apiAddress = new ApiAddress();
+		apiAddress.setAddress(address.getAddress());
+		apiAddress.setCell(address.getCell());
+		apiAddress.setCity(address.getCity());
+		apiAddress.setCountry(toApiCountry(address.getCountry()));
+		apiAddress.setHondurasDepartment(address.getHondurasDepartment());
+		apiAddress.setHondurasFarm(address.getHondurasFarm());
+		apiAddress.setHondurasMunicipality(address.getHondurasMunicipality());
+		apiAddress.setHondurasVillage(address.getHondurasVillage());
+		apiAddress.setSector(address.getSector());
+		apiAddress.setState(address.getState());
+		apiAddress.setVillage(address.getVillage());
+		apiAddress.setZip(address.getZip());
+
+		return apiAddress;
+	}
+
+	public ApiCountry toApiCountry(Country country) {
+		ApiCountry apiCountry = new ApiCountry();
+		apiCountry.setId(country.getId());
+		apiCountry.setCode(country.getCode());
+		apiCountry.setName(country.getName());
+
+		return apiCountry;
 	}
 				
 }
