@@ -35,6 +35,8 @@ import javax.persistence.Version;
 				query = "SELECT p FROM Payment p "
 						+ "INNER JOIN FETCH p.payingCompany pc "
 						+ "INNER JOIN FETCH p.stockOrder so "
+						+ "INNER JOIN FETCH p.recipientCompany rc "
+						+ "INNER JOIN FETCH p.representativeOfRecipientCompany rorc "
 						+ "WHERE pc.id = :companyId"),
 	@NamedQuery(name = "Payment.countPaymentsByCompany",
 	            query = "SELECT COUNT(p) FROM Payment p "

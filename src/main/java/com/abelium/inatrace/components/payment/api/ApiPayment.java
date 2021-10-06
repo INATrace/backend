@@ -22,22 +22,22 @@ import io.swagger.annotations.ApiModelProperty;
 
 public class ApiPayment extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Payment created by user")
 	private User createdBy;
 
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Payment type")
 	private PaymentType paymentType;
 
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Payment's currency")
 	private String currency;
 
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Payment amount")
 	private BigDecimal amount;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Payment amount paid to the collector")
 	private BigDecimal amountPaidToTheCollector;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Stock order related to the payment")
 	private ApiStockOrder stockOrder;
 	
 //	@ApiModelProperty(value = "")
@@ -46,58 +46,58 @@ public class ApiPayment extends ApiBaseEntity {
 //	@ApiModelProperty(value = "")
 //	private List<Transaction> inputTransactions = new ArrayList<>();
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Company that is making the payment")
 	private ApiCompanyBase payingCompany;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Company that receives the payment")
 	private ApiCompanyBase recipientCompany; // TODO: is this a company receiving a payment?
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "User customer who receives the payment")
 	private ApiUserCustomer recipientUserCustomer;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Representative of the company that receives the payment")
 	private ApiCompanyBase representativeOfRecipientCompany;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Representative of the user customer that receives the payment")
 	private ApiUserCustomer representativeOfRecipientUserCustomer;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Company customer that receives the payment")
 	private ApiCompanyCustomer recipientCompanyCustomer;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Recipient type")
 	private RecipientType recipientType;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Receipt number")
 	private Long receiptNumber;
 
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Receipt document")
 	private ApiDocument receiptDocument;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Receipt document type")
 	private ReceiptDocumentType receiptDocumentType;
 	
 //	@ApiModelProperty(value = "")
 //	private BulkPayment bankTransfer;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Payment purpose type")
 	private PaymentPurposeType paymentPurporseType;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Payment status")
 	private PaymentStatus paymentStatus;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "User who confirmed the payment")
 	private ApiUser paymentConfirmedByUser;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Company that confirmed the payment")
 	private ApiCompanyBase paymentConfirmedByCompany;
     
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Payment time confirmation")
     private Instant paymentConfirmedAtTime;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Preferred way of payment")
 	private PreferredWayOfPayment preferredWayOfPayment;
 	
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "Production date")
     private Instant productionDate;
 
 	public User getCreatedBy() {

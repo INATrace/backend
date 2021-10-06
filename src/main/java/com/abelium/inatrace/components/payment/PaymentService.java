@@ -49,9 +49,9 @@ public class PaymentService extends BaseService {
 
 	private Payment paymentQueryObject(ApiPaginatedRequest request) {
 		
-		Payment facilityProxy = Torpedo.from(Payment.class);
-		QueryTools.orderBy(request.sort, facilityProxy.getId());
-		return facilityProxy;
+		Payment paymentProxy = Torpedo.from(Payment.class);
+		QueryTools.orderBy(request.sort, paymentProxy.getId());
+		return paymentProxy;
 	}
 
 	public ApiPayment getPayment(Long id) throws ApiException {
@@ -156,7 +156,7 @@ public class PaymentService extends BaseService {
 				.setParameter("companyId", companyId).getSingleResult();
 
 		return new ApiPaginatedList<>(
-				payments.stream().map(PaymentMapper::toApiPayment).collect(Collectors.toList()), count);
+			payments.stream().map(PaymentMapper::toApiPayment).collect(Collectors.toList()), count);
 	}
 	
 }

@@ -1,76 +1,80 @@
 package com.abelium.inatrace.components.payment;
 
-import com.abelium.inatrace.api.*;
+import com.abelium.inatrace.api.ApiBaseEntity;
+import com.abelium.inatrace.api.ApiDefaultResponse;
+import com.abelium.inatrace.api.ApiPaginatedRequest;
+import com.abelium.inatrace.api.ApiPaginatedResponse;
+import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.facility.api.ApiPayment;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import com.abelium.inatrace.components.payment.api.ApiPayment;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
 /**
- * REST controller for facility entity.
+ * REST controller for payment entity.
  *
  * @author Rene Flores, Sunesis d.o.o.
  */
 @RestController
-@RequestMapping("/chain/facility")
+@RequestMapping("/chain/payment")
 public class PaymentController {
 
-//	private final PaymentService facilityService;
-//
-//	@Autowired
-//	public PaymentController(PaymentService facilityService) {
-//		this.facilityService = facilityService;
-//	}
-//
-//	@GetMapping("list")
-//	@ApiOperation("Get a paginated list of facilities.")
-//	public ApiPaginatedResponse<ApiPayment> getFacilityList(@Valid ApiPaginatedRequest request) {
-//
-//		return new ApiPaginatedResponse<>(facilityService.getFacilityList(request));
-//	}
-//	
-//	@GetMapping("list/company/{id}")
-//	@ApiOperation("Get a list of facilities by company ID.")
-//	public ApiPaginatedResponse<ApiPayment> listFacilitiesByCompany(
-//			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId, @Valid ApiPaginatedRequest request) {
-//
-//		return new ApiPaginatedResponse<>(facilityService.listFacilitiesByCompany(companyId, request));
-//	}
-//	
-//	@GetMapping("list/collecting/company/{id}")
-//	@ApiOperation("Get a list of collecting facilities by company ID.")
-//	public ApiPaginatedResponse<ApiPayment> listCollectingFacilitiesByCompany(
-//			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId, @Valid ApiPaginatedRequest request) {
-//
-//		return new ApiPaginatedResponse<>(facilityService.listCollectingFacilitiesByCompany(companyId, request));
-//	}
-//
-//	@GetMapping("{id}")
-//	@ApiOperation("Get a single facility with the provided ID.")
-//	public ApiResponse<ApiPayment> getFacility(@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) throws ApiException {
-//
-//		return new ApiResponse<>(facilityService.getFacility(id));
-//
-//	}
-//
-//	@PutMapping
-//	@ApiOperation("Create or update facility. If ID is provided, then the entity with the provided ID is updated.")
-//	public ApiResponse<ApiBaseEntity> createOrUpdateFacility(@Valid @RequestBody ApiPayment apiFacility) throws ApiException {
-//
-//		return new ApiResponse<>(facilityService.createOrUpdateFacility(apiFacility));
-//
-//	}
-//
-//	@DeleteMapping("{id}")
-//	@ApiOperation("Deletes a facility with the provided ID.")
-//	public ApiDefaultResponse deleteFacility(@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) throws ApiException {
-//
-//		facilityService.deleteFacility(id);
-//		return new ApiDefaultResponse();
-//
-//	}
+	private final PaymentService paymentService;
+
+	@Autowired
+	public PaymentController(PaymentService paymentService) {
+		this.paymentService = paymentService;
+	}
+
+	@GetMapping("list")
+	@ApiOperation("Get a paginated list of payments.")
+	public ApiPaginatedResponse<ApiPayment> getPaymentList(@Valid ApiPaginatedRequest request) {
+
+		return new ApiPaginatedResponse<>(paymentService.getPaymentList(request));
+	}
+	
+	@GetMapping("list/company/{id}")
+	@ApiOperation("Get a list of payments by company ID.")
+	public ApiPaginatedResponse<ApiPayment> listPaymentsByCompany(
+			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId, @Valid ApiPaginatedRequest request) {
+
+		return new ApiPaginatedResponse<>(paymentService.listPaymentsByCompany(companyId, request));
+	}
+	
+	@GetMapping("{id}")
+	@ApiOperation("Get a single payment with the provided ID.")
+	public ApiResponse<ApiPayment> getPayment(@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id) throws ApiException {
+
+		return new ApiResponse<>(paymentService.getPayment(id));
+
+	}
+
+	@PutMapping
+	@ApiOperation("Create or update payment. If ID is provided, then the entity with the provided ID is updated.")
+	public ApiResponse<ApiBaseEntity> createOrUpdatePayment(@Valid @RequestBody ApiPayment apiPayment) throws ApiException {
+
+		return new ApiResponse<>(paymentService.createOrUpdatePayment(apiPayment));
+
+	}
+
+	@DeleteMapping("{id}")
+	@ApiOperation("Deletes a payment with the provided ID.")
+	public ApiDefaultResponse deletePayment(@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id) throws ApiException {
+
+		paymentService.deletePayment(id);
+		return new ApiDefaultResponse();
+
+	}
 }
