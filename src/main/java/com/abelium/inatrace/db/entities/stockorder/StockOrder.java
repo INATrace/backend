@@ -27,6 +27,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -34,6 +36,11 @@ import javax.persistence.Version;
 
 @Entity
 @Table
+@NamedQueries({
+	@NamedQuery(name = "StockOrder.getStockOrderById",
+				query = "SELECT so FROM StockOrder so "
+						+ "WHERE so.id = :stockOrderId")
+})
 public class StockOrder extends TimestampEntity {
 
 	@Version

@@ -2,7 +2,7 @@ package com.abelium.inatrace.components.facility;
 
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
-import com.abelium.inatrace.components.facility.api.ApiFacility;
+import com.abelium.inatrace.components.facility.api.ApiPayment;
 import com.abelium.inatrace.components.facility.api.ApiFacilityLocation;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
 import com.abelium.inatrace.components.common.api.ApiCountry;
@@ -24,10 +24,10 @@ public final class FacilityMapper {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static ApiFacility toApiFacility(Facility entity) {
+	public static ApiPayment toApiFacility(Facility entity) {
 
 		// Simplest apiFacility object
-		ApiFacility apiFacility = new ApiFacility();
+		ApiPayment apiFacility = new ApiPayment();
 		apiFacility.setId(entity.getId());
 		apiFacility.setName(entity.getName());
 		apiFacility.setIsCollectionFacility(entity.getIsCollectionFacility());

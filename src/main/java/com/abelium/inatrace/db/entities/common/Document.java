@@ -9,6 +9,11 @@ import javax.persistence.*;
 
 @Entity
 @Table(indexes = { @Index(columnList = "storageKey") })
+@NamedQueries({
+	@NamedQuery(name = "Document.getDocumentById", 
+				query = "SELECT d FROM Document d "
+						+ "WHERE d.id = :documentId"),
+})
 public class Document extends CreationTimestampEntity {
 
     /**

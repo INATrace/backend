@@ -8,6 +8,11 @@ import com.abelium.inatrace.db.entities.product.Product;
 import javax.persistence.*;
 
 @Entity
+@Table
+@NamedQueries({
+	@NamedQuery(name = "CompanyCustomer.getCompanyCustomerById", 
+				query = "SELECT cc FROM CompanyCustomer cc WHERE cc.id = :companyCustomerId")
+})
 public class CompanyCustomer extends BaseEntity {
 
 	/**

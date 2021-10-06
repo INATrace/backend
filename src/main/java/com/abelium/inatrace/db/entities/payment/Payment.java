@@ -1,7 +1,7 @@
 package com.abelium.inatrace.db.entities.payment;
 
 import com.abelium.inatrace.api.types.Lengths;
-import com.abelium.inatrace.db.base.BaseEntity;
+import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
@@ -21,6 +21,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -28,7 +30,18 @@ import javax.persistence.Version;
 
 @Entity
 @Table
-public class Payment extends BaseEntity {
+@NamedQueries({
+	@NamedQuery(name = "Payment.listPaymentsByCompany", 
+				query = "SELECT p FROM Payment p "
+						+ "INNER JOIN FETCH p.payingCompany pc "
+						+ "INNER JOIN FETCH p.stockOrder so "
+						+ "WHERE pc.id = :companyId"),
+	@NamedQuery(name = "Payment.countPaymentsByCompany",
+	            query = "SELECT COUNT(p) FROM Payment p "
+						+ "INNER JOIN p.payingCompany pc "
+						+ "WHERE pc.id = :companyId")
+})
+public class Payment extends TimestampEntity {
 
 	@Version
 	private Long entityVersion;
@@ -88,7 +101,7 @@ public class Payment extends BaseEntity {
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
-	private ReceiptDocumentType recipientDocumentType;
+	private ReceiptDocumentType receiptDocumentType;
 	
 	@ManyToOne
 	private BulkPayment bankTransfer;
@@ -253,12 +266,12 @@ public class Payment extends BaseEntity {
 		this.receiptDocument = receiptDocument;
 	}
 
-	public ReceiptDocumentType getRecipientDocumentType() {
-		return recipientDocumentType;
+	public ReceiptDocumentType getReceiptDocumentType() {
+		return receiptDocumentType;
 	}
 
-	public void setRecipientDocumentType(ReceiptDocumentType recipientDocumentType) {
-		this.recipientDocumentType = recipientDocumentType;
+	public void setReceiptDocumentType(ReceiptDocumentType receiptDocumentType) {
+		this.receiptDocumentType = receiptDocumentType;
 	}
 
 	public BulkPayment getBankTransfer() {

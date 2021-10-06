@@ -7,7 +7,7 @@ import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
-import com.abelium.inatrace.components.facility.api.ApiFacility;
+import com.abelium.inatrace.components.facility.api.ApiPayment;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
@@ -42,7 +42,7 @@ public class FacilityService extends BaseService {
 	@Autowired
 	private SemiProductService semiProductService;
 
-	public ApiPaginatedList<ApiFacility> getFacilityList(ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiPayment> getFacilityList(ApiPaginatedRequest request) {
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> facilityQueryObject(request), FacilityMapper::toApiFacility);
 
@@ -60,12 +60,12 @@ public class FacilityService extends BaseService {
 		return facilityProxy;
 	}
 
-	public ApiFacility getFacility(Long id) throws ApiException {
+	public ApiPayment getFacility(Long id) throws ApiException {
 		return FacilityMapper.toApiFacility(fetchFacility(id));
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdateFacility(ApiFacility apiFacility) throws ApiException {
+	public ApiBaseEntity createOrUpdateFacility(ApiPayment apiFacility) throws ApiException {
 
 		Facility entity;
 		FacilityLocation facilityLocation;
@@ -149,7 +149,7 @@ public class FacilityService extends BaseService {
 
 	}
 	
-	public ApiPaginatedList<ApiFacility> listFacilitiesByCompany(Long companyId, ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiPayment> listFacilitiesByCompany(Long companyId, ApiPaginatedRequest request) {
 
 		TypedQuery<Facility> facilitiesQuery = em.createNamedQuery("Facility.listFacilitiesByCompany", Facility.class)
 				.setParameter("companyId", companyId)
@@ -165,7 +165,7 @@ public class FacilityService extends BaseService {
 				facilities.stream().map(FacilityMapper::toApiFacility).collect(Collectors.toList()), count);
 	}
 	
-	public ApiPaginatedList<ApiFacility> listCollectingFacilitiesByCompany(Long companyId, ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiPayment> listCollectingFacilitiesByCompany(Long companyId, ApiPaginatedRequest request) {
 
 		TypedQuery<Facility> collectingFacilitiesQuery = em.createNamedQuery("Facility.listCollectingFacilitiesByCompany",
 						Facility.class)
