@@ -111,7 +111,7 @@ public class CompanyController {
         return new ApiResponse<>(companyService.addUserCustomer(companyId, request));
     }
 
-    @PutMapping(value = "/userCustomers/edit/{id}")
+    @PutMapping(value = "/userCustomers/edit")
     @ApiOperation(value = "Update user customer with given ID")
     public ApiResponse<ApiUserCustomer> updateUserCustomer(
             @Valid @RequestBody ApiUserCustomer request

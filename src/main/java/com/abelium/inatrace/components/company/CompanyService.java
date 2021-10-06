@@ -300,6 +300,45 @@ public class CompanyService extends BaseService {
 		userCustomer.setEmail(apiUserCustomer.getEmail());
 		userCustomer.setPhone(apiUserCustomer.getPhone());
 		userCustomer.setHasSmartphone(apiUserCustomer.getHasSmartphone());
+		userCustomer.setGender(apiUserCustomer.getGender());
+		userCustomer.setType(apiUserCustomer.getType());
+
+		if (userCustomer.getBank() == null) {
+			userCustomer.setBank(new BankInformation());
+		}
+		userCustomer.getBank().setAccountHolderName(apiUserCustomer.getBank().getAccountHolderName());
+		userCustomer.getBank().setAccountNumber(apiUserCustomer.getBank().getAccountNumber());
+		userCustomer.getBank().setAdditionalInformation(apiUserCustomer.getBank().getAdditionalInformation());
+		userCustomer.getBank().setBankName(apiUserCustomer.getBank().getBankName());
+
+		if (userCustomer.getFarm() == null) {
+			userCustomer.setFarm(new FarmInformation());
+		}
+		userCustomer.getFarm().setAreaOrganicCertified(apiUserCustomer.getFarm().getAreaOrganicCertified());
+		userCustomer.getFarm().setCoffeeCultivatedArea(apiUserCustomer.getFarm().getCoffeeCultivatedArea());
+		userCustomer.getFarm().setNumberOfTrees(apiUserCustomer.getFarm().getNumberOfTrees());
+		userCustomer.getFarm().setOrganic(apiUserCustomer.getFarm().getOrganic());
+		userCustomer.getFarm().setStartTransitionToOrganic(apiUserCustomer.getFarm().getStartTransitionToOrganic());
+		userCustomer.getFarm().setTotalCultivatedArea(apiUserCustomer.getFarm().getTotalCultivatedArea());
+
+		if (userCustomer.getUserCustomerLocation() == null) {
+			userCustomer.setUserCustomerLocation(new UserCustomerLocation());
+		}
+		if (userCustomer.getUserCustomerLocation().getAddress() == null) {
+			userCustomer.getUserCustomerLocation().setAddress(new Address());
+		}
+		userCustomer.getUserCustomerLocation().getAddress().setAddress(apiUserCustomer.getLocation().getAddress().getAddress());
+		userCustomer.getUserCustomerLocation().getAddress().setCell(apiUserCustomer.getLocation().getAddress().getCell());
+		userCustomer.getUserCustomerLocation().getAddress().setCity(apiUserCustomer.getLocation().getAddress().getCity());
+		Country country = getCountry(apiUserCustomer.getLocation().getAddress().getCountry().getId());
+		userCustomer.getUserCustomerLocation().getAddress().setCountry(country);
+		userCustomer.getUserCustomerLocation().getAddress().setHondurasDepartment(apiUserCustomer.getLocation().getAddress().getHondurasDepartment());
+		userCustomer.getUserCustomerLocation().getAddress().setHondurasFarm(apiUserCustomer.getLocation().getAddress().getHondurasFarm());
+		userCustomer.getUserCustomerLocation().getAddress().setHondurasMunicipality(apiUserCustomer.getLocation().getAddress().getHondurasMunicipality());
+		userCustomer.getUserCustomerLocation().getAddress().setHondurasVillage(apiUserCustomer.getLocation().getAddress().getHondurasVillage());
+		userCustomer.getUserCustomerLocation().setLatitude(apiUserCustomer.getLocation().getLatitude());
+		userCustomer.getUserCustomerLocation().setLongitude(apiUserCustomer.getLocation().getLongitude());
+		userCustomer.getUserCustomerLocation().setPubliclyVisible(apiUserCustomer.getLocation().getPubliclyVisible());
 
 		return companyApiTools.toApiUserCustomer(userCustomer);
 	}
