@@ -239,7 +239,7 @@ public class CompanyService extends BaseService {
 		UserCustomer userCustomer = new UserCustomer();
 		userCustomer.setCompany(company);
 		userCustomer.setGender(apiUserCustomer.getGender());
-		userCustomer.setType(UserCustomerType.FARMER);
+		userCustomer.setType(apiUserCustomer.getType());
 		userCustomer.setEmail(apiUserCustomer.getEmail());
 		userCustomer.setName(apiUserCustomer.getName());
 		userCustomer.setSurname(apiUserCustomer.getSurname());
