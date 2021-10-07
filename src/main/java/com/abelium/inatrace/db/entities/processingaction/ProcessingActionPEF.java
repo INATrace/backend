@@ -1,7 +1,7 @@
 package com.abelium.inatrace.db.entities.processingaction;
 
 import com.abelium.inatrace.db.base.BaseEntity;
-import com.abelium.inatrace.db.entities.processingevidencefield.ProcessingEvidenceField;
+import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceField;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

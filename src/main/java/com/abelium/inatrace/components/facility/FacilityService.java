@@ -117,7 +117,7 @@ public class FacilityService extends BaseService {
 			em.persist(entity);
 		}
 
-		entity.getFacilitySemiProducts().removeIf(facilitySemiProduct -> apiFacility.getFacilitySemiProductList().stream().noneMatch(apiFacilitySemiProduct -> apiFacilitySemiProduct.getId().equals(facilitySemiProduct.getId())));
+		entity.getFacilitySemiProducts().clear();
 
 		for (ApiSemiProduct apiSemiProduct : apiFacility.getFacilitySemiProductList()) {
 			FacilitySemiProduct facilitySemiProduct = new FacilitySemiProduct();

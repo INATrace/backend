@@ -5,7 +5,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.abelium.inatrace.db.base.BaseEntity;
-import com.abelium.inatrace.db.entities.processingevidencefield.ProcessingEvidenceField;
+import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceField;
 
 /**
  * Intermediate entity between value chain and processing evidence field.
