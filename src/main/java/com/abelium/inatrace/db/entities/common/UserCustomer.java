@@ -28,6 +28,9 @@ public class UserCustomer extends BaseEntity {
 	 */
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Company company;
+
+	@Column(length = Lengths.DEFAULT)
+	private String farmerCompanyInternalId;
 	
 	/**
 	 * type (collector, farmer)
@@ -105,6 +108,14 @@ public class UserCustomer extends BaseEntity {
 
 	public void setCompany(Company company) {
 		this.company = company;
+	}
+
+	public String getFarmerCompanyInternalId() {
+		return farmerCompanyInternalId;
+	}
+
+	public void setFarmerCompanyInternalId(String farmerCompanyInternalId) {
+		this.farmerCompanyInternalId = farmerCompanyInternalId;
 	}
 
 	public Product getProduct() {

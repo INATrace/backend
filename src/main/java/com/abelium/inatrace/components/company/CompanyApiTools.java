@@ -259,6 +259,7 @@ public class CompanyApiTools {
 
 		ApiUserCustomer apiUserCustomer = new ApiUserCustomer();
 		apiUserCustomer.setId(userCustomer.getId());
+		apiUserCustomer.setFarmerCompanyInternalId(userCustomer.getFarmerCompanyInternalId());
 		apiUserCustomer.setName(userCustomer.getName());
 		apiUserCustomer.setSurname(userCustomer.getSurname());
 		apiUserCustomer.setType(userCustomer.getType());
