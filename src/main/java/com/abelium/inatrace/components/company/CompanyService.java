@@ -8,9 +8,20 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
+import com.abelium.inatrace.components.product.api.ApiUserCustomer;
+import com.abelium.inatrace.components.product.api.ApiUserCustomerAssociation;
+import com.abelium.inatrace.components.product.api.ApiUserCustomerCooperative;
 import com.abelium.inatrace.components.user.UserQueries;
+import com.abelium.inatrace.db.entities.common.Address;
+import com.abelium.inatrace.db.entities.common.BankInformation;
+import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.common.Document;
+import com.abelium.inatrace.db.entities.common.FarmInformation;
 import com.abelium.inatrace.db.entities.common.User;
+import com.abelium.inatrace.db.entities.common.UserCustomer;
+import com.abelium.inatrace.db.entities.common.UserCustomerLocation;
+import com.abelium.inatrace.db.entities.common.UserCustomerAssociation;
+import com.abelium.inatrace.db.entities.common.UserCustomerCooperative;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.security.service.CustomUserDetails;
@@ -22,6 +33,7 @@ import com.abelium.inatrace.types.CompanyStatus;
 import com.abelium.inatrace.types.CompanyUserRole;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserRole;
+import com.abelium.inatrace.types.UserCustomerType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -212,6 +224,191 @@ public class CompanyService extends BaseService {
 		}
 	}
 
+	public ApiUserCustomer getUserCustomer(Long id) {
+		return companyApiTools.toApiUserCustomer(em.find(UserCustomer.class, id));
+	}
+
+	public ApiPaginatedList<ApiUserCustomer> getUserCustomersForCompanyAndType(Long companyId, UserCustomerType type, ApiListFarmersRequest request) {
+		return PaginationTools.createPaginatedResponse(em, request, () -> userCustomerListQueryObject(companyId, type, request), companyApiTools::toApiUserCustomer);
+	}
+
+	@Transactional
+	public ApiUserCustomer addUserCustomer(Long companyId, ApiUserCustomer apiUserCustomer) {
+		Company company = em.find(Company.class, companyId);
+
+		UserCustomer userCustomer = new UserCustomer();
+		userCustomer.setCompany(company);
+		userCustomer.setGender(apiUserCustomer.getGender());
+		userCustomer.setType(apiUserCustomer.getType());
+		userCustomer.setEmail(apiUserCustomer.getEmail());
+		userCustomer.setName(apiUserCustomer.getName());
+		userCustomer.setSurname(apiUserCustomer.getSurname());
+		userCustomer.setPhone(apiUserCustomer.getPhone());
+		userCustomer.setHasSmartphone(apiUserCustomer.getHasSmartphone());
+
+		if (apiUserCustomer.getBank() != null) {
+			userCustomer.setBank(new BankInformation());
+			userCustomer.getBank().setAccountHolderName(apiUserCustomer.getBank().getAccountHolderName());
+			userCustomer.getBank().setAccountNumber(apiUserCustomer.getBank().getAccountNumber());
+			userCustomer.getBank().setAdditionalInformation(apiUserCustomer.getBank().getAdditionalInformation());
+			userCustomer.getBank().setBankName(apiUserCustomer.getBank().getBankName());
+		}
+
+		if (apiUserCustomer.getFarm() != null) {
+			userCustomer.setFarm(new FarmInformation());
+			userCustomer.getFarm().setAreaOrganicCertified(apiUserCustomer.getFarm().getAreaOrganicCertified());
+			userCustomer.getFarm().setCoffeeCultivatedArea(apiUserCustomer.getFarm().getCoffeeCultivatedArea());
+			userCustomer.getFarm().setNumberOfTrees(apiUserCustomer.getFarm().getNumberOfTrees());
+			userCustomer.getFarm().setOrganic(apiUserCustomer.getFarm().getOrganic());
+			userCustomer.getFarm().setStartTransitionToOrganic(apiUserCustomer.getFarm().getStartTransitionToOrganic());
+			userCustomer.getFarm().setTotalCultivatedArea(apiUserCustomer.getFarm().getTotalCultivatedArea());
+		}
+
+		UserCustomerLocation userCustomerLocation = new UserCustomerLocation();
+		if (apiUserCustomer.getLocation() != null) {
+			userCustomerLocation.setLatitude(apiUserCustomer.getLocation().getLatitude());
+			userCustomerLocation.setLongitude(apiUserCustomer.getLocation().getLongitude());
+			userCustomerLocation.setPubliclyVisible(apiUserCustomer.getLocation().getPubliclyVisible());
+			if (apiUserCustomer.getLocation().getAddress() != null) {
+				userCustomerLocation.setAddress(new Address());
+				userCustomerLocation.getAddress().setAddress(apiUserCustomer.getLocation().getAddress().getAddress());
+				userCustomerLocation.getAddress().setCell(apiUserCustomer.getLocation().getAddress().getCell());
+				userCustomerLocation.getAddress().setCity(apiUserCustomer.getLocation().getAddress().getCity());
+				userCustomerLocation.getAddress().setCountry(getCountry(apiUserCustomer.getLocation().getAddress().getCountry().getId()));
+				userCustomerLocation.getAddress().setSector(apiUserCustomer.getLocation().getAddress().getSector());
+				userCustomerLocation.getAddress().setState(apiUserCustomer.getLocation().getAddress().getState());
+				userCustomerLocation.getAddress().setVillage(apiUserCustomer.getLocation().getAddress().getVillage());
+				userCustomerLocation.getAddress().setZip(apiUserCustomer.getLocation().getAddress().getZip());
+				userCustomerLocation.getAddress().setHondurasDepartment(apiUserCustomer.getLocation().getAddress().getHondurasDepartment());
+				userCustomerLocation.getAddress().setHondurasFarm(apiUserCustomer.getLocation().getAddress().getHondurasFarm());
+				userCustomerLocation.getAddress().setHondurasMunicipality(apiUserCustomer.getLocation().getAddress().getHondurasMunicipality());
+				userCustomerLocation.getAddress().setHondurasVillage(apiUserCustomer.getLocation().getAddress().getHondurasVillage());
+			}
+		}
+		em.persist(userCustomerLocation);
+
+		userCustomer.setUserCustomerLocation(userCustomerLocation);
+		em.persist(userCustomer);
+
+		userCustomer.setAssociations(new ArrayList<>());
+		if (apiUserCustomer.getAssociations() != null) {
+			for (ApiUserCustomerAssociation apiUserCustomerAssociation : apiUserCustomer.getAssociations()) {
+				UserCustomerAssociation userCustomerAssociation = new UserCustomerAssociation();
+				userCustomerAssociation.setCompany(em.find(Company.class, apiUserCustomerAssociation.getCompany().getId()));
+				userCustomerAssociation.setUserCustomer(userCustomer);
+				userCustomer.getAssociations().add(userCustomerAssociation);
+				em.persist(userCustomerAssociation);
+			}
+		}
+
+		userCustomer.setCooperatives(new ArrayList<>());
+		if (apiUserCustomer.getCooperatives() != null) {
+			for (ApiUserCustomerCooperative apiUserCustomerCooperative : apiUserCustomer.getCooperatives()) {
+				UserCustomerCooperative userCustomerCooperative = new UserCustomerCooperative();
+				userCustomerCooperative.setCompany(em.find(Company.class, apiUserCustomerCooperative.getCompany().getId()));
+				userCustomerCooperative.setRole(apiUserCustomerCooperative.getUserCustomerType());
+				userCustomerCooperative.setUserCustomer(userCustomer);
+				userCustomer.getCooperatives().add(userCustomerCooperative);
+				em.persist(userCustomerCooperative);
+			}
+		}
+
+		return companyApiTools.toApiUserCustomer(userCustomer);
+	}
+
+	@Transactional
+	public ApiUserCustomer updateUserCustomer(ApiUserCustomer apiUserCustomer) {
+		if (apiUserCustomer == null) return null;
+
+		UserCustomer userCustomer = em.find(UserCustomer.class, apiUserCustomer.getId());
+
+		userCustomer.setName(apiUserCustomer.getName());
+		userCustomer.setSurname(apiUserCustomer.getSurname());
+		userCustomer.setEmail(apiUserCustomer.getEmail());
+		userCustomer.setPhone(apiUserCustomer.getPhone());
+		userCustomer.setHasSmartphone(apiUserCustomer.getHasSmartphone());
+		userCustomer.setGender(apiUserCustomer.getGender());
+		userCustomer.setType(apiUserCustomer.getType());
+
+		if (userCustomer.getBank() == null) {
+			userCustomer.setBank(new BankInformation());
+		}
+		userCustomer.getBank().setAccountHolderName(apiUserCustomer.getBank().getAccountHolderName());
+		userCustomer.getBank().setAccountNumber(apiUserCustomer.getBank().getAccountNumber());
+		userCustomer.getBank().setAdditionalInformation(apiUserCustomer.getBank().getAdditionalInformation());
+		userCustomer.getBank().setBankName(apiUserCustomer.getBank().getBankName());
+
+		if (userCustomer.getFarm() == null) {
+			userCustomer.setFarm(new FarmInformation());
+		}
+		userCustomer.getFarm().setAreaOrganicCertified(apiUserCustomer.getFarm().getAreaOrganicCertified());
+		userCustomer.getFarm().setCoffeeCultivatedArea(apiUserCustomer.getFarm().getCoffeeCultivatedArea());
+		userCustomer.getFarm().setNumberOfTrees(apiUserCustomer.getFarm().getNumberOfTrees());
+		userCustomer.getFarm().setOrganic(apiUserCustomer.getFarm().getOrganic());
+		userCustomer.getFarm().setStartTransitionToOrganic(apiUserCustomer.getFarm().getStartTransitionToOrganic());
+		userCustomer.getFarm().setTotalCultivatedArea(apiUserCustomer.getFarm().getTotalCultivatedArea());
+
+		if (userCustomer.getUserCustomerLocation() == null) {
+			userCustomer.setUserCustomerLocation(new UserCustomerLocation());
+		}
+		if (userCustomer.getUserCustomerLocation().getAddress() == null) {
+			userCustomer.getUserCustomerLocation().setAddress(new Address());
+		}
+		userCustomer.getUserCustomerLocation().getAddress().setAddress(apiUserCustomer.getLocation().getAddress().getAddress());
+		userCustomer.getUserCustomerLocation().getAddress().setCell(apiUserCustomer.getLocation().getAddress().getCell());
+		userCustomer.getUserCustomerLocation().getAddress().setCity(apiUserCustomer.getLocation().getAddress().getCity());
+		Country country = getCountry(apiUserCustomer.getLocation().getAddress().getCountry().getId());
+		userCustomer.getUserCustomerLocation().getAddress().setCountry(country);
+		userCustomer.getUserCustomerLocation().getAddress().setHondurasDepartment(apiUserCustomer.getLocation().getAddress().getHondurasDepartment());
+		userCustomer.getUserCustomerLocation().getAddress().setHondurasFarm(apiUserCustomer.getLocation().getAddress().getHondurasFarm());
+		userCustomer.getUserCustomerLocation().getAddress().setHondurasMunicipality(apiUserCustomer.getLocation().getAddress().getHondurasMunicipality());
+		userCustomer.getUserCustomerLocation().getAddress().setHondurasVillage(apiUserCustomer.getLocation().getAddress().getHondurasVillage());
+		userCustomer.getUserCustomerLocation().setLatitude(apiUserCustomer.getLocation().getLatitude());
+		userCustomer.getUserCustomerLocation().setLongitude(apiUserCustomer.getLocation().getLongitude());
+		userCustomer.getUserCustomerLocation().setPubliclyVisible(apiUserCustomer.getLocation().getPubliclyVisible());
+
+		if (userCustomer.getAssociations() == null) {
+			userCustomer.setAssociations(new ArrayList<>());
+		}
+
+		userCustomer.getAssociations().removeIf(userCustomerAssociation -> apiUserCustomer.getAssociations().stream().noneMatch(apiUserCustomerAssociation -> userCustomerAssociation.getId().equals(apiUserCustomerAssociation.getId())));
+
+		for (ApiUserCustomerAssociation apiUserCustomerAssociation : apiUserCustomer.getAssociations()) {
+			if (userCustomer.getAssociations().stream().noneMatch(userCustomerAssociation -> userCustomerAssociation.getId().equals(apiUserCustomerAssociation.getId()))) {
+				UserCustomerAssociation userCustomerAssociation = new UserCustomerAssociation();
+				userCustomerAssociation.setCompany(em.find(Company.class, apiUserCustomerAssociation.getCompany().getId()));
+				userCustomerAssociation.setUserCustomer(userCustomer);
+				userCustomer.getAssociations().add(userCustomerAssociation);
+				em.persist(userCustomerAssociation);
+			}
+		}
+
+		if (userCustomer.getCooperatives() == null) {
+			userCustomer.setCooperatives(new ArrayList<>());
+		}
+
+		userCustomer.getCooperatives().removeIf(userCustomerCooperative -> apiUserCustomer.getCooperatives().stream().noneMatch(apiUserCustomerCooperative -> userCustomerCooperative.getId().equals(apiUserCustomerCooperative.getId())));
+
+		for (ApiUserCustomerCooperative apiUserCustomerCooperative : apiUserCustomer.getCooperatives()) {
+			if (userCustomer.getCooperatives().stream().noneMatch(userCustomerCooperative -> userCustomerCooperative.getId().equals(apiUserCustomerCooperative.getId()))) {
+				UserCustomerCooperative userCustomerCooperative = new UserCustomerCooperative();
+				userCustomerCooperative.setUserCustomer(userCustomer);
+				userCustomerCooperative.setCompany(em.find(Company.class, apiUserCustomerCooperative.getCompany().getId()));
+				userCustomerCooperative.setRole(apiUserCustomerCooperative.getUserCustomerType());
+				userCustomer.getCooperatives().add(userCustomerCooperative);
+				em.persist(userCustomerCooperative);
+			}
+		}
+
+		return companyApiTools.toApiUserCustomer(userCustomer);
+	}
+
+	@Transactional
+	public void deleteUserCustomer(Long id) {
+		UserCustomer userCustomer = em.find(UserCustomer.class, id);
+		em.remove(userCustomer);
+	}
+
 	private void mergeToCompany(Company c, Long otherCompanyId) throws ApiException {
 		Company other = companyQueries.fetchCompany(otherCompanyId);
 		if (other.getStatus() != CompanyStatus.ACTIVE) {
@@ -267,6 +464,48 @@ public class CompanyService extends BaseService {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid status");
 		}
 		company.setStatus(CompanyStatus.DEACTIVATED);
+	}
+
+	private UserCustomer userCustomerListQueryObject(Long companyId, UserCustomerType type, ApiListFarmersRequest request) {
+		UserCustomer userCustomer = Torpedo.from(UserCustomer.class);
+
+		OnGoingLogicalCondition condition = Torpedo.condition();
+
+		condition = condition.and(userCustomer.getCompany().getId()).eq(companyId);
+		condition = condition.and(userCustomer.getType()).eq(type);
+
+		if (request.getQuery() != null && !request.getQuery().equals("")) {
+			OnGoingLogicalCondition queryCondition = Torpedo.condition();
+			switch (request.getSearchBy()) {
+				case "BY_NAME":
+					queryCondition = Torpedo.condition(userCustomer.getName()).like().any(request.getQuery());
+					break;
+				case "BY_SURNAME":
+					queryCondition = Torpedo.condition(userCustomer.getSurname()).like().any(request.getQuery());
+					break;
+			}
+			condition = condition.and(queryCondition);
+		}
+
+		Torpedo.where(condition);
+
+		switch (request.getSortBy()) {
+			case "BY_ID":
+				QueryTools.orderBy(request.getSort(), userCustomer.getId());
+				break;
+			case "BY_NAME":
+				QueryTools.orderBy(request.getSort(), userCustomer.getName());
+				break;
+			case "BY_SURNAME":
+				QueryTools.orderBy(request.getSort(), userCustomer.getSurname());
+				break;
+		}
+
+		return userCustomer;
+	}
+
+	private Country getCountry(Long id) {
+		return em.find(Country.class, id);
 	}
 
 }
