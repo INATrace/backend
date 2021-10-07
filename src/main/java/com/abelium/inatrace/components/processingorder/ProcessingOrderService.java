@@ -93,7 +93,20 @@ public class ProcessingOrderService extends BaseService {
                 break;
 
             case PROCESSING:
-                // TODO: TBD
+                // Validate that there is no transaction that is referencing current ProcessingOrder (via targetStockOrder)
+                // That kind of transaction cannot be part of the same processing
+                if (entity.getId() != null) {
+                    for (ApiTransaction apiTransaction : apiProcessingOrder.getInputTransactions()) {
+
+                        if (apiTransaction.getId() != null
+                                && apiTransaction.getTargetStockOrder() != null
+                                && entity.getId().equals(apiTransaction.getTargetStockOrder().getId()))
+
+                            throw new ApiException(ApiStatus.VALIDATION_ERROR, "Transaction with ID '"
+                                    + apiTransaction.getId()
+                                    + "' cannot be used, because it has been already used in this processing step");
+                    }
+                }
                 break;
 
             case TRANSFER:
@@ -144,8 +157,7 @@ public class ProcessingOrderService extends BaseService {
             transaction.setIsProcessing(processingAction.getType() == ProcessingActionType.PROCESSING);
             transaction.setInputQuantity(it.getInputQuantity());
             transaction.setOutputQuantity(it.getOutputQuantity());
-            // TODO: It says "TargetStockOrder", but in this case it should actually reference "ProcessingOrder", so it is omitted for now!
-            // transaction.setTargetStockOrder(processingOrder);
+            transaction.setTargetProcessingOrder(entity);
 
             entity.getInputTransactions().add(transaction);
         }

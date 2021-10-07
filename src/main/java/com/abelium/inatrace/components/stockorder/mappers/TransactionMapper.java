@@ -18,7 +18,7 @@ public class TransactionMapper {
         apiTransaction.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
         apiTransaction.setInitiationUserId(entity.getInitiationUserId());
         apiTransaction.setSourceStockOrder(StockOrderMapper.toApiStockOrder(entity.getSourceStockOrder(), null));
-        apiTransaction.setTargetStockOrder(StockOrderMapper.toApiStockOrder(entity.getTargetStockOrder(), null));
+//        apiTransaction.setTargetStockOrder(StockOrderMapper.toApiStockOrder(entity.getTargetStockOrder(), null));
         apiTransaction.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct()));
         apiTransaction.setSourceFacility(FacilityMapper.toApiFacility(entity.getSourceFacility()));
         apiTransaction.setTargetFacility(FacilityMapper.toApiFacility(entity.getTargetFacility()));

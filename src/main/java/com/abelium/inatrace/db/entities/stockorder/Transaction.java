@@ -8,15 +8,10 @@ import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.facility.Facility;
+import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
@@ -34,8 +29,12 @@ public class Transaction extends TimestampEntity {
 	@OneToOne
 	private StockOrder sourceStockOrder;
 
-	@OneToOne
-	private StockOrder targetStockOrder;
+//	@OneToOne
+//	private StockOrder targetStockOrder;
+
+	// Does this replace "targetStockOrder"?
+	@ManyToOne(fetch = FetchType.LAZY)
+	private ProcessingOrder targetProcessingOrder;
 
 	@ManyToOne
 	private SemiProduct semiProduct;
@@ -107,12 +106,12 @@ public class Transaction extends TimestampEntity {
 		this.sourceStockOrder = sourceStockOrder;
 	}
 
-	public StockOrder getTargetStockOrder() {
-		return targetStockOrder;
+	public ProcessingOrder getTargetProcessingOrder() {
+		return targetProcessingOrder;
 	}
 
-	public void setTargetStockOrder(StockOrder targetStockOrder) {
-		this.targetStockOrder = targetStockOrder;
+	public void setTargetProcessingOrder(ProcessingOrder targetProcessingOrder) {
+		this.targetProcessingOrder = targetProcessingOrder;
 	}
 
 	public SemiProduct getSemiProduct() {

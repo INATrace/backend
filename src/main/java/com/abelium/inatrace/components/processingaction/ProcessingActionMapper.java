@@ -28,8 +28,6 @@ public final class ProcessingActionMapper {
 	
 	public static ApiProcessingAction toApiProcessingAction(ProcessingAction entity) {
 
-		System.out.println("@@@Translations size: " + entity.getProcessingActionTranslations().size());
-
 		// Simplest apiProcessingAction object
 		ApiProcessingAction apiProcessingAction = new ApiProcessingAction();
 		apiProcessingAction.setId(entity.getId());
