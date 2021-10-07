@@ -17,6 +17,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Version;
+import java.math.BigDecimal;
 
 @Entity
 public class Transaction extends TimestampEntity {
@@ -26,13 +27,13 @@ public class Transaction extends TimestampEntity {
 	
 	@ManyToOne
 	private Company company;
-	
+
 	@Column
 	private Long initiationUserId;
 	
 	@OneToOne
 	private StockOrder sourceStockOrder;
-	
+
 	@OneToOne
 	private StockOrder targetStockOrder;
 
@@ -41,7 +42,7 @@ public class Transaction extends TimestampEntity {
 	
 	@ManyToOne
 	private Facility sourceFacility;
-	
+
 	@ManyToOne
 	private Facility targetFacility;
 
@@ -57,21 +58,21 @@ public class Transaction extends TimestampEntity {
 	
 	@Column
 	private Long shipmentId;
-	
+
 	@OneToOne
 	private MeasureUnitType inputMeasureUnitType;
-	
-	@Column
-	private Float inputQuantity;
-	
+
 	@OneToOne
 	private MeasureUnitType outputMeasureUnitType;
 	
 	@Column
-	private Float outputQuantity;
+	private BigDecimal inputQuantity;
+
+	@Column
+	private BigDecimal outputQuantity;
 	
 	@Column
-	private Float pricePerUnit;
+	private BigDecimal pricePerUnit;
 	
 	@Column
 	private String currency;
@@ -178,14 +179,6 @@ public class Transaction extends TimestampEntity {
 		this.inputMeasureUnitType = inputMeasureUnitType;
 	}
 
-	public Float getInputQuantity() {
-		return inputQuantity;
-	}
-
-	public void setInputQuantity(Float inputQuantity) {
-		this.inputQuantity = inputQuantity;
-	}
-
 	public MeasureUnitType getOutputMeasureUnitType() {
 		return outputMeasureUnitType;
 	}
@@ -194,19 +187,27 @@ public class Transaction extends TimestampEntity {
 		this.outputMeasureUnitType = outputMeasureUnitType;
 	}
 
-	public Float getOutputQuantity() {
+	public BigDecimal getInputQuantity() {
+		return inputQuantity;
+	}
+
+	public void setInputQuantity(BigDecimal inputQuantity) {
+		this.inputQuantity = inputQuantity;
+	}
+
+	public BigDecimal getOutputQuantity() {
 		return outputQuantity;
 	}
 
-	public void setOutputQuantity(Float outputQuantity) {
+	public void setOutputQuantity(BigDecimal outputQuantity) {
 		this.outputQuantity = outputQuantity;
 	}
 
-	public Float getPricePerUnit() {
+	public BigDecimal getPricePerUnit() {
 		return pricePerUnit;
 	}
 
-	public void setPricePerUnit(Float pricePerUnit) {
+	public void setPricePerUnit(BigDecimal pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
 	}
 

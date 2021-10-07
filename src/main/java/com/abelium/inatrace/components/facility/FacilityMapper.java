@@ -25,6 +25,7 @@ public final class FacilityMapper {
 	}
 
 	public static ApiFacility toApiFacility(Facility entity) {
+		if (entity == null) return null;
 
 		// Simplest apiFacility object
 		ApiFacility apiFacility = new ApiFacility();
