@@ -29,6 +29,9 @@ public class UserCustomer extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Company company;
 
+	/**
+	 * company farmer internal id
+	 */
 	@Column(length = Lengths.DEFAULT)
 	private String farmerCompanyInternalId;
 	
