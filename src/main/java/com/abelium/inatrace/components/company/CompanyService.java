@@ -9,6 +9,8 @@ import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.api.ApiUserCustomer;
+import com.abelium.inatrace.components.product.api.ApiUserCustomerAssociation;
+import com.abelium.inatrace.components.product.api.ApiUserCustomerCooperative;
 import com.abelium.inatrace.components.user.UserQueries;
 import com.abelium.inatrace.db.entities.common.Address;
 import com.abelium.inatrace.db.entities.common.BankInformation;
@@ -18,6 +20,8 @@ import com.abelium.inatrace.db.entities.common.FarmInformation;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.common.UserCustomerLocation;
+import com.abelium.inatrace.db.entities.common.UserCustomerAssociation;
+import com.abelium.inatrace.db.entities.common.UserCustomerCooperative;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.security.service.CustomUserDetails;
@@ -286,7 +290,30 @@ public class CompanyService extends BaseService {
 		userCustomer.setUserCustomerLocation(userCustomerLocation);
 		em.persist(userCustomer);
 
-		return new ApiUserCustomer();
+		userCustomer.setAssociations(new ArrayList<>());
+		if (apiUserCustomer.getAssociations() != null) {
+			for (ApiUserCustomerAssociation apiUserCustomerAssociation : apiUserCustomer.getAssociations()) {
+				UserCustomerAssociation userCustomerAssociation = new UserCustomerAssociation();
+				userCustomerAssociation.setCompany(em.find(Company.class, apiUserCustomerAssociation.getCompany().getId()));
+				userCustomerAssociation.setUserCustomer(userCustomer);
+				userCustomer.getAssociations().add(userCustomerAssociation);
+				em.persist(userCustomerAssociation);
+			}
+		}
+
+		userCustomer.setCooperatives(new ArrayList<>());
+		if (apiUserCustomer.getCooperatives() != null) {
+			for (ApiUserCustomerCooperative apiUserCustomerCooperative : apiUserCustomer.getCooperatives()) {
+				UserCustomerCooperative userCustomerCooperative = new UserCustomerCooperative();
+				userCustomerCooperative.setCompany(em.find(Company.class, apiUserCustomerCooperative.getCompany().getId()));
+				userCustomerCooperative.setRole(apiUserCustomerCooperative.getUserCustomerType());
+				userCustomerCooperative.setUserCustomer(userCustomer);
+				userCustomer.getCooperatives().add(userCustomerCooperative);
+				em.persist(userCustomerCooperative);
+			}
+		}
+
+		return companyApiTools.toApiUserCustomer(userCustomer);
 	}
 
 	@Transactional
@@ -339,6 +366,39 @@ public class CompanyService extends BaseService {
 		userCustomer.getUserCustomerLocation().setLatitude(apiUserCustomer.getLocation().getLatitude());
 		userCustomer.getUserCustomerLocation().setLongitude(apiUserCustomer.getLocation().getLongitude());
 		userCustomer.getUserCustomerLocation().setPubliclyVisible(apiUserCustomer.getLocation().getPubliclyVisible());
+
+		if (userCustomer.getAssociations() == null) {
+			userCustomer.setAssociations(new ArrayList<>());
+		}
+
+		userCustomer.getAssociations().removeIf(userCustomerAssociation -> apiUserCustomer.getAssociations().stream().noneMatch(apiUserCustomerAssociation -> userCustomerAssociation.getId().equals(apiUserCustomerAssociation.getId())));
+
+		for (ApiUserCustomerAssociation apiUserCustomerAssociation : apiUserCustomer.getAssociations()) {
+			if (userCustomer.getAssociations().stream().noneMatch(userCustomerAssociation -> userCustomerAssociation.getId().equals(apiUserCustomerAssociation.getId()))) {
+				UserCustomerAssociation userCustomerAssociation = new UserCustomerAssociation();
+				userCustomerAssociation.setCompany(em.find(Company.class, apiUserCustomerAssociation.getCompany().getId()));
+				userCustomerAssociation.setUserCustomer(userCustomer);
+				userCustomer.getAssociations().add(userCustomerAssociation);
+				em.persist(userCustomerAssociation);
+			}
+		}
+
+		if (userCustomer.getCooperatives() == null) {
+			userCustomer.setCooperatives(new ArrayList<>());
+		}
+
+		userCustomer.getCooperatives().removeIf(userCustomerCooperative -> apiUserCustomer.getCooperatives().stream().noneMatch(apiUserCustomerCooperative -> userCustomerCooperative.getId().equals(apiUserCustomerCooperative.getId())));
+
+		for (ApiUserCustomerCooperative apiUserCustomerCooperative : apiUserCustomer.getCooperatives()) {
+			if (userCustomer.getCooperatives().stream().noneMatch(userCustomerCooperative -> userCustomerCooperative.getId().equals(apiUserCustomerCooperative.getId()))) {
+				UserCustomerCooperative userCustomerCooperative = new UserCustomerCooperative();
+				userCustomerCooperative.setUserCustomer(userCustomer);
+				userCustomerCooperative.setCompany(em.find(Company.class, apiUserCustomerCooperative.getCompany().getId()));
+				userCustomerCooperative.setRole(apiUserCustomerCooperative.getUserCustomerType());
+				userCustomer.getCooperatives().add(userCustomerCooperative);
+				em.persist(userCustomerCooperative);
+			}
+		}
 
 		return companyApiTools.toApiUserCustomer(userCustomer);
 	}

@@ -275,9 +275,9 @@ public class CompanyApiTools {
 		// Farm
 		apiUserCustomer.setFarm(toApiFarmInformation(userCustomer.getFarm()));
 		// Associations
-		apiUserCustomer.setAssociations(userCustomer.getAssociations().stream().map(this::toApiUserCustomerAssociation).collect(Collectors.toList()));
+		apiUserCustomer.setAssociations(toApiUserCustomerAssociationList(userCustomer.getAssociations()));
 		// Cooperatives
-		apiUserCustomer.setCooperatives(userCustomer.getCooperatives().stream().map(this::toApiUserCustomerCooperative).collect(Collectors.toList()));
+		apiUserCustomer.setCooperatives(toApiUserCustomerCooperativesList(userCustomer.getCooperatives()));
 
 		return apiUserCustomer;
 	}
@@ -368,6 +368,20 @@ public class CompanyApiTools {
 		apiCountry.setName(country.getName());
 
 		return apiCountry;
+	}
+
+	public List<ApiUserCustomerAssociation> toApiUserCustomerAssociationList(List<UserCustomerAssociation> userCustomerAssociationList) {
+		if (userCustomerAssociationList == null) {
+			return null;
+		}
+		return userCustomerAssociationList.stream().map(this::toApiUserCustomerAssociation).collect(Collectors.toList());
+	}
+
+	public List<ApiUserCustomerCooperative> toApiUserCustomerCooperativesList(List<UserCustomerCooperative> userCustomerCooperativeList) {
+		if (userCustomerCooperativeList == null) {
+			return null;
+		}
+		return userCustomerCooperativeList.stream().map(this::toApiUserCustomerCooperative).collect(Collectors.toList());
 	}
 				
 }
