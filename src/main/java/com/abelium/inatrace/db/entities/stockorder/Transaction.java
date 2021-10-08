@@ -29,10 +29,10 @@ public class Transaction extends TimestampEntity {
 	@OneToOne
 	private StockOrder sourceStockOrder;
 
-//	@OneToOne
-//	private StockOrder targetStockOrder;
+	// Used when ProcessingActionType is TRANSFER
+	@OneToOne
+	private StockOrder targetStockOrder;
 
-	// Does this replace "targetStockOrder"?
 	@ManyToOne(fetch = FetchType.LAZY)
 	private ProcessingOrder targetProcessingOrder;
 
@@ -104,6 +104,14 @@ public class Transaction extends TimestampEntity {
 
 	public void setSourceStockOrder(StockOrder sourceStockOrder) {
 		this.sourceStockOrder = sourceStockOrder;
+	}
+
+	public StockOrder getTargetStockOrder() {
+		return targetStockOrder;
+	}
+
+	public void setTargetStockOrder(StockOrder targetStockOrder) {
+		this.targetStockOrder = targetStockOrder;
 	}
 
 	public ProcessingOrder getTargetProcessingOrder() {

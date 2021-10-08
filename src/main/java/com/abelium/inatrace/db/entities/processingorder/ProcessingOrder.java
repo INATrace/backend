@@ -28,8 +28,7 @@ public class ProcessingOrder extends TimestampEntity {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Transaction> inputTransactions;
 
-    // TODO: ManyToMany?? -> Can targetStockOrder be part of multiple ProcessingOrders?? -> I guess no?
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany
     private List<StockOrder> targetStockOrders;
 
     public Long getInitiatorUserId() {
