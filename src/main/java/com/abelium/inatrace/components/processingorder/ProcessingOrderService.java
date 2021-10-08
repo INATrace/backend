@@ -10,8 +10,8 @@ import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
 import com.abelium.inatrace.components.stockorder.StockOrderService;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
+import com.abelium.inatrace.components.transaction.TransactionService;
 import com.abelium.inatrace.components.transaction.api.ApiTransaction;
-import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
@@ -38,7 +38,10 @@ public class ProcessingOrderService extends BaseService {
     @Autowired
     private StockOrderService stockOrderService;
 
-    public ApiProcessingOrder getProcessingOrder(long id) throws ApiException {
+    @Autowired
+    private TransactionService transactionService;
+
+    public ApiProcessingOrder getProcessingOrder(Long id) throws ApiException {
         return ProcessingOrderMapper.toApiProcessingOrder(fetchEntity(id, ProcessingOrder.class));
     }
 
@@ -170,6 +173,7 @@ public class ProcessingOrderService extends BaseService {
         // (applies only for existing ProcessingOrders)
         if(entity.getId() != null) {
 
+            // TODO: Remove transactions over service, not with cascade!
             // Remove transactions that are not present in request
             entity.getInputTransactions().removeAll(entity.getInputTransactions()
                     .stream()
@@ -228,47 +232,20 @@ public class ProcessingOrderService extends BaseService {
 
         // Create new or update existing input Transactions
         for (int i = 0; i < apiProcessingOrder.getInputTransactions().size(); i++) {
-            ApiTransaction it = apiProcessingOrder.getInputTransactions().get(i);
 
-            // No need to fetch transaction, as it cannot exist yet
-            Transaction transaction = new Transaction();
-            transaction.setCompany(fetchEntity(it.getCompany().getId(), Company.class));
-            transaction.setInitiationUserId(it.getInitiationUserId());
-            transaction.setStatus(it.getStatus());
-            transaction.setIsProcessing(processingAction.getType() == ProcessingActionType.PROCESSING);
-            transaction.setInputQuantity(it.getInputQuantity());
-            transaction.setOutputQuantity(it.getOutputQuantity());
-            transaction.setSourceStockOrder(fetchEntity(it.getSourceStockOrder().getId(), StockOrder.class));
-            transaction.setSourceFacility(transaction.getSourceStockOrder().getFacility());
-            transaction.setInputMeasureUnitType(transaction.getSourceStockOrder().getMeasurementUnitType());
-            transaction.setSemiProduct(transaction.getSourceStockOrder().getSemiProduct());
-            transaction.setTargetProcessingOrder(entity);
+            ApiTransaction apiTransaction = apiProcessingOrder.getInputTransactions().get(i);
+            Boolean isProcessing = processingAction.getType() == ProcessingActionType.PROCESSING;
+            Long targetStockOrderId = !isProcessing ? sequentialIdsOfInsertedTargetStockOrders.get(i) : null;
 
-            // If ProcessingActionType is TRANSFER, set target StockOrder
-            if (!transaction.getIsProcessing()) {
-                StockOrder targetStockOrder = fetchEntity(sequentialIdsOfInsertedTargetStockOrders.get(i), StockOrder.class);
-                transaction.setTargetStockOrder(targetStockOrder);
-                transaction.setOutputMeasureUnitType(targetStockOrder.getMeasurementUnitType());
-                transaction.setTargetFacility(targetStockOrder.getFacility());
+            ApiBaseEntity insertedApiTransaction = transactionService.createOrUpdateTransaction(apiTransaction, isProcessing, targetStockOrderId);
 
-            } else {
-                transaction.setOutputMeasureUnitType(transaction.getInputMeasureUnitType());
-                transaction.setTargetFacility(transaction.getSourceFacility()); // TODO: As in nodeJS code, this should be fetched from ProcessingOrder which does not have a Facility?
-            }
-
-            if (!transaction.getIsProcessing() && (transaction.getSemiProduct() == null || !transaction.getSemiProduct().equals(transaction.getSourceStockOrder().getSemiProduct())))
-                throw new ApiException(ApiStatus.VALIDATION_ERROR, "Target SemiProduct has to match source SemiProduct.");
-
-            entity.getInputTransactions().add(transaction);
+            // TODO: Reference on ProcessingOrder if needed
+            entity.getInputTransactions().add(fetchEntity(insertedApiTransaction.getId(), Transaction.class));
         }
-
-        System.out.println("-----------------------------------------------------------------------------------");
-        System.out.println("Kaskada, ni druge");
 
         if (entity.getId() == null)
             em.persist(entity);
 
-        System.out.println("Tukile pa nebi smel pridet...");
         return new ApiBaseEntity(entity);
     }
 
