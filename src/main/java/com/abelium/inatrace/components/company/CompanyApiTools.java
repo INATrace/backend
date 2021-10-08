@@ -69,8 +69,7 @@ public class CompanyApiTools {
 		ac.manager = c.getManager();
 		ac.email = c.getEmail();
 		ac.phone = c.getPhone();
-		ac.currency = new ApiCurrencyType();
-		ac.setCurrency(CurrencyTypeMapper.toApiCurrencyType(c.getCurrency()));
+		ac.currency = CommonApiTools.toApiCurrencyType(c.getCurrency());
 	}
 
 	public void updateApiCompanyPublic(ApiCompanyPublic ac, Company c, Language language) {
