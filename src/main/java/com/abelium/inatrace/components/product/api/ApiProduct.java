@@ -24,7 +24,15 @@ public class ApiProduct extends ApiProductContent {
 
 	@ApiModelProperty(value = "valueChain")
 	public ApiValueChain valueChain;
-	
+
+	public ApiCompany getCompany() {
+		return company;
+	}
+
+	public void setCompany(ApiCompany company) {
+		this.company = company;
+	}
+
 	public List<ApiProductCompany> getAssociatedCompanies() {
 		return associatedCompanies;
 	}
