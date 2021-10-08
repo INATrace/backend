@@ -1,4 +1,4 @@
-package com.abelium.inatrace.components.stockorder.mappers;
+package com.abelium.inatrace.components.transaction.mappers;
 
 import com.abelium.inatrace.components.codebook.action_type.ActionTypeMapper;
 import com.abelium.inatrace.components.codebook.grade_abbreviation.GradeAbbreviationMapper;
@@ -6,7 +6,8 @@ import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTyp
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.facility.FacilityMapper;
-import com.abelium.inatrace.components.stockorder.api.ApiTransaction;
+import com.abelium.inatrace.components.transaction.api.ApiTransaction;
+import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
 
 public class TransactionMapper {

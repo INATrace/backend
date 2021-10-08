@@ -3,7 +3,7 @@ package com.abelium.inatrace.components.processingorder.mappers;
 import com.abelium.inatrace.components.processingaction.ProcessingActionMapper;
 import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
-import com.abelium.inatrace.components.stockorder.mappers.TransactionMapper;
+import com.abelium.inatrace.components.transaction.mappers.TransactionMapper;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 
 import java.util.stream.Collectors;

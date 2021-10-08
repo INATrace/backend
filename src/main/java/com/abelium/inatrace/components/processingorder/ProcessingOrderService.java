@@ -10,7 +10,7 @@ import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
 import com.abelium.inatrace.components.stockorder.StockOrderService;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
-import com.abelium.inatrace.components.stockorder.api.ApiTransaction;
+import com.abelium.inatrace.components.transaction.api.ApiTransaction;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;

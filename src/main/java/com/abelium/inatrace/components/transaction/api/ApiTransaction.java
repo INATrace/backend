@@ -1,4 +1,4 @@
-package com.abelium.inatrace.components.stockorder.api;
+package com.abelium.inatrace.components.transaction.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.action_type.api.ApiActionType;
@@ -7,6 +7,7 @@ import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasure
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
+import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
 import io.swagger.annotations.ApiModelProperty;
 
