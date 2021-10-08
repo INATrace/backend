@@ -4,6 +4,8 @@ import com.abelium.inatrace.api.ApiCodebookBaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
+import java.math.BigDecimal;
+
 /**
  * Measure unit type API model.
  *
@@ -13,16 +15,16 @@ import org.springframework.validation.annotation.Validated;
 public class ApiMeasureUnitType extends ApiCodebookBaseEntity {
 
 	@ApiModelProperty(value = "the weight of the measurement unit type", position = 3)
-	private Integer weight;
+	private BigDecimal weight;
 
 	@ApiModelProperty(value = "the underlying measurement unit type", position = 4)
 	private ApiMeasureUnitType underlyingMeasurementUnitType;
 
-	public Integer getWeight() {
+	public BigDecimal getWeight() {
 		return weight;
 	}
 
-	public void setWeight(Integer weight) {
+	public void setWeight(BigDecimal weight) {
 		this.weight = weight;
 	}
 
