@@ -12,7 +12,6 @@ import java.util.List;
 public class ApiProduct extends ApiProductContent {
 
 	@ApiModelProperty(value = "company", position = 14)
-	@Valid
 	public ApiCompany company;
 	
 	@ApiModelProperty(value = "associated companies", position = 14)
