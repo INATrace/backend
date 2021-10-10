@@ -142,11 +142,12 @@ public class CompanyService extends BaseService {
 
 	@Transactional
 	public ApiCompanyGet getCompany(CustomUserDetails authUser, long id, Language language) throws ApiException {
+
 		Company c = companyQueries.fetchCompany(id);
 		List<ApiCompanyUser> users = companyQueries.fetchUsersForCompany(id);
 
 		if (authUser.getUserRole() != UserRole.ADMIN
-				&& !users.stream().anyMatch(u -> u.getId().equals(authUser.getUserId()))) {
+				&& users.stream().noneMatch(u -> u.getId().equals(authUser.getUserId()))) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "Not authorized");
 		}
 
