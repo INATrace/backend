@@ -47,6 +47,7 @@ public class StockOrderService extends BaseService {
     public ApiPaginatedList<ApiStockOrder> getStockOrderList(ApiPaginatedRequest request,
                                                              Long companyId,
                                                              Long facilityId,
+                                                             Long semiProductId,
                                                              Boolean isOpenBalanceOnly,
                                                              Boolean isWomenShare,
                                                              PreferredWayOfPayment wayOfPayment,
@@ -59,6 +60,7 @@ public class StockOrderService extends BaseService {
                         request,
                         companyId,
                         facilityId,
+                        semiProductId,
                         isOpenBalanceOnly,
                         isWomenShare,
                         wayOfPayment,
@@ -71,6 +73,7 @@ public class StockOrderService extends BaseService {
     private StockOrder stockOrderQueryObject(ApiPaginatedRequest request,
                                              Long companyId,
                                              Long facilityId,
+                                             Long semiProductId,
                                              Boolean isOpenBalanceOnly,
                                              Boolean isWomenShare,
                                              PreferredWayOfPayment wayOfPayment,
@@ -89,6 +92,9 @@ public class StockOrderService extends BaseService {
 
 
         // Query parameter filters
+        if(semiProductId != null)
+            condition.and(stockOrderProxy.getSemiProduct()).isNotNull()
+                    .and(stockOrderProxy.getSemiProduct().getId()).eq(semiProductId);
         if(isOpenBalanceOnly != null && isOpenBalanceOnly)
             condition.and(stockOrderProxy.getBalance()).isNotNull()
                     .and(stockOrderProxy.getBalance()).gt(BigDecimal.ZERO);

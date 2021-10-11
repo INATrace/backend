@@ -43,7 +43,29 @@ public class StockOrderController {
             @Valid ApiPaginatedRequest request,
             @AuthenticationPrincipal CustomUserDetails authUser) {
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
-                request, null, null, null, null, null,null,null,null, authUser.getUserId()));
+                request, null, null, null, null, null, null,null,null,null, authUser.getUserId()));
+    }
+
+    @GetMapping("listAvailableStockForSemiProductInFacility")
+    @ApiOperation("Get a paginated list of stock orders for provided semi product ID and facility ID.")
+    public ApiPaginatedResponse<ApiStockOrder> getStockOrderListByFacilityId(
+            @Valid ApiPaginatedRequest request,
+            @Valid @ApiParam(value = "Facility ID", required = true) @RequestParam("facilityId") Long facilityId,
+            @Valid @ApiParam(value = "Facility ID", required = true) @RequestParam("semiProductId") Long semiProductId,
+            @AuthenticationPrincipal CustomUserDetails authUser) {
+
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
+                request,
+                null,
+                facilityId,
+                semiProductId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                authUser.getUserId()));
     }
 
     @GetMapping("list/facility/{facilityId}")
@@ -63,12 +85,14 @@ public class StockOrderController {
                 request,
                 null,
                 facilityId,
+                null,
                 isOpenBalanceOnly,
                 isWomenShare,
                 wayOfPayment,
-                productionDateStart != null ? productionDateStart.toInstant() : null ,
+                productionDateStart != null ? productionDateStart.toInstant() : null,
                 productionDateEnd != null ? productionDateEnd.toInstant() : null,
-                producerUserCustomerName, authUser.getUserId()));
+                producerUserCustomerName,
+                authUser.getUserId()));
     }
 
     @GetMapping("list/company/{companyId}")
@@ -89,12 +113,14 @@ public class StockOrderController {
                 request,
                 companyId,
                 null,
+                null,
                 isOpenBalanceOnly,
                 isWomenShare,
                 wayOfPayment,
-                productionDateStart != null ? productionDateStart.toInstant() : null ,
+                productionDateStart != null ? productionDateStart.toInstant() : null,
                 productionDateEnd != null ? productionDateEnd.toInstant() : null,
-                producerUserCustomerName, authUser.getUserId()));
+                producerUserCustomerName,
+                authUser.getUserId()));
     }
 
     @PutMapping
