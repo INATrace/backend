@@ -12,7 +12,6 @@ import java.util.List;
 public class ApiProduct extends ApiProductContent {
 
 	@ApiModelProperty(value = "company", position = 14)
-	@Valid
 	public ApiCompany company;
 	
 	@ApiModelProperty(value = "associated companies", position = 14)
@@ -24,7 +23,15 @@ public class ApiProduct extends ApiProductContent {
 
 	@ApiModelProperty(value = "valueChain")
 	public ApiValueChain valueChain;
-	
+
+	public ApiCompany getCompany() {
+		return company;
+	}
+
+	public void setCompany(ApiCompany company) {
+		this.company = company;
+	}
+
 	public List<ApiProductCompany> getAssociatedCompanies() {
 		return associatedCompanies;
 	}

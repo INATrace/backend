@@ -8,11 +8,14 @@ import com.abelium.inatrace.components.codebook.currencies.api.ApiCurrencyType;
 import com.abelium.inatrace.components.common.CommonApiTools;
 import com.abelium.inatrace.components.common.CommonService;
 import com.abelium.inatrace.components.common.api.ApiCertification;
+import com.abelium.inatrace.components.common.api.ApiCountry;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.company.types.CompanyTranslatables;
+import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.user.UserApiTools;
 import com.abelium.inatrace.components.user.UserQueries;
+import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.*;
 import com.abelium.inatrace.tools.ListTools;
 import com.abelium.inatrace.types.Language;
@@ -20,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,6 +33,9 @@ import java.util.stream.Collectors;
 @Lazy
 @Component
 public class CompanyApiTools {
+
+	@PersistenceContext
+	private EntityManager em;
 	
 	@Autowired
 	private CommonService commonEngine;
@@ -66,8 +74,7 @@ public class CompanyApiTools {
 		ac.manager = c.getManager();
 		ac.email = c.getEmail();
 		ac.phone = c.getPhone();
-		ac.currency = new ApiCurrencyType();
-		ac.setCurrency(CurrencyTypeMapper.toApiCurrencyType(c.getCurrency()));
+		ac.currency = CommonApiTools.toApiCurrencyType(c.getCurrency());
 	}
 
 	public void updateApiCompanyPublic(ApiCompanyPublic ac, Company c, Language language) {
@@ -105,7 +112,33 @@ public class CompanyApiTools {
 		updateApiCompany(userId, ac, c, language);
 		return ac;
 	}
-	
+
+	public ApiCompany toApiCompany(Company company) {
+		if (company == null) return null;
+
+		ApiCompany apiCompany = new ApiCompany();
+		apiCompany.setId(company.getId());
+		apiCompany.setName(company.getName());
+
+		return apiCompany;
+	}
+
+	public void updateLocation(GeoAddress geoAddress, ApiGeoAddress apiGeoAddress) {
+		geoAddress.setAddress(apiGeoAddress.getAddress());
+		geoAddress.setCell(apiGeoAddress.getCell());
+		geoAddress.setCity(apiGeoAddress.getCity());
+		geoAddress.setCountry(em.find(Country.class, apiGeoAddress.getCountry().getId()));
+		geoAddress.setHondurasDepartment(apiGeoAddress.getHondurasDepartment());
+		geoAddress.setHondurasFarm(apiGeoAddress.getHondurasFarm());
+		geoAddress.setHondurasMunicipality(apiGeoAddress.getHondurasMunicipality());
+		geoAddress.setHondurasVillage(apiGeoAddress.getHondurasVillage());
+		geoAddress.setLatitude(apiGeoAddress.getLatitude());
+		geoAddress.setLongitude(apiGeoAddress.getLongitude());
+		geoAddress.setSector(apiGeoAddress.getSector());
+		geoAddress.setState(apiGeoAddress.getState());
+		geoAddress.setVillage(apiGeoAddress.getVillage());
+		geoAddress.setZip(apiGeoAddress.getZip());
+	}
 
 	public void updateCompany(Long userId, Company c, ApiCompany ac, Language language) throws ApiException {
 		if (Language.EN == language || language == null) {
@@ -239,6 +272,179 @@ public class CompanyApiTools {
 		UserApiTools.updateApiUserBase(acu, cu.getUser());
 		acu.companyRole = cu.getRole();
 		return acu;
+	}
+
+	public ApiUserCustomer toApiUserCustomer(UserCustomer userCustomer) {
+		if (userCustomer == null) return null;
+
+		ApiUserCustomer apiUserCustomer = new ApiUserCustomer();
+		apiUserCustomer.setId(userCustomer.getId());
+		apiUserCustomer.setFarmerCompanyInternalId(userCustomer.getFarmerCompanyInternalId());
+		apiUserCustomer.setName(userCustomer.getName());
+		apiUserCustomer.setSurname(userCustomer.getSurname());
+		apiUserCustomer.setType(userCustomer.getType());
+		apiUserCustomer.setPhone(userCustomer.getPhone());
+		apiUserCustomer.setEmail(userCustomer.getEmail());
+		apiUserCustomer.setGender(userCustomer.getGender());
+		apiUserCustomer.setHasSmartphone(userCustomer.getHasSmartphone());
+		// Company
+		apiUserCustomer.setCompanyId(userCustomer.getCompany().getId());
+		// Location
+		apiUserCustomer.setLocation(toApiUserCustomerLocation(userCustomer.getUserCustomerLocation()));
+		// Bank
+		apiUserCustomer.setBank(toApiBankInformation(userCustomer.getBank()));
+		// Farm
+		apiUserCustomer.setFarm(toApiFarmInformation(userCustomer.getFarm()));
+		// Associations
+		apiUserCustomer.setAssociations(toApiUserCustomerAssociationList(userCustomer.getAssociations()));
+		// Cooperatives
+		apiUserCustomer.setCooperatives(toApiUserCustomerCooperativesList(userCustomer.getCooperatives()));
+
+		return apiUserCustomer;
+	}
+
+	public ApiBankInformation toApiBankInformation(BankInformation bankInformation) {
+		if (bankInformation == null) return null;
+
+		ApiBankInformation apiBankInformation = new ApiBankInformation();
+		apiBankInformation.setAccountHolderName(bankInformation.getAccountHolderName());
+		apiBankInformation.setAccountNumber(bankInformation.getAccountNumber());
+		apiBankInformation.setAdditionalInformation(bankInformation.getAdditionalInformation());
+		apiBankInformation.setBankName(bankInformation.getBankName());
+
+		return apiBankInformation;
+	}
+
+	public ApiFarmInformation toApiFarmInformation(FarmInformation farmInformation) {
+		if (farmInformation == null) return null;
+
+		ApiFarmInformation apiFarmInformation = new ApiFarmInformation();
+		apiFarmInformation.setAreaOrganicCertified(farmInformation.getAreaOrganicCertified());
+		apiFarmInformation.setCoffeeCultivatedArea(farmInformation.getCoffeeCultivatedArea());
+		apiFarmInformation.setNumberOfTrees(farmInformation.getNumberOfTrees());
+		apiFarmInformation.setOrganic(farmInformation.getOrganic());
+		apiFarmInformation.setStartTransitionToOrganic(farmInformation.getStartTransitionToOrganic());
+		apiFarmInformation.setTotalCultivatedArea(farmInformation.getTotalCultivatedArea());
+
+		return apiFarmInformation;
+	}
+
+	public ApiUserCustomerAssociation toApiUserCustomerAssociation(UserCustomerAssociation userCustomerAssociation) {
+		if (userCustomerAssociation == null) return null;
+
+		ApiUserCustomerAssociation apiUserCustomerAssociation = new ApiUserCustomerAssociation();
+		apiUserCustomerAssociation.setId(userCustomerAssociation.getId());
+		apiUserCustomerAssociation.setCompany(toApiCompany(userCustomerAssociation.getCompany()));
+		apiUserCustomerAssociation.setUserCustomer(new ApiUserCustomer());
+		apiUserCustomerAssociation.getUserCustomer().setId(userCustomerAssociation.getUserCustomer().getId());
+
+		return apiUserCustomerAssociation;
+	}
+
+	public ApiUserCustomerCooperative toApiUserCustomerCooperative(UserCustomerCooperative userCustomerCooperative) {
+		if (userCustomerCooperative == null) return null;
+
+		ApiUserCustomerCooperative apiUserCustomerCooperative = new ApiUserCustomerCooperative();
+		apiUserCustomerCooperative.setId(userCustomerCooperative.getId());
+		apiUserCustomerCooperative.setCompany(toApiCompany(userCustomerCooperative.getCompany()));
+		apiUserCustomerCooperative.setUserCustomer(new ApiUserCustomer());
+		apiUserCustomerCooperative.getUserCustomer().setId(userCustomerCooperative.getUserCustomer().getId());
+		apiUserCustomerCooperative.setUserCustomerType(userCustomerCooperative.getRole());
+
+		return apiUserCustomerCooperative;
+	}
+
+	public ApiUserCustomerLocation toApiUserCustomerLocation(UserCustomerLocation userCustomerLocation) {
+		ApiUserCustomerLocation apiUserCustomerLocation = new ApiUserCustomerLocation();
+		apiUserCustomerLocation.setAddress(toApiAddress(userCustomerLocation.getAddress()));
+		apiUserCustomerLocation.setLatitude(userCustomerLocation.getLatitude());
+		apiUserCustomerLocation.setLongitude(userCustomerLocation.getLongitude());
+		apiUserCustomerLocation.setPubliclyVisible(userCustomerLocation.getPubliclyVisible());
+
+		return apiUserCustomerLocation;
+	}
+
+	public ApiAddress toApiAddress(Address address) {
+		ApiAddress apiAddress = new ApiAddress();
+		apiAddress.setAddress(address.getAddress());
+		apiAddress.setCell(address.getCell());
+		apiAddress.setCity(address.getCity());
+		apiAddress.setCountry(toApiCountry(address.getCountry()));
+		apiAddress.setHondurasDepartment(address.getHondurasDepartment());
+		apiAddress.setHondurasFarm(address.getHondurasFarm());
+		apiAddress.setHondurasMunicipality(address.getHondurasMunicipality());
+		apiAddress.setHondurasVillage(address.getHondurasVillage());
+		apiAddress.setSector(address.getSector());
+		apiAddress.setState(address.getState());
+		apiAddress.setVillage(address.getVillage());
+		apiAddress.setZip(address.getZip());
+
+		return apiAddress;
+	}
+
+	public ApiCountry toApiCountry(Country country) {
+		ApiCountry apiCountry = new ApiCountry();
+		apiCountry.setId(country.getId());
+		apiCountry.setCode(country.getCode());
+		apiCountry.setName(country.getName());
+
+		return apiCountry;
+	}
+
+	public List<ApiUserCustomerAssociation> toApiUserCustomerAssociationList(List<UserCustomerAssociation> userCustomerAssociationList) {
+		if (userCustomerAssociationList == null) {
+			return null;
+		}
+		return userCustomerAssociationList.stream().map(this::toApiUserCustomerAssociation).collect(Collectors.toList());
+	}
+
+	public List<ApiUserCustomerCooperative> toApiUserCustomerCooperativesList(List<UserCustomerCooperative> userCustomerCooperativeList) {
+		if (userCustomerCooperativeList == null) {
+			return null;
+		}
+		return userCustomerCooperativeList.stream().map(this::toApiUserCustomerCooperative).collect(Collectors.toList());
+	}
+
+	public ApiCompanyCustomer toApiCompanyCustomer(CompanyCustomer companyCustomer) {
+		ApiCompanyCustomer apiCompanyCustomer = new ApiCompanyCustomer();
+		apiCompanyCustomer.setId(companyCustomer.getId());
+		apiCompanyCustomer.setCompanyId(companyCustomer.getCompany().getId());
+		apiCompanyCustomer.setContact(companyCustomer.getContact());
+		apiCompanyCustomer.setEmail(companyCustomer.getEmail());
+		apiCompanyCustomer.setLocation(toApiGeoAddress(companyCustomer.getLocation()));
+		apiCompanyCustomer.setName(companyCustomer.getName());
+		apiCompanyCustomer.setOfficialCompanyName(companyCustomer.getOfficialCompanyName());
+		apiCompanyCustomer.setPhone(companyCustomer.getPhone());
+		apiCompanyCustomer.setVatId(companyCustomer.getVatId());
+
+		return apiCompanyCustomer;
+	}
+
+	public ApiLocation toApiLocation(Location location) {
+		ApiLocation apiLocation = new ApiLocation();
+		apiLocation.setAddress(toApiAddress(location.getAddress()));
+
+		return apiLocation;
+	}
+
+	public ApiGeoAddress toApiGeoAddress(GeoAddress geoAddress) {
+		ApiGeoAddress apiGeoAddress = new ApiGeoAddress();
+		apiGeoAddress.setAddress(geoAddress.getAddress());
+		apiGeoAddress.setCell(geoAddress.getCell());
+		apiGeoAddress.setCity(geoAddress.getCity());
+		apiGeoAddress.setCountry(toApiCountry(geoAddress.getCountry()));
+		apiGeoAddress.setHondurasDepartment(geoAddress.getHondurasDepartment());
+		apiGeoAddress.setHondurasFarm(geoAddress.getHondurasFarm());
+		apiGeoAddress.setHondurasMunicipality(geoAddress.getHondurasMunicipality());
+		apiGeoAddress.setHondurasVillage(geoAddress.getHondurasVillage());
+		apiGeoAddress.setLatitude(geoAddress.getLatitude());
+		apiGeoAddress.setLongitude(geoAddress.getLongitude());
+		apiGeoAddress.setSector(geoAddress.getSector());
+		apiGeoAddress.setState(geoAddress.getState());
+		apiGeoAddress.setVillage(geoAddress.getVillage());
+		apiGeoAddress.setZip(geoAddress.getZip());
+
+		return apiGeoAddress;
 	}
 				
 }

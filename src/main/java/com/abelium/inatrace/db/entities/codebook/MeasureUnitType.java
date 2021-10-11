@@ -4,6 +4,7 @@ import com.abelium.inatrace.db.base.CodebookBaseEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import java.math.BigDecimal;
 
 /**
  * Codebook entity for measuring unit types.
@@ -13,7 +14,7 @@ import javax.persistence.ManyToOne;
 @Entity
 public class MeasureUnitType extends CodebookBaseEntity {
 
-	private Integer weight;
+	private BigDecimal weight;
 
 	@ManyToOne
 	private MeasureUnitType underlyingMeasurementUnitType;
@@ -22,16 +23,16 @@ public class MeasureUnitType extends CodebookBaseEntity {
 		super();
 	}
 
-	public MeasureUnitType(String code, String label, Integer weight) {
+	public MeasureUnitType(String code, String label, BigDecimal weight) {
 		super(code, label);
 		this.weight = weight;
 	}
 
-	public Integer getWeight() {
+	public BigDecimal getWeight() {
 		return weight;
 	}
 
-	public void setWeight(Integer weight) {
+	public void setWeight(BigDecimal weight) {
 		this.weight = weight;
 	}
 

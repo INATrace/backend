@@ -117,7 +117,7 @@ public class FacilityService extends BaseService {
 			em.persist(entity);
 		}
 
-		entity.getFacilitySemiProducts().removeIf(facilitySemiProduct -> apiFacility.getFacilitySemiProductList().stream().noneMatch(apiFacilitySemiProduct -> apiFacilitySemiProduct.getId().equals(facilitySemiProduct.getId())));
+		entity.getFacilitySemiProducts().clear();
 
 		for (ApiSemiProduct apiSemiProduct : apiFacility.getFacilitySemiProductList()) {
 			FacilitySemiProduct facilitySemiProduct = new FacilitySemiProduct();
@@ -176,6 +176,23 @@ public class FacilityService extends BaseService {
 		List<Facility> facilities = collectingFacilitiesQuery.getResultList();
 
 		Long count = em.createNamedQuery("Facility.countCollectingFacilitiesByCompany", Long.class)
+				.setParameter("companyId", companyId).getSingleResult();
+
+		return new ApiPaginatedList<>(
+				facilities.stream().map(FacilityMapper::toApiFacility).collect(Collectors.toList()), count);
+	}
+
+	public ApiPaginatedList<ApiFacility> listSellingFacilitiesByCompany(Long companyId, ApiPaginatedRequest request) {
+
+		TypedQuery<Facility> collectingFacilitiesQuery = em.createNamedQuery("Facility.listSellingFacilitiesByCompany",
+						Facility.class)
+				.setParameter("companyId", companyId)
+				.setFirstResult(request.getOffset())
+				.setMaxResults(request.getLimit());
+
+		List<Facility> facilities = collectingFacilitiesQuery.getResultList();
+
+		Long count = em.createNamedQuery("Facility.countSellingFacilitiesByCompany", Long.class)
 				.setParameter("companyId", companyId).getSingleResult();
 
 		return new ApiPaginatedList<>(

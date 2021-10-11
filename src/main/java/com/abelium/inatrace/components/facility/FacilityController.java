@@ -44,9 +44,19 @@ public class FacilityController {
 	@GetMapping("list/collecting/company/{id}")
 	@ApiOperation("Get a list of collecting facilities by company ID.")
 	public ApiPaginatedResponse<ApiFacility> listCollectingFacilitiesByCompany(
-			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId, @Valid ApiPaginatedRequest request) {
+			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid ApiPaginatedRequest request) {
 
 		return new ApiPaginatedResponse<>(facilityService.listCollectingFacilitiesByCompany(companyId, request));
+	}
+
+	@GetMapping("list/selling/company/{id}")
+	@ApiOperation("Get a list of selling facilities by company ID.")
+	public ApiPaginatedResponse<ApiFacility> listSellingFacilitiesByCompany(
+			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid ApiPaginatedRequest request) {
+
+		return new ApiPaginatedResponse<>(facilityService.listSellingFacilitiesByCompany(companyId, request));
 	}
 
 	@GetMapping("{id}")
