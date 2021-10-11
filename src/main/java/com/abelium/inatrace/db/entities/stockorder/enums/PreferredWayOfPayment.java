@@ -4,6 +4,7 @@ public enum PreferredWayOfPayment
 {
 	CASH,
 	CASH_VIA_COLLECTOR,
+	CASH_VIA_COOPERATIVE,
 	BANK_TRANSFER,
 	CHEQUE,
 	OFFSETTING,

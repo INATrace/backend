@@ -73,7 +73,7 @@ public class PaymentService extends BaseService {
 		User paymentConfirmedByUser = null;
 		UserCustomer payableToCollector = null;
 		UserCustomer payableToFarmer = null;
-		CompanyCustomer recipientCompanyCustomer = null; // still don't know where to get it from - assing null for now
+		CompanyCustomer recipientCompanyCustomer = null; // still don't know where to get it from - assign null for now
 		PreferredWayOfPayment preferredWayOfPayment = null;
 		String orderReference = null;
 		Integer purchased = null;
@@ -91,6 +91,9 @@ public class PaymentService extends BaseService {
 					entity.setPaymentStatus(PaymentStatus.CONFIRMED);
 				}
 			}
+			
+			entity.setPaymentStatus(apiPayment.getPaymentStatus());
+			entity.setUpdatedBy(userService.fetchUserById(apiPayment.getUpdatedBy()));
 			
 		} else {
 			
@@ -127,46 +130,47 @@ public class PaymentService extends BaseService {
 				throw new ApiException(ApiStatus.INVALID_REQUEST, "A purchase order is required in order to create a payment.");
 			}
 			
+			// Storage key needs to be unique
+			receiptDocument = new Document();
+			receiptDocument.setContentType(apiPayment.getReceiptDocument().getContentType());
+			receiptDocument.setName(apiPayment.getReceiptDocument().getName());
+			receiptDocument.setSize(apiPayment.getReceiptDocument().getSize());
+			receiptDocument.setStorageKey(apiPayment.getReceiptDocument().getStorageKey());
+			
+			entity.setAmountPaidToTheFarmer(totalPaid);
+			entity.setAmountPaidToTheCollector(0);
+			entity.setCreatedBy(userService.fetchUserById(apiPayment.getCreatedBy()));
+			entity.setUpdatedBy(userService.fetchUserById(apiPayment.getUpdatedBy()));
+			entity.setCurrency(apiPayment.getCurrency());
+//			entity.setInputTransactions(null);
+			entity.setStockOrder(stockOrder);
+			entity.setOrderReference(orderReference);
+			entity.setPayingCompany(payingCompany);
+			entity.setPaymentConfirmedAtTime(apiPayment.getPaymentConfirmedAtTime());
+			entity.setPaymentConfirmedByCompany(paymentConfirmedByCompany);
+			entity.setPaymentConfirmedByUser(paymentConfirmedByUser);
+			entity.setPaymentPurposeType(apiPayment.getPaymentPurposeType());
+			entity.setPaymentStatus(apiPayment.getPaymentStatus());
+			entity.setPaymentType(apiPayment.getPaymentType());
+			entity.setPreferredWayOfPayment(preferredWayOfPayment);
+//			entity.setProductionDate(apiPayment.getProductionDate());
+			entity.setPurchased(purchased);
+			entity.setReceiptDocument(receiptDocument);
+			entity.setReceiptNumber(apiPayment.getReceiptNumber());
+			entity.setRecipientCompany(recipientCompany);
+			entity.setRecipientCompanyCustomer(recipientCompanyCustomer);
+			entity.setReceiptDocumentType(apiPayment.getReceiptDocumentType());
+			entity.setRecipientType(apiPayment.getRecipientType());
+			entity.setRecipientUserCustomer(payableToFarmer);
+			entity.setRepresentativeOfRecipientCompany(recipientCompany); // is this required? seems to be same as recipientCompany
+			entity.setRepresentativeOfRecipientUserCustomer(payableToCollector);
+			entity.setTotalPaid(totalPaid);
+			
+			// do not forget to update the stock order entity - open balance - a negative open balance is allowed
+			stockOrder.setBalance(new BigDecimal(openBalance - entity.getTotalPaid()));
+			stockOrder.setUpdatedBy(userService.fetchUserById(apiPayment.getUpdatedBy()));
 		}
 		
-		// Storage key needs to be unique
-		receiptDocument = new Document();
-		receiptDocument.setContentType(apiPayment.getReceiptDocument().getContentType());
-		receiptDocument.setName(apiPayment.getReceiptDocument().getName());
-		receiptDocument.setSize(apiPayment.getReceiptDocument().getSize());
-		receiptDocument.setStorageKey(apiPayment.getReceiptDocument().getStorageKey());
-		
-		entity.setAmountPaidToTheFarmer(totalPaid);
-		entity.setAmountPaidToTheCollector(0);
-		entity.setCreatedBy(userService.fetchUserById(apiPayment.getCreatedBy()));
-		entity.setCurrency(apiPayment.getCurrency());
-//		entity.setInputTransactions(null);
-		entity.setStockOrder(stockOrder);
-		entity.setOrderReference(orderReference);
-		entity.setPayingCompany(payingCompany);
-		entity.setPaymentConfirmedAtTime(apiPayment.getPaymentConfirmedAtTime());
-		entity.setPaymentConfirmedByCompany(paymentConfirmedByCompany);
-		entity.setPaymentConfirmedByUser(paymentConfirmedByUser);
-		entity.setPaymentPurposeType(apiPayment.getPaymentPurposeType());
-		entity.setPaymentStatus(apiPayment.getPaymentStatus());
-		entity.setPaymentType(apiPayment.getPaymentType());
-		entity.setPreferredWayOfPayment(preferredWayOfPayment);
-//		entity.setProductionDate(apiPayment.getProductionDate());
-		entity.setPurchased(purchased);
-		entity.setReceiptDocument(receiptDocument);
-		entity.setReceiptNumber(apiPayment.getReceiptNumber());
-		entity.setRecipientCompany(recipientCompany);
-		entity.setRecipientCompanyCustomer(recipientCompanyCustomer);
-		entity.setReceiptDocumentType(apiPayment.getReceiptDocumentType());
-		entity.setRecipientType(apiPayment.getRecipientType());
-		entity.setRecipientUserCustomer(payableToFarmer);
-		entity.setRepresentativeOfRecipientCompany(recipientCompany); // is this required? seems to be same as recipientCompany
-		entity.setRepresentativeOfRecipientUserCustomer(payableToCollector);
-		entity.setTotalPaid(totalPaid);
-		
-		// do not forget to update the stock order entity - open balance - a negative open balance is allowed
-		stockOrder.setBalance(new BigDecimal(openBalance - entity.getTotalPaid()));
-
 		if (entity.getId() == null) {
 			em.persist(entity);
 			em.persist(stockOrder);

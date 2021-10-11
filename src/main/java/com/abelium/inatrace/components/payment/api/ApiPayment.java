@@ -22,6 +22,9 @@ public class ApiPayment extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "Payment created by user")
 	private Long createdBy;
+	
+	@ApiModelProperty(value = "Payment updated by user")
+	private Long updatedBy;
 
 	@ApiModelProperty(value = "Payment type")
 	private PaymentType paymentType;
@@ -103,6 +106,14 @@ public class ApiPayment extends ApiBaseEntity {
 
 	public void setCreatedBy(Long createdBy) {
 		this.createdBy = createdBy;
+	}
+	
+	public Long getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(Long updatedBy) {
+		this.updatedBy = updatedBy;
 	}
 
 	public PaymentType getPaymentType() {

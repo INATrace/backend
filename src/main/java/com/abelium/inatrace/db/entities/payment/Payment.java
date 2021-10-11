@@ -57,6 +57,9 @@ public class Payment extends TimestampEntity {
 	@ManyToOne(optional = false)
 	private User createdBy; // logged-in user
 	
+	@ManyToOne
+	private User updatedBy;
+	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
 	private PaymentType paymentType; // cash, bank
@@ -158,6 +161,14 @@ public class Payment extends TimestampEntity {
 
 	public void setCreatedBy(User createdBy) {
 		this.createdBy = createdBy;
+	}
+	
+	public User getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(User updatedBy) {
+		this.updatedBy = updatedBy;
 	}
 
 	public PaymentType getPaymentType() {

@@ -24,6 +24,7 @@ public final class PaymentMapper {
 		ApiPayment apiPayment = new ApiPayment();
 		apiPayment.setId(entity.getId());
 		apiPayment.setCreatedBy(entity.getCreatedBy().getId());
+		apiPayment.setUpdatedBy(entity.getUpdatedBy().getId());
 		apiPayment.setPaymentType(entity.getPaymentType());
 		apiPayment.setCurrency(entity.getCurrency());
 		apiPayment.setAmountPaidToTheFarmer(entity.getAmountPaidToTheFarmer());
