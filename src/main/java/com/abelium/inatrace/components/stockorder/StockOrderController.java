@@ -48,10 +48,10 @@ public class StockOrderController {
 
     @GetMapping("listAvailableStockForSemiProductInFacility")
     @ApiOperation("Get a paginated list of stock orders for provided semi product ID and facility ID.")
-    public ApiPaginatedResponse<ApiStockOrder> getStockOrderListByFacilityId(
+    public ApiPaginatedResponse<ApiStockOrder> getAvailableStockForSemiProductInFacility(
             @Valid ApiPaginatedRequest request,
             @Valid @ApiParam(value = "Facility ID", required = true) @RequestParam("facilityId") Long facilityId,
-            @Valid @ApiParam(value = "Facility ID", required = true) @RequestParam("semiProductId") Long semiProductId,
+            @Valid @ApiParam(value = "SemiProduct ID", required = true) @RequestParam("semiProductId") Long semiProductId,
             @AuthenticationPrincipal CustomUserDetails authUser) {
 
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
