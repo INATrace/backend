@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.facility;
 
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
+import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.facility.api.ApiFacilityLocation;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
@@ -32,6 +33,8 @@ public final class FacilityMapper {
 		apiFacility.setName(entity.getName());
 		apiFacility.setIsCollectionFacility(entity.getIsCollectionFacility());
 		apiFacility.setIsPublic(entity.getIsPublic());
+
+		apiFacility.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
 
 		ApiFacilityLocation apiFacilityLocation = new ApiFacilityLocation();
 		ApiAddress apiAddress = new ApiAddress();
