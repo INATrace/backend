@@ -19,7 +19,6 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderActivityProof;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderLocation;
-import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -31,7 +30,6 @@ import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.time.Instant;
 
 @Lazy
 @Service
@@ -45,69 +43,48 @@ public class StockOrderService extends BaseService {
     }
 
     public ApiPaginatedList<ApiStockOrder> getStockOrderList(ApiPaginatedRequest request,
-                                                             Long companyId,
-                                                             Long facilityId,
-                                                             Long semiProductId,
-                                                             Boolean isOpenBalanceOnly,
-                                                             Boolean isWomenShare,
-                                                             PreferredWayOfPayment wayOfPayment,
-                                                             Instant productionDateStart,
-                                                             Instant productionDateEnd,
-                                                             String producerUserCustomerName,
+                                                             StockOrderQueryRequest queryRequest,
                                                              Long userId) {
         return PaginationTools.createPaginatedResponse(em, request,
                 () -> stockOrderQueryObject(
                         request,
-                        companyId,
-                        facilityId,
-                        semiProductId,
-                        isOpenBalanceOnly,
-                        isWomenShare,
-                        wayOfPayment,
-                        productionDateStart,
-                        productionDateEnd,
-                        producerUserCustomerName
+                        queryRequest
                 ), stockOrder -> StockOrderMapper.toApiStockOrder(stockOrder, userId));
     }
 
     private StockOrder stockOrderQueryObject(ApiPaginatedRequest request,
-                                             Long companyId,
-                                             Long facilityId,
-                                             Long semiProductId,
-                                             Boolean isOpenBalanceOnly,
-                                             Boolean isWomenShare,
-                                             PreferredWayOfPayment wayOfPayment,
-                                             Instant productionDateStart,
-                                             Instant productionDateEnd,
-                                             String producerUserCustomerName) {
+                                             StockOrderQueryRequest queryRequest) {
 
         StockOrder stockOrderProxy = Torpedo.from(StockOrder.class);
         OnGoingLogicalCondition condition = Torpedo.condition();
 
         // Only present when listing by facility or company
-        if(companyId != null)
-            condition = condition.and(stockOrderProxy.getCompany().getId()).eq(companyId);
-        else if (facilityId != null)
-            condition = condition.and(stockOrderProxy.getFacility().getId()).eq(facilityId);
+        if(queryRequest.companyId != null)
+            condition = condition.and(stockOrderProxy.getCompany().getId()).eq(queryRequest.companyId);
+        else if (queryRequest.facilityId != null)
+            condition = condition.and(stockOrderProxy.getFacility().getId()).eq(queryRequest.facilityId);
 
 
         // Query parameter filters
-        if(semiProductId != null)
+        if(queryRequest.semiProductId != null)
             condition.and(stockOrderProxy.getSemiProduct()).isNotNull()
-                    .and(stockOrderProxy.getSemiProduct().getId()).eq(semiProductId);
-        if(isOpenBalanceOnly != null && isOpenBalanceOnly)
+                    .and(stockOrderProxy.getSemiProduct().getId()).eq(queryRequest.semiProductId);
+        if(queryRequest.isOpenBalanceOnly != null && queryRequest.isOpenBalanceOnly)
             condition.and(stockOrderProxy.getBalance()).isNotNull()
                     .and(stockOrderProxy.getBalance()).gt(BigDecimal.ZERO);
-        if(isWomenShare != null)
-            condition.and(stockOrderProxy.getWomenShare()).eq(isWomenShare);
-        if(wayOfPayment != null)
-            condition.and(stockOrderProxy.getPreferredWayOfPayment()).eq(wayOfPayment);
-        if(productionDateStart != null)
-            condition.and(stockOrderProxy.getProductionDate()).gte(productionDateStart);
-        if(productionDateEnd != null)
-            condition.and(stockOrderProxy.getProductionDate()).lte(productionDateEnd);
-        if(producerUserCustomerName != null) // Search by farmers name (query)
-            condition.and(stockOrderProxy.getProducerUserCustomer().getName()).like().startsWith(producerUserCustomerName);
+        if(queryRequest.isWomenShare != null)
+            condition.and(stockOrderProxy.getWomenShare()).eq(queryRequest.isWomenShare);
+        if(queryRequest.wayOfPayment != null)
+            condition.and(stockOrderProxy.getPreferredWayOfPayment()).eq(queryRequest.wayOfPayment);
+        if(queryRequest.productionDateStart != null)
+            condition.and(stockOrderProxy.getProductionDate()).gte(queryRequest.productionDateStart);
+        if(queryRequest.productionDateEnd != null)
+            condition.and(stockOrderProxy.getProductionDate()).lte(queryRequest.productionDateEnd);
+        if(queryRequest.producerUserCustomerName != null) // Search by farmers name (query)
+            condition.and(stockOrderProxy.getProducerUserCustomer().getName())
+                    .like().startsWith(queryRequest.producerUserCustomerName);
+        if(queryRequest.isAvailable)
+            condition.and(stockOrderProxy.getAvailableQuantity()).gt(0);
 
         Torpedo.where(condition);
 

@@ -43,7 +43,7 @@ public class StockOrderController {
             @Valid ApiPaginatedRequest request,
             @AuthenticationPrincipal CustomUserDetails authUser) {
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
-                request, null, null, null, null, null, null,null,null,null, authUser.getUserId()));
+                request, new StockOrderQueryRequest(), authUser.getUserId()));
     }
 
     @GetMapping("listAvailableStockForSemiProductInFacility")
@@ -56,15 +56,7 @@ public class StockOrderController {
 
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
                 request,
-                null,
-                facilityId,
-                semiProductId,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
+                new StockOrderQueryRequest(facilityId, semiProductId, true),
                 authUser.getUserId()));
     }
 
@@ -83,15 +75,16 @@ public class StockOrderController {
 
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
                 request,
-                null,
-                facilityId,
-                null,
-                isOpenBalanceOnly,
-                isWomenShare,
-                wayOfPayment,
-                productionDateStart != null ? productionDateStart.toInstant() : null,
-                productionDateEnd != null ? productionDateEnd.toInstant() : null,
-                producerUserCustomerName,
+                new StockOrderQueryRequest(
+                        null,
+                        facilityId,
+                        isOpenBalanceOnly,
+                        isWomenShare,
+                        wayOfPayment,
+                        productionDateStart != null ? productionDateStart.toInstant() : null,
+                        productionDateEnd != null ? productionDateEnd.toInstant() : null,
+                        producerUserCustomerName
+                ),
                 authUser.getUserId()));
     }
 
@@ -111,15 +104,16 @@ public class StockOrderController {
     ) {
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
                 request,
-                companyId,
-                null,
-                null,
-                isOpenBalanceOnly,
-                isWomenShare,
-                wayOfPayment,
-                productionDateStart != null ? productionDateStart.toInstant() : null,
-                productionDateEnd != null ? productionDateEnd.toInstant() : null,
-                producerUserCustomerName,
+                new StockOrderQueryRequest(
+                        companyId,
+                        null,
+                        isOpenBalanceOnly,
+                        isWomenShare,
+                        wayOfPayment,
+                        productionDateStart != null ? productionDateStart.toInstant() : null,
+                        productionDateEnd != null ? productionDateEnd.toInstant() : null,
+                        producerUserCustomerName
+                ),
                 authUser.getUserId()));
     }
 
