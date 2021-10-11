@@ -37,9 +37,13 @@ import javax.persistence.Version;
 @Entity
 @Table
 @NamedQueries({
-	@NamedQuery(name = "StockOrder.getStockOrderById",
+	@NamedQuery(name = "StockOrder.getPurchaseOrderById",
 				query = "SELECT so FROM StockOrder so "
-						+ "WHERE so.id = :stockOrderId")
+						+ "INNER JOIN FETCH so.company c "
+						+ "INNER JOIN FETCH so.representativeOfProducerUserCustomer ropuc "
+						+ "INNER JOIN FETCH so.producerUserCustomer puc "
+						+ "WHERE so.id = :stockOrderId "
+						+ "AND so.orderType = 'PURCHASE_ORDER'")
 })
 public class StockOrder extends TimestampEntity {
 
@@ -98,6 +102,10 @@ public class StockOrder extends TimestampEntity {
 	// Activity proofs that were provided while creating or updating a purchase order
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<StockOrderActivityProof> activityProofs;
+	
+	// A stock (purchase) order can be divided in many payments
+	@OneToMany(mappedBy = "payingCompany", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Payment> payments = new ArrayList<>();
 
 	@ManyToOne
 	private Company company;
@@ -200,9 +208,6 @@ public class StockOrder extends TimestampEntity {
 	
 	@OneToOne // Verify relationship
 	private ProcessingOrder processingOrder;
-	
-	@OneToOne // Verify relationship - for every purchase, we will have a corresponding payment?
-	private Payment payment;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
@@ -503,6 +508,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setSalesPricePerUnit(BigDecimal salesPricePerUnit) {
 		this.salesPricePerUnit = salesPricePerUnit;
+	}
+	
+	public List<Payment> getPayments() {
+		return payments;
+	}
+
+	public void setPayments(List<Payment> payments) {
+		this.payments = payments;
 	}
 
 	public String getCurrency() {

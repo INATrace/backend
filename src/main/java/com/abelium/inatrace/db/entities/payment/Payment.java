@@ -8,14 +8,11 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
-import com.abelium.inatrace.db.entities.stockorder.Transaction;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
-import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -23,7 +20,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
@@ -31,106 +27,130 @@ import javax.persistence.Version;
 @Entity
 @Table
 @NamedQueries({
-	@NamedQuery(name = "Payment.listPaymentsByCompany", 
+	@NamedQuery(name = "Payment.listPaymentsByPurchaseId", 
 				query = "SELECT p FROM Payment p "
-						+ "INNER JOIN FETCH p.payingCompany pc "
-						+ "INNER JOIN FETCH p.stockOrder so "
-						+ "INNER JOIN FETCH p.recipientCompany rc "
-						+ "INNER JOIN FETCH p.representativeOfRecipientCompany rorc "
-						+ "WHERE pc.id = :companyId"),
-	@NamedQuery(name = "Payment.countPaymentsByCompany",
+						+ "INNER JOIN p.stockOrder so "
+						+ "WHERE so.id = :purchaseId"),
+	@NamedQuery(name = "Payment.countPaymentsByPurchaseId",
 	            query = "SELECT COUNT(p) FROM Payment p "
-						+ "INNER JOIN p.payingCompany pc "
-						+ "WHERE pc.id = :companyId")
+	            		+ "INNER JOIN p.stockOrder so "
+						+ "WHERE so.id = :purchaseId"),
+	@NamedQuery(name = "Payment.listPaymentsByCompanyId", 
+				query = "SELECT p FROM Payment p "
+						+ "INNER JOIN p.stockOrder so "
+						+ "INNER JOIN so.company c "
+						+ "WHERE c.id = :companyId"),
+	@NamedQuery(name = "Payment.countPaymentsByCompanyId",
+    			query = "SELECT COUNT(p) FROM Payment p "
+    					+ "INNER JOIN p.stockOrder so "
+						+ "INNER JOIN so.company c "
+						+ "WHERE c.id = :companyId")
 })
 public class Payment extends TimestampEntity {
 
 	@Version
 	private Long entityVersion;
+	
+	@Column
+	private String orderReference; // stock order identifier
 
 	@ManyToOne(optional = false)
-	private User createdBy;
+	private User createdBy; // logged-in user
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
-	private PaymentType paymentType;
+	private PaymentType paymentType; // cash, bank
 
 	@Column
-	private String currency;
+	private String currency; // not chooseable on the frontend
+	
+	@Column
+	private Integer purchased; // stock order quantity
 
 	@Column
-	private BigDecimal amount;
+	private Integer amountPaidToTheFarmer; // same as stock order balance
 	
 	@Column
-	private BigDecimal amountPaidToTheCollector;
+	private Integer amountPaidToTheCollector; // set to 0 by default
 	
-	@OneToOne
-	private StockOrder stockOrder;
-	
-	@OneToOne // TODO: check relationship and how it fits here ?
-	private StockOrder order;
-	
-	@OneToMany // TODO: check relationship and how it fits here ?
-	private List<Transaction> inputTransactions = new ArrayList<>();
+	@Column
+	private Integer totalPaid;
 	
 	@ManyToOne
-	private Company payingCompany;
+	private StockOrder stockOrder; // stock order to which the payment(s) belong to
+	
+//	@OneToOne // TODO: check relationship and how it fits here ?
+//	private StockOrder order;
+//	
+//	@OneToMany // TODO: check relationship and how it fits here ?
+//	private List<Transaction> inputTransactions = new ArrayList<>();
 	
 	@ManyToOne
-	private Company recipientCompany; // TODO: is this a company receiving a payment?
+	private Company payingCompany; // company who is paying - logged-in user
 	
 	@ManyToOne
-	private UserCustomer recipientUserCustomer;
+	private Company recipientCompany; // farmer's company who is receiving payment
 	
 	@ManyToOne
-	private Company representativeOfRecipientCompany;
+	private Company representativeOfRecipientCompany; // collector's company who is receiving payment
 	
 	@ManyToOne
-	private UserCustomer representativeOfRecipientUserCustomer;
+	private UserCustomer recipientUserCustomer; // farmer
 	
 	@ManyToOne
-	private CompanyCustomer recipientCompanyCustomer;
+	private UserCustomer representativeOfRecipientUserCustomer; // collector
+	
+	@ManyToOne
+	private CompanyCustomer recipientCompanyCustomer; // farmer geolocation, etc. ?
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
-	private RecipientType recipientType;
+	private RecipientType recipientType; // organization, company customer or user customer (should be default)
 	
 	@Column
-	private Long receiptNumber;
+	private Long receiptNumber; // defined by user
 
-	@OneToOne
-	private Document receiptDocument;
+	@OneToOne(cascade = CascadeType.ALL)
+	private Document receiptDocument; // document info
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
-	private ReceiptDocumentType receiptDocumentType;
+	private ReceiptDocumentType receiptDocumentType; // purchase sheet, receipt
 	
-	@ManyToOne
-	private BulkPayment bankTransfer;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(length = Lengths.ENUM)
-	private PaymentPurposeType paymentPurporseType;
+//	@ManyToOne
+//	private BulkPayment bankTransfer;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
-	private PaymentStatus paymentStatus;
+	private PaymentPurposeType paymentPurposeType; // advanced, cherry, member bonus, af women premium, invoice payment
+	
+	@Enumerated(EnumType.STRING)
+	@Column(length = Lengths.ENUM)
+	private PaymentStatus paymentStatus; // unconfirmed, confirmed
 	
 	@ManyToOne
-	private User paymentConfirmedByUser;
+	private User paymentConfirmedByUser; // user logged-in
 	
 	@ManyToOne
-	private Company paymentConfirmedByCompany;
+	private Company paymentConfirmedByCompany; // user's company who's logged-in
     
     @Column
     private Instant paymentConfirmedAtTime;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
-	private PreferredWayOfPayment preferredWayOfPayment;
+	private PreferredWayOfPayment preferredWayOfPayment; // cash cooperative, cash collector, bank transfer
 	
 	@Column
-    private Instant productionDate;
+    private Instant productionDate; // ?
+	
+	public String getOrderReference() {
+		return orderReference;
+	}
+
+	public void setOrderReference(String orderReference) {
+		this.orderReference = orderReference;
+	}
 
 	public User getCreatedBy() {
 		return createdBy;
@@ -156,20 +176,36 @@ public class Payment extends TimestampEntity {
 		this.currency = currency;
 	}
 
-	public BigDecimal getAmount() {
-		return amount;
+	public Integer getAmountPaidToTheFarmer() {
+		return amountPaidToTheFarmer;
 	}
 
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
+	public void setAmountPaidToTheFarmer(Integer amount) {
+		this.amountPaidToTheFarmer = amount;
 	}
 
-	public BigDecimal getAmountPaidToTheCollector() {
+	public Integer getAmountPaidToTheCollector() {
 		return amountPaidToTheCollector;
 	}
 
-	public void setAmountPaidToTheCollector(BigDecimal amountPaidToTheCollector) {
+	public void setAmountPaidToTheCollector(Integer amountPaidToTheCollector) {
 		this.amountPaidToTheCollector = amountPaidToTheCollector;
+	}
+	
+	public Integer getPurchased() {
+		return purchased;
+	}
+
+	public void setPurchased(Integer purchased) {
+		this.purchased = purchased;
+	}
+
+	public Integer getTotalPaid() {
+		return totalPaid;
+	}
+
+	public void setTotalPaid(Integer totalPaid) {
+		this.totalPaid = totalPaid;
 	}
 
 	public StockOrder getStockOrder() {
@@ -180,21 +216,21 @@ public class Payment extends TimestampEntity {
 		this.stockOrder = stockOrder;
 	}
 
-	public StockOrder getOrder() {
-		return order;
-	}
-
-	public void setOrder(StockOrder order) {
-		this.order = order;
-	}
-
-	public List<Transaction> getInputTransactions() {
-		return inputTransactions;
-	}
-
-	public void setInputTransactions(List<Transaction> inputTransactions) {
-		this.inputTransactions = inputTransactions;
-	}
+//	public StockOrder getOrder() {
+//		return order;
+//	}
+//
+//	public void setOrder(StockOrder order) {
+//		this.order = order;
+//	}
+//
+//	public List<Transaction> getInputTransactions() {
+//		return inputTransactions;
+//	}
+//
+//	public void setInputTransactions(List<Transaction> inputTransactions) {
+//		this.inputTransactions = inputTransactions;
+//	}
 
 	public Company getPayingCompany() {
 		return payingCompany;
@@ -276,20 +312,20 @@ public class Payment extends TimestampEntity {
 		this.receiptDocumentType = receiptDocumentType;
 	}
 
-	public BulkPayment getBankTransfer() {
-		return bankTransfer;
+//	public BulkPayment getBankTransfer() {
+//		return bankTransfer;
+//	}
+//
+//	public void setBankTransfer(BulkPayment bankTransfer) {
+//		this.bankTransfer = bankTransfer;
+//	}
+
+	public PaymentPurposeType getPaymentPurposeType() {
+		return paymentPurposeType;
 	}
 
-	public void setBankTransfer(BulkPayment bankTransfer) {
-		this.bankTransfer = bankTransfer;
-	}
-
-	public PaymentPurposeType getPaymentPurporseType() {
-		return paymentPurporseType;
-	}
-
-	public void setPaymentPurporseType(PaymentPurposeType paymentPurporseType) {
-		this.paymentPurporseType = paymentPurporseType;
+	public void setPaymentPurposeType(PaymentPurposeType paymentPurporseType) {
+		this.paymentPurposeType = paymentPurporseType;
 	}
 
 	public PaymentStatus getPaymentStatus() {

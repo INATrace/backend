@@ -14,7 +14,9 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.payment.Payment;
+import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -24,6 +26,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,64 +65,111 @@ public class PaymentService extends BaseService {
 	public ApiBaseEntity createOrUpdatePayment(ApiPayment apiPayment) throws ApiException {
 
 		Payment entity;
-		Company payingCompany;
-		Company recipientCompany;
-		Company paymentConfirmedByCompany;
-		StockOrder stockOrder;
-		User paymentConfirmedByUser;
-		Document receiptDocument;
-		CompanyCustomer recipientCompanyCustomer;
-		UserCustomer recipientUserCustomer;
+		Company payingCompany = null;
+		Company recipientCompany = null;
+		Company paymentConfirmedByCompany = null;
+		StockOrder stockOrder = null;
+		Document receiptDocument = null;
+		User paymentConfirmedByUser = null;
+		UserCustomer payableToCollector = null;
+		UserCustomer payableToFarmer = null;
+		CompanyCustomer recipientCompanyCustomer = null; // still don't know where to get it from - assing null for now
+		PreferredWayOfPayment preferredWayOfPayment = null;
+		String orderReference = null;
+		Integer purchased = null;
+		Integer openBalance = null;
+		Integer totalPaid = null;
 
 		if (apiPayment.getId() != null) {
+
+			// If method is PUT, let's keep it simple and just allow to update the payment status to CONFIRMED
+			// Coffee Matheo doesn't allow us to update fields other than the payment status
+			// Also it is not allowed to set back the value to UNCONFIRMED
 			entity = fetchPayment(apiPayment.getId());
-			payingCompany = entity.getPayingCompany();
-			recipientCompany = entity.getRecipientCompany();
-			paymentConfirmedByCompany = entity.getPaymentConfirmedByCompany();
-			stockOrder = entity.getStockOrder();
-			paymentConfirmedByUser = entity.getPaymentConfirmedByUser();
-			receiptDocument = entity.getReceiptDocument();
-			recipientCompanyCustomer = entity.getRecipientCompanyCustomer();
-			recipientUserCustomer = entity.getRecipientUserCustomer();
+			if (apiPayment.getPaymentStatus() == PaymentStatus.CONFIRMED) {
+				if (entity.getPaymentStatus() == PaymentStatus.UNCONFIRMED) {
+					entity.setPaymentStatus(PaymentStatus.CONFIRMED);
+				}
+			}
+			
 		} else {
+			
+			// If method is POST, let's create a payment from scratch
+			// Important to consider that a purchase order must exist, since we will extract information from it
 			entity = new Payment();
-			payingCompany = (Company) em.createNamedQuery("Company.getCompanyById").setParameter("companyId", apiPayment.getPayingCompany().getId()).getSingleResult();
-			recipientCompany = (Company) em.createNamedQuery("Company.getCompanyById").setParameter("companyId", apiPayment.getRecipientCompany().getId()).getSingleResult();
-			paymentConfirmedByCompany = (Company) em.createNamedQuery("Company.getCompanyById").setParameter("companyId", apiPayment.getPaymentConfirmedByCompany().getId()).getSingleResult();
-			stockOrder = (StockOrder) em.createNamedQuery("StockOrder.getStockOrderById").setParameter("stockOrderId", apiPayment.getStockOrder().getId()).getSingleResult();
-			paymentConfirmedByUser = userService.fetchUserById(apiPayment.getPaymentConfirmedByUser().getId());
-			receiptDocument = (Document) em.createNamedQuery("Document.getDocumentById").setParameter("documentId", apiPayment.getReceiptDocument().getId()).getSingleResult();
-			recipientCompanyCustomer = (CompanyCustomer) em.createNamedQuery("CompanyCustomer.getCompanyCustomerById").setParameter("companyCustomerId", apiPayment.getRecipientCompanyCustomer().getId()).getSingleResult();
-			recipientUserCustomer = (UserCustomer) em.createNamedQuery("UserCustomer.getUserCustomerById").setParameter("userCustomerId", apiPayment.getRecipientUserCustomer().getId()).getSingleResult();
+			// Get purchase order to which you will generate a payment
+			stockOrder = (StockOrder) em.createNamedQuery("StockOrder.getPurchaseOrderById").setParameter("stockOrderId", apiPayment.getStockOrder().getId()).getSingleResult();
+			if (stockOrder != null) {
+				
+				// the company who creates a purchase should be the one who pays for it, right?
+				payingCompany = stockOrder.getCompany();
+				// company who receives the payment - could this be client property on stock order?
+				recipientCompany = (Company) em.createNamedQuery("Company.getCompanyById").setParameter("companyId", apiPayment.getRecipientCompany().getId()).getSingleResult();
+				// collector (representative) who is getting the payment
+				payableToCollector = stockOrder.getRepresentativeOfProducerUserCustomer();
+				// farmer who is getting the payment
+				payableToFarmer = stockOrder.getProducerUserCustomer();
+				// purchase order identifier
+				orderReference = stockOrder.getIdentifier();
+				// purchase order preferred way of payment
+				preferredWayOfPayment = stockOrder.getPreferredWayOfPayment();
+				// purchase order total quantity of semi-product
+				purchased = stockOrder.getTotalQuantity();
+				// purchase order open balance
+				openBalance = stockOrder.getBalance().intValue();
+				// amount paid to the farmer
+				totalPaid = apiPayment.getAmountPaidToTheFarmer();
+				// should be the same as paying company?
+				paymentConfirmedByCompany = payingCompany;
+				// user logged-in
+				paymentConfirmedByUser = userService.fetchUserById(apiPayment.getPaymentConfirmedByUser().getId());
+			} else {
+				throw new ApiException(ApiStatus.INVALID_REQUEST, "A purchase order is required in order to create a payment.");
+			}
+			
 		}
 		
-		entity.setAmount(apiPayment.getAmount());
-		entity.setAmountPaidToTheCollector(apiPayment.getAmountPaidToTheCollector());
-		entity.setCreatedBy(apiPayment.getCreatedBy());
+		// Storage key needs to be unique
+		receiptDocument = new Document();
+		receiptDocument.setContentType(apiPayment.getReceiptDocument().getContentType());
+		receiptDocument.setName(apiPayment.getReceiptDocument().getName());
+		receiptDocument.setSize(apiPayment.getReceiptDocument().getSize());
+		receiptDocument.setStorageKey(apiPayment.getReceiptDocument().getStorageKey());
+		
+		entity.setAmountPaidToTheFarmer(totalPaid);
+		entity.setAmountPaidToTheCollector(0);
+		entity.setCreatedBy(userService.fetchUserById(apiPayment.getCreatedBy()));
 		entity.setCurrency(apiPayment.getCurrency());
 //		entity.setInputTransactions(null);
 		entity.setStockOrder(stockOrder);
+		entity.setOrderReference(orderReference);
 		entity.setPayingCompany(payingCompany);
 		entity.setPaymentConfirmedAtTime(apiPayment.getPaymentConfirmedAtTime());
 		entity.setPaymentConfirmedByCompany(paymentConfirmedByCompany);
 		entity.setPaymentConfirmedByUser(paymentConfirmedByUser);
-		entity.setPaymentPurporseType(apiPayment.getPaymentPurporseType());
+		entity.setPaymentPurposeType(apiPayment.getPaymentPurposeType());
 		entity.setPaymentStatus(apiPayment.getPaymentStatus());
 		entity.setPaymentType(apiPayment.getPaymentType());
-		entity.setPreferredWayOfPayment(apiPayment.getPreferredWayOfPayment());
-		entity.setProductionDate(apiPayment.getProductionDate());
+		entity.setPreferredWayOfPayment(preferredWayOfPayment);
+//		entity.setProductionDate(apiPayment.getProductionDate());
+		entity.setPurchased(purchased);
 		entity.setReceiptDocument(receiptDocument);
 		entity.setReceiptNumber(apiPayment.getReceiptNumber());
 		entity.setRecipientCompany(recipientCompany);
 		entity.setRecipientCompanyCustomer(recipientCompanyCustomer);
 		entity.setReceiptDocumentType(apiPayment.getReceiptDocumentType());
 		entity.setRecipientType(apiPayment.getRecipientType());
-		entity.setRecipientUserCustomer(recipientUserCustomer);
-		entity.setRepresentativeOfRecipientCompany(null);
-		entity.setRepresentativeOfRecipientUserCustomer(null);
+		entity.setRecipientUserCustomer(payableToFarmer);
+		entity.setRepresentativeOfRecipientCompany(recipientCompany); // is this required? seems to be same as recipientCompany
+		entity.setRepresentativeOfRecipientUserCustomer(payableToCollector);
+		entity.setTotalPaid(totalPaid);
+		
+		// do not forget to update the stock order entity - open balance - a negative open balance is allowed
+		stockOrder.setBalance(new BigDecimal(openBalance - entity.getTotalPaid()));
 
 		if (entity.getId() == null) {
 			em.persist(entity);
+			em.persist(stockOrder);
 		}
 
 		return new ApiBaseEntity(entity);
@@ -141,10 +191,28 @@ public class PaymentService extends BaseService {
 		return payment;
 	}
 	
+	public ApiPaginatedList<ApiPayment> listPaymentsByPurchase(Long purchaseId, ApiPaginatedRequest request) {
+
+		TypedQuery<Payment> paymentsQuery = 
+			em.createNamedQuery("Payment.listPaymentsByPurchaseId", Payment.class)
+				.setParameter("purchaseId", purchaseId)
+				.setFirstResult(request.getOffset())
+				.setMaxResults(request.getLimit());
+
+		List<Payment> payments = paymentsQuery.getResultList();
+
+		Long count = 
+			em.createNamedQuery("Payment.countPaymentsByPurchaseId", Long.class)
+				.setParameter("purchaseId", purchaseId).getSingleResult();
+
+		return new ApiPaginatedList<>(
+			payments.stream().map(PaymentMapper::toApiPayment).collect(Collectors.toList()), count);
+	}
+	
 	public ApiPaginatedList<ApiPayment> listPaymentsByCompany(Long companyId, ApiPaginatedRequest request) {
 
 		TypedQuery<Payment> paymentsQuery = 
-			em.createNamedQuery("Payment.listPaymentsByCompany", Payment.class)
+			em.createNamedQuery("Payment.listPaymentsByCompanyId", Payment.class)
 				.setParameter("companyId", companyId)
 				.setFirstResult(request.getOffset())
 				.setMaxResults(request.getLimit());
@@ -152,7 +220,7 @@ public class PaymentService extends BaseService {
 		List<Payment> payments = paymentsQuery.getResultList();
 
 		Long count = 
-			em.createNamedQuery("Payment.countPaymentsByCompany", Long.class)
+			em.createNamedQuery("Payment.countPaymentsByCompanyId", Long.class)
 				.setParameter("companyId", companyId).getSingleResult();
 
 		return new ApiPaginatedList<>(

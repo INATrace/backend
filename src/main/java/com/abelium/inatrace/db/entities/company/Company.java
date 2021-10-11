@@ -165,12 +165,6 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	@OneToMany(mappedBy = "company")
 	private List<StockOrder> stockOrders = new ArrayList<>();
 	
-	/**
-	 * stock orders
-	 */
-	@OneToMany(mappedBy = "payingCompany")
-	private List<Payment> payments = new ArrayList<>();
-
 	@ManyToOne()
 	private CurrencyType currency;
 
@@ -326,14 +320,6 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 		this.stockOrders = stockOrders;
 	}
 	
-	public List<Payment> getPayments() {
-		return payments;
-	}
-
-	public void setPayments(List<Payment> payments) {
-		this.payments = payments;
-	}
-
 	public CurrencyType getCurrency() {
 		return currency;
 	}

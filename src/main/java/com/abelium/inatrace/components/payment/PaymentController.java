@@ -45,20 +45,29 @@ public class PaymentController {
 		return new ApiPaginatedResponse<>(paymentService.getPaymentList(request));
 	}
 	
-	@GetMapping("list/company/{id}")
-	@ApiOperation("Get a list of payments by company ID.")
-	public ApiPaginatedResponse<ApiPayment> listPaymentsByCompany(
-			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId, @Valid ApiPaginatedRequest request) {
-
-		return new ApiPaginatedResponse<>(paymentService.listPaymentsByCompany(companyId, request));
-	}
-	
 	@GetMapping("{id}")
 	@ApiOperation("Get a single payment with the provided ID.")
 	public ApiResponse<ApiPayment> getPayment(@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		return new ApiResponse<>(paymentService.getPayment(id));
+	}
+	
+	@GetMapping("list/purchase/{id}")
+	@ApiOperation("Get a list of payments by purchase order (stock order) ID.")
+	public ApiPaginatedResponse<ApiPayment> listPaymentsByPurchase(
+		@Valid @ApiParam(value = "Purchase ID", required = true) @PathVariable("id") Long purchaseId, 
+		@Valid ApiPaginatedRequest request) {
 
+		return new ApiPaginatedResponse<>(paymentService.listPaymentsByPurchase(purchaseId, request));
+	}
+	
+	@GetMapping("list/company/{id}")
+	@ApiOperation("Get a list of payments by company ID.")
+	public ApiPaginatedResponse<ApiPayment> listPaymentsByCompany(
+		@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId, 
+		@Valid ApiPaginatedRequest request) {
+
+		return new ApiPaginatedResponse<>(paymentService.listPaymentsByCompany(companyId, request));
 	}
 
 	@PutMapping
@@ -66,7 +75,6 @@ public class PaymentController {
 	public ApiResponse<ApiBaseEntity> createOrUpdatePayment(@Valid @RequestBody ApiPayment apiPayment) throws ApiException {
 
 		return new ApiResponse<>(paymentService.createOrUpdatePayment(apiPayment));
-
 	}
 
 	@DeleteMapping("{id}")
@@ -75,6 +83,5 @@ public class PaymentController {
 
 		paymentService.deletePayment(id);
 		return new ApiDefaultResponse();
-
 	}
 }

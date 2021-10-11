@@ -7,7 +7,6 @@ import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.product.api.ApiUserCustomer;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
-import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
 import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.payment.PaymentType;
@@ -15,7 +14,6 @@ import com.abelium.inatrace.db.entities.payment.ReceiptDocumentType;
 import com.abelium.inatrace.db.entities.payment.RecipientType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -23,19 +21,25 @@ import io.swagger.annotations.ApiModelProperty;
 public class ApiPayment extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "Payment created by user")
-	private User createdBy;
+	private Long createdBy;
 
 	@ApiModelProperty(value = "Payment type")
 	private PaymentType paymentType;
 
 	@ApiModelProperty(value = "Payment's currency")
 	private String currency;
+	
+	@ApiModelProperty(value = "Quantity purchased to be paid")
+	private Integer purchased;
 
-	@ApiModelProperty(value = "Payment amount")
-	private BigDecimal amount;
+	@ApiModelProperty(value = "Payment amount paid to the farmer")
+	private Integer amountPaidToTheFarmer;
 	
 	@ApiModelProperty(value = "Payment amount paid to the collector")
-	private BigDecimal amountPaidToTheCollector;
+	private Integer amountPaidToTheCollector;
+	
+	@ApiModelProperty(value = "Payment total amount")
+	private Integer totalPaid;
 	
 	@ApiModelProperty(value = "Stock order related to the payment")
 	private ApiStockOrder stockOrder;
@@ -45,24 +49,6 @@ public class ApiPayment extends ApiBaseEntity {
 	
 //	@ApiModelProperty(value = "")
 //	private List<Transaction> inputTransactions = new ArrayList<>();
-	
-	@ApiModelProperty(value = "Company that is making the payment")
-	private ApiCompanyBase payingCompany;
-	
-	@ApiModelProperty(value = "Company that receives the payment")
-	private ApiCompanyBase recipientCompany; // TODO: is this a company receiving a payment?
-	
-	@ApiModelProperty(value = "User customer who receives the payment")
-	private ApiUserCustomer recipientUserCustomer;
-	
-	@ApiModelProperty(value = "Representative of the company that receives the payment")
-	private ApiCompanyBase representativeOfRecipientCompany;
-	
-	@ApiModelProperty(value = "Representative of the user customer that receives the payment")
-	private ApiUserCustomer representativeOfRecipientUserCustomer;
-	
-	@ApiModelProperty(value = "Company customer that receives the payment")
-	private ApiCompanyCustomer recipientCompanyCustomer;
 	
 	@ApiModelProperty(value = "Recipient type")
 	private RecipientType recipientType;
@@ -80,7 +66,7 @@ public class ApiPayment extends ApiBaseEntity {
 //	private BulkPayment bankTransfer;
 	
 	@ApiModelProperty(value = "Payment purpose type")
-	private PaymentPurposeType paymentPurporseType;
+	private PaymentPurposeType paymentPurposeType;
 	
 	@ApiModelProperty(value = "Payment status")
 	private PaymentStatus paymentStatus;
@@ -88,9 +74,6 @@ public class ApiPayment extends ApiBaseEntity {
 	@ApiModelProperty(value = "User who confirmed the payment")
 	private ApiUser paymentConfirmedByUser;
 	
-	@ApiModelProperty(value = "Company that confirmed the payment")
-	private ApiCompanyBase paymentConfirmedByCompany;
-    
 	@ApiModelProperty(value = "Payment time confirmation")
     private Instant paymentConfirmedAtTime;
 	
@@ -99,12 +82,26 @@ public class ApiPayment extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Production date")
     private Instant productionDate;
+	
+	// The next properties can be extracted from the purchase (stock order) on the way back
+	
+	@ApiModelProperty(value = "Company that receives the payment")
+	private ApiCompanyBase recipientCompany; // TODO: is this a company receiving a payment?
+	
+	@ApiModelProperty(value = "Representative of the company that receives the payment")
+	private ApiCompanyBase representativeOfRecipientCompany;
+	
+	@ApiModelProperty(value = "Representative of the user customer that receives the payment")
+	private ApiUserCustomer representativeOfRecipientUserCustomer;
+	
+	@ApiModelProperty(value = "Company customer that receives the payment")
+	private ApiCompanyCustomer recipientCompanyCustomer;
 
-	public User getCreatedBy() {
+	public Long getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreatedBy(User createdBy) {
+	public void setCreatedBy(Long createdBy) {
 		this.createdBy = createdBy;
 	}
 
@@ -124,20 +121,36 @@ public class ApiPayment extends ApiBaseEntity {
 		this.currency = currency;
 	}
 
-	public BigDecimal getAmount() {
-		return amount;
+	public Integer getPurchased() {
+		return purchased;
 	}
 
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
+	public void setPurchased(Integer purchased) {
+		this.purchased = purchased;
 	}
 
-	public BigDecimal getAmountPaidToTheCollector() {
+	public Integer getAmountPaidToTheFarmer() {
+		return amountPaidToTheFarmer;
+	}
+
+	public void setAmountPaidToTheFarmer(Integer amountPaidToTheFarmer) {
+		this.amountPaidToTheFarmer = amountPaidToTheFarmer;
+	}
+
+	public Integer getAmountPaidToTheCollector() {
 		return amountPaidToTheCollector;
 	}
 
-	public void setAmountPaidToTheCollector(BigDecimal amountPaidToTheCollector) {
+	public void setAmountPaidToTheCollector(Integer amountPaidToTheCollector) {
 		this.amountPaidToTheCollector = amountPaidToTheCollector;
+	}
+
+	public Integer getTotalPaid() {
+		return totalPaid;
+	}
+
+	public void setTotalPaid(Integer totalPaid) {
+		this.totalPaid = totalPaid;
 	}
 
 	public ApiStockOrder getStockOrder() {
@@ -146,54 +159,6 @@ public class ApiPayment extends ApiBaseEntity {
 
 	public void setStockOrder(ApiStockOrder stockOrder) {
 		this.stockOrder = stockOrder;
-	}
-
-	public ApiCompanyBase getPayingCompany() {
-		return payingCompany;
-	}
-
-	public void setPayingCompany(ApiCompanyBase payingCompany) {
-		this.payingCompany = payingCompany;
-	}
-
-	public ApiCompanyBase getRecipientCompany() {
-		return recipientCompany;
-	}
-
-	public void setRecipientCompany(ApiCompanyBase recipientCompany) {
-		this.recipientCompany = recipientCompany;
-	}
-
-	public ApiUserCustomer getRecipientUserCustomer() {
-		return recipientUserCustomer;
-	}
-
-	public void setRecipientUserCustomer(ApiUserCustomer recipientUserCustomer) {
-		this.recipientUserCustomer = recipientUserCustomer;
-	}
-
-	public ApiCompanyBase getRepresentativeOfRecipientCompany() {
-		return representativeOfRecipientCompany;
-	}
-
-	public void setRepresentativeOfRecipientCompany(ApiCompanyBase representativeOfRecipientCompany) {
-		this.representativeOfRecipientCompany = representativeOfRecipientCompany;
-	}
-
-	public ApiUserCustomer getRepresentativeOfRecipientUserCustomer() {
-		return representativeOfRecipientUserCustomer;
-	}
-
-	public void setRepresentativeOfRecipientUserCustomer(ApiUserCustomer representativeOfRecipientUserCustomer) {
-		this.representativeOfRecipientUserCustomer = representativeOfRecipientUserCustomer;
-	}
-
-	public ApiCompanyCustomer getRecipientCompanyCustomer() {
-		return recipientCompanyCustomer;
-	}
-
-	public void setRecipientCompanyCustomer(ApiCompanyCustomer recipientCompanyCustomer) {
-		this.recipientCompanyCustomer = recipientCompanyCustomer;
 	}
 
 	public RecipientType getRecipientType() {
@@ -228,12 +193,12 @@ public class ApiPayment extends ApiBaseEntity {
 		this.receiptDocumentType = receiptDocumentType;
 	}
 
-	public PaymentPurposeType getPaymentPurporseType() {
-		return paymentPurporseType;
+	public PaymentPurposeType getPaymentPurposeType() {
+		return paymentPurposeType;
 	}
 
-	public void setPaymentPurporseType(PaymentPurposeType paymentPurporseType) {
-		this.paymentPurporseType = paymentPurporseType;
+	public void setPaymentPurporseType(PaymentPurposeType paymentPurposeType) {
+		this.paymentPurposeType = paymentPurposeType;
 	}
 
 	public PaymentStatus getPaymentStatus() {
@@ -250,14 +215,6 @@ public class ApiPayment extends ApiBaseEntity {
 
 	public void setPaymentConfirmedByUser(ApiUser paymentConfirmedByUser) {
 		this.paymentConfirmedByUser = paymentConfirmedByUser;
-	}
-
-	public ApiCompanyBase getPaymentConfirmedByCompany() {
-		return paymentConfirmedByCompany;
-	}
-
-	public void setPaymentConfirmedByCompany(ApiCompanyBase paymentConfirmedByCompany) {
-		this.paymentConfirmedByCompany = paymentConfirmedByCompany;
 	}
 
 	public Instant getPaymentConfirmedAtTime() {
@@ -283,5 +240,37 @@ public class ApiPayment extends ApiBaseEntity {
 	public void setProductionDate(Instant productionDate) {
 		this.productionDate = productionDate;
 	}
-	
+
+	public ApiCompanyBase getRecipientCompany() {
+		return recipientCompany;
+	}
+
+	public void setRecipientCompany(ApiCompanyBase recipientCompany) {
+		this.recipientCompany = recipientCompany;
+	}
+
+	public ApiCompanyBase getRepresentativeOfRecipientCompany() {
+		return representativeOfRecipientCompany;
+	}
+
+	public void setRepresentativeOfRecipientCompany(ApiCompanyBase representativeOfRecipientCompany) {
+		this.representativeOfRecipientCompany = representativeOfRecipientCompany;
+	}
+
+	public ApiUserCustomer getRepresentativeOfRecipientUserCustomer() {
+		return representativeOfRecipientUserCustomer;
+	}
+
+	public void setRepresentativeOfRecipientUserCustomer(ApiUserCustomer representativeOfRecipientUserCustomer) {
+		this.representativeOfRecipientUserCustomer = representativeOfRecipientUserCustomer;
+	}
+
+	public ApiCompanyCustomer getRecipientCompanyCustomer() {
+		return recipientCompanyCustomer;
+	}
+
+	public void setRecipientCompanyCustomer(ApiCompanyCustomer recipientCompanyCustomer) {
+		this.recipientCompanyCustomer = recipientCompanyCustomer;
+	}
+
 }
