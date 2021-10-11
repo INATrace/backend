@@ -28,7 +28,7 @@ public class ApiCompany extends ApiCompanyBase {
 	@Valid
 	public List<ApiCertification> certifications;
 
-	@ApiModelProperty(value = "Preffered currency of the company")
+	@ApiModelProperty(value = "Preferred currency of the company")
 	@Valid
 	public ApiCurrencyType currency;
 	

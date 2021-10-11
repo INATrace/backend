@@ -1,12 +1,13 @@
 package com.abelium.inatrace.components.facility;
 
+import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
-import com.abelium.inatrace.components.facility.api.ApiPayment;
-import com.abelium.inatrace.components.facility.api.ApiFacilityLocation;
-import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
 import com.abelium.inatrace.components.common.api.ApiCountry;
 import com.abelium.inatrace.components.company.api.ApiAddress;
+import com.abelium.inatrace.components.company.mappers.CompanyMapper;
+import com.abelium.inatrace.components.facility.api.ApiFacility;
+import com.abelium.inatrace.components.facility.api.ApiFacilityLocation;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.facility.FacilitySemiProduct;
 
@@ -24,14 +25,16 @@ public final class FacilityMapper {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static ApiPayment toApiFacility(Facility entity) {
+	public static ApiFacility toApiFacility(Facility entity) {
 
 		// Simplest apiFacility object
-		ApiPayment apiFacility = new ApiPayment();
+		ApiFacility apiFacility = new ApiFacility();
 		apiFacility.setId(entity.getId());
 		apiFacility.setName(entity.getName());
 		apiFacility.setIsCollectionFacility(entity.getIsCollectionFacility());
 		apiFacility.setIsPublic(entity.getIsPublic());
+
+		apiFacility.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
 
 		ApiFacilityLocation apiFacilityLocation = new ApiFacilityLocation();
 		ApiAddress apiAddress = new ApiAddress();

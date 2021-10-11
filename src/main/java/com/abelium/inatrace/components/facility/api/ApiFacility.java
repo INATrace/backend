@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
 
-public class ApiPayment extends ApiBaseEntity {
+public class ApiFacility extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "Facility name")
 	private String name;
@@ -88,11 +88,11 @@ public class ApiPayment extends ApiBaseEntity {
 		this.facilitySemiProductList = facilitySemiProductList;
 	}
 
-	public ApiPayment() {
+	public ApiFacility() {
 		super();
 	}
 
-	public ApiPayment(String name, Boolean isCollectionFacility, Boolean isPublic,
+	public ApiFacility(String name, Boolean isCollectionFacility, Boolean isPublic,
 			ApiFacilityLocation facilityLocation, ApiCompanyBase company, ApiFacilityType facilityType) {
 		super();
 		this.name = name;

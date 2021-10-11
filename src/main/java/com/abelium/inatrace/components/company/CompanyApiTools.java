@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,6 +33,9 @@ import java.util.stream.Collectors;
 @Lazy
 @Component
 public class CompanyApiTools {
+
+	@PersistenceContext
+	private EntityManager em;
 	
 	@Autowired
 	private CommonService commonEngine;
@@ -69,8 +74,7 @@ public class CompanyApiTools {
 		ac.manager = c.getManager();
 		ac.email = c.getEmail();
 		ac.phone = c.getPhone();
-		ac.currency = new ApiCurrencyType();
-		ac.setCurrency(CurrencyTypeMapper.toApiCurrencyType(c.getCurrency()));
+		ac.currency = CommonApiTools.toApiCurrencyType(c.getCurrency());
 	}
 
 	public void updateApiCompanyPublic(ApiCompanyPublic ac, Company c, Language language) {
@@ -118,7 +122,23 @@ public class CompanyApiTools {
 
 		return apiCompany;
 	}
-	
+
+	public void updateLocation(GeoAddress geoAddress, ApiGeoAddress apiGeoAddress) {
+		geoAddress.setAddress(apiGeoAddress.getAddress());
+		geoAddress.setCell(apiGeoAddress.getCell());
+		geoAddress.setCity(apiGeoAddress.getCity());
+		geoAddress.setCountry(em.find(Country.class, apiGeoAddress.getCountry().getId()));
+		geoAddress.setHondurasDepartment(apiGeoAddress.getHondurasDepartment());
+		geoAddress.setHondurasFarm(apiGeoAddress.getHondurasFarm());
+		geoAddress.setHondurasMunicipality(apiGeoAddress.getHondurasMunicipality());
+		geoAddress.setHondurasVillage(apiGeoAddress.getHondurasVillage());
+		geoAddress.setLatitude(apiGeoAddress.getLatitude());
+		geoAddress.setLongitude(apiGeoAddress.getLongitude());
+		geoAddress.setSector(apiGeoAddress.getSector());
+		geoAddress.setState(apiGeoAddress.getState());
+		geoAddress.setVillage(apiGeoAddress.getVillage());
+		geoAddress.setZip(apiGeoAddress.getZip());
+	}
 
 	public void updateCompany(Long userId, Company c, ApiCompany ac, Language language) throws ApiException {
 		if (Language.EN == language || language == null) {
@@ -259,6 +279,7 @@ public class CompanyApiTools {
 
 		ApiUserCustomer apiUserCustomer = new ApiUserCustomer();
 		apiUserCustomer.setId(userCustomer.getId());
+		apiUserCustomer.setFarmerCompanyInternalId(userCustomer.getFarmerCompanyInternalId());
 		apiUserCustomer.setName(userCustomer.getName());
 		apiUserCustomer.setSurname(userCustomer.getSurname());
 		apiUserCustomer.setType(userCustomer.getType());
@@ -382,6 +403,48 @@ public class CompanyApiTools {
 			return null;
 		}
 		return userCustomerCooperativeList.stream().map(this::toApiUserCustomerCooperative).collect(Collectors.toList());
+	}
+
+	public ApiCompanyCustomer toApiCompanyCustomer(CompanyCustomer companyCustomer) {
+		ApiCompanyCustomer apiCompanyCustomer = new ApiCompanyCustomer();
+		apiCompanyCustomer.setId(companyCustomer.getId());
+		apiCompanyCustomer.setCompanyId(companyCustomer.getCompany().getId());
+		apiCompanyCustomer.setContact(companyCustomer.getContact());
+		apiCompanyCustomer.setEmail(companyCustomer.getEmail());
+		apiCompanyCustomer.setLocation(toApiGeoAddress(companyCustomer.getLocation()));
+		apiCompanyCustomer.setName(companyCustomer.getName());
+		apiCompanyCustomer.setOfficialCompanyName(companyCustomer.getOfficialCompanyName());
+		apiCompanyCustomer.setPhone(companyCustomer.getPhone());
+		apiCompanyCustomer.setVatId(companyCustomer.getVatId());
+
+		return apiCompanyCustomer;
+	}
+
+	public ApiLocation toApiLocation(Location location) {
+		ApiLocation apiLocation = new ApiLocation();
+		apiLocation.setAddress(toApiAddress(location.getAddress()));
+
+		return apiLocation;
+	}
+
+	public ApiGeoAddress toApiGeoAddress(GeoAddress geoAddress) {
+		ApiGeoAddress apiGeoAddress = new ApiGeoAddress();
+		apiGeoAddress.setAddress(geoAddress.getAddress());
+		apiGeoAddress.setCell(geoAddress.getCell());
+		apiGeoAddress.setCity(geoAddress.getCity());
+		apiGeoAddress.setCountry(toApiCountry(geoAddress.getCountry()));
+		apiGeoAddress.setHondurasDepartment(geoAddress.getHondurasDepartment());
+		apiGeoAddress.setHondurasFarm(geoAddress.getHondurasFarm());
+		apiGeoAddress.setHondurasMunicipality(geoAddress.getHondurasMunicipality());
+		apiGeoAddress.setHondurasVillage(geoAddress.getHondurasVillage());
+		apiGeoAddress.setLatitude(geoAddress.getLatitude());
+		apiGeoAddress.setLongitude(geoAddress.getLongitude());
+		apiGeoAddress.setSector(geoAddress.getSector());
+		apiGeoAddress.setState(geoAddress.getState());
+		apiGeoAddress.setVillage(geoAddress.getVillage());
+		apiGeoAddress.setZip(geoAddress.getZip());
+
+		return apiGeoAddress;
 	}
 				
 }

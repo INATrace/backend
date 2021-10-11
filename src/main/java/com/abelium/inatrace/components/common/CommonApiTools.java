@@ -1,5 +1,7 @@
 package com.abelium.inatrace.components.common;
 
+import com.abelium.inatrace.components.codebook.currencies.api.ApiCurrencyType;
+import com.abelium.inatrace.db.entities.codebook.CurrencyType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -66,6 +68,19 @@ public class CommonApiTools {
         ApiAddress aa = new ApiAddress();
         updateApiAddress(aa, address);
         return aa;
+    }
+
+    public static ApiCurrencyType toApiCurrencyType(CurrencyType currencyType) {
+        if (currencyType == null) {
+            return null;
+        }
+        ApiCurrencyType apiCurrencyType = new ApiCurrencyType();
+        apiCurrencyType.setId(currencyType.getId());
+        apiCurrencyType.setCode(currencyType.getCode());
+        apiCurrencyType.setEnabled(currencyType.getEnabled());
+        apiCurrencyType.setLabel(currencyType.getLabel());
+
+        return apiCurrencyType;
     }
     
     public static ApiGeoAddress toApiGeoAddress(GeoAddress address) {

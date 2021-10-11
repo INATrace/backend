@@ -5,7 +5,7 @@ import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasure
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.company.api.ApiCompany;
-import com.abelium.inatrace.components.facility.api.ApiPayment;
+import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.product.api.ApiUserCustomer;
 import com.abelium.inatrace.components.stockorder.converters.SimpleDateConverter;
 import com.abelium.inatrace.components.user.api.ApiUser;
@@ -62,7 +62,7 @@ public class ApiStockOrder extends ApiBaseEntity {
     public ApiSemiProduct semiProduct;
 
     @ApiModelProperty(value = "Facility", position = 8)
-    public ApiPayment facility;
+    public ApiFacility facility;
 
     @ApiModelProperty(value = "Company", position = 9)
     public ApiCompany company;
@@ -318,11 +318,11 @@ public class ApiStockOrder extends ApiBaseEntity {
         this.semiProduct = semiProduct;
     }
 
-    public ApiPayment getFacility() {
+    public ApiFacility getFacility() {
         return facility;
     }
 
-    public void setFacility(ApiPayment facility) {
+    public void setFacility(ApiFacility facility) {
         this.facility = facility;
     }
 

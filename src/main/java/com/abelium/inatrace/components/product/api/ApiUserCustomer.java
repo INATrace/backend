@@ -17,6 +17,9 @@ public class ApiUserCustomer extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "Company id", position = 1)
 	public Long companyId;
+
+	@ApiModelProperty(value = "Company internal farmer ID")
+	public String farmerCompanyInternalId;
 	
 	@ApiModelProperty(value = "Type", position = 2)
 	public UserCustomerType type;
@@ -64,6 +67,14 @@ public class ApiUserCustomer extends ApiBaseEntity {
 
 	public void setCompanyId(Long companyId) {
 		this.companyId = companyId;
+	}
+
+	public String getFarmerCompanyInternalId() {
+		return farmerCompanyInternalId;
+	}
+
+	public void setFarmerCompanyInternalId(String farmerCompanyInternalId) {
+		this.farmerCompanyInternalId = farmerCompanyInternalId;
 	}
 
 	public UserCustomerType getType() {
