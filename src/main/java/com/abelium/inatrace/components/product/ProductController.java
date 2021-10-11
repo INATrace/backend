@@ -202,61 +202,6 @@ public class ProductController {
         return productDocumentEngine.createLabelsAndHowToUseInstructions(authUser, id).toResponseEntity();
     }
 
-    @GetMapping(value = "/userCustomers/{id}")
-    @ApiOperation(value = "Get user customer by id")
-    public ApiResponse<ApiUserCustomer> getUserCustomer(
-            @Valid @ApiParam(value = "User customer ID", required = true) @PathVariable("id") Long id
-    ) throws ApiException {
-        return new ApiResponse<>(productEngine.getUserCustomer(id));
-    }
-
-    @GetMapping(value = "/userCustomers/list/{companyId}/{type}")
-    @ApiOperation(value = "List user customers for a company and role")
-    public ApiPaginatedResponse<ApiUserCustomer> getUserCustomerListForCompanyAndType(
-            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
-            @Valid @ApiParam(value = "Type (collector, farmer)", required = true) @PathVariable("type") String type,
-            @Valid ApiPaginatedRequest request
-            ) throws ApiException {
-        return new ApiPaginatedResponse<>(productEngine.listUserCustomersForCompanyAndType(companyId, type, request));
-    }
-    
-    @GetMapping(value = "/userCustomers/list/{productId}")
-    @ApiOperation(value = "List user customers for a product")
-    public ApiPaginatedResponse<ApiUserCustomer> getUserCustomersList(
-    		@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @ApiParam(value = "Product id", required = true) @PathVariable("productId") Long productId,
-    		@Valid ApiListCollectorsRequest request) throws ApiException {
-    	return new ApiPaginatedResponse<>(productEngine.listUserCustomers(authUser, productId, request));
-    }
-    
-    @PutMapping(value = "/userCustomers")
-    @ApiOperation(value = "Update user customer (collector, farmer)")
-    public ApiDefaultResponse updateUserCustomer(
-    		@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @RequestBody ApiUserCustomer request) throws ApiException {
-    	productEngine.updateUserCustomer(authUser, request);
-    	return new ApiDefaultResponse();
-    }
-    
-    @PostMapping(value = "/userCustomers/add/{productId}/{companyId}")
-    @ApiOperation(value = "Add a user customer")
-    public ApiResponse<ApiBaseEntity> addUserCustomer(
-    		@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @ApiParam(value = "Product id", required = true) @PathVariable("productId") Long productId,
-    		@Valid @ApiParam(value = "Company id", required = true) @PathVariable("companyId") Long companyId,
-    		@Valid @RequestBody ApiUserCustomer request) throws ApiException {
-    	return new ApiResponse<>(productEngine.addUserCustomer(authUser, productId, companyId, request));
-    }
-    
-    @DeleteMapping(value = "/userCustomers/{id}")
-    @ApiOperation(value = "Deletes a user customer")
-    public ApiDefaultResponse deleteUserCustomer(
-    		@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @ApiParam(value = "Collector id", required = true) @PathVariable("id") Long id) throws ApiException {
-    	productEngine.deleteUserCustomer(authUser, id);
-    	return new ApiDefaultResponse();
-    }
-
     @GetMapping(value = "/companyCustomers/list/{productId}")
     @ApiOperation(value = "List company customers for a product")
     public ApiPaginatedResponse<ApiCompanyCustomer> getCompanyCustomersList(

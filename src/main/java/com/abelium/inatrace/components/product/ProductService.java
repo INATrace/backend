@@ -17,7 +17,6 @@ import com.abelium.inatrace.api.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
@@ -30,7 +29,6 @@ import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.product.api.ApiKnowledgeBlog;
 import com.abelium.inatrace.components.product.api.ApiKnowledgeBlogBase;
-import com.abelium.inatrace.components.product.api.ApiListCollectorsRequest;
 import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
 import com.abelium.inatrace.components.product.api.ApiListKnowledgeBlogRequest;
 import com.abelium.inatrace.components.product.api.ApiListProductLabelBatchesRequest;
@@ -38,7 +36,6 @@ import com.abelium.inatrace.components.product.api.ApiListProductLabelFeedbackRe
 import com.abelium.inatrace.components.product.api.ApiListProductsRequest;
 import com.abelium.inatrace.components.product.api.ApiLocation;
 import com.abelium.inatrace.components.product.api.ApiProduct;
-import com.abelium.inatrace.components.product.api.ApiUserCustomer;
 import com.abelium.inatrace.components.product.api.ApiProductLabel;
 import com.abelium.inatrace.components.product.api.ApiProductLabelAnalytics;
 import com.abelium.inatrace.components.product.api.ApiProductLabelBase;
@@ -57,7 +54,6 @@ import com.abelium.inatrace.db.entities.product.ComparisonOfPrice;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.product.KnowledgeBlog;
 import com.abelium.inatrace.db.entities.product.Product;
-import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
@@ -73,7 +69,6 @@ import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.tools.TorpedoProjector;
 import com.abelium.inatrace.types.ProductLabelStatus;
 import com.abelium.inatrace.types.RequestLogType;
-import com.abelium.inatrace.types.UserCustomerType;
 import com.abelium.inatrace.types.UserRole;
 
 
@@ -92,7 +87,9 @@ public class ProductService extends BaseService {
 	
 	@Autowired
 	private AnalyticsEngine analyticsEngine;
-	
+
+	@Autowired
+	private ProductMapper productMapper;
 	
     private Product productListQueryObject(ApiListProductsRequest request) {
         Product pProxy = Torpedo.from(Product.class);
@@ -297,33 +294,11 @@ public class ProductService extends BaseService {
 		em.remove(pl.getContent());
 		em.remove(pl);
 	}
-    
-    @Transactional
-	public void updateUserCustomer(CustomUserDetails authUser, ApiUserCustomer request) throws ApiException {
-		UserCustomer pc = fetchUserCustomer(authUser, request.id);
-		ProductApiTools.updateUserCustomer(pc, request);
-	}
 
     @Transactional
 	public void updateCompanyCustomer(CustomUserDetails authUser, ApiCompanyCustomer request) throws ApiException {
 		CompanyCustomer pc = fetchCompanyCustomer(authUser, request.id);
 		productApiTools.updateCompanyCustomer(pc, request);
-	}    
-    
-    @Transactional
-	public ApiBaseEntity addUserCustomer(CustomUserDetails authUser, Long productId, Long companyId, ApiUserCustomer request) throws ApiException {
-		Product p = fetchProduct(authUser, productId);
-		List<Long> userCompanyIds = userCompanies(authUser, productId);
-		
-		if (!userCompanyIds.contains(companyId)) 
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid company id");
-		
-		UserCustomer pc = new UserCustomer();
-		pc.setProduct(p);
-		pc.setCompany(Queries.get(em, Company.class, companyId));
-		ProductApiTools.updateUserCustomer(pc, request);
-		em.persist(pc);
-		return new ApiBaseEntity(pc);
 	}
 
     @Transactional
@@ -340,12 +315,6 @@ public class ProductService extends BaseService {
 		productApiTools.updateCompanyCustomer(pc, request);
 		em.persist(pc);
 		return new ApiBaseEntity(pc);
-	}
-    
-    @Transactional
-	public void deleteUserCustomer(CustomUserDetails authUser, Long id) throws ApiException {
-		UserCustomer pc = fetchUserCustomer(authUser, id);
-		em.remove(pc);
 	}
 
     @Transactional
@@ -543,41 +512,6 @@ public class ProductService extends BaseService {
     	productApiTools.updateKnowledgeBlog(authUser.getUserId(), kb, request);
     	em.persist(kb);
 	}
-
-	private UserCustomer userCustomerListQueryObject(Long companyId, UserCustomerType type, ApiPaginatedRequest request) {
-		UserCustomer proxy = Torpedo.from(UserCustomer.class);
-
-		OnGoingLogicalCondition condition = Torpedo.condition();
-		condition = condition.and(proxy.getCompany().getId()).eq(companyId).and(proxy.getType()).eq(type);
-
-		Torpedo.where(condition);
-
-		return proxy;
-	}
-    
-    private UserCustomer collectorListQueryObject(Long userId, Long productId, ApiListCollectorsRequest request) {
-    	UserCustomer pcProxy = Torpedo.from(UserCustomer.class);
-        
-        OnGoingLogicalCondition condition = Torpedo.condition(); // .Torpedo conditions = new ArrayList<>();
-        condition = condition.and(pcProxy.getProduct().getId()).eq(productId); 
-        if (StringUtils.isNotBlank(request.query)) {
-        	OnGoingLogicalCondition queryCondition = 
-    				Torpedo.condition(pcProxy.getName()).like().any(request.query).
-        				   or(pcProxy.getSurname()).like().any(request.query);
-        	condition = condition.and(queryCondition);
-        }
-        if (request.phone != null) {
-            condition = condition.and(Torpedo.condition(pcProxy.getPhone()).like().startsWith(request.phone));
-        }
-        Torpedo.where(condition);
-        switch (request.sortBy) {
-	        case "name": QueryTools.orderBy(request.sort, pcProxy.getName()); break;
-	        case "surname": QueryTools.orderBy(request.sort, pcProxy.getSurname()); break;
-	        case "phone": QueryTools.orderBy(request.sort, pcProxy.getPhone()); break;
-	        default: QueryTools.orderBy(request.sort, pcProxy.getSurname());
-        }
-        return pcProxy;
-    }	
     
     private CompanyCustomer customerListQueryObject(Long userId, Long productId, ApiListCustomersRequest request) {
     	CompanyCustomer pcProxy = Torpedo.from(CompanyCustomer.class);
@@ -601,23 +535,7 @@ public class ProductService extends BaseService {
 	        default: QueryTools.orderBy(request.sort, pcProxy.getName());
         }
         return pcProxy;
-    }	
-
-	public ApiUserCustomer getUserCustomer(Long id) throws ApiException {
-		return ProductApiTools.toApiUserCustomer(em.find(UserCustomer.class, id));
-	}
-
-    @Transactional
-	public ApiPaginatedList<ApiUserCustomer> listUserCustomers(CustomUserDetails authUser, Long productId, ApiListCollectorsRequest request) throws ApiException {
-    	checkProductPermission(authUser, productId);
-    	return PaginationTools.createPaginatedResponse(em, request, () -> collectorListQueryObject(authUser.getUserId(), productId, request), 
-    			ProductApiTools::toApiUserCustomer); 
-	}    
-
-	@Transactional
-	public ApiPaginatedList<ApiUserCustomer> listUserCustomersForCompanyAndType(Long companyId, String type, ApiPaginatedRequest request) throws ApiException {
-		return PaginationTools.createPaginatedResponse(em, request, () -> userCustomerListQueryObject(companyId, UserCustomerType.valueOf(type), request), ProductApiTools::toApiUserCustomer);
-	}
+    }
 
     @Transactional
 	public ApiPaginatedList<ApiCompanyCustomer> listCompanyCustomers(CustomUserDetails authUser, Long productId, ApiListCustomersRequest request) throws ApiException {
@@ -773,16 +691,6 @@ public class ProductService extends BaseService {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid product id");
 		}		
 		return p;
-	}
-	
-	
-	private UserCustomer fetchUserCustomer(CustomUserDetails authUser, Long id) throws ApiException {
-		UserCustomer pc = Queries.get(em, UserCustomer.class, id);
-		if (pc == null) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid id");
-		}		
-		checkProductPermission(authUser, pc.getProduct().getId());
-		return pc;
 	}
 
 	private CompanyCustomer fetchCompanyCustomer(CustomUserDetails authUser, Long id) throws ApiException {

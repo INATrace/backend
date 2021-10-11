@@ -1,5 +1,7 @@
 package com.abelium.inatrace.components.common;
 
+import com.abelium.inatrace.components.codebook.currencies.api.ApiCurrencyType;
+import com.abelium.inatrace.db.entities.codebook.CurrencyType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -67,6 +69,19 @@ public class CommonApiTools {
         updateApiAddress(aa, address);
         return aa;
     }
+
+    public static ApiCurrencyType toApiCurrencyType(CurrencyType currencyType) {
+        if (currencyType == null) {
+            return null;
+        }
+        ApiCurrencyType apiCurrencyType = new ApiCurrencyType();
+        apiCurrencyType.setId(currencyType.getId());
+        apiCurrencyType.setCode(currencyType.getCode());
+        apiCurrencyType.setEnabled(currencyType.getEnabled());
+        apiCurrencyType.setLabel(currencyType.getLabel());
+
+        return apiCurrencyType;
+    }
     
     public static ApiGeoAddress toApiGeoAddress(GeoAddress address) {
         if (address == null) {
@@ -84,7 +99,14 @@ public class CommonApiTools {
         aa.city = address.getCity();
         aa.state = address.getState();
         aa.zip = address.getZip();
-        aa.country = toApiCountry(address.getCountry());    	
+        aa.country = toApiCountry(address.getCountry());
+        aa.cell = address.getCell();
+        aa.sector = address.getSector();
+        aa.village = address.getVillage();
+        aa.hondurasDepartment = address.getHondurasDepartment();
+        aa.hondurasFarm = address.getHondurasFarm();
+        aa.hondurasMunicipality = address.getHondurasMunicipality();
+        aa.hondurasVillage = address.getHondurasVillage();
     }
     
     public void updateAddress(Address a, ApiAddress aa) throws ApiException {
