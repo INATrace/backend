@@ -17,6 +17,7 @@ import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -89,12 +90,15 @@ public class StockOrder extends TimestampEntity {
 	private MeasureUnitType measurementUnitType;
 	
 	@Column
+	@NotNull
 	private Integer totalQuantity;
 	
 	@Column
+	@NotNull
 	private Integer fulfilledQuantity;
 	
 	@Column
+	@NotNull
 	private Integer availableQuantity;
 	
 	@Column

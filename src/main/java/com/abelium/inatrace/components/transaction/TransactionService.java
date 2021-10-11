@@ -4,12 +4,15 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
+import com.abelium.inatrace.components.stockorder.StockOrderService;
+import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.components.transaction.api.ApiTransaction;
 import com.abelium.inatrace.components.transaction.mappers.TransactionMapper;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
 import com.abelium.inatrace.tools.Queries;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,9 @@ import javax.transaction.Transactional;
 @Lazy
 @Service
 public class TransactionService extends BaseService {
+
+    @Autowired
+    private StockOrderService stockOrderService;
 
     public ApiTransaction getApiTransaction(Long id) throws ApiException {
         return TransactionMapper.toApiTransaction(fetchEntity(id, Transaction.class));
@@ -75,8 +81,32 @@ public class TransactionService extends BaseService {
     }
 
     @Transactional
-    public void deleteTransaction(Long id) throws ApiException {
-        em.remove(fetchEntity(id, Transaction.class));
+    public void deleteTransaction(Long id, Long userId) throws ApiException {
+
+        Transaction transaction = fetchEntity(id, Transaction.class);
+
+        StockOrder sourceStockOrder = transaction.getSourceStockOrder();
+        StockOrder targetStockOrder = transaction.getTargetStockOrder();
+
+        // Set source StockOrder available quantity
+        if (sourceStockOrder != null) {
+            sourceStockOrder.setAvailableQuantity(Math.min(
+                    sourceStockOrder.getAvailableQuantity() + transaction.getInputQuantity(),
+                    sourceStockOrder.getTotalQuantity()
+            ));
+            stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(sourceStockOrder, userId), userId);
+        }
+
+        // Set target StockOrder fulfilled quantity
+        if (!transaction.getIsProcessing() && targetStockOrder != null) {
+            targetStockOrder.setFulfilledQuantity(Math.max(
+                    targetStockOrder.getFulfilledQuantity() - transaction.getOutputQuantity(),
+                    0
+            ));
+            stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(targetStockOrder, userId), userId);
+        }
+
+        em.remove(transaction);
     }
 
     private <E> E fetchEntity(Long id, Class<E> entityClass) throws ApiException {

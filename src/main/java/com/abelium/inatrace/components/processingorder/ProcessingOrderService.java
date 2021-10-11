@@ -173,14 +173,16 @@ public class ProcessingOrderService extends BaseService {
         // (applies only for existing ProcessingOrders)
         if(entity.getId() != null) {
 
-            // TODO: Remove transactions over service, not with cascade!
             // Remove transactions that are not present in request
-            entity.getInputTransactions().removeAll(entity.getInputTransactions()
+            List<Transaction> transactionsToBeDeleted = entity.getInputTransactions()
                     .stream()
                     .filter(transaction -> apiProcessingOrder.getInputTransactions()
                             .stream()
                             .noneMatch(apiTransaction -> transaction.getId().equals(apiTransaction.getId())))
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
+
+            for (Transaction t: transactionsToBeDeleted)
+                transactionService.deleteTransaction(t.getId(), userId);
 
             // Find target StockOrders that are not present in request
             List<StockOrder> targetStockOrdersToBeDeleted = entity.getTargetStockOrders()

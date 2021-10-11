@@ -55,10 +55,10 @@ public class ApiTransaction extends ApiBaseEntity {
     private ApiMeasureUnitType outputMeasureUnitType;
 
     @ApiModelProperty(value = "Input quantity", position = 14)
-    private BigDecimal inputQuantity;
+    private Integer inputQuantity;
 
     @ApiModelProperty(value = "Output quantity", position = 15)
-    private BigDecimal outputQuantity;
+    private Integer outputQuantity;
 
     @ApiModelProperty(value = "Price per unit", position = 16)
     private BigDecimal pricePerUnit;
@@ -176,24 +176,20 @@ public class ApiTransaction extends ApiBaseEntity {
         this.outputMeasureUnitType = outputMeasureUnitType;
     }
 
-    public BigDecimal getInputQuantity() {
+    public Integer getInputQuantity() {
         return inputQuantity;
     }
 
-    public void setInputQuantity(BigDecimal inputQuantity) {
+    public void setInputQuantity(Integer inputQuantity) {
         this.inputQuantity = inputQuantity;
     }
 
-    public BigDecimal getOutputQuantity() {
+    public Integer getOutputQuantity() {
         return outputQuantity;
     }
 
-    public void setOutputQuantity(BigDecimal outputQuantity) {
+    public void setOutputQuantity(Integer outputQuantity) {
         this.outputQuantity = outputQuantity;
-    }
-
-    public BigDecimal getPricePerUnit() {
-        return pricePerUnit;
     }
 
     public void setPricePerUnit(BigDecimal pricePerUnit) {
