@@ -8,6 +8,7 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
+import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
 import com.abelium.inatrace.components.product.api.ApiUserCustomer;
 import com.abelium.inatrace.components.product.api.ApiUserCustomerAssociation;
 import com.abelium.inatrace.components.product.api.ApiUserCustomerCooperative;
@@ -17,12 +18,14 @@ import com.abelium.inatrace.db.entities.common.BankInformation;
 import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.FarmInformation;
+import com.abelium.inatrace.db.entities.common.GeoAddress;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.common.UserCustomerLocation;
 import com.abelium.inatrace.db.entities.common.UserCustomerAssociation;
 import com.abelium.inatrace.db.entities.common.UserCustomerCooperative;
 import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -407,6 +410,80 @@ public class CompanyService extends BaseService {
 	public void deleteUserCustomer(Long id) {
 		UserCustomer userCustomer = em.find(UserCustomer.class, id);
 		em.remove(userCustomer);
+	}
+
+	public ApiPaginatedList<ApiCompanyCustomer> listCompanyCustomers(CustomUserDetails authUser, Long companyId, ApiListCustomersRequest request) throws ApiException {
+		return PaginationTools.createPaginatedResponse(em, request, () -> customerListQueryObject(companyId, request), companyApiTools::toApiCompanyCustomer);
+	}
+
+	private CompanyCustomer customerListQueryObject(Long companyId, ApiListCustomersRequest request) {
+		CompanyCustomer companyCustomer = Torpedo.from(CompanyCustomer.class);
+
+		OnGoingLogicalCondition condition = Torpedo.condition();
+
+		condition = condition.and(companyCustomer.getCompany().getId()).eq(companyId);
+
+		if (request.getQuery() != null) {
+			condition = condition.and(companyCustomer.getName()).like().any(request.getQuery());
+		}
+
+		Torpedo.where(condition);
+
+		switch (request.sortBy) {
+			case "name": QueryTools.orderBy(request.sort, companyCustomer.getName()); break;
+			case "contact": QueryTools.orderBy(request.sort, companyCustomer.getContact()); break;
+			case "email": QueryTools.orderBy(request.sort, companyCustomer.getEmail()); break;
+		}
+
+		return companyCustomer;
+	}
+
+	public ApiCompanyCustomer getCompanyCustomer(Long companyCustomerId) {
+		return companyApiTools.toApiCompanyCustomer(em.find(CompanyCustomer.class, companyCustomerId));
+	}
+
+	@Transactional
+	public ApiCompanyCustomer createCompanyCustomer(ApiCompanyCustomer apiCompanyCustomer) {
+		CompanyCustomer companyCustomer = new CompanyCustomer();
+		companyCustomer.setCompany(em.find(Company.class, apiCompanyCustomer.getCompanyId()));
+		companyCustomer.setContact(apiCompanyCustomer.getContact());
+		companyCustomer.setEmail(apiCompanyCustomer.getEmail());
+		companyCustomer.setLocation(new GeoAddress());
+		companyApiTools.updateLocation(companyCustomer.getLocation(), apiCompanyCustomer.getLocation());
+		companyCustomer.setName(apiCompanyCustomer.getName());
+		companyCustomer.setOfficialCompanyName(apiCompanyCustomer.getOfficialCompanyName());
+		companyCustomer.setPhone(apiCompanyCustomer.getPhone());
+		companyCustomer.setVatId(apiCompanyCustomer.getVatId());
+
+		em.persist(companyCustomer);
+		return companyApiTools.toApiCompanyCustomer(companyCustomer);
+	}
+
+	@Transactional
+	public ApiCompanyCustomer updateCompanyCustomer(ApiCompanyCustomer apiCompanyCustomer) {
+		if (apiCompanyCustomer == null) {
+			return null;
+		}
+		CompanyCustomer companyCustomer = em.find(CompanyCustomer.class, apiCompanyCustomer.getId());
+		companyCustomer.setCompany(em.find(Company.class, apiCompanyCustomer.getCompanyId()));
+		companyCustomer.setContact(apiCompanyCustomer.getContact());
+		companyCustomer.setEmail(apiCompanyCustomer.getEmail());
+		if (companyCustomer.getLocation() == null) {
+			companyCustomer.setLocation(new GeoAddress());
+		}
+		companyApiTools.updateLocation(companyCustomer.getLocation(), apiCompanyCustomer.getLocation());
+		companyCustomer.setName(apiCompanyCustomer.getName());
+		companyCustomer.setOfficialCompanyName(apiCompanyCustomer.getOfficialCompanyName());
+		companyCustomer.setPhone(apiCompanyCustomer.getPhone());
+		companyCustomer.setVatId(apiCompanyCustomer.getVatId());
+
+		return companyApiTools.toApiCompanyCustomer(companyCustomer);
+	}
+
+	@Transactional
+	public void deleteCompanyCustomer(Long id) {
+		CompanyCustomer companyCustomer = em.find(CompanyCustomer.class, id);
+		em.remove(companyCustomer);
 	}
 
 	private void mergeToCompany(Company c, Long otherCompanyId) throws ApiException {
