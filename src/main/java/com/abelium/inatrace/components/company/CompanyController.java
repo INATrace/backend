@@ -7,6 +7,7 @@ import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
+import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
 import com.abelium.inatrace.components.product.api.ApiUserCustomer;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
@@ -127,5 +128,47 @@ public class CompanyController {
         companyService.deleteUserCustomer(id);
         return new ApiDefaultResponse();
     }
-    
+
+    @GetMapping(value = "/companyCustomers/list/{companyId}")
+    @ApiOperation(value = "List company customers for company")
+    public ApiPaginatedResponse<ApiCompanyCustomer> getCompanyCustomersList(
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "Company id", required = true) @PathVariable("companyId") Long companyId,
+            @Valid ApiListCustomersRequest request) throws ApiException {
+        return new ApiPaginatedResponse<>(companyService.listCompanyCustomers(authUser, companyId, request));
+    }
+
+    @GetMapping(value = "/companyCustomers/{id}")
+    @ApiOperation(value = "Get company customer by ID")
+    public ApiResponse<ApiCompanyCustomer> getCompanyCustomer(
+            @Valid @ApiParam(value = "Company customer ID", required = true) @PathVariable("id") Long companyCustomerId
+    ) throws ApiException {
+        return new ApiResponse<>(companyService.getCompanyCustomer(companyCustomerId));
+    }
+
+    @PostMapping(value = "/companyCustomers")
+    @ApiOperation(value = "Create company customer")
+    public ApiResponse<ApiCompanyCustomer> createCompanyCustomer(
+            @Valid @RequestBody ApiCompanyCustomer apiCompanyCustomer
+    ) throws ApiException {
+        return new ApiResponse<>(companyService.createCompanyCustomer(apiCompanyCustomer));
+    }
+
+    @PutMapping(value = "/companyCustomers")
+    @ApiOperation(value = "Update company customer")
+    public ApiResponse<ApiCompanyCustomer> updateCompanyCustomer(
+            @Valid @RequestBody ApiCompanyCustomer apiCompanyCustomer
+    ) throws ApiException {
+        return new ApiResponse<>(companyService.updateCompanyCustomer(apiCompanyCustomer));
+    }
+
+    @DeleteMapping(value = "/companyCustomers/{id}")
+    @ApiOperation(value = "Delete company customer with ID")
+    public ApiDefaultResponse deleteCompanyCustomer(
+            @Valid @ApiParam(value = "Company customer ID", required = true) @PathVariable("id") Long id
+    ) throws ApiException {
+        companyService.deleteCompanyCustomer(id);
+        return new ApiDefaultResponse();
+    }
+
 }
