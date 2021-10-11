@@ -83,7 +83,7 @@ public class StockOrderService extends BaseService {
         if(queryRequest.producerUserCustomerName != null) // Search by farmers name (query)
             condition.and(stockOrderProxy.getProducerUserCustomer().getName())
                     .like().startsWith(queryRequest.producerUserCustomerName);
-        if(queryRequest.isAvailable)
+        if(queryRequest.isAvailable != null && queryRequest.isAvailable)
             condition.and(stockOrderProxy.getAvailableQuantity()).gt(0);
 
         Torpedo.where(condition);
