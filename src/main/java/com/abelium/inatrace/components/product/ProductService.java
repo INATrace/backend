@@ -152,10 +152,10 @@ public class ProductService extends BaseService {
 		productApiTools.updateProduct(userId, product, request);
 
 		if (product.getAssociatedCompanies().stream().noneMatch(productCompany -> productCompany.getType() == ProductCompanyType.OWNER)) {
-			ProductCompany productCompany = new ProductCompany();
 			if (request.getCompany() == null || request.getCompany().getId() == null) {
 				throw new ApiException(ApiStatus.INVALID_REQUEST, "Company ID is required");
 			}
+			ProductCompany productCompany = new ProductCompany();
 			productCompany.setCompany(em.find(Company.class, request.getCompany().getId()));
 			productCompany.setProduct(product);
 			productCompany.setType(ProductCompanyType.OWNER);
