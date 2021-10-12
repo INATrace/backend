@@ -11,11 +11,13 @@ public class StockOrderQueryRequest {
     public StockOrderQueryRequest(Long facilityId,
                                   Long semiProductId,
                                   Boolean isAvailable,
+                                  Boolean isWomenShare,
                                   Instant productionDateStart,
                                   Instant productionDateEnd) {
         this.facilityId = facilityId;
         this.semiProductId = semiProductId;
         this.isAvailable = isAvailable;
+        this.isWomenShare = isWomenShare;
         this.productionDateStart = productionDateStart;
         this.productionDateEnd = productionDateEnd;
     }
