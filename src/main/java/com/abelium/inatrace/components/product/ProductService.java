@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import com.abelium.inatrace.api.*;
+import com.abelium.inatrace.types.ProductCompanyType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -149,6 +150,18 @@ public class ProductService extends BaseService {
 		Product product = new Product();
 		
 		productApiTools.updateProduct(userId, product, request);
+
+		if (product.getAssociatedCompanies().stream().noneMatch(productCompany -> productCompany.getType() == ProductCompanyType.OWNER)) {
+			ProductCompany productCompany = new ProductCompany();
+			if (request.getCompany() == null || request.getCompany().getId() == null) {
+				throw new ApiException(ApiStatus.INVALID_REQUEST, "Company ID is required");
+			}
+			productCompany.setCompany(em.find(Company.class, request.getCompany().getId()));
+			productCompany.setProduct(product);
+			productCompany.setType(ProductCompanyType.OWNER);
+			product.getAssociatedCompanies().add(productCompany);
+		}
+
 		em.persist(product.getProcess());
 		em.persist(product.getResponsibility());
 		em.persist(product.getSustainability());
@@ -576,7 +589,7 @@ public class ProductService extends BaseService {
 	}
     
     private void checkProductPermission(CustomUserDetails authUser, Long productId) throws ApiException {
-		if (authUser.getUserRole() == UserRole.ADMIN) return; 
+		if (authUser.getUserRole() == UserRole.ADMIN) return;
     
     	Number count = em.createQuery("SELECT count(*) FROM Product p INNER JOIN CompanyUser cu ON cu.company.id = p.company.id "
     			+ "WHERE cu.user.id = :userId AND p.id = :productId", Number.class).
