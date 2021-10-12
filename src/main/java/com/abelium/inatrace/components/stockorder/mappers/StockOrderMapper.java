@@ -1,5 +1,7 @@
 package com.abelium.inatrace.components.stockorder.mappers;
 
+import com.abelium.inatrace.components.codebook.action_type.ActionTypeMapper;
+import com.abelium.inatrace.components.codebook.grade_abbreviation.GradeAbbreviationMapper;
 import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
 import com.abelium.inatrace.components.common.mappers.ActivityProofMapper;
@@ -62,19 +64,20 @@ public class StockOrderMapper {
 //        apiStockOrder.setSalesCurrency(entity.getSalesCurrency());
         apiStockOrder.setPurchaseOrder(entity.getPurchaseOrder());
         apiStockOrder.setOrderType(entity.getOrderType());
+        apiStockOrder.setGradeAbbreviation(GradeAbbreviationMapper.toApiGradeAbbreviation(entity.getGradeAbbreviation()));
         apiStockOrder.setInternalLotNumber(entity.getInternalLotNumber());
-//        apiStockOrder.setLotNumber(entity.getLotNumber());
-//        apiStockOrder.setLotLabel(entity.getLotLabel());
-//        apiStockOrder.setScreenSize(entity.getScreenSize());
-//        apiStockOrder.setComments(entity.getComments());
-//        apiStockOrder.setActionType(ActionTypeMapper.toApiActionType(entity.getActionType()));
+        apiStockOrder.setLotNumber(entity.getLotNumber());
+        apiStockOrder.setLotLabel(entity.getLotLabel());
+        apiStockOrder.setScreenSize(entity.getScreenSize());
+        apiStockOrder.setComments(entity.getComments());
+        apiStockOrder.setActionType(ActionTypeMapper.toApiActionType(entity.getActionType()));
         apiStockOrder.setWomenShare(entity.getWomenShare());
         apiStockOrder.setCost(entity.getCost());
         apiStockOrder.setPaid(entity.getPaid());
         apiStockOrder.setBalance(entity.getBalance());
-//        apiStockOrder.setStartOfDrying(entity.getStartOfDrying());
+        apiStockOrder.setStartOfDrying(entity.getStartOfDrying());
 //        apiStockOrder.setClient(CompanyMapper.toApiCompany(entity.getClient()));
-//        apiStockOrder.setFlavourProfile(entity.getFlavourProfile());
+        apiStockOrder.setFlavourProfile(entity.getFlavourProfile());
 //        apiStockOrder.setProcessingAction(ProcessingActionMapper.toApiProcessingAction(entity.getProcessingAction()));
         apiStockOrder.setPreferredWayOfPayment(entity.getPreferredWayOfPayment());
 //        apiStockOrder.setSacNumber(entity.getSacNumber());

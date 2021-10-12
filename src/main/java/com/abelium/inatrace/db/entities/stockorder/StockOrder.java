@@ -55,7 +55,7 @@ public class StockOrder extends TimestampEntity {
 	private StockOrderLocation productionLocation;
 	
 	@OneToOne
-	private CompanyCustomer consumerCompanyCustomer; // probably not used for purchase
+	private CompanyCustomer consumerCompanyCustomer;
 	
 	@ManyToOne
 	private SemiProduct semiProduct;
@@ -67,7 +67,7 @@ public class StockOrder extends TimestampEntity {
 	private ProcessingAction processingActionDef;
 
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Certification> certifications; // probably not used for purchase
+	private List<Certification> certifications;
 
 	// The required processing evidence fields values - the available values are sourced from the
 	// selected Processing action definition;
@@ -141,7 +141,7 @@ public class StockOrder extends TimestampEntity {
 	@Column(length = Lengths.ENUM)
 	private OrderType orderType;
 	
-	@OneToOne
+	@ManyToOne
 	private GradeAbbreviationType gradeAbbreviation;
 	
 	@Column
