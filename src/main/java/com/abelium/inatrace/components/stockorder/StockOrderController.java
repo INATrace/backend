@@ -52,11 +52,21 @@ public class StockOrderController {
             @Valid ApiPaginatedRequest request,
             @Valid @ApiParam(value = "Facility ID", required = true) @RequestParam("facilityId") Long facilityId,
             @Valid @ApiParam(value = "SemiProduct ID", required = true) @RequestParam("semiProductId") Long semiProductId,
+            @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
+            @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
             @AuthenticationPrincipal CustomUserDetails authUser) {
+
+        // TODO: Should company be verified (if facility is part of user's company)
 
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
                 request,
-                new StockOrderQueryRequest(facilityId, semiProductId, true),
+                new StockOrderQueryRequest(
+                        facilityId,
+                        semiProductId,
+                        true,
+                        productionDateStart != null ? productionDateStart.toInstant() : null,
+                        productionDateEnd != null ? productionDateEnd.toInstant() : null
+                ),
                 authUser.getUserId()));
     }
 

@@ -8,10 +8,16 @@ public class StockOrderQueryRequest {
     
     public StockOrderQueryRequest() {}
 
-    public StockOrderQueryRequest(Long facilityId, Long semiProductId, Boolean isAvailable) {
+    public StockOrderQueryRequest(Long facilityId,
+                                  Long semiProductId,
+                                  Boolean isAvailable,
+                                  Instant productionDateStart,
+                                  Instant productionDateEnd) {
         this.facilityId = facilityId;
         this.semiProductId = semiProductId;
         this.isAvailable = isAvailable;
+        this.productionDateStart = productionDateStart;
+        this.productionDateEnd = productionDateEnd;
     }
     
     public StockOrderQueryRequest(Long companyId,
