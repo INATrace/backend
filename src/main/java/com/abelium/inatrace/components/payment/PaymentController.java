@@ -8,7 +8,10 @@ import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
 
+import com.abelium.inatrace.security.service.CustomUserDetails;
+import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,9 +75,11 @@ public class PaymentController {
 
 	@PutMapping
 	@ApiOperation("Create or update payment. If ID is provided, then the entity with the provided ID is updated.")
-	public ApiResponse<ApiBaseEntity> createOrUpdatePayment(@Valid @RequestBody ApiPayment apiPayment) throws ApiException {
+	public ApiResponse<ApiBaseEntity> createOrUpdatePayment(
+			@Valid @RequestBody ApiPayment apiPayment,
+			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		return new ApiResponse<>(paymentService.createOrUpdatePayment(apiPayment));
+		return new ApiResponse<>(paymentService.createOrUpdatePayment(apiPayment, authUser.getUserId()));
 	}
 
 	@DeleteMapping("{id}")

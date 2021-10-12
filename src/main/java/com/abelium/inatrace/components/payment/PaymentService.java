@@ -20,18 +20,17 @@ import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service for payment entity.
@@ -62,7 +61,7 @@ public class PaymentService extends BaseService {
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdatePayment(ApiPayment apiPayment) throws ApiException {
+	public ApiBaseEntity createOrUpdatePayment(ApiPayment apiPayment, Long userId) throws ApiException {
 
 		Payment entity;
 		Company payingCompany = null;
@@ -91,23 +90,31 @@ public class PaymentService extends BaseService {
 					entity.setPaymentStatus(PaymentStatus.CONFIRMED);
 				}
 			}
-			
 			entity.setPaymentStatus(apiPayment.getPaymentStatus());
 			entity.setUpdatedBy(userService.fetchUserById(apiPayment.getUpdatedBy()));
-			
+
+			// TODO: Should the "paymentConfirmedByCompany" be the same as "payingCompany"?
+			entity.setPaymentConfirmedByCompany(entity.getPayingCompany());
+			entity.setPaymentConfirmedByUser(userService.fetchUserById(userId));
+			entity.setPaymentConfirmedAtTime(Instant.now());
+
 		} else {
 			
 			// If method is POST, let's create a payment from scratch
 			// Important to consider that a purchase order must exist, since we will extract information from it
 			entity = new Payment();
 			// Get purchase order to which you will generate a payment
-			stockOrder = (StockOrder) em.createNamedQuery("StockOrder.getPurchaseOrderById").setParameter("stockOrderId", apiPayment.getStockOrder().getId()).getSingleResult();
+			stockOrder = (StockOrder) em.createNamedQuery("StockOrder.getPurchaseOrderById")
+					.setParameter("stockOrderId", apiPayment.getStockOrder().getId())
+					.getSingleResult();
 			if (stockOrder != null) {
 				
 				// the company who creates a purchase should be the one who pays for it, right?
 				payingCompany = stockOrder.getCompany();
 				// company who receives the payment - could this be client property on stock order?
-				recipientCompany = (Company) em.createNamedQuery("Company.getCompanyById").setParameter("companyId", apiPayment.getRecipientCompany().getId()).getSingleResult();
+				recipientCompany = (Company) em.createNamedQuery("Company.getCompanyById")
+						.setParameter("companyId", apiPayment.getRecipientCompany().getId())
+						.getSingleResult();
 				// collector (representative) who is getting the payment
 				payableToCollector = stockOrder.getRepresentativeOfProducerUserCustomer();
 				// farmer who is getting the payment
@@ -122,10 +129,7 @@ public class PaymentService extends BaseService {
 				openBalance = stockOrder.getBalance().intValue();
 				// amount paid to the farmer
 				totalPaid = apiPayment.getAmountPaidToTheFarmer();
-				// should be the same as paying company?
-				paymentConfirmedByCompany = payingCompany;
-				// user logged-in
-				paymentConfirmedByUser = userService.fetchUserById(apiPayment.getPaymentConfirmedByUser().getId());
+
 			} else {
 				throw new ApiException(ApiStatus.INVALID_REQUEST, "A purchase order is required in order to create a payment.");
 			}
