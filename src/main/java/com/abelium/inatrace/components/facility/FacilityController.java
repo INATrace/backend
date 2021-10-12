@@ -36,9 +36,11 @@ public class FacilityController {
 	@GetMapping("list/company/{id}")
 	@ApiOperation("Get a list of facilities by company ID.")
 	public ApiPaginatedResponse<ApiFacility> listFacilitiesByCompany(
-			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId, @Valid ApiPaginatedRequest request) {
+			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @ApiParam(value = "Semi product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+			@Valid ApiPaginatedRequest request) {
 
-		return new ApiPaginatedResponse<>(facilityService.listFacilitiesByCompany(companyId, request));
+		return new ApiPaginatedResponse<>(facilityService.listFacilitiesByCompany(companyId, semiProductId, request));
 	}
 	
 	@GetMapping("list/collecting/company/{id}")
@@ -54,9 +56,10 @@ public class FacilityController {
 	@ApiOperation("Get a list of selling facilities by company ID.")
 	public ApiPaginatedResponse<ApiFacility> listSellingFacilitiesByCompany(
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @ApiParam(value = "Semi product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
 			@Valid ApiPaginatedRequest request) {
 
-		return new ApiPaginatedResponse<>(facilityService.listSellingFacilitiesByCompany(companyId, request));
+		return new ApiPaginatedResponse<>(facilityService.listSellingFacilitiesByCompany(companyId, semiProductId, request));
 	}
 
 	@GetMapping("{id}")
