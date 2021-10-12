@@ -8,22 +8,22 @@ import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
 
+import com.abelium.inatrace.components.stockorder.converters.SimpleDateConverter;
+import com.abelium.inatrace.db.entities.payment.PaymentStatus;
+import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+
+import java.util.Date;
 
 /**
  * REST controller for payment entity.
@@ -43,9 +43,23 @@ public class PaymentController {
 
 	@GetMapping("list")
 	@ApiOperation("Get a paginated list of payments.")
-	public ApiPaginatedResponse<ApiPayment> getPaymentList(@Valid ApiPaginatedRequest request) {
+	public ApiPaginatedResponse<ApiPayment> getPaymentList(
+			@Valid ApiPaginatedRequest request,
+			@Valid @ApiParam(value = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
+			@Valid @ApiParam(value = "Payment status") @RequestParam(value = "paymentStatus", required = false) PaymentStatus paymentStatus,
+			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
+			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
+			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) {
 
-		return new ApiPaginatedResponse<>(paymentService.getPaymentList(request));
+		return new ApiPaginatedResponse<>(paymentService.getPaymentList(
+				request,
+				new PaymentQueryRequest(
+						preferredWayOfPayment,
+						paymentStatus,
+						productionDateStart != null ? productionDateStart.toInstant() : null,
+						productionDateEnd != null ? productionDateEnd.toInstant() : null,
+						farmerName
+				)));
 	}
 	
 	@GetMapping("{id}")

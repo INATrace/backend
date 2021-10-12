@@ -3,6 +3,7 @@ package com.abelium.inatrace.components.payment;
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
+import com.abelium.inatrace.components.product.mapper.UserCustomerMapper;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.db.entities.payment.Payment;
@@ -37,6 +38,7 @@ public final class PaymentMapper {
 		apiPayment.setPaymentConfirmedAtTime(entity.getPaymentConfirmedAtTime());
 		apiPayment.setPreferredWayOfPayment(entity.getPreferredWayOfPayment());
 		apiPayment.setProductionDate(entity.getProductionDate());
+		apiPayment.setRecipientUserCustomer(UserCustomerMapper.toApiUserCustomerBase(entity.getRecipientUserCustomer()));
 		
 		ApiStockOrder apiStockOrder = new ApiStockOrder();
 		apiStockOrder.setId(entity.getStockOrder().getId());
@@ -47,7 +49,7 @@ public final class PaymentMapper {
 		apiRecipientCompany.setId(entity.getRecipientCompany().getId());
 		apiRecipientCompany.setName(entity.getRecipientCompany().getName());
 		apiPayment.setRecipientCompany(apiRecipientCompany);
-		
+
 //		ApiCompanyCustomer apiRecipientCompanyCustomer = new ApiCompanyCustomer();
 //		apiRecipientCompanyCustomer.setId(entity.getRecipientCompanyCustomer().getId());
 //		apiRecipientCompanyCustomer.setName(entity.getRecipientCompanyCustomer().getName());

@@ -93,8 +93,11 @@ public class ApiPayment extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Representative of the company that receives the payment")
 	private ApiCompanyBase representativeOfRecipientCompany;
-	
-	@ApiModelProperty(value = "Representative of the user customer that receives the payment")
+
+	@ApiModelProperty(value = "User customer that receives the payment (farmer)")
+	private ApiUserCustomer recipientUserCustomer;
+
+	@ApiModelProperty(value = "Representative of the user customer that receives the payment (collector)")
 	private ApiUserCustomer representativeOfRecipientUserCustomer;
 	
 	@ApiModelProperty(value = "Company customer that receives the payment")
@@ -266,6 +269,14 @@ public class ApiPayment extends ApiBaseEntity {
 
 	public void setRepresentativeOfRecipientCompany(ApiCompanyBase representativeOfRecipientCompany) {
 		this.representativeOfRecipientCompany = representativeOfRecipientCompany;
+	}
+
+	public ApiUserCustomer getRecipientUserCustomer() {
+		return recipientUserCustomer;
+	}
+
+	public void setRecipientUserCustomer(ApiUserCustomer recipientUserCustomer) {
+		this.recipientUserCustomer = recipientUserCustomer;
 	}
 
 	public ApiUserCustomer getRepresentativeOfRecipientUserCustomer() {

@@ -23,6 +23,7 @@ import com.abelium.inatrace.tools.QueryTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.persistence.TypedQuery;
@@ -44,15 +45,32 @@ public class PaymentService extends BaseService {
 	@Autowired
 	private UserService userService;
 	
-	public ApiPaginatedList<ApiPayment> getPaymentList(ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiPayment> getPaymentList(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
 
-		return PaginationTools.createPaginatedResponse(em, request, () -> paymentQueryObject(request), PaymentMapper::toApiPayment);
+		return PaginationTools.createPaginatedResponse(em, request, () -> paymentQueryObject(request, queryRequest), PaymentMapper::toApiPayment);
 	}
 
-	private Payment paymentQueryObject(ApiPaginatedRequest request) {
-		
+	private Payment paymentQueryObject(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
+
 		Payment paymentProxy = Torpedo.from(Payment.class);
+		OnGoingLogicalCondition condition = Torpedo.condition();
+
+		// Query parameter filters
+		if(queryRequest.paymentStatus != null)
+			condition.and(paymentProxy.getPaymentStatus()).eq(queryRequest.paymentStatus);
+		if(queryRequest.preferredWayOfPayment != null)
+			condition.and(paymentProxy.getPreferredWayOfPayment()).eq(queryRequest.preferredWayOfPayment);
+		if(queryRequest.productionDateStart != null)
+			condition.and(paymentProxy.getProductionDate()).gte(queryRequest.productionDateStart);
+		if(queryRequest.productionDateEnd != null)
+			condition.and(paymentProxy.getProductionDate()).lte(queryRequest.productionDateEnd);
+		if(queryRequest.farmerName != null) // Search by farmers name (query)
+			condition.and(paymentProxy.getRecipientUserCustomer()).isNotNull()
+					.and(paymentProxy.getRecipientUserCustomer().getName() + " " + paymentProxy.getRecipientUserCustomer().getSurname())
+					.like().startsWith(queryRequest.farmerName);
+
 		QueryTools.orderBy(request.sort, paymentProxy.getId());
+
 		return paymentProxy;
 	}
 
