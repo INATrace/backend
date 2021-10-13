@@ -50,7 +50,7 @@ public class CommonController
     @ApiOperation(value = "Uploads an image")
     @PostMapping(value = "/image", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ApiResponse<ApiDocument> uploadImage(@AuthenticationPrincipal CustomUserDetails authUser,
-    		@RequestParam(value = "resize", defaultValue = "false") boolean resize,
+    		@RequestParam(value = "resize", defaultValue = "true") boolean resize,
     		@RequestParam("file") MultipartFile file) throws ApiException, IOException {
         return new ApiResponse<>(commonEngine.uploadImage(authUser.getUserId(), file.getBytes(), file.getOriginalFilename(), file.getContentType(), file.getSize(), resize));
     }    
