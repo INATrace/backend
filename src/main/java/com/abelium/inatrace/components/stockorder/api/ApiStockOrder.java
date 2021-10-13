@@ -6,7 +6,7 @@ import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
-import com.abelium.inatrace.components.product.api.ApiUserCustomer;
+import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomer;
 import com.abelium.inatrace.components.stockorder.converters.SimpleDateConverter;
 import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;

@@ -1,5 +1,6 @@
-package com.abelium.inatrace.components.product.api;
+package com.abelium.inatrace.components.usercustomer.api;
 
+import com.abelium.inatrace.components.product.api.ApiLocation;
 import io.swagger.annotations.ApiModelProperty;
 
 public class ApiUserCustomerLocation extends ApiLocation {

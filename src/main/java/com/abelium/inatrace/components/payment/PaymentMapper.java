@@ -1,9 +1,8 @@
 package com.abelium.inatrace.components.payment;
 
-import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
-import com.abelium.inatrace.components.product.mapper.UserCustomerMapper;
+import com.abelium.inatrace.components.usercustomer.mappers.UserCustomerMapper;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.db.entities.payment.Payment;
@@ -55,11 +54,11 @@ public final class PaymentMapper {
 //		apiRecipientCompanyCustomer.setName(entity.getRecipientCompanyCustomer().getName());
 //		apiPayment.setRecipientCompanyCustomer(apiRecipientCompanyCustomer);
 		
-		ApiDocument apiReceiptDocument = new ApiDocument();
-		apiReceiptDocument.setId(entity.getReceiptDocument().getId());
-		apiReceiptDocument.setName(entity.getReceiptDocument().getName());
-		apiReceiptDocument.setStorageKey(entity.getReceiptDocument().getStorageKey());
-		apiPayment.setReceiptDocument(apiReceiptDocument);
+//		ApiDocument apiReceiptDocument = new ApiDocument();
+//		apiReceiptDocument.setId(entity.getReceiptDocument().getId());
+//		apiReceiptDocument.setName(entity.getReceiptDocument().getName());
+//		apiReceiptDocument.setStorageKey(entity.getReceiptDocument().getStorageKey());
+//		apiPayment.setReceiptDocument(apiReceiptDocument);
 		
 		ApiUser apiPaymentConfirmedByUser = new ApiUser();
 		apiPaymentConfirmedByUser.setId(entity.getPaymentConfirmedByUser().getId());
