@@ -26,12 +26,9 @@ import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
-import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service for payment entity.
@@ -44,16 +41,25 @@ public class PaymentService extends BaseService {
 
 	@Autowired
 	private UserService userService;
-	
-	public ApiPaginatedList<ApiPayment> getPaymentList(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
 
-		return PaginationTools.createPaginatedResponse(em, request, () -> paymentQueryObject(request, queryRequest), PaymentMapper::toApiPayment);
+	public ApiPaginatedList<ApiPayment> listPayments(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
+		return PaginationTools.createPaginatedResponse(em, request, () -> paymentQueryObject(
+				request, queryRequest), PaymentMapper::toApiPayment);
 	}
 
 	private Payment paymentQueryObject(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
 
 		Payment paymentProxy = Torpedo.from(Payment.class);
 		OnGoingLogicalCondition condition = Torpedo.condition();
+
+		// Applies only when fetching list by PurchaseID or CompanyID
+		if(queryRequest.companyId != null)
+			condition.and(paymentProxy.getStockOrder()).isNotNull()
+					.and(paymentProxy.getStockOrder().getCompany()).isNotNull()
+					.and(paymentProxy.getStockOrder().getCompany().getId()).eq(queryRequest.companyId);
+		else if (queryRequest.purchaseId != null)
+			condition.and(paymentProxy.getStockOrder()).isNotNull()
+					.and(paymentProxy.getStockOrder().getId()).eq(queryRequest.companyId);
 
 		// Query parameter filters
 		if(queryRequest.paymentStatus != null)
@@ -66,8 +72,11 @@ public class PaymentService extends BaseService {
 			condition.and(paymentProxy.getProductionDate()).lte(queryRequest.productionDateEnd);
 		if(queryRequest.farmerName != null) // Search by farmers name (query)
 			condition.and(paymentProxy.getRecipientUserCustomer()).isNotNull()
-					.and(paymentProxy.getRecipientUserCustomer().getName() + " " + paymentProxy.getRecipientUserCustomer().getSurname())
+					.and(paymentProxy.getRecipientUserCustomer().getName())
+//					.and(paymentProxy.getRecipientUserCustomer().getName() + " " + paymentProxy.getRecipientUserCustomer().getSurname())
 					.like().startsWith(queryRequest.farmerName);
+
+		Torpedo.where(condition);
 
 		QueryTools.orderBy(request.sort, paymentProxy.getId());
 
@@ -215,42 +224,6 @@ public class PaymentService extends BaseService {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid payment ID");
 		}
 		return payment;
-	}
-	
-	public ApiPaginatedList<ApiPayment> listPaymentsByPurchase(Long purchaseId, ApiPaginatedRequest request) {
-
-		TypedQuery<Payment> paymentsQuery = 
-			em.createNamedQuery("Payment.listPaymentsByPurchaseId", Payment.class)
-				.setParameter("purchaseId", purchaseId)
-				.setFirstResult(request.getOffset())
-				.setMaxResults(request.getLimit());
-
-		List<Payment> payments = paymentsQuery.getResultList();
-
-		Long count = 
-			em.createNamedQuery("Payment.countPaymentsByPurchaseId", Long.class)
-				.setParameter("purchaseId", purchaseId).getSingleResult();
-
-		return new ApiPaginatedList<>(
-			payments.stream().map(PaymentMapper::toApiPayment).collect(Collectors.toList()), count);
-	}
-	
-	public ApiPaginatedList<ApiPayment> listPaymentsByCompany(Long companyId, ApiPaginatedRequest request) {
-
-		TypedQuery<Payment> paymentsQuery = 
-			em.createNamedQuery("Payment.listPaymentsByCompanyId", Payment.class)
-				.setParameter("companyId", companyId)
-				.setFirstResult(request.getOffset())
-				.setMaxResults(request.getLimit());
-
-		List<Payment> payments = paymentsQuery.getResultList();
-
-		Long count = 
-			em.createNamedQuery("Payment.countPaymentsByCompanyId", Long.class)
-				.setParameter("companyId", companyId).getSingleResult();
-
-		return new ApiPaginatedList<>(
-			payments.stream().map(PaymentMapper::toApiPayment).collect(Collectors.toList()), count);
 	}
 	
 }
