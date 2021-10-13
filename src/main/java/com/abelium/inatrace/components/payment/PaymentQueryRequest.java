@@ -33,4 +33,17 @@ public class PaymentQueryRequest {
     public Instant productionDateEnd;
     // representativeOfRecipientUserCustomer.name
     public String farmerName;
+
+    @Override
+    public String toString() {
+        return "PaymentQueryRequest{" +
+                "companyId=" + companyId +
+                ", purchaseId=" + purchaseId +
+                ", preferredWayOfPayment=" + preferredWayOfPayment +
+                ", paymentStatus=" + paymentStatus +
+                ", productionDateStart=" + productionDateStart +
+                ", productionDateEnd=" + productionDateEnd +
+                ", farmerName='" + farmerName + '\'' +
+                '}';
+    }
 }

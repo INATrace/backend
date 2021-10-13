@@ -42,9 +42,10 @@ public class PaymentService extends BaseService {
 	@Autowired
 	private UserService userService;
 
-	public ApiPaginatedList<ApiPayment> listPayments(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
+	public ApiPaginatedList<ApiPayment> getPaymentList(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
 		return PaginationTools.createPaginatedResponse(em, request, () -> paymentQueryObject(
 				request, queryRequest), PaymentMapper::toApiPayment);
+
 	}
 
 	private Payment paymentQueryObject(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
@@ -53,13 +54,10 @@ public class PaymentService extends BaseService {
 		OnGoingLogicalCondition condition = Torpedo.condition();
 
 		// Applies only when fetching list by PurchaseID or CompanyID
-		if(queryRequest.companyId != null)
-			condition.and(paymentProxy.getStockOrder()).isNotNull()
-					.and(paymentProxy.getStockOrder().getCompany()).isNotNull()
-					.and(paymentProxy.getStockOrder().getCompany().getId()).eq(queryRequest.companyId);
-		else if (queryRequest.purchaseId != null)
-			condition.and(paymentProxy.getStockOrder()).isNotNull()
-					.and(paymentProxy.getStockOrder().getId()).eq(queryRequest.companyId);
+		if(queryRequest.companyId != null) {
+			condition.and(paymentProxy.getStockOrder().getCompany().getId()).eq(queryRequest.companyId);
+		} else if (queryRequest.purchaseId != null)
+			condition.and(paymentProxy.getStockOrder().getId()).eq(queryRequest.purchaseId);
 
 		// Query parameter filters
 		if(queryRequest.paymentStatus != null)
@@ -72,13 +70,15 @@ public class PaymentService extends BaseService {
 			condition.and(paymentProxy.getProductionDate()).lte(queryRequest.productionDateEnd);
 		if(queryRequest.farmerName != null) // Search by farmers name (query)
 			condition.and(paymentProxy.getRecipientUserCustomer()).isNotNull()
-					.and(paymentProxy.getRecipientUserCustomer().getName())
-//					.and(paymentProxy.getRecipientUserCustomer().getName() + " " + paymentProxy.getRecipientUserCustomer().getSurname())
-					.like().startsWith(queryRequest.farmerName);
+					.and(paymentProxy.getRecipientUserCustomer().getName() + " " + paymentProxy.getRecipientUserCustomer().getSurname())
+					.like().any(queryRequest.farmerName);
 
 		Torpedo.where(condition);
 
-		QueryTools.orderBy(request.sort, paymentProxy.getId());
+		switch (request.sortBy) {
+			case "productionDate": QueryTools.orderBy(request.sort, paymentProxy.getProductionDate()); break;
+			default: QueryTools.orderBy(request.sort, paymentProxy.getId());
+		}
 
 		return paymentProxy;
 	}

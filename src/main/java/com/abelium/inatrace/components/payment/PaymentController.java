@@ -42,7 +42,7 @@ public class PaymentController {
 	@GetMapping("list")
 	@ApiOperation("Get a paginated list of payments.")
 	public ApiPaginatedResponse<ApiPayment> getPaymentList(@Valid ApiPaginatedRequest request) {
-		return new ApiPaginatedResponse<>(paymentService.listPayments(request, new PaymentQueryRequest()));
+		return new ApiPaginatedResponse<>(paymentService.getPaymentList(request, new PaymentQueryRequest()));
 	}
 
 	@GetMapping("list/purchase/{id}")
@@ -56,7 +56,7 @@ public class PaymentController {
 			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
 			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) {
 
-		return new ApiPaginatedResponse<>(paymentService.listPayments(
+		return new ApiPaginatedResponse<>(paymentService.getPaymentList(
 				request,
 				new PaymentQueryRequest(
 						null,
@@ -69,7 +69,7 @@ public class PaymentController {
 				)
 		));
 	}
-
+	public static int counter = 0;
 	@GetMapping("list/company/{id}")
 	@ApiOperation("Get a list of payments by company ID.")
 	public ApiPaginatedResponse<ApiPayment> listPaymentsByCompany(
@@ -81,7 +81,7 @@ public class PaymentController {
 			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
 			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) {
 
-		return new ApiPaginatedResponse<>(paymentService.listPayments(
+		return new ApiPaginatedResponse<>(paymentService.getPaymentList(
 				request,
 				new PaymentQueryRequest(
 						companyId,
