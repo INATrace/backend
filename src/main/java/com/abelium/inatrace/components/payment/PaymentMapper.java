@@ -32,9 +32,10 @@ public final class PaymentMapper {
 		apiPayment.setRecipientType(entity.getRecipientType());
 		apiPayment.setReceiptNumber(entity.getReceiptNumber());
 		apiPayment.setReceiptDocumentType(entity.getReceiptDocumentType());
-		apiPayment.setPaymentPurporseType(entity.getPaymentPurposeType());
+		apiPayment.setPaymentPurposeType(entity.getPaymentPurposeType());
 		apiPayment.setPaymentStatus(entity.getPaymentStatus());
 		apiPayment.setPaymentConfirmedAtTime(entity.getPaymentConfirmedAtTime());
+		apiPayment.setFormalCreationTime(entity.getFormalCreationTime());
 		apiPayment.setPreferredWayOfPayment(entity.getPreferredWayOfPayment());
 		apiPayment.setProductionDate(entity.getProductionDate());
 		apiPayment.setRecipientUserCustomer(UserCustomerMapper.toApiUserCustomerBase(entity.getRecipientUserCustomer()));

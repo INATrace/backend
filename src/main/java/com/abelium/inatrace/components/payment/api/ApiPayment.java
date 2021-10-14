@@ -79,7 +79,10 @@ public class ApiPayment extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Payment time confirmation")
     private Instant paymentConfirmedAtTime;
-	
+
+	@ApiModelProperty(value = "Formal date of payment (for example: date on receipt)")
+	private Instant formalCreationTime;
+
 	@ApiModelProperty(value = "Preferred way of payment")
 	private PreferredWayOfPayment preferredWayOfPayment;
 	
@@ -211,7 +214,7 @@ public class ApiPayment extends ApiBaseEntity {
 		return paymentPurposeType;
 	}
 
-	public void setPaymentPurporseType(PaymentPurposeType paymentPurposeType) {
+	public void setPaymentPurposeType(PaymentPurposeType paymentPurposeType) {
 		this.paymentPurposeType = paymentPurposeType;
 	}
 
@@ -237,6 +240,14 @@ public class ApiPayment extends ApiBaseEntity {
 
 	public void setPaymentConfirmedAtTime(Instant paymentConfirmedAtTime) {
 		this.paymentConfirmedAtTime = paymentConfirmedAtTime;
+	}
+
+	public Instant getFormalCreationTime() {
+		return formalCreationTime;
+	}
+
+	public void setFormalCreationTime(Instant formalCreationTime) {
+		this.formalCreationTime = formalCreationTime;
 	}
 
 	public PreferredWayOfPayment getPreferredWayOfPayment() {

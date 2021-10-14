@@ -178,6 +178,7 @@ public class PaymentService extends BaseService {
 			entity.setOrderReference(orderReference);
 			entity.setPayingCompany(payingCompany);
 			entity.setPaymentConfirmedAtTime(apiPayment.getPaymentConfirmedAtTime());
+			entity.setFormalCreationTime(apiPayment.getFormalCreationTime());
 			entity.setPaymentConfirmedByCompany(paymentConfirmedByCompany);
 			entity.setPaymentConfirmedByUser(paymentConfirmedByUser);
 			entity.setPaymentPurposeType(apiPayment.getPaymentPurposeType());
