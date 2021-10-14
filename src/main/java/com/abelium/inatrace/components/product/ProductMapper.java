@@ -37,6 +37,7 @@ public class ProductMapper extends BaseService {
             userCustomer.setFarm(new FarmInformation());
         }
         if (apiUserCustomer.getFarm() != null) {
+            userCustomer.getFarm().setAreaUnit(apiUserCustomer.getFarm().getAreaUnit());
             userCustomer.getFarm().setTotalCultivatedArea(apiUserCustomer.getFarm().getTotalCultivatedArea());
             userCustomer.getFarm().setCoffeeCultivatedArea(apiUserCustomer.getFarm().getCoffeeCultivatedArea());
             userCustomer.getFarm().setNumberOfTrees(apiUserCustomer.getFarm().getNumberOfTrees());
