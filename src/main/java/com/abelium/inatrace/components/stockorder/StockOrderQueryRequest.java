@@ -1,5 +1,6 @@
 package com.abelium.inatrace.components.stockorder;
 
+import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
 import java.time.Instant;
@@ -22,17 +23,21 @@ public class StockOrderQueryRequest {
     
     public StockOrderQueryRequest(Long companyId,
                                   Long facilityId,
+                                  Long farmerId,
                                   Boolean isOpenBalanceOnly,
                                   Boolean isWomenShare,
                                   PreferredWayOfPayment wayOfPayment,
+                                  OrderType orderType,
                                   Instant productionDateStart,
                                   Instant productionDateEnd,
                                   String producerUserCustomerName) {
         this.companyId = companyId;
         this.facilityId = facilityId;
+        this.farmerId = farmerId;
         this.isOpenBalanceOnly = isOpenBalanceOnly;
         this.isWomenShare = isWomenShare;
         this.wayOfPayment = wayOfPayment;
+        this.orderType = orderType;
         this.productionDateStart = productionDateStart;
         this.productionDateEnd = productionDateEnd;
         this.producerUserCustomerName = producerUserCustomerName;
@@ -40,10 +45,12 @@ public class StockOrderQueryRequest {
 
     public Long companyId;
     public Long facilityId;
+    public Long farmerId;
     public Long semiProductId;
     public Boolean isOpenBalanceOnly;
     public Boolean isWomenShare;
     public PreferredWayOfPayment wayOfPayment;
+    public OrderType orderType;
     public Instant productionDateStart;
     public Instant productionDateEnd;
     public String producerUserCustomerName;

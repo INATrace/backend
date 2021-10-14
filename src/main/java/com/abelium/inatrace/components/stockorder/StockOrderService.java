@@ -66,6 +66,9 @@ public class StockOrderService extends BaseService {
 
 
         // Query parameter filters
+        if(queryRequest.farmerId != null)
+            condition.and(stockOrderProxy.getProducerUserCustomer()).isNotNull()
+                    .and(stockOrderProxy.getProducerUserCustomer().getId()).eq(queryRequest.farmerId);
         if(queryRequest.semiProductId != null)
             condition.and(stockOrderProxy.getSemiProduct()).isNotNull()
                     .and(stockOrderProxy.getSemiProduct().getId()).eq(queryRequest.semiProductId);
@@ -76,6 +79,8 @@ public class StockOrderService extends BaseService {
             condition.and(stockOrderProxy.getWomenShare()).eq(queryRequest.isWomenShare);
         if(queryRequest.wayOfPayment != null)
             condition.and(stockOrderProxy.getPreferredWayOfPayment()).eq(queryRequest.wayOfPayment);
+        if(queryRequest.orderType != null)
+            condition.and(stockOrderProxy.getOrderType()).eq(queryRequest.orderType);
         if(queryRequest.productionDateStart != null)
             condition.and(stockOrderProxy.getProductionDate()).gte(queryRequest.productionDateStart);
         if(queryRequest.productionDateEnd != null)
