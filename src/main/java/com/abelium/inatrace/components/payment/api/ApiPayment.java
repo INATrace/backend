@@ -2,21 +2,19 @@ package com.abelium.inatrace.components.payment.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.common.api.ApiDocument;
-import com.abelium.inatrace.components.company.api.ApiCompanyBase;
+import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
-import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomer;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
-import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
-import com.abelium.inatrace.db.entities.payment.PaymentStatus;
-import com.abelium.inatrace.db.entities.payment.PaymentType;
-import com.abelium.inatrace.db.entities.payment.ReceiptDocumentType;
-import com.abelium.inatrace.db.entities.payment.RecipientType;
+import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomer;
+import com.abelium.inatrace.db.entities.payment.*;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
+import com.abelium.inatrace.tools.converters.SimpleDateConverter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.time.Instant;
-
-import io.swagger.annotations.ApiModelProperty;
 
 public class ApiPayment extends ApiBaseEntity {
 
@@ -36,7 +34,7 @@ public class ApiPayment extends ApiBaseEntity {
 	private Integer purchased;
 
 	@ApiModelProperty(value = "Payment amount paid to the farmer")
-	private Integer amountPaidToTheFarmer;
+		private Integer amountPaidToTheFarmer;
 	
 	@ApiModelProperty(value = "Payment amount paid to the collector")
 	private Integer amountPaidToTheCollector;
@@ -78,24 +76,33 @@ public class ApiPayment extends ApiBaseEntity {
 	private ApiUser paymentConfirmedByUser;
 	
 	@ApiModelProperty(value = "Payment time confirmation")
+	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
+	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
     private Instant paymentConfirmedAtTime;
 
 	@ApiModelProperty(value = "Formal date of payment (for example: date on receipt)")
+	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
+	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
 	private Instant formalCreationTime;
 
 	@ApiModelProperty(value = "Preferred way of payment")
 	private PreferredWayOfPayment preferredWayOfPayment;
 	
 	@ApiModelProperty(value = "Production date")
+	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
+	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
     private Instant productionDate;
+
+	@ApiModelProperty(value = "Company that is paying for product")
+	private ApiCompany payingCompany;
 	
 	// The next properties can be extracted from the purchase (stock order) on the way back
 	
 	@ApiModelProperty(value = "Company that receives the payment")
-	private ApiCompanyBase recipientCompany; // TODO: is this a company receiving a payment?
+	private ApiCompany recipientCompany;
 	
 	@ApiModelProperty(value = "Representative of the company that receives the payment")
-	private ApiCompanyBase representativeOfRecipientCompany;
+	private ApiCompany representativeOfRecipientCompany;
 
 	@ApiModelProperty(value = "User customer that receives the payment (farmer)")
 	private ApiUserCustomer recipientUserCustomer;
@@ -266,19 +273,28 @@ public class ApiPayment extends ApiBaseEntity {
 		this.productionDate = productionDate;
 	}
 
-	public ApiCompanyBase getRecipientCompany() {
+
+	public ApiCompany getPayingCompany() {
+		return payingCompany;
+	}
+
+	public void setPayingCompany(ApiCompany payingCompany) {
+		this.payingCompany = payingCompany;
+	}
+
+	public ApiCompany getRecipientCompany() {
 		return recipientCompany;
 	}
 
-	public void setRecipientCompany(ApiCompanyBase recipientCompany) {
+	public void setRecipientCompany(ApiCompany recipientCompany) {
 		this.recipientCompany = recipientCompany;
 	}
 
-	public ApiCompanyBase getRepresentativeOfRecipientCompany() {
+	public ApiCompany getRepresentativeOfRecipientCompany() {
 		return representativeOfRecipientCompany;
 	}
 
-	public void setRepresentativeOfRecipientCompany(ApiCompanyBase representativeOfRecipientCompany) {
+	public void setRepresentativeOfRecipientCompany(ApiCompany representativeOfRecipientCompany) {
 		this.representativeOfRecipientCompany = representativeOfRecipientCompany;
 	}
 

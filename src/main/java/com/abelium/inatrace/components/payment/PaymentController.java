@@ -3,7 +3,7 @@ package com.abelium.inatrace.components.payment;
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
-import com.abelium.inatrace.components.stockorder.converters.SimpleDateConverter;
+import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;

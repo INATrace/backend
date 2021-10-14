@@ -29,9 +29,6 @@ import java.util.List;
 @NamedQueries({
 	@NamedQuery(name = "StockOrder.getPurchaseOrderById",
 				query = "SELECT so FROM StockOrder so "
-						+ "INNER JOIN FETCH so.company c "
-						+ "INNER JOIN FETCH so.representativeOfProducerUserCustomer ropuc "
-						+ "INNER JOIN FETCH so.producerUserCustomer puc "
 						+ "WHERE so.id = :stockOrderId "
 						+ "AND so.orderType = 'PURCHASE_ORDER'")
 })

@@ -1,10 +1,10 @@
 package com.abelium.inatrace.components.payment;
 
-import com.abelium.inatrace.components.company.api.ApiCompanyBase;
+import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
-import com.abelium.inatrace.components.usercustomer.mappers.UserCustomerMapper;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
-import com.abelium.inatrace.components.user.api.ApiUser;
+import com.abelium.inatrace.components.user.mappers.UserMapper;
+import com.abelium.inatrace.components.usercustomer.mappers.UserCustomerMapper;
 import com.abelium.inatrace.db.entities.payment.Payment;
 
 /**
@@ -39,16 +39,14 @@ public final class PaymentMapper {
 		apiPayment.setPreferredWayOfPayment(entity.getPreferredWayOfPayment());
 		apiPayment.setProductionDate(entity.getProductionDate());
 		apiPayment.setRecipientUserCustomer(UserCustomerMapper.toApiUserCustomerBase(entity.getRecipientUserCustomer()));
-		
+		apiPayment.setRecipientCompany(CompanyMapper.toApiCompanyBase(entity.getRecipientCompany()));
+		apiPayment.setPayingCompany(CompanyMapper.toApiCompanyBase(entity.getPayingCompany()));
+		apiPayment.setPaymentConfirmedByUser(UserMapper.toSimpleApiUser(entity.getPaymentConfirmedByUser()));
+
 		ApiStockOrder apiStockOrder = new ApiStockOrder();
 		apiStockOrder.setId(entity.getStockOrder().getId());
 		apiStockOrder.setIdentifier(entity.getStockOrder().getIdentifier());
 		apiPayment.setStockOrder(apiStockOrder);
-		
-		ApiCompanyBase apiRecipientCompany = new ApiCompanyBase();
-		apiRecipientCompany.setId(entity.getRecipientCompany().getId());
-		apiRecipientCompany.setName(entity.getRecipientCompany().getName());
-		apiPayment.setRecipientCompany(apiRecipientCompany);
 
 //		ApiCompanyCustomer apiRecipientCompanyCustomer = new ApiCompanyCustomer();
 //		apiRecipientCompanyCustomer.setId(entity.getRecipientCompanyCustomer().getId());
@@ -60,12 +58,7 @@ public final class PaymentMapper {
 //		apiReceiptDocument.setName(entity.getReceiptDocument().getName());
 //		apiReceiptDocument.setStorageKey(entity.getReceiptDocument().getStorageKey());
 //		apiPayment.setReceiptDocument(apiReceiptDocument);
-		
-		ApiUser apiPaymentConfirmedByUser = new ApiUser();
-		apiPaymentConfirmedByUser.setId(entity.getPaymentConfirmedByUser().getId());
-		apiPaymentConfirmedByUser.setName(entity.getPaymentConfirmedByUser().getName());
-		apiPayment.setPaymentConfirmedByUser(apiPaymentConfirmedByUser);
-		
+
 		return apiPayment;
 	}
 }

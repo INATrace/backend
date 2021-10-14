@@ -8,15 +8,11 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
 import com.abelium.inatrace.components.user.UserService;
-import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
-import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
-import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -26,8 +22,8 @@ import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
+import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
 import java.time.Instant;
 
 /**
@@ -84,34 +80,20 @@ public class PaymentService extends BaseService {
 	}
 
 	public ApiPayment getPayment(Long id) throws ApiException {
-		return PaymentMapper.toApiPayment(fetchPayment(id));
+		return PaymentMapper.toApiPayment(fetchEntity(id, Payment.class));
 	}
 
 	@Transactional
 	public ApiBaseEntity createOrUpdatePayment(ApiPayment apiPayment, Long userId) throws ApiException {
 
-		Payment entity;
-		Company payingCompany = null;
-		Company recipientCompany = null;
-		Company paymentConfirmedByCompany = null;
-		StockOrder stockOrder = null;
-		Document receiptDocument = null;
-		User paymentConfirmedByUser = null;
-		UserCustomer payableToCollector = null;
-		UserCustomer payableToFarmer = null;
-		CompanyCustomer recipientCompanyCustomer = null; // still don't know where to get it from - assign null for now
-		PreferredWayOfPayment preferredWayOfPayment = null;
-		String orderReference = null;
-		Integer purchased = null;
-		Integer openBalance = null;
-		Integer totalPaid = null;
+		Payment entity = fetchEntityOrElse(apiPayment.getId(), Payment.class, new Payment());
+		User currentUser = userService.fetchUserById(userId);
 
-		if (apiPayment.getId() != null) {
+		if (entity.getId() != null) {
 
 			// If method is PUT, let's keep it simple and just allow to update the payment status to CONFIRMED
 			// Coffee Matheo doesn't allow us to update fields other than the payment status
 			// Also it is not allowed to set back the value to UNCONFIRMED
-			entity = fetchPayment(apiPayment.getId());
 			if (apiPayment.getPaymentStatus() == PaymentStatus.CONFIRMED) {
 				if (entity.getPaymentStatus() == PaymentStatus.UNCONFIRMED) {
 					entity.setPaymentStatus(PaymentStatus.CONFIRMED);
@@ -121,91 +103,73 @@ public class PaymentService extends BaseService {
 			entity.setUpdatedBy(userService.fetchUserById(apiPayment.getUpdatedBy()));
 
 			// TODO: Should the "paymentConfirmedByCompany" be the same as "payingCompany"?
-			entity.setPaymentConfirmedByCompany(entity.getPayingCompany());
-			entity.setPaymentConfirmedByUser(userService.fetchUserById(userId));
 			entity.setPaymentConfirmedAtTime(Instant.now());
+			entity.setPaymentConfirmedByCompany(entity.getPayingCompany());
+			entity.setPaymentConfirmedByUser(currentUser);
+			entity.setUpdatedBy(currentUser);
 
 		} else {
-			
+
 			// If method is POST, let's create a payment from scratch
 			// Important to consider that a purchase order must exist, since we will extract information from it
-			entity = new Payment();
 			// Get purchase order to which you will generate a payment
-			stockOrder = (StockOrder) em.createNamedQuery("StockOrder.getPurchaseOrderById")
-					.setParameter("stockOrderId", apiPayment.getStockOrder().getId())
-					.getSingleResult();
-			if (stockOrder != null) {
-				
-				// the company who creates a purchase should be the one who pays for it, right?
-				payingCompany = stockOrder.getCompany();
-				// company who receives the payment - could this be client property on stock order?
-				recipientCompany = (Company) em.createNamedQuery("Company.getCompanyById")
-						.setParameter("companyId", apiPayment.getRecipientCompany().getId())
+			StockOrder stockOrder;
+			try {
+				stockOrder = (StockOrder) em.createNamedQuery("StockOrder.getPurchaseOrderById")
+						.setParameter("stockOrderId", apiPayment.getStockOrder().getId())
 						.getSingleResult();
-				// collector (representative) who is getting the payment
-				payableToCollector = stockOrder.getRepresentativeOfProducerUserCustomer();
-				// farmer who is getting the payment
-				payableToFarmer = stockOrder.getProducerUserCustomer();
-				// purchase order identifier
-				orderReference = stockOrder.getIdentifier();
-				// purchase order preferred way of payment
-				preferredWayOfPayment = stockOrder.getPreferredWayOfPayment();
-				// purchase order total quantity of semi-product
-				purchased = stockOrder.getTotalQuantity();
-				// purchase order open balance
-				openBalance = stockOrder.getBalance().intValue();
-				// amount paid to the farmer
-				totalPaid = apiPayment.getAmountPaidToTheFarmer();
-
-			} else {
-				throw new ApiException(ApiStatus.INVALID_REQUEST, "A purchase order is required in order to create a payment.");
+			} catch (NoResultException e) {
+				throw new ApiException(ApiStatus.INVALID_REQUEST, "A purchase order (StockOrder) is required in order to create a payment.");
 			}
-			
-			// Storage key needs to be unique
-			receiptDocument = new Document();
-			receiptDocument.setContentType(apiPayment.getReceiptDocument().getContentType());
-			receiptDocument.setName(apiPayment.getReceiptDocument().getName());
-			receiptDocument.setSize(apiPayment.getReceiptDocument().getSize());
-			receiptDocument.setStorageKey(apiPayment.getReceiptDocument().getStorageKey());
-			
-			entity.setAmountPaidToTheFarmer(totalPaid);
-			entity.setAmountPaidToTheCollector(0);
-			entity.setCreatedBy(userService.fetchUserById(apiPayment.getCreatedBy()));
-			entity.setUpdatedBy(userService.fetchUserById(apiPayment.getUpdatedBy()));
-			entity.setCurrency(apiPayment.getCurrency());
-//			entity.setInputTransactions(null);
+
+			// Values from StockOrder
 			entity.setStockOrder(stockOrder);
-			entity.setOrderReference(orderReference);
-			entity.setPayingCompany(payingCompany);
+			entity.setOrderReference(stockOrder.getIdentifier());
+			entity.setProductionDate(stockOrder.getProductionDate()); // TODO: Is productionDate same as StockOrder prod. date?
+			entity.setPayingCompany(stockOrder.getCompany()); // same company which has created purchase order
+			entity.setPurchased(stockOrder.getTotalQuantity());
+			entity.setPreferredWayOfPayment(stockOrder.getPreferredWayOfPayment());
+			entity.setRecipientUserCustomer(stockOrder.getProducerUserCustomer()); // farmer
+			entity.setRepresentativeOfRecipientUserCustomer(stockOrder.getRepresentativeOfProducerUserCustomer()); // collector
+
+			// Storage key needs to be unique
+//			Document receiptDocument = new Document();
+//			receiptDocument.setContentType(apiPayment.getReceiptDocument().getContentType());
+//			receiptDocument.setName(apiPayment.getReceiptDocument().getName());
+//			receiptDocument.setSize(apiPayment.getReceiptDocument().getSize());
+//			receiptDocument.setStorageKey(apiPayment.getReceiptDocument().getStorageKey());
+//			entity.setReceiptDocument(receiptDocument);
+
+			entity.setReceiptDocumentType(apiPayment.getReceiptDocumentType());
 			entity.setPaymentConfirmedAtTime(apiPayment.getPaymentConfirmedAtTime());
 			entity.setFormalCreationTime(apiPayment.getFormalCreationTime());
-			entity.setPaymentConfirmedByCompany(paymentConfirmedByCompany);
-			entity.setPaymentConfirmedByUser(paymentConfirmedByUser);
 			entity.setPaymentPurposeType(apiPayment.getPaymentPurposeType());
 			entity.setPaymentStatus(apiPayment.getPaymentStatus());
 			entity.setPaymentType(apiPayment.getPaymentType());
-			entity.setPreferredWayOfPayment(preferredWayOfPayment);
-//			entity.setProductionDate(apiPayment.getProductionDate());
-			entity.setPurchased(purchased);
-			entity.setReceiptDocument(receiptDocument);
 			entity.setReceiptNumber(apiPayment.getReceiptNumber());
-			entity.setRecipientCompany(recipientCompany);
-			entity.setRecipientCompanyCustomer(recipientCompanyCustomer);
-			entity.setReceiptDocumentType(apiPayment.getReceiptDocumentType());
 			entity.setRecipientType(apiPayment.getRecipientType());
-			entity.setRecipientUserCustomer(payableToFarmer);
-			entity.setRepresentativeOfRecipientCompany(recipientCompany); // is this required? seems to be same as recipientCompany
-			entity.setRepresentativeOfRecipientUserCustomer(payableToCollector);
-			entity.setTotalPaid(totalPaid);
-			
-			// do not forget to update the stock order entity - open balance - a negative open balance is allowed
-			stockOrder.setBalance(new BigDecimal(openBalance - entity.getTotalPaid()));
-			stockOrder.setUpdatedBy(userService.fetchUserById(apiPayment.getUpdatedBy()));
+			entity.setCurrency(apiPayment.getCurrency());
+
+			entity.setTotalPaid(apiPayment.getAmountPaidToTheFarmer()); // ?
+			entity.setAmountPaidToTheFarmer(apiPayment.getAmountPaidToTheFarmer());
+			entity.setAmountPaidToTheCollector(0); // ?
+
+			// TODO: Optional ? -> Or should be error thrown?
+			if (apiPayment.getRecipientCompany() != null)
+				entity.setRecipientCompany(fetchEntityOrElse(apiPayment.getRecipientCompany().getId(), Company.class, null));
+			if (apiPayment.getRepresentativeOfRecipientCompany() != null)
+				entity.setRecipientCompany(fetchEntityOrElse(apiPayment.getRepresentativeOfRecipientCompany().getId(), Company.class, null));
+
+			entity.setCreatedBy(currentUser);
+			entity.setUpdatedBy(currentUser);
+
+			// TODO:  do not forget to update the stock order entity - open balance - a negative open balance is allowed
+//			stockOrder.setBalance(stockOrder.getBalance().subtract(BigDecimal.valueOf(entity.getTotalPaid())));
+			stockOrder.setUpdatedBy(currentUser);
 		}
 		
 		if (entity.getId() == null) {
 			em.persist(entity);
-			em.persist(stockOrder);
 		}
 
 		return new ApiBaseEntity(entity);
@@ -213,18 +177,21 @@ public class PaymentService extends BaseService {
 
 	@Transactional
 	public void deletePayment(Long id) throws ApiException {
-
-		Payment payment = fetchPayment(id);
-		em.remove(payment);
+		em.remove(fetchEntity(id, Payment.class));
 	}
 
-	public Payment fetchPayment(Long id) throws ApiException {
+	private <E> E fetchEntity(Long id, Class<E> entityClass) throws ApiException {
 
-		Payment payment = Queries.get(em, Payment.class, id);
-		if (payment == null) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid payment ID");
+		E entity = Queries.get(em, entityClass, id);
+		if (entity == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid " + entityClass.getSimpleName() + " ID");
 		}
-		return payment;
+		return entity;
+	}
+
+	private <E> E fetchEntityOrElse(Long id, Class<E> entityClass, E defaultValue) {
+		E entity = Queries.get(em, entityClass, id);
+		return entity == null ? defaultValue : entity;
 	}
 	
 }
