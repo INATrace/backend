@@ -2,8 +2,6 @@ package com.abelium.inatrace.db.entities.payment;
 
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
-import com.abelium.inatrace.db.entities.common.ActivityProof;
-import com.abelium.inatrace.db.entities.common.BankInformation;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
@@ -13,17 +11,31 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
 @Entity
 @Table
+@NamedQueries({
+	@NamedQuery(name = "BulkPayment.listBulkPaymentsByCompanyId", 
+				query = "SELECT bp FROM BulkPayment bp "
+						+ "INNER JOIN bp.payingCompany pc "
+						+ "WHERE pc.id = :companyId"),
+	@NamedQuery(name = "BulkPayment.countBulkPaymentsByCompanyId",
+    			query = "SELECT COUNT(bp) FROM BulkPayment bp "
+						+ "INNER JOIN bp.payingCompany pc "
+						+ "WHERE pc.id = :companyId")
+})
 public class BulkPayment extends BaseEntity {
 
 	@Version
@@ -38,27 +50,21 @@ public class BulkPayment extends BaseEntity {
 	@Column
     private Instant formalCreationTime;
 	
-	@Column
-	private BankInformation bankInfo;
-	
-	@Column
-	private Long receiptNumber;
-
 	@ManyToOne
 	private Company payingCompany;
 	
+	@Lob
+	private String paymentDescription;
+	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
-	private PaymentPurposeType paymentPurporseType;
-
-	@Column
-	private String paymentDescription;
-
-	@Column
-	private BigDecimal totalAmount;
+	private PaymentPurposeType paymentPurposeType;
 	
 	@Column
-	private BigDecimal paymentPerKg;
+	private Long receiptNumber;
+	
+	@Column
+	private BigDecimal totalAmount;
 	
 	@Column
 	private BigDecimal additionalCost;
@@ -66,15 +72,9 @@ public class BulkPayment extends BaseEntity {
 	@Column
 	private String additionalCostDescription;
 	
-	@OneToMany
+	@OneToMany(mappedBy = "bulkPayment", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<StockOrder> stockOrders = new ArrayList<>();
 	
-	@OneToMany
-	private List<ActivityProof> additionalProofs = new ArrayList<>();
-	
-	@OneToMany
-	private List<Payment> payments = new ArrayList<>();
-
 	public User getCreatedBy() {
 		return createdBy;
 	}
@@ -99,28 +99,12 @@ public class BulkPayment extends BaseEntity {
 		this.formalCreationTime = formalCreationTime;
 	}
 
-	public Long getReceiptNumber() {
-		return receiptNumber;
-	}
-
-	public void setReceiptNumber(Long receiptNumber) {
-		this.receiptNumber = receiptNumber;
-	}
-
 	public Company getPayingCompany() {
 		return payingCompany;
 	}
 
 	public void setPayingCompany(Company payingCompany) {
 		this.payingCompany = payingCompany;
-	}
-
-	public PaymentPurposeType getPaymentPurporseType() {
-		return paymentPurporseType;
-	}
-
-	public void setPaymentPurporseType(PaymentPurposeType paymentPurporseType) {
-		this.paymentPurporseType = paymentPurporseType;
 	}
 
 	public String getPaymentDescription() {
@@ -131,20 +115,28 @@ public class BulkPayment extends BaseEntity {
 		this.paymentDescription = paymentDescription;
 	}
 
+	public PaymentPurposeType getPaymentPurposeType() {
+		return paymentPurposeType;
+	}
+
+	public void setPaymentPurposeType(PaymentPurposeType paymentPurposeType) {
+		this.paymentPurposeType = paymentPurposeType;
+	}
+
+	public Long getReceiptNumber() {
+		return receiptNumber;
+	}
+
+	public void setReceiptNumber(Long receiptNumber) {
+		this.receiptNumber = receiptNumber;
+	}
+
 	public BigDecimal getTotalAmount() {
 		return totalAmount;
 	}
 
 	public void setTotalAmount(BigDecimal totalAmount) {
 		this.totalAmount = totalAmount;
-	}
-
-	public BigDecimal getPaymentPerKg() {
-		return paymentPerKg;
-	}
-
-	public void setPaymentPerKg(BigDecimal paymentPerKg) {
-		this.paymentPerKg = paymentPerKg;
 	}
 
 	public BigDecimal getAdditionalCost() {
@@ -171,20 +163,4 @@ public class BulkPayment extends BaseEntity {
 		this.stockOrders = stockOrders;
 	}
 
-	public List<ActivityProof> getAdditionalProofs() {
-		return additionalProofs;
-	}
-
-	public void setAdditionalProofs(List<ActivityProof> additionalProofs) {
-		this.additionalProofs = additionalProofs;
-	}
-
-	public List<Payment> getPayments() {
-		return payments;
-	}
-
-	public void setPayments(List<Payment> payments) {
-		this.payments = payments;
-	}
-	
 }

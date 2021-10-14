@@ -11,6 +11,7 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.facility.Facility;
+import com.abelium.inatrace.db.entities.payment.BulkPayment;
 import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
@@ -85,6 +86,9 @@ public class StockOrder extends TimestampEntity {
 	
 	@ManyToOne
 	private ProcessingAction processingActionDef;
+	
+	@ManyToOne
+	private BulkPayment bulkPayment;
 
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Certification> certifications; // probably not used for purchase
@@ -668,6 +672,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setProcessingActionDef(ProcessingAction processingAction) {
 		this.processingActionDef = processingAction;
+	}
+	
+	public BulkPayment getBulkPayment() {
+		return bulkPayment;
+	}
+
+	public void setBulkPayment(BulkPayment bulkPayment) {
+		this.bulkPayment = bulkPayment;
 	}
 
 	public ProcessingOrder getProcessingOrder() {
