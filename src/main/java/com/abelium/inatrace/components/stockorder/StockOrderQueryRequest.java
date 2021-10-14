@@ -25,6 +25,7 @@ public class StockOrderQueryRequest {
     public StockOrderQueryRequest(Long companyId,
                                   Long facilityId,
                                   Boolean isOpenBalanceOnly,
+                                  Boolean isPurchaseOrderOnly,
                                   Boolean isWomenShare,
                                   PreferredWayOfPayment wayOfPayment,
                                   Instant productionDateStart,
@@ -33,6 +34,7 @@ public class StockOrderQueryRequest {
         this.companyId = companyId;
         this.facilityId = facilityId;
         this.isOpenBalanceOnly = isOpenBalanceOnly;
+        this.isPurchaseOrderOnly = isPurchaseOrderOnly;
         this.isWomenShare = isWomenShare;
         this.wayOfPayment = wayOfPayment;
         this.productionDateStart = productionDateStart;
@@ -44,10 +46,12 @@ public class StockOrderQueryRequest {
     public Long facilityId;
     public Long semiProductId;
     public Boolean isOpenBalanceOnly;
+    public Boolean isPurchaseOrderOnly;
     public Boolean isWomenShare;
     public PreferredWayOfPayment wayOfPayment;
     public Instant productionDateStart;
     public Instant productionDateEnd;
     public String producerUserCustomerName;
     public Boolean isAvailable;
+
 }
