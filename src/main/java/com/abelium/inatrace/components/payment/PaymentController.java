@@ -102,7 +102,7 @@ public class PaymentController {
 	}
 	
 	@GetMapping("list/bulk-payment/company/{id}")
-	@ApiOperation("Get a list of payments by company ID.")
+	@ApiOperation("Get a list of bulk payments by company ID.")
 	public ApiPaginatedResponse<ApiBulkPayment> listBulkPaymentsByCompany(
 		@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId, 
 		@Valid ApiPaginatedRequest request) {
