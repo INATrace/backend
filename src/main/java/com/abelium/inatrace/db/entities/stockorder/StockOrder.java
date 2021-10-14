@@ -11,7 +11,6 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.facility.Facility;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
@@ -62,9 +61,6 @@ public class StockOrder extends TimestampEntity {
 	
 	@ManyToOne
 	private Facility facility;
-	
-	@ManyToOne
-	private ProcessingAction processingActionDef;
 
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Certification> certifications;
@@ -185,7 +181,7 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private String flavourProfile;
 	
-	@OneToOne // Verify relationship
+	@ManyToOne
 	private ProcessingOrder processingOrder;
 	
 	@Enumerated(EnumType.STRING)
@@ -631,14 +627,6 @@ public class StockOrder extends TimestampEntity {
 
 	public void setFlavourProfile(String flavourProfile) {
 		this.flavourProfile = flavourProfile;
-	}
-
-	public ProcessingAction getProcessingActionDef() {
-		return processingActionDef;
-	}
-
-	public void setProcessingActionDef(ProcessingAction processingAction) {
-		this.processingActionDef = processingAction;
 	}
 
 	public ProcessingOrder getProcessingOrder() {
