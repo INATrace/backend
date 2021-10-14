@@ -114,6 +114,18 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	private String webPage;
 
 	/**
+	 * Display preffered way of payment selection on purchase order form
+	 */
+	@Column
+	private Boolean displayPrefferedWayOfPayment;
+
+	/**
+	 * Enable adding multiple farmers for one purchase proof document on purchase order form
+	 */
+	@Column
+	private Boolean purchaseProofDocumentMultipleFarmers;
+
+	/**
 	 * social media URL links (Facebook, Instagram, Twitter, YouTube, ...)
 	 */
 	@ElementCollection(fetch = FetchType.EAGER)
@@ -237,6 +249,22 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 
 	public void setWebPage(String webPage) {
 		this.webPage = webPage;
+	}
+
+	public Boolean getDisplayPrefferedWayOfPayment() {
+		return displayPrefferedWayOfPayment;
+	}
+
+	public void setDisplayPrefferedWayOfPayment(Boolean displayPrefferedWayOfPayment) {
+		this.displayPrefferedWayOfPayment = displayPrefferedWayOfPayment;
+	}
+
+	public Boolean getPurchaseProofDocumentMultipleFarmers() {
+		return purchaseProofDocumentMultipleFarmers;
+	}
+
+	public void setPurchaseProofDocumentMultipleFarmers(Boolean purchaseProofDocumentMultipleFarmers) {
+		this.purchaseProofDocumentMultipleFarmers = purchaseProofDocumentMultipleFarmers;
 	}
 
 	public String getEmail() {
