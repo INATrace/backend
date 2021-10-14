@@ -152,7 +152,7 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     // Relevant only for order type: STOCK_ORDER
 //    @ApiModelProperty(value = "Input transactions for stock order. Read only.")
-//    public List<ApiTransaction> apiTransactions;
+//    public List<ApiTransaction> inputTransactions;
 
 //    @ApiModelProperty(value = "Date when product has been started drying", position = 37)
 //    public Instant startOfDrying;

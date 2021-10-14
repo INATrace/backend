@@ -19,7 +19,6 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderActivityProof;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderLocation;
-import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -31,7 +30,6 @@ import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.time.Instant;
 
 @Lazy
 @Service
@@ -45,63 +43,48 @@ public class StockOrderService extends BaseService {
     }
 
     public ApiPaginatedList<ApiStockOrder> getStockOrderList(ApiPaginatedRequest request,
-                                                             Long companyId,
-                                                             Long facilityId,
-                                                             Boolean isOpenBalanceOnly,
-                                                             Boolean isWomenShare,
-                                                             PreferredWayOfPayment wayOfPayment,
-                                                             Instant productionDateStart,
-                                                             Instant productionDateEnd,
-                                                             String producerUserCustomerName,
+                                                             StockOrderQueryRequest queryRequest,
                                                              Long userId) {
         return PaginationTools.createPaginatedResponse(em, request,
                 () -> stockOrderQueryObject(
                         request,
-                        companyId,
-                        facilityId,
-                        isOpenBalanceOnly,
-                        isWomenShare,
-                        wayOfPayment,
-                        productionDateStart,
-                        productionDateEnd,
-                        producerUserCustomerName
+                        queryRequest
                 ), stockOrder -> StockOrderMapper.toApiStockOrder(stockOrder, userId));
     }
 
     private StockOrder stockOrderQueryObject(ApiPaginatedRequest request,
-                                             Long companyId,
-                                             Long facilityId,
-                                             Boolean isOpenBalanceOnly,
-                                             Boolean isWomenShare,
-                                             PreferredWayOfPayment wayOfPayment,
-                                             Instant productionDateStart,
-                                             Instant productionDateEnd,
-                                             String producerUserCustomerName) {
+                                             StockOrderQueryRequest queryRequest) {
 
         StockOrder stockOrderProxy = Torpedo.from(StockOrder.class);
         OnGoingLogicalCondition condition = Torpedo.condition();
 
         // Only present when listing by facility or company
-        if(companyId != null)
-            condition = condition.and(stockOrderProxy.getCompany().getId()).eq(companyId);
-        else if (facilityId != null)
-            condition = condition.and(stockOrderProxy.getFacility().getId()).eq(facilityId);
+        if(queryRequest.companyId != null)
+            condition = condition.and(stockOrderProxy.getCompany().getId()).eq(queryRequest.companyId);
+        else if (queryRequest.facilityId != null)
+            condition = condition.and(stockOrderProxy.getFacility().getId()).eq(queryRequest.facilityId);
 
 
         // Query parameter filters
-        if(isOpenBalanceOnly != null && isOpenBalanceOnly)
+        if(queryRequest.semiProductId != null)
+            condition.and(stockOrderProxy.getSemiProduct()).isNotNull()
+                    .and(stockOrderProxy.getSemiProduct().getId()).eq(queryRequest.semiProductId);
+        if(queryRequest.isOpenBalanceOnly != null && queryRequest.isOpenBalanceOnly)
             condition.and(stockOrderProxy.getBalance()).isNotNull()
                     .and(stockOrderProxy.getBalance()).gt(BigDecimal.ZERO);
-        if(isWomenShare != null)
-            condition.and(stockOrderProxy.getWomenShare()).eq(isWomenShare);
-        if(wayOfPayment != null)
-            condition.and(stockOrderProxy.getPreferredWayOfPayment()).eq(wayOfPayment);
-        if(productionDateStart != null)
-            condition.and(stockOrderProxy.getProductionDate()).gte(productionDateStart);
-        if(productionDateEnd != null)
-            condition.and(stockOrderProxy.getProductionDate()).lte(productionDateEnd);
-        if(producerUserCustomerName != null) // Search by farmers name (query)
-            condition.and(stockOrderProxy.getProducerUserCustomer().getName()).like().startsWith(producerUserCustomerName);
+        if(queryRequest.isWomenShare != null)
+            condition.and(stockOrderProxy.getWomenShare()).eq(queryRequest.isWomenShare);
+        if(queryRequest.wayOfPayment != null)
+            condition.and(stockOrderProxy.getPreferredWayOfPayment()).eq(queryRequest.wayOfPayment);
+        if(queryRequest.productionDateStart != null)
+            condition.and(stockOrderProxy.getProductionDate()).gte(queryRequest.productionDateStart);
+        if(queryRequest.productionDateEnd != null)
+            condition.and(stockOrderProxy.getProductionDate()).lte(queryRequest.productionDateEnd);
+        if(queryRequest.producerUserCustomerName != null) // Search by farmers name (query)
+            condition.and(stockOrderProxy.getProducerUserCustomer().getName())
+                    .like().startsWith(queryRequest.producerUserCustomerName);
+        if(queryRequest.isAvailable != null && queryRequest.isAvailable)
+            condition.and(stockOrderProxy.getAvailableQuantity()).gt(0);
 
         Torpedo.where(condition);
 
@@ -127,9 +110,11 @@ public class StockOrderService extends BaseService {
 
         // Validation of required fields
         if(apiStockOrder.getOrderType() == null)
-            throw new ApiException(ApiStatus.INVALID_REQUEST, "Order type needs to be provided!");
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "OrderType needs to be provided!");
         if(apiStockOrder.getFacility() == null)
-            throw new ApiException(ApiStatus.INVALID_REQUEST, "Facility.id needs to be provided!");
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Facility needs to be provided!");
+        if(apiStockOrder.getSemiProduct() == null)
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "SemiProduct needs to be provided!");
 
         entity.setOrderType(apiStockOrder.getOrderType());
         entity.setFacility(facilityService.fetchFacility(apiStockOrder.getFacility().getId()));
@@ -159,7 +144,7 @@ public class StockOrderService extends BaseService {
         ApiStockOrderLocation apiProdLocation = apiStockOrder.getProductionLocation();
         if(apiProdLocation != null) {
 
-            StockOrderLocation stockOrderLocation = fetchEntityOrDefault(apiProdLocation.getId(), StockOrderLocation.class, null);
+            StockOrderLocation stockOrderLocation = fetchEntityOrElse(apiProdLocation.getId(), StockOrderLocation.class, null);
 
             if(stockOrderLocation == null)
                 stockOrderLocation = new StockOrderLocation();
@@ -204,23 +189,6 @@ public class StockOrderService extends BaseService {
                     entity.getActivityProofs().add(stockOrderActivityProof);
                 }
 
-                // Remove documents not present in API request
-//                entity.getDocumentRequirements().removeIf(dr -> apiStockOrder.getDocumentRequirements()
-//                                .stream().noneMatch(apiDr -> dr.getId().equals(apiDr.getId())));
-
-                // Add or update other documents
-//                apiStockOrder.getDocumentRequirements().forEach(apiDr -> {
-//
-//                    StockOrderPETypeValue dr = fetchEntityOrDefault(apiDr.getId(), StockOrderPETypeValue.class, new StockOrderPETypeValue());
-//                    entity.getDocumentRequirements().remove(dr);
-//                    dr.setName(apiDr.getName());
-//                    dr.setDescription(apiDr.getDescription());
-//                    // doc.setScoreTarget();
-//                    // doc.setFields();
-//                    // doc.setScoreTarget();
-//                    entity.getDocumentRequirements().add(dr);
-//                });
-
                 break;
             case SALES_ORDER:
                 break;
@@ -231,6 +199,23 @@ public class StockOrderService extends BaseService {
             case PROCESSING_ORDER:
                 break;
         }
+
+        // Remove documents not present in API request
+//                entity.getDocumentRequirements().removeIf(dr -> apiStockOrder.getDocumentRequirements()
+//                                .stream().noneMatch(apiDr -> dr.getId().equals(apiDr.getId())));
+
+        // Add or update other documents
+//                apiStockOrder.getDocumentRequirements().forEach(apiDr -> {
+//
+//                    StockOrderPETypeValue dr = fetchEntityOrElse(apiDr.getId(), StockOrderPETypeValue.class, new StockOrderPETypeValue());
+//                    entity.getDocumentRequirements().remove(dr);
+//                    dr.setName(apiDr.getName());
+//                    dr.setDescription(apiDr.getDescription());
+//                    // doc.setScoreTarget();
+//                    // doc.setFields();
+//                    // doc.setScoreTarget();
+//                    entity.getDocumentRequirements().add(dr);
+//                });
 
         if (entity.getId() == null) {
             em.persist(entity);
@@ -247,16 +232,16 @@ public class StockOrderService extends BaseService {
 
     private <E> E fetchEntity(Long id, Class<E> entityClass) throws ApiException {
 
-        E object = Queries.get(em, entityClass, id);
-        if (object == null) {
+        E entity = Queries.get(em, entityClass, id);
+        if (entity == null) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid " + entityClass.getSimpleName() + " ID");
         }
-        return object;
+        return entity;
     }
 
-    private <E> E fetchEntityOrDefault(Long id, Class<E> entityClass, E defaultValue) {
-        E object = Queries.get(em, entityClass, id);
-        return object == null ? defaultValue : object;
+    private <E> E fetchEntityOrElse(Long id, Class<E> entityClass, E defaultValue) {
+        E entity = Queries.get(em, entityClass, id);
+        return entity == null ? defaultValue : entity;
     }
 
 }

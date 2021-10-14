@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public class StockOrderMapper {
 
     public static ApiStockOrder toApiStockOrder(StockOrder entity, Long userId) {
+        if(entity == null) return null;
 
         ApiStockOrder apiStockOrder = new ApiStockOrder();
         apiStockOrder.setId(entity.getId());

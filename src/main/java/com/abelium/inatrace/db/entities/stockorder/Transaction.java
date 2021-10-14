@@ -8,15 +8,11 @@ import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.facility.Facility;
+import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Version;
+import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 public class Transaction extends TimestampEntity {
@@ -26,22 +22,26 @@ public class Transaction extends TimestampEntity {
 	
 	@ManyToOne
 	private Company company;
-	
+
 	@Column
 	private Long initiationUserId;
 	
 	@OneToOne
 	private StockOrder sourceStockOrder;
-	
+
+	// Used when ProcessingActionType is TRANSFER
 	@OneToOne
 	private StockOrder targetStockOrder;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private ProcessingOrder targetProcessingOrder;
 
 	@ManyToOne
 	private SemiProduct semiProduct;
 	
 	@ManyToOne
 	private Facility sourceFacility;
-	
+
 	@ManyToOne
 	private Facility targetFacility;
 
@@ -57,21 +57,21 @@ public class Transaction extends TimestampEntity {
 	
 	@Column
 	private Long shipmentId;
-	
+
 	@OneToOne
 	private MeasureUnitType inputMeasureUnitType;
-	
-	@Column
-	private Float inputQuantity;
-	
+
 	@OneToOne
 	private MeasureUnitType outputMeasureUnitType;
 	
 	@Column
-	private Float outputQuantity;
+	private Integer inputQuantity;
+
+	@Column
+	private Integer outputQuantity;
 	
 	@Column
-	private Float pricePerUnit;
+	private BigDecimal pricePerUnit;
 	
 	@Column
 	private String currency;
@@ -112,6 +112,14 @@ public class Transaction extends TimestampEntity {
 
 	public void setTargetStockOrder(StockOrder targetStockOrder) {
 		this.targetStockOrder = targetStockOrder;
+	}
+
+	public ProcessingOrder getTargetProcessingOrder() {
+		return targetProcessingOrder;
+	}
+
+	public void setTargetProcessingOrder(ProcessingOrder targetProcessingOrder) {
+		this.targetProcessingOrder = targetProcessingOrder;
 	}
 
 	public SemiProduct getSemiProduct() {
@@ -178,14 +186,6 @@ public class Transaction extends TimestampEntity {
 		this.inputMeasureUnitType = inputMeasureUnitType;
 	}
 
-	public Float getInputQuantity() {
-		return inputQuantity;
-	}
-
-	public void setInputQuantity(Float inputQuantity) {
-		this.inputQuantity = inputQuantity;
-	}
-
 	public MeasureUnitType getOutputMeasureUnitType() {
 		return outputMeasureUnitType;
 	}
@@ -194,19 +194,27 @@ public class Transaction extends TimestampEntity {
 		this.outputMeasureUnitType = outputMeasureUnitType;
 	}
 
-	public Float getOutputQuantity() {
+	public Integer getInputQuantity() {
+		return inputQuantity;
+	}
+
+	public void setInputQuantity(Integer inputQuantity) {
+		this.inputQuantity = inputQuantity;
+	}
+
+	public Integer getOutputQuantity() {
 		return outputQuantity;
 	}
 
-	public void setOutputQuantity(Float outputQuantity) {
+	public void setOutputQuantity(Integer outputQuantity) {
 		this.outputQuantity = outputQuantity;
 	}
 
-	public Float getPricePerUnit() {
+	public BigDecimal getPricePerUnit() {
 		return pricePerUnit;
 	}
 
-	public void setPricePerUnit(Float pricePerUnit) {
+	public void setPricePerUnit(BigDecimal pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
 	}
 
