@@ -1,7 +1,6 @@
-package com.abelium.inatrace.components.usercustomer.api;
+package com.abelium.inatrace.components.company.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.types.UserCustomerType;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;

@@ -1,10 +1,10 @@
 package com.abelium.inatrace.components.product;
 
 import com.abelium.inatrace.components.common.BaseService;
-import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomer;
-import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomerAssociation;
-import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomerCooperative;
-import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomerLocation;
+import com.abelium.inatrace.components.company.api.ApiUserCustomer;
+import com.abelium.inatrace.components.company.api.ApiUserCustomerAssociation;
+import com.abelium.inatrace.components.company.api.ApiUserCustomerCooperative;
+import com.abelium.inatrace.components.company.api.ApiUserCustomerLocation;
 import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.Company;
 import org.springframework.stereotype.Component;
