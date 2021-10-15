@@ -171,4 +171,12 @@ public class CompanyController {
         return new ApiDefaultResponse();
     }
 
+    @GetMapping(value = "/associations/{id}")
+    @ApiOperation(value = "Get list of associations for the selected company with given ID")
+    public ApiResponse<List<ApiCompany>> getAssociations(
+            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long id
+    ) {
+        return new ApiResponse<>(companyService.getAssociations(id));
+    }
+
 }

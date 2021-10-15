@@ -27,6 +27,7 @@ import com.abelium.inatrace.db.entities.common.UserCustomerCooperative;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
+import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
@@ -37,6 +38,7 @@ import com.abelium.inatrace.types.CompanyUserRole;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserRole;
 import com.abelium.inatrace.types.UserCustomerType;
+import com.abelium.inatrace.types.ProductCompanyType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -417,6 +419,22 @@ public class CompanyService extends BaseService {
 
 	public ApiPaginatedList<ApiCompanyCustomer> listCompanyCustomers(CustomUserDetails authUser, Long companyId, ApiListCustomersRequest request) throws ApiException {
 		return PaginationTools.createPaginatedResponse(em, request, () -> customerListQueryObject(companyId, request), companyApiTools::toApiCompanyCustomer);
+	}
+
+	public List<ApiCompany> getAssociations(Long id) {
+		ProductCompany productCompanyCompany = Torpedo.from(ProductCompany.class);
+		OnGoingLogicalCondition companyCondition = Torpedo.condition(productCompanyCompany.getCompany().getId()).eq(id);
+		Torpedo.where(companyCondition);
+		List<Long> associatedProductIds = Torpedo.select(productCompanyCompany.getProduct().getId()).list(em);
+
+		ProductCompany productCompanyProduct = Torpedo.from(ProductCompany.class);
+		OnGoingLogicalCondition productCondition = Torpedo.condition()
+				.and(productCompanyProduct.getProduct().getId()).in(associatedProductIds)
+				.and(productCompanyProduct.getType()).eq(ProductCompanyType.ASSOCIATION);
+		Torpedo.where(productCondition);
+		List<Company> associations = Torpedo.select(productCompanyProduct.getCompany()).list(em);
+
+		return associations.stream().map(companyApiTools::toApiCompany).collect(Collectors.toList());
 	}
 
 	private CompanyCustomer customerListQueryObject(Long companyId, ApiListCustomersRequest request) {
