@@ -261,6 +261,7 @@ public class CompanyService extends BaseService {
 
 		if (apiUserCustomer.getFarm() != null) {
 			userCustomer.setFarm(new FarmInformation());
+			userCustomer.getFarm().setAreaUnit(apiUserCustomer.getFarm().getAreaUnit());
 			userCustomer.getFarm().setAreaOrganicCertified(apiUserCustomer.getFarm().getAreaOrganicCertified());
 			userCustomer.getFarm().setCoffeeCultivatedArea(apiUserCustomer.getFarm().getCoffeeCultivatedArea());
 			userCustomer.getFarm().setNumberOfTrees(apiUserCustomer.getFarm().getNumberOfTrees());
@@ -347,6 +348,7 @@ public class CompanyService extends BaseService {
 		if (userCustomer.getFarm() == null) {
 			userCustomer.setFarm(new FarmInformation());
 		}
+		userCustomer.getFarm().setAreaUnit(apiUserCustomer.getFarm().getAreaUnit());
 		userCustomer.getFarm().setAreaOrganicCertified(apiUserCustomer.getFarm().getAreaOrganicCertified());
 		userCustomer.getFarm().setCoffeeCultivatedArea(apiUserCustomer.getFarm().getCoffeeCultivatedArea());
 		userCustomer.getFarm().setNumberOfTrees(apiUserCustomer.getFarm().getNumberOfTrees());

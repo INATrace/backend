@@ -648,6 +648,7 @@ public class ProductApiTools {
 		if (pc.getFarm() == null) {
 			pc.setFarm(new FarmInformation());
 		}
+		pc.getFarm().setAreaUnit(apc.getFarm().getAreaUnit());
 		pc.getFarm().setTotalCultivatedArea(apc.getFarm().getTotalCultivatedArea());
 		pc.getFarm().setCoffeeCultivatedArea(apc.getFarm().getCoffeeCultivatedArea());
 		pc.getFarm().setNumberOfTrees(apc.getFarm().getNumberOfTrees());
