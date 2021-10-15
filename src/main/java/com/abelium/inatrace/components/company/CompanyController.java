@@ -1,9 +1,6 @@
 package com.abelium.inatrace.components.company;
 
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiDefaultResponse;
-import com.abelium.inatrace.api.ApiPaginatedResponse;
-import com.abelium.inatrace.api.ApiResponse;
+import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
@@ -173,10 +170,11 @@ public class CompanyController {
 
     @GetMapping(value = "/associations/{id}")
     @ApiOperation(value = "Get list of associations for the selected company with given ID")
-    public ApiResponse<List<ApiCompany>> getAssociations(
-            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long id
+    public ApiPaginatedResponse<ApiCompanyListResponse> getAssociations(
+            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long id,
+            @Valid ApiPaginatedRequest request
     ) {
-        return new ApiResponse<>(companyService.getAssociations(id));
+        return new ApiPaginatedResponse<>(companyService.getAssociations(id, request));
     }
 
 }
