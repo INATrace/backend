@@ -27,7 +27,7 @@ public class StockOrderMapper {
         apiStockOrder.setUpdateTimestamp(entity.getUpdateTimestamp());
         apiStockOrder.setCreatorId(entity.getCreatorId());
         apiStockOrder.setRepresentativeOfProducerUserCustomer(UserCustomerMapper.toApiUserCustomerBase(entity.getRepresentativeOfProducerUserCustomer()));
-        apiStockOrder.setProducerUserCustomer(UserCustomerMapper.toApiUserCustomerBase(entity.getProducerUserCustomer()));
+        apiStockOrder.setProducerUserCustomer(UserCustomerMapper.toApiUserCustomerWithLocation(entity.getProducerUserCustomer()));
         apiStockOrder.setProductionLocation(StockOrderLocationMapper.toApiStockOrderLocation(entity.getProductionLocation()));
 
 //        apiStockOrder.setCertifications(entity.getCertifications()

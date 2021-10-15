@@ -7,6 +7,7 @@ import com.abelium.inatrace.db.entities.common.Location;
 public class LocationMapper {
 
     public static ApiLocation toApiLocation(Location entity) {
+
         if(entity == null) return null;
         ApiLocation apiLocation = new ApiLocation();
         apiLocation.setAddress(AddressMapper.toApiAddress(entity.getAddress()));
