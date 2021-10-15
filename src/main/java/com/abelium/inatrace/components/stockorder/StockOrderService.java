@@ -235,7 +235,7 @@ public class StockOrderService extends BaseService {
         em.remove(stockOrder);
     }
 
-    private <E> E fetchEntity(Long id, Class<E> entityClass) throws ApiException {
+    public <E> E fetchEntity(Long id, Class<E> entityClass) throws ApiException {
 
         E entity = Queries.get(em, entityClass, id);
         if (entity == null) {

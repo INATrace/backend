@@ -2,11 +2,12 @@ package com.abelium.inatrace.components.payment;
 
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.payment.api.ApiBulkPayment;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
-import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +70,7 @@ public class PaymentController {
 				)
 		));
 	}
-	public static int counter = 0;
+
 	@GetMapping("list/company/{id}")
 	@ApiOperation("Get a list of payments by company ID.")
 	public ApiPaginatedResponse<ApiPayment> listPaymentsByCompany(
@@ -95,6 +96,15 @@ public class PaymentController {
 		));
 	}
 
+	@GetMapping("list/bulk-payment/company/{id}")
+	@ApiOperation("Get a list of bulk payments by company ID.")
+	public ApiPaginatedResponse<ApiBulkPayment> listBulkPaymentsByCompany(
+		@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+		@Valid ApiPaginatedRequest request) {
+
+		return new ApiPaginatedResponse<>(paymentService.listBulkPaymentsByCompany(companyId, request));
+	}
+
 	@PutMapping
 	@ApiOperation("Create or update payment. If ID is provided, then the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdatePayment(
@@ -102,6 +112,15 @@ public class PaymentController {
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
 		return new ApiResponse<>(paymentService.createOrUpdatePayment(apiPayment, authUser.getUserId()));
+	}
+
+	@PutMapping("bulk-payment")
+	@ApiOperation("Create bulk payment.")
+	public ApiResponse<ApiBaseEntity> createOrUpdateBulkPayment(
+			@Valid @RequestBody ApiBulkPayment apiBulkPayment,
+			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
+
+		return new ApiResponse<>(paymentService.createOrUpdateBulkPayment(apiBulkPayment, authUser.getUserId()));
 	}
 
 	@DeleteMapping("{id}")

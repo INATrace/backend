@@ -18,11 +18,16 @@ import java.time.Instant;
 
 public class ApiPayment extends ApiBaseEntity {
 
+	// From BaseEntity
+	@ApiModelProperty(value = "Last updated timestamp")
+	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
+	private Instant updatedTimestamp;
+
 	@ApiModelProperty(value = "Payment created by user")
-	private Long createdBy;
+	private ApiUser createdBy;
 	
 	@ApiModelProperty(value = "Payment updated by user")
-	private Long updatedBy;
+	private ApiUser updatedBy;
 
 	@ApiModelProperty(value = "Payment type")
 	private PaymentType paymentType;
@@ -113,19 +118,27 @@ public class ApiPayment extends ApiBaseEntity {
 	@ApiModelProperty(value = "Company customer that receives the payment")
 	private ApiCompanyCustomer recipientCompanyCustomer;
 
-	public Long getCreatedBy() {
+	public Instant getUpdatedTimestamp() {
+		return updatedTimestamp;
+	}
+
+	public void setUpdatedTimestamp(Instant updatedTimestamp) {
+		this.updatedTimestamp = updatedTimestamp;
+	}
+
+	public ApiUser getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreatedBy(Long createdBy) {
+	public void setCreatedBy(ApiUser createdBy) {
 		this.createdBy = createdBy;
 	}
-	
-	public Long getUpdatedBy() {
+
+	public ApiUser getUpdatedBy() {
 		return updatedBy;
 	}
 
-	public void setUpdatedBy(Long updatedBy) {
+	public void setUpdatedBy(ApiUser updatedBy) {
 		this.updatedBy = updatedBy;
 	}
 

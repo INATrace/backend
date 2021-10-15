@@ -14,6 +14,15 @@ import java.util.stream.Collectors;
 
 public class StockOrderMapper {
 
+    public static ApiStockOrder toApiStockOrderBase(StockOrder entity) {
+        if(entity == null) return null;
+
+        ApiStockOrder apiStockOrder = new ApiStockOrder();
+        apiStockOrder.setId(entity.getId());
+        apiStockOrder.setIdentifier(entity.getIdentifier());
+        return apiStockOrder;
+    }
+
     public static ApiStockOrder toApiStockOrder(StockOrder entity, Long userId) {
         if(entity == null) return null;
 

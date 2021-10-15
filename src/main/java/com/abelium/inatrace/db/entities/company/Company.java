@@ -7,7 +7,7 @@ import com.abelium.inatrace.db.entities.codebook.CurrencyType;
 import com.abelium.inatrace.db.entities.common.Address;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.facility.Facility;
-import com.abelium.inatrace.db.entities.payment.Payment;
+import com.abelium.inatrace.db.entities.payment.BulkPayment;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.types.CompanyStatus;
@@ -164,6 +164,12 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	 */
 	@OneToMany(mappedBy = "company")
 	private List<StockOrder> stockOrders = new ArrayList<>();
+	
+	/**
+	 * bulk payments
+	 */
+	@OneToMany(mappedBy = "payingCompany")
+	private List<BulkPayment> bulkPayments = new ArrayList<>();
 	
 	@ManyToOne()
 	private CurrencyType currency;
