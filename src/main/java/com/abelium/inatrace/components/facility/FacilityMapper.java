@@ -1,13 +1,13 @@
 package com.abelium.inatrace.components.facility;
 
+import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
+import com.abelium.inatrace.components.common.api.ApiCountry;
+import com.abelium.inatrace.components.company.api.ApiAddress;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.facility.api.ApiFacilityLocation;
-import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
-import com.abelium.inatrace.components.common.api.ApiCountry;
-import com.abelium.inatrace.components.company.api.ApiAddress;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.facility.FacilitySemiProduct;
 
@@ -26,6 +26,7 @@ public final class FacilityMapper {
 	}
 
 	public static ApiFacility toApiFacility(Facility entity) {
+		if (entity == null) return null;
 
 		// Simplest apiFacility object
 		ApiFacility apiFacility = new ApiFacility();

@@ -7,6 +7,17 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
+@NamedQueries({
+	@NamedQuery(name = "Facility.listFacilitiesByCompanyAndSemiProduct",
+	            query = "SELECT fsp.facility FROM FacilitySemiProduct fsp WHERE fsp.facility.company.id = :companyId AND fsp.semiProduct.id = :semiProductId"),
+	@NamedQuery(name = "Facility.countFacilitiesByCompanyAndSemiProduct",
+	            query = "SELECT COUNT(fsp.facility) FROM FacilitySemiProduct fsp WHERE fsp.facility.company.id = :companyId AND fsp.semiProduct.id = :semiProductId"),
+
+	@NamedQuery(name = "Facility.listSellingFacilitiesByCompanyAndSemiProduct",
+	            query = "SELECT fsp.facility FROM FacilitySemiProduct fsp WHERE fsp.facility.company.id = :companyId AND fsp.facility.isPublic = true AND fsp.semiProduct.id = :semiProductId"),
+	@NamedQuery(name = "Facility.countSellingFacilitiesByCompanyAndSemiProduct",
+	            query = "SELECT COUNT(fsp.facility) FROM FacilitySemiProduct fsp WHERE fsp.facility.company.id = :companyId AND fsp.facility.isPublic = true AND fsp.semiProduct.id = :semiProductId")
+})
 public class FacilitySemiProduct extends TimestampEntity {
 
 	@Version

@@ -12,26 +12,15 @@ import java.util.List;
 @Entity
 @Table(indexes = { @Index(columnList = "name") })
 @NamedQueries({
-	@NamedQuery(name = "Facility.listFacilitiesByCompany", 
-				query = "SELECT f FROM Facility f "
-						+ "INNER JOIN f.company c "
-						+ "WHERE c.id = :companyId"),
-	@NamedQuery(name = "Facility.countFacilitiesByCompany",
-	            query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId"),
-	@NamedQuery(name = "Facility.listCollectingFacilitiesByCompany", 
-				query = "SELECT f FROM Facility f "
-						+ "INNER JOIN f.company c "
-						+ "WHERE c.id = :companyId "
-						+ "AND f.isCollectionFacility = true"),
-	@NamedQuery(name = "Facility.listSellingFacilitiesByCompany",
-	            query = "SELECT f FROM Facility f "
-			            + "INNER JOIN f.company c "
-			            + "WHERE c.id = :companyId "
-			            + "AND f.isPublic = true"),
-	@NamedQuery(name = "Facility.countCollectingFacilitiesByCompany",
-	            query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId AND f.isCollectionFacility = true"),
-	@NamedQuery(name = "Facility.countSellingFacilitiesByCompany",
-	            query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId AND f.isPublic = true")
+	@NamedQuery(name = "Facility.listFacilitiesByCompany", query = "SELECT f FROM Facility f INNER JOIN f.company c WHERE c.id = :companyId"),
+	@NamedQuery(name = "Facility.countFacilitiesByCompany", query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId"),
+
+	@NamedQuery(name = "Facility.listCollectingFacilitiesByCompany",
+				query = "SELECT f FROM Facility f INNER JOIN f.company c WHERE c.id = :companyId AND f.isCollectionFacility = true"),
+	@NamedQuery(name = "Facility.listSellingFacilitiesByCompany", query = "SELECT f FROM Facility f INNER JOIN f.company c WHERE c.id = :companyId AND f.isPublic = true"),
+
+	@NamedQuery(name = "Facility.countCollectingFacilitiesByCompany", query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId AND f.isCollectionFacility = true"),
+	@NamedQuery(name = "Facility.countSellingFacilitiesByCompany", query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId AND f.isPublic = true")
 })
 public class Facility extends TimestampEntity {
 

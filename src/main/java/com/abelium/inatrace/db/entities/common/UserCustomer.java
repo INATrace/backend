@@ -3,7 +3,6 @@ package com.abelium.inatrace.db.entities.common;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.db.entities.facility.FacilityLocation;
 import com.abelium.inatrace.db.entities.product.Product;
 import com.abelium.inatrace.types.Gender;
 import com.abelium.inatrace.types.UserCustomerType;
@@ -13,7 +12,7 @@ import java.util.List;
 
 @Entity
 @NamedQueries({
-		@NamedQuery(name = "UserCustomer.getUserCustomerByCompanyIdAndType", query = "SELECT u FROM UserCustomer u WHERE u.company.id = :companyId AND u.type = :type")
+	@NamedQuery(name = "UserCustomer.getUserCustomerByCompanyIdAndType", query = "SELECT u FROM UserCustomer u WHERE u.company.id = :companyId AND u.type = :type")
 })
 public class UserCustomer extends BaseEntity {
 

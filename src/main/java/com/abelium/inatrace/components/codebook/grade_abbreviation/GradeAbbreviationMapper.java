@@ -15,6 +15,7 @@ public final class GradeAbbreviationMapper {
 	}
 
 	public static ApiGradeAbbreviation toApiGradeAbbreviation(GradeAbbreviationType entity) {
+		if(entity == null) return null;
 
 		ApiGradeAbbreviation apiGradeAbbreviation = new ApiGradeAbbreviation();
 		apiGradeAbbreviation.setId(entity.getId());

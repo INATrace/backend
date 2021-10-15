@@ -11,18 +11,40 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.facility.Facility;
+import com.abelium.inatrace.db.entities.payment.BulkPayment;
+import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
+import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Version;
+
 @Entity
 @Table
+@NamedQueries({
+	@NamedQuery(name = "StockOrder.getPurchaseOrderByIdAndType",
+				query = "SELECT so FROM StockOrder so "
+						+ "WHERE so.id = :stockOrderId "
+						+ "AND so.orderType = 'PURCHASE_ORDER'")
+})
 public class StockOrder extends TimestampEntity {
 
 	@Version
@@ -63,6 +85,9 @@ public class StockOrder extends TimestampEntity {
 	
 	@ManyToOne
 	private ProcessingAction processingActionDef;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	private BulkPayment bulkPayment;
 
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Certification> certifications; // probably not used for purchase
@@ -80,6 +105,10 @@ public class StockOrder extends TimestampEntity {
 	// Activity proofs that were provided while creating or updating a purchase order
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<StockOrderActivityProof> activityProofs;
+	
+	// A stock (purchase) order can be divided in many payments
+	@OneToMany(mappedBy = "payingCompany", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Payment> payments = new ArrayList<>();
 
 	@ManyToOne
 	private Company company;
@@ -492,6 +521,14 @@ public class StockOrder extends TimestampEntity {
 	public void setSalesPricePerUnit(BigDecimal salesPricePerUnit) {
 		this.salesPricePerUnit = salesPricePerUnit;
 	}
+	
+	public List<Payment> getPayments() {
+		return payments;
+	}
+
+	public void setPayments(List<Payment> payments) {
+		this.payments = payments;
+	}
 
 	public String getCurrency() {
 		return currency;
@@ -643,6 +680,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setProcessingActionDef(ProcessingAction processingAction) {
 		this.processingActionDef = processingAction;
+	}
+	
+	public BulkPayment getBulkPayment() {
+		return bulkPayment;
+	}
+
+	public void setBulkPayment(BulkPayment bulkPayment) {
+		this.bulkPayment = bulkPayment;
 	}
 
 	public ProcessingOrder getProcessingOrder() {

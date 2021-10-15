@@ -154,17 +154,35 @@ public class FacilityService extends BaseService {
 
 	}
 	
-	public ApiPaginatedList<ApiFacility> listFacilitiesByCompany(Long companyId, ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiFacility> listFacilitiesByCompany(Long companyId, Long semiProductId, ApiPaginatedRequest request) {
 
-		TypedQuery<Facility> facilitiesQuery = em.createNamedQuery("Facility.listFacilitiesByCompany", Facility.class)
-				.setParameter("companyId", companyId)
-				.setFirstResult(request.getOffset())
-				.setMaxResults(request.getLimit());
+		TypedQuery<Facility> facilitiesQuery;
+		Long count;
+
+		if (semiProductId != null) {
+
+			facilitiesQuery = em.createNamedQuery("Facility.listFacilitiesByCompanyAndSemiProduct", Facility.class)
+					.setParameter("companyId", companyId)
+					.setParameter("semiProductId", semiProductId)
+					.setFirstResult(request.getOffset())
+					.setMaxResults(request.getLimit());
+
+			count = em.createNamedQuery("Facility.countFacilitiesByCompanyAndSemiProduct", Long.class)
+					.setParameter("companyId", companyId)
+					.setParameter("semiProductId", semiProductId)
+					.getSingleResult();
+		} else {
+
+			facilitiesQuery = em.createNamedQuery("Facility.listFacilitiesByCompany", Facility.class)
+					.setParameter("companyId", companyId)
+					.setFirstResult(request.getOffset())
+					.setMaxResults(request.getLimit());
+
+			count = em.createNamedQuery("Facility.countFacilitiesByCompany", Long.class)
+					.setParameter("companyId", companyId).getSingleResult();
+		}
 
 		List<Facility> facilities = facilitiesQuery.getResultList();
-
-		Long count = em.createNamedQuery("Facility.countFacilitiesByCompany", Long.class)
-				.setParameter("companyId", companyId).getSingleResult();
 
 		return new ApiPaginatedList<>(
 				facilities.stream().map(FacilityMapper::toApiFacility).collect(Collectors.toList()), count);
@@ -187,18 +205,38 @@ public class FacilityService extends BaseService {
 				facilities.stream().map(FacilityMapper::toApiFacility).collect(Collectors.toList()), count);
 	}
 
-	public ApiPaginatedList<ApiFacility> listSellingFacilitiesByCompany(Long companyId, ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiFacility> listSellingFacilitiesByCompany(Long companyId, Long semiProductId, ApiPaginatedRequest request) {
 
-		TypedQuery<Facility> collectingFacilitiesQuery = em.createNamedQuery("Facility.listSellingFacilitiesByCompany",
-						Facility.class)
-				.setParameter("companyId", companyId)
-				.setFirstResult(request.getOffset())
-				.setMaxResults(request.getLimit());
+		TypedQuery<Facility> collectingFacilitiesQuery;
+		Long count;
+
+		if (semiProductId != null) {
+
+			collectingFacilitiesQuery = em.createNamedQuery("Facility.listSellingFacilitiesByCompanyAndSemiProduct",
+							Facility.class)
+					.setParameter("companyId", companyId)
+					.setParameter("semiProductId", semiProductId)
+					.setFirstResult(request.getOffset())
+					.setMaxResults(request.getLimit());
+
+			count = em.createNamedQuery("Facility.countSellingFacilitiesByCompanyAndSemiProduct", Long.class)
+					.setParameter("companyId", companyId)
+					.setParameter("semiProductId", semiProductId)
+					.getSingleResult();
+
+		} else {
+
+			collectingFacilitiesQuery = em.createNamedQuery("Facility.listSellingFacilitiesByCompany",
+							Facility.class)
+					.setParameter("companyId", companyId)
+					.setFirstResult(request.getOffset())
+					.setMaxResults(request.getLimit());
+
+			count = em.createNamedQuery("Facility.countSellingFacilitiesByCompany", Long.class)
+					.setParameter("companyId", companyId).getSingleResult();
+		}
 
 		List<Facility> facilities = collectingFacilitiesQuery.getResultList();
-
-		Long count = em.createNamedQuery("Facility.countSellingFacilitiesByCompany", Long.class)
-				.setParameter("companyId", companyId).getSingleResult();
 
 		return new ApiPaginatedList<>(
 				facilities.stream().map(FacilityMapper::toApiFacility).collect(Collectors.toList()), count);
