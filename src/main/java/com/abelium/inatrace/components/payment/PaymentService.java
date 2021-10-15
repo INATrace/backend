@@ -156,6 +156,10 @@ public class PaymentService extends BaseService {
 			if (apiPayment.getPaymentPurposeType() == PaymentPurposeType.FIRST_INSTALLMENT && apiPayment.getReceiptDocument() == null)
 				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Receipt document has to be provided!");
 
+			// Verify totalPaid (amount paid to the farmer) is not negative
+			if (apiPayment.getAmountPaidToTheFarmer().compareTo(BigDecimal.ZERO) >= 0)
+				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Total amount paid cannot be negative	");
+
 			// Receipt document (note: Storage key needs to be unique)
 			if(apiPayment.getReceiptDocument() != null) {
 				Document receiptDocument = new Document();
@@ -199,8 +203,7 @@ public class PaymentService extends BaseService {
 			entity.setCreatedBy(currentUser);
 			entity.setUpdatedBy(currentUser);
 
-			// TODO:  do not forget to update the stock order entity - open balance - a negative open balance is allowed
-//			stockOrder.setBalance(stockOrder.getBalance().subtract(BigDecimal.valueOf(entity.getTotalPaid())));
+			stockOrder.setBalance(stockOrder.getBalance().subtract(entity.getTotalPaid()));
 			stockOrder.setUpdatedBy(currentUser);
 		}
 		
