@@ -323,6 +323,7 @@ public class CompanyApiTools {
 	public ApiFarmInformation toApiFarmInformation(FarmInformation farmInformation) {
 		if (farmInformation == null) return null;
 		ApiFarmInformation apiFarmInformation = new ApiFarmInformation();
+		apiFarmInformation.setAreaUnit(farmInformation.getAreaUnit());
 		apiFarmInformation.setAreaOrganicCertified(farmInformation.getAreaOrganicCertified());
 		apiFarmInformation.setCoffeeCultivatedArea(farmInformation.getCoffeeCultivatedArea());
 		apiFarmInformation.setNumberOfTrees(farmInformation.getNumberOfTrees());
