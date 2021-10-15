@@ -20,6 +20,21 @@ public class ApiFacility extends ApiBaseEntity {
 	@ApiModelProperty(value = "Is public facility")
 	private Boolean isPublic;
 
+	@ApiModelProperty(value = "Enable form control 'May involve collectors'")
+	private Boolean displayMayInvolveCollectors;
+
+	@ApiModelProperty(value = "Enable form control 'Organic'")
+	private Boolean displayOrganic;
+
+	@ApiModelProperty(value = "Enable form control 'Price deduction damage'")
+	private Boolean displayPriceDeductionDamage;
+
+	@ApiModelProperty(value = "Enable form control 'Tare'")
+	private Boolean displayTare;
+
+	@ApiModelProperty(value = "Enable form control 'Women only'")
+	private Boolean displayWomenOnly;
+
 	@ApiModelProperty(value = "Facility location")
 	private ApiFacilityLocation facilityLocation;
 
@@ -54,6 +69,46 @@ public class ApiFacility extends ApiBaseEntity {
 
 	public void setIsPublic(Boolean isPublic) {
 		this.isPublic = isPublic;
+	}
+
+	public Boolean getDisplayMayInvolveCollectors() {
+		return displayMayInvolveCollectors;
+	}
+
+	public void setDisplayMayInvolveCollectors(Boolean displayMayInvolveCollectors) {
+		this.displayMayInvolveCollectors = displayMayInvolveCollectors;
+	}
+
+	public Boolean getDisplayOrganic() {
+		return displayOrganic;
+	}
+
+	public void setDisplayOrganic(Boolean displayOrganic) {
+		this.displayOrganic = displayOrganic;
+	}
+
+	public Boolean getDisplayPriceDeductionDamage() {
+		return displayPriceDeductionDamage;
+	}
+
+	public void setDisplayPriceDeductionDamage(Boolean displayPriceDeductionDamage) {
+		this.displayPriceDeductionDamage = displayPriceDeductionDamage;
+	}
+
+	public Boolean getDisplayTare() {
+		return displayTare;
+	}
+
+	public void setDisplayTare(Boolean displayTare) {
+		this.displayTare = displayTare;
+	}
+
+	public Boolean getDisplayWomenOnly() {
+		return displayWomenOnly;
+	}
+
+	public void setDisplayWomenOnly(Boolean displayWomenOnly) {
+		this.displayWomenOnly = displayWomenOnly;
 	}
 
 	public ApiFacilityLocation getFacilityLocation() {

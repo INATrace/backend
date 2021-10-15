@@ -102,6 +102,9 @@ public class StockOrderMapper {
 //        apiStockOrder.setRequiredWomensCoffee(entity.getRequiredWomensCoffee());
 //        apiStockOrder.setShippedAtDateFromOriginPort(entity.getShippedAtDateFromOriginPort());
 //        apiStockOrder.setArrivedAtDateToDestinationPort(entity.getArrivedAtDateToDestinationPort());
+        apiStockOrder.setOrganic(entity.getOrganic());
+        apiStockOrder.setTare(entity.getTare());
+        apiStockOrder.setDamagedPriceDeduction(entity.getDamagedPriceDeduction());
 
         return apiStockOrder;
     }

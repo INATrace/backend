@@ -75,6 +75,8 @@ public class CompanyApiTools {
 		ac.email = c.getEmail();
 		ac.phone = c.getPhone();
 		ac.currency = CommonApiTools.toApiCurrencyType(c.getCurrency());
+		ac.displayPrefferedWayOfPayment = c.getDisplayPrefferedWayOfPayment();
+		ac.purchaseProofDocumentMultipleFarmers = c.getPurchaseProofDocumentMultipleFarmers();
 	}
 
 	public void updateApiCompanyPublic(ApiCompanyPublic ac, Company c, Language language) {
@@ -153,6 +155,8 @@ public class CompanyApiTools {
 		c.setEmail(ac.email);
 		c.setPhone(ac.phone);
 		c.setCurrency(ac.getCurrency() == null ? null : currencyTypeService.getCurrencyType(ac.getCurrency().getId()));
+		c.setDisplayPrefferedWayOfPayment(ac.displayPrefferedWayOfPayment);
+		c.setPurchaseProofDocumentMultipleFarmers(ac.purchaseProofDocumentMultipleFarmers);
 	}
 	
 	

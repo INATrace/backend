@@ -87,6 +87,11 @@ public class FacilityService extends BaseService {
 		entity.setName(apiFacility.getName());
 		entity.setIsCollectionFacility(apiFacility.getIsCollectionFacility());
 		entity.setIsPublic(apiFacility.getIsPublic());
+		entity.setDisplayMayInvolveCollectors(apiFacility.getDisplayMayInvolveCollectors() != null ? apiFacility.getDisplayMayInvolveCollectors() : Boolean.FALSE);
+		entity.setDisplayOrganic(apiFacility.getDisplayOrganic() != null ? apiFacility.getDisplayOrganic() : Boolean.FALSE);
+		entity.setDisplayPriceDeductionDamage(apiFacility.getDisplayPriceDeductionDamage() != null ? apiFacility.getDisplayPriceDeductionDamage() : Boolean.FALSE);
+		entity.setDisplayTare(apiFacility.getDisplayTare() != null ? apiFacility.getDisplayTare() : Boolean.FALSE);
+		entity.setDisplayWomenOnly(apiFacility.getDisplayWomenOnly() != null ? apiFacility.getDisplayWomenOnly() : Boolean.FALSE);
 
 		facilityLocation.setLatitude(apiFacility.getFacilityLocation().getLatitude());
 		facilityLocation.setLongitude(apiFacility.getFacilityLocation().getLongitude());

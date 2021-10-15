@@ -270,6 +270,15 @@ public class StockOrder extends TimestampEntity {
 	@Column
     private Instant arrivedAtDateToDestinationPort;
 
+	@Column
+	private Boolean organic;
+
+	@Column
+	private BigDecimal tare;
+
+	@Column
+	private BigDecimal damagedPriceDeduction;
+
 	public User getCreatedBy() {
 		return createdBy;
 	}
@@ -843,5 +852,29 @@ public class StockOrder extends TimestampEntity {
 
 	public void setArrivedAtDateToDestinationPort(Instant arrivedAtDateToDestinationPort) {
 		this.arrivedAtDateToDestinationPort = arrivedAtDateToDestinationPort;
+	}
+
+	public Boolean getOrganic() {
+		return organic;
+	}
+
+	public void setOrganic(Boolean organic) {
+		this.organic = organic;
+	}
+
+	public BigDecimal getTare() {
+		return tare;
+	}
+
+	public void setTare(BigDecimal tare) {
+		this.tare = tare;
+	}
+
+	public BigDecimal getDamagedPriceDeduction() {
+		return damagedPriceDeduction;
+	}
+
+	public void setDamagedPriceDeduction(BigDecimal damagedPriceDeduction) {
+		this.damagedPriceDeduction = damagedPriceDeduction;
 	}
 }
