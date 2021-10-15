@@ -104,9 +104,9 @@ public class PaymentService extends BaseService {
 		CompanyCustomer recipientCompanyCustomer = null; // still don't know where to get it from - assign null for now
 		PreferredWayOfPayment preferredWayOfPayment = null;
 		String orderReference = null;
-		Integer purchased = null;
-		Integer openBalance = null;
-		Integer totalPaid = null;
+		BigDecimal purchased = null;
+		BigDecimal openBalance = null;
+		BigDecimal totalPaid = null;
 
 		if (apiPayment.getId() != null) {
 
@@ -153,9 +153,9 @@ public class PaymentService extends BaseService {
 				// purchase order preferred way of payment
 				preferredWayOfPayment = stockOrder.getPreferredWayOfPayment();
 				// purchase order total quantity of semi-product
-				purchased = stockOrder.getTotalQuantity();
+				purchased = new BigDecimal(stockOrder.getTotalQuantity());
 				// purchase order open balance
-				openBalance = stockOrder.getBalance().intValue();
+				openBalance = stockOrder.getBalance();
 				// amount paid to the farmer
 				totalPaid = apiPayment.getAmountPaidToTheFarmer();
 
@@ -171,7 +171,7 @@ public class PaymentService extends BaseService {
 			receiptDocument.setStorageKey(apiPayment.getReceiptDocument().getStorageKey());
 			
 			entity.setAmountPaidToTheFarmer(totalPaid);
-			entity.setAmountPaidToTheCollector(0);
+			entity.setAmountPaidToTheCollector(new BigDecimal(0));
 			entity.setCreatedBy(userService.fetchUserById(apiPayment.getCreatedBy()));
 			entity.setUpdatedBy(userService.fetchUserById(apiPayment.getUpdatedBy()));
 			entity.setCurrency(apiPayment.getCurrency());
@@ -200,7 +200,7 @@ public class PaymentService extends BaseService {
 			entity.setTotalPaid(totalPaid);
 			
 			// do not forget to update the stock order entity - open balance - a negative open balance is allowed
-			stockOrder.setBalance(new BigDecimal(openBalance - entity.getTotalPaid()));
+			stockOrder.setBalance(openBalance.subtract(entity.getTotalPaid()));
 			stockOrder.setUpdatedBy(userService.fetchUserById(apiPayment.getUpdatedBy()));
 		}
 		
@@ -266,66 +266,58 @@ public class PaymentService extends BaseService {
 	
 	
 	@Transactional
-	public ApiBaseEntity createOrUpdateBulkPayment(ApiBulkPayment apiBulkPayment, Long userId) throws ApiException {
+	public ApiBaseEntity createBulkPayment(ApiBulkPayment apiBulkPayment, Long userId) throws ApiException {
 
 		BulkPayment entity = null;
+			
+		// If method is POST, let's create a bulk payment from scratch
+		// Important to consider that when a bulk payment is created, 
+		// the purchase order related needs to inherit the activity proofs created within the bulk payment
+		entity = new BulkPayment();
 		
-		if (apiBulkPayment.getId() != null) {
-
-			// If method is PUT, Coffee Matheo doesn't allow us to update bulk payments
-			// entity = fetchBulkPayment(apiBulkPayment.getId());
-
-		} else {
+		List<Long> stockOrdersIds = apiBulkPayment.getStockOrders();
+		StockOrder purchase = null;
+		for (Long purchaseId: stockOrdersIds) {
 			
-			// If method is POST, let's create a bulk payment from scratch
-			// Important to consider that when a bulk payment is created, 
-			// the purchase order related needs to inherit the activity proofs created within the bulk payment
-			entity = new BulkPayment();
-			
-			List<Long> stockOrdersIds = apiBulkPayment.getStockOrders();
-			StockOrder purchase = null;
-			for (Long purchaseId: stockOrdersIds) {
+			purchase = stockOrderService.fetchEntity(purchaseId, StockOrder.class);
+			if (purchase != null) {
 				
-				purchase = stockOrderService.fetchEntity(purchaseId, StockOrder.class);
-				if (purchase != null) {
-					
-					purchase.setBulkPayment(entity);
-					
-	                for (ApiActivityProof apiAP : apiBulkPayment.getAdditionalProofs()) {
+				purchase.setBulkPayment(entity);
+				
+                for (ApiActivityProof apiAP : apiBulkPayment.getAdditionalProofs()) {
 
-	                    Document activityProofDoc = stockOrderService.fetchEntity(apiAP.getDocument().getId(), Document.class);
+                    Document activityProofDoc = stockOrderService.fetchEntity(apiAP.getDocument().getId(), Document.class);
 
-	                    StockOrderActivityProof stockOrderActivityProof = new StockOrderActivityProof();
-	                    stockOrderActivityProof.setStockOrder(purchase);
-	                    stockOrderActivityProof.setActivityProof(new ActivityProof());
-	                    stockOrderActivityProof.getActivityProof().setDocument(activityProofDoc);
-	                    stockOrderActivityProof.getActivityProof().setFormalCreationDate(apiAP.getFormalCreationDate());
-	                    stockOrderActivityProof.getActivityProof().setType(apiAP.getType());
-	                    stockOrderActivityProof.getActivityProof().setValidUntil(apiAP.getValidUntil());
+                    StockOrderActivityProof stockOrderActivityProof = new StockOrderActivityProof();
+                    stockOrderActivityProof.setStockOrder(purchase);
+                    stockOrderActivityProof.setActivityProof(new ActivityProof());
+                    stockOrderActivityProof.getActivityProof().setDocument(activityProofDoc);
+                    stockOrderActivityProof.getActivityProof().setFormalCreationDate(apiAP.getFormalCreationDate());
+                    stockOrderActivityProof.getActivityProof().setType(apiAP.getType());
+                    stockOrderActivityProof.getActivityProof().setValidUntil(apiAP.getValidUntil());
 
-	                    purchase.getActivityProofs().add(stockOrderActivityProof);
-	                }
-					
-					entity.getStockOrders().add(purchase);
-					
-				} else {
-					throw new ApiException(ApiStatus.INVALID_REQUEST, "A purchase order is required in order to create a bulk payment.");
-				}
+                    purchase.getActivityProofs().add(stockOrderActivityProof);
+                }
+				
+				entity.getStockOrders().add(purchase);
+				
+			} else {
+				throw new ApiException(ApiStatus.INVALID_REQUEST, "A purchase order is required in order to create a bulk payment.");
 			}
-			
-			entity.setAdditionalCost(apiBulkPayment.getAdditionalCost());
-			entity.setAdditionalCostDescription(apiBulkPayment.getAdditionalCostDescription());
-			entity.setCreatedBy(userService.fetchUserById(apiBulkPayment.getCreatedBy()));
-			entity.setCurrency(apiBulkPayment.getCurrency());
-			entity.setFormalCreationTime(Instant.now());
-			entity.setPayingCompany(purchase.getCompany());
-			entity.setPaymentDescription(apiBulkPayment.getPaymentDescription());
-			entity.setPaymentPurposeType(apiBulkPayment.getPaymentPurposeType());
-			entity.setReceiptNumber(apiBulkPayment.getReceiptNumber());
-			entity.getStockOrders().add(purchase);
-			entity.setTotalAmount(apiBulkPayment.getTotalAmount());
-					
 		}
+		
+		entity.setAdditionalCost(apiBulkPayment.getAdditionalCost());
+		entity.setAdditionalCostDescription(apiBulkPayment.getAdditionalCostDescription());
+		entity.setCreatedBy(userService.fetchUserById(apiBulkPayment.getCreatedBy()));
+		entity.setCurrency(apiBulkPayment.getCurrency());
+		entity.setFormalCreationTime(Instant.now());
+		entity.setPayingCompany(purchase.getCompany());
+		entity.setPaymentDescription(apiBulkPayment.getPaymentDescription());
+		entity.setPaymentPurposeType(apiBulkPayment.getPaymentPurposeType());
+		entity.setReceiptNumber(apiBulkPayment.getReceiptNumber());
+		entity.getStockOrders().add(purchase);
+		entity.setTotalAmount(apiBulkPayment.getTotalAmount());
+					
 		
 		if (entity.getId() == null) {
 			em.persist(entity);

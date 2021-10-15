@@ -10,6 +10,7 @@ import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 import javax.persistence.CascadeType;
@@ -68,16 +69,16 @@ public class Payment extends TimestampEntity {
 	private String currency; // not chooseable on the frontend
 	
 	@Column
-	private Integer purchased; // stock order quantity
+	private BigDecimal purchased; // stock order quantity
 
 	@Column
-	private Integer amountPaidToTheFarmer; // same as stock order balance
+	private BigDecimal amountPaidToTheFarmer; // same as stock order balance
 	
 	@Column
-	private Integer amountPaidToTheCollector; // set to 0 by default
+	private BigDecimal amountPaidToTheCollector; // set to 0 by default
 	
 	@Column
-	private Integer totalPaid;
+	private BigDecimal totalPaid;
 	
 	@ManyToOne
 	private StockOrder stockOrder; // stock order to which the payment(s) belong to
@@ -187,35 +188,35 @@ public class Payment extends TimestampEntity {
 		this.currency = currency;
 	}
 
-	public Integer getAmountPaidToTheFarmer() {
+	public BigDecimal getAmountPaidToTheFarmer() {
 		return amountPaidToTheFarmer;
 	}
 
-	public void setAmountPaidToTheFarmer(Integer amount) {
+	public void setAmountPaidToTheFarmer(BigDecimal amount) {
 		this.amountPaidToTheFarmer = amount;
 	}
 
-	public Integer getAmountPaidToTheCollector() {
+	public BigDecimal getAmountPaidToTheCollector() {
 		return amountPaidToTheCollector;
 	}
 
-	public void setAmountPaidToTheCollector(Integer amountPaidToTheCollector) {
+	public void setAmountPaidToTheCollector(BigDecimal amountPaidToTheCollector) {
 		this.amountPaidToTheCollector = amountPaidToTheCollector;
 	}
 	
-	public Integer getPurchased() {
+	public BigDecimal getPurchased() {
 		return purchased;
 	}
 
-	public void setPurchased(Integer purchased) {
+	public void setPurchased(BigDecimal purchased) {
 		this.purchased = purchased;
 	}
 
-	public Integer getTotalPaid() {
+	public BigDecimal getTotalPaid() {
 		return totalPaid;
 	}
 
-	public void setTotalPaid(Integer totalPaid) {
+	public void setTotalPaid(BigDecimal totalPaid) {
 		this.totalPaid = totalPaid;
 	}
 

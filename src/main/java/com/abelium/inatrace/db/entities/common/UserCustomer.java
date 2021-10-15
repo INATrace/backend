@@ -12,8 +12,7 @@ import java.util.List;
 
 @Entity
 @NamedQueries({
-	@NamedQuery(name = "UserCustomer.getUserCustomerByCompanyIdAndType", query = "SELECT u FROM UserCustomer u WHERE u.company.id = :companyId AND u.type = :type"),
-	@NamedQuery(name = "UserCustomer.getUserCustomerById", query = "SELECT u FROM UserCustomer u WHERE u.id = :userCustomerId")
+	@NamedQuery(name = "UserCustomer.getUserCustomerByCompanyIdAndType", query = "SELECT u FROM UserCustomer u WHERE u.company.id = :companyId AND u.type = :type")
 })
 public class UserCustomer extends BaseEntity {
 

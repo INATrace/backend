@@ -19,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -119,13 +120,13 @@ public class PaymentController {
 		return new ApiResponse<>(paymentService.createOrUpdatePayment(apiPayment, authUser.getUserId()));
 	}
 	
-	@PutMapping("bulk-payment")
+	@PostMapping("bulk-payment")
 	@ApiOperation("Create bulk payment.")
-	public ApiResponse<ApiBaseEntity> createOrUpdateBulkPayment(
+	public ApiResponse<ApiBaseEntity> createBulkPayment(
 			@Valid @RequestBody ApiBulkPayment apiBulkPayment,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		return new ApiResponse<>(paymentService.createOrUpdateBulkPayment(apiBulkPayment, authUser.getUserId()));
+		return new ApiResponse<>(paymentService.createBulkPayment(apiBulkPayment, authUser.getUserId()));
 	}
 
 	@DeleteMapping("{id}")

@@ -27,6 +27,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -87,7 +88,7 @@ public class StockOrder extends TimestampEntity {
 	@ManyToOne
 	private ProcessingAction processingActionDef;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private BulkPayment bulkPayment;
 
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
