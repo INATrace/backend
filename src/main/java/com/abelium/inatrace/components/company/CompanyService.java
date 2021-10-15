@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.company;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.ApiPaginatedList;
+import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
@@ -27,6 +28,7 @@ import com.abelium.inatrace.db.entities.common.UserCustomerCooperative;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
+import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
@@ -37,6 +39,7 @@ import com.abelium.inatrace.types.CompanyUserRole;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserRole;
 import com.abelium.inatrace.types.UserCustomerType;
+import com.abelium.inatrace.types.ProductCompanyType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -419,6 +422,28 @@ public class CompanyService extends BaseService {
 
 	public ApiPaginatedList<ApiCompanyCustomer> listCompanyCustomers(CustomUserDetails authUser, Long companyId, ApiListCustomersRequest request) throws ApiException {
 		return PaginationTools.createPaginatedResponse(em, request, () -> customerListQueryObject(companyId, request), companyApiTools::toApiCompanyCustomer);
+	}
+
+	private TorpedoProjector<ProductCompany, ApiCompanyListResponse> associationsCompanyListQueryObject(Long companyId, ApiPaginatedRequest request) {
+		ProductCompany productCompanyCompany = Torpedo.from(ProductCompany.class);
+		OnGoingLogicalCondition companyCondition = Torpedo.condition(productCompanyCompany.getCompany().getId()).eq(companyId);
+		Torpedo.where(companyCondition);
+		List<Long> associatedProductIds = Torpedo.select(productCompanyCompany.getProduct().getId()).list(em);
+
+		ProductCompany productCompanyProduct = Torpedo.from(ProductCompany.class);
+		OnGoingLogicalCondition productCondition = Torpedo.condition()
+				.and(productCompanyProduct.getProduct().getId()).in(associatedProductIds)
+				.and(productCompanyProduct.getType()).eq(ProductCompanyType.ASSOCIATION);
+		Torpedo.where(productCondition);
+
+		return new TorpedoProjector<>(productCompanyProduct, ApiCompanyListResponse.class)
+				.add(productCompanyProduct.getCompany().getId(), ApiCompanyListResponse::setId)
+				.add(productCompanyProduct.getCompany().getName(), ApiCompanyListResponse::setName)
+				.add(productCompanyProduct.getCompany().getStatus(), ApiCompanyListResponse::setStatus);
+	}
+
+	public ApiPaginatedList<ApiCompanyListResponse> getAssociations(Long id, ApiPaginatedRequest request) {
+		return PaginationTools.createPaginatedResponse(em, request, () -> associationsCompanyListQueryObject(id, request));
 	}
 
 	private CompanyCustomer customerListQueryObject(Long companyId, ApiListCustomersRequest request) {
