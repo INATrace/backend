@@ -54,6 +54,13 @@ public class PaymentController {
 	public ApiResponse<ApiPayment> getPayment(@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id) throws ApiException {
 		return new ApiResponse<>(paymentService.getPayment(id));
 	}
+	
+	@GetMapping("bulk-payment/{id}")
+	@ApiOperation("Get a single bulk payment with the provided ID.")
+	public ApiResponse<ApiBulkPayment> getBulkPayment(@Valid @ApiParam(value = "Bulk payment ID", required = true) @PathVariable("id") Long id) throws ApiException {
+
+		return new ApiResponse<>(paymentService.getBulkPayment(id));
+	}
 
 	@GetMapping("list")
 	@ApiOperation("Get a paginated list of payments.")
