@@ -127,7 +127,6 @@ public class CompanyService extends BaseService {
 	}
 
 	public ApiPaginatedList<ApiCompanyListResponse> listUserCompanies(Long userId, ApiListCompaniesRequest request) {
-		// zzz
 		return PaginationTools.createPaginatedResponse(em, request, () -> userCompanyListQueryObject(userId, request));
 	}
 
