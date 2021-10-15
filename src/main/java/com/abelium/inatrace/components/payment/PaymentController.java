@@ -1,6 +1,10 @@
 package com.abelium.inatrace.components.payment;
 
-import com.abelium.inatrace.api.*;
+import com.abelium.inatrace.api.ApiBaseEntity;
+import com.abelium.inatrace.api.ApiDefaultResponse;
+import com.abelium.inatrace.api.ApiPaginatedRequest;
+import com.abelium.inatrace.api.ApiPaginatedResponse;
+import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.payment.api.ApiBulkPayment;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
@@ -8,15 +12,26 @@ import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.converters.SimpleDateConverter;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
 
 import javax.validation.Valid;
-import java.util.Date;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 /**
  * REST controller for payment entity.
@@ -113,14 +128,14 @@ public class PaymentController {
 
 		return new ApiResponse<>(paymentService.createOrUpdatePayment(apiPayment, authUser.getUserId()));
 	}
-
-	@PutMapping("bulk-payment")
+	
+	@PostMapping("bulk-payment")
 	@ApiOperation("Create bulk payment.")
-	public ApiResponse<ApiBaseEntity> createOrUpdateBulkPayment(
+	public ApiResponse<ApiBaseEntity> createBulkPayment(
 			@Valid @RequestBody ApiBulkPayment apiBulkPayment,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		return new ApiResponse<>(paymentService.createOrUpdateBulkPayment(apiBulkPayment, authUser.getUserId()));
+		return new ApiResponse<>(paymentService.createBulkPayment(apiBulkPayment, authUser.getUserId()));
 	}
 
 	@DeleteMapping("{id}")

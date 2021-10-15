@@ -2,32 +2,30 @@ package com.abelium.inatrace.components.payment.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.common.api.ApiDocument;
-import com.abelium.inatrace.components.company.api.ApiCompany;
+import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomer;
-import com.abelium.inatrace.db.entities.payment.*;
+import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
+import com.abelium.inatrace.db.entities.payment.PaymentStatus;
+import com.abelium.inatrace.db.entities.payment.PaymentType;
+import com.abelium.inatrace.db.entities.payment.ReceiptDocumentType;
+import com.abelium.inatrace.db.entities.payment.RecipientType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
-import com.abelium.inatrace.tools.converters.SimpleDateConverter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
 import java.time.Instant;
+
+import io.swagger.annotations.ApiModelProperty;
 
 public class ApiPayment extends ApiBaseEntity {
 
-	// From BaseEntity
-	@ApiModelProperty(value = "Last updated timestamp")
-	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
-	private Instant updatedTimestamp;
-
 	@ApiModelProperty(value = "Payment created by user")
-	private ApiUser createdBy;
+	private Long createdBy;
 	
 	@ApiModelProperty(value = "Payment updated by user")
-	private ApiUser updatedBy;
+	private Long updatedBy;
 
 	@ApiModelProperty(value = "Payment type")
 	private PaymentType paymentType;
@@ -36,22 +34,19 @@ public class ApiPayment extends ApiBaseEntity {
 	private String currency;
 	
 	@ApiModelProperty(value = "Quantity purchased to be paid")
-	private Integer purchased;
+	private BigDecimal purchased;
 
 	@ApiModelProperty(value = "Payment amount paid to the farmer")
-		private Integer amountPaidToTheFarmer;
+	private BigDecimal amountPaidToTheFarmer;
 	
 	@ApiModelProperty(value = "Payment amount paid to the collector")
-	private Integer amountPaidToTheCollector;
+	private BigDecimal amountPaidToTheCollector;
 	
 	@ApiModelProperty(value = "Payment total amount")
-	private Integer totalPaid;
+	private BigDecimal totalPaid;
 	
 	@ApiModelProperty(value = "Stock order related to the payment")
 	private ApiStockOrder stockOrder;
-	
-//	@ApiModelProperty(value = "")
-//	private StockOrder order;
 	
 //	@ApiModelProperty(value = "")
 //	private List<Transaction> inputTransactions = new ArrayList<>();
@@ -81,33 +76,21 @@ public class ApiPayment extends ApiBaseEntity {
 	private ApiUser paymentConfirmedByUser;
 	
 	@ApiModelProperty(value = "Payment time confirmation")
-	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
-	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
     private Instant paymentConfirmedAtTime;
-
-	@ApiModelProperty(value = "Formal date of payment (for example: date on receipt)")
-	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
-	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
-	private Instant formalCreationTime;
-
+	
 	@ApiModelProperty(value = "Preferred way of payment")
 	private PreferredWayOfPayment preferredWayOfPayment;
 	
 	@ApiModelProperty(value = "Production date")
-	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
-	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
     private Instant productionDate;
-
-	@ApiModelProperty(value = "Company that is paying for product")
-	private ApiCompany payingCompany;
 	
 	// The next properties can be extracted from the purchase (stock order) on the way back
 	
 	@ApiModelProperty(value = "Company that receives the payment")
-	private ApiCompany recipientCompany;
+	private ApiCompanyBase recipientCompany; // TODO: is this a company receiving a payment?
 	
 	@ApiModelProperty(value = "Representative of the company that receives the payment")
-	private ApiCompany representativeOfRecipientCompany;
+	private ApiCompanyBase representativeOfRecipientCompany;
 
 	@ApiModelProperty(value = "User customer that receives the payment (farmer)")
 	private ApiUserCustomer recipientUserCustomer;
@@ -118,27 +101,19 @@ public class ApiPayment extends ApiBaseEntity {
 	@ApiModelProperty(value = "Company customer that receives the payment")
 	private ApiCompanyCustomer recipientCompanyCustomer;
 
-	public Instant getUpdatedTimestamp() {
-		return updatedTimestamp;
-	}
-
-	public void setUpdatedTimestamp(Instant updatedTimestamp) {
-		this.updatedTimestamp = updatedTimestamp;
-	}
-
-	public ApiUser getCreatedBy() {
+	public Long getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreatedBy(ApiUser createdBy) {
+	public void setCreatedBy(Long createdBy) {
 		this.createdBy = createdBy;
 	}
-
-	public ApiUser getUpdatedBy() {
+	
+	public Long getUpdatedBy() {
 		return updatedBy;
 	}
 
-	public void setUpdatedBy(ApiUser updatedBy) {
+	public void setUpdatedBy(Long updatedBy) {
 		this.updatedBy = updatedBy;
 	}
 
@@ -158,35 +133,35 @@ public class ApiPayment extends ApiBaseEntity {
 		this.currency = currency;
 	}
 
-	public Integer getPurchased() {
+	public BigDecimal getPurchased() {
 		return purchased;
 	}
 
-	public void setPurchased(Integer purchased) {
+	public void setPurchased(BigDecimal purchased) {
 		this.purchased = purchased;
 	}
 
-	public Integer getAmountPaidToTheFarmer() {
+	public BigDecimal getAmountPaidToTheFarmer() {
 		return amountPaidToTheFarmer;
 	}
 
-	public void setAmountPaidToTheFarmer(Integer amountPaidToTheFarmer) {
+	public void setAmountPaidToTheFarmer(BigDecimal amountPaidToTheFarmer) {
 		this.amountPaidToTheFarmer = amountPaidToTheFarmer;
 	}
 
-	public Integer getAmountPaidToTheCollector() {
+	public BigDecimal getAmountPaidToTheCollector() {
 		return amountPaidToTheCollector;
 	}
 
-	public void setAmountPaidToTheCollector(Integer amountPaidToTheCollector) {
+	public void setAmountPaidToTheCollector(BigDecimal amountPaidToTheCollector) {
 		this.amountPaidToTheCollector = amountPaidToTheCollector;
 	}
 
-	public Integer getTotalPaid() {
+	public BigDecimal getTotalPaid() {
 		return totalPaid;
 	}
 
-	public void setTotalPaid(Integer totalPaid) {
+	public void setTotalPaid(BigDecimal totalPaid) {
 		this.totalPaid = totalPaid;
 	}
 
@@ -234,7 +209,7 @@ public class ApiPayment extends ApiBaseEntity {
 		return paymentPurposeType;
 	}
 
-	public void setPaymentPurposeType(PaymentPurposeType paymentPurposeType) {
+	public void setPaymentPurporseType(PaymentPurposeType paymentPurposeType) {
 		this.paymentPurposeType = paymentPurposeType;
 	}
 
@@ -262,14 +237,6 @@ public class ApiPayment extends ApiBaseEntity {
 		this.paymentConfirmedAtTime = paymentConfirmedAtTime;
 	}
 
-	public Instant getFormalCreationTime() {
-		return formalCreationTime;
-	}
-
-	public void setFormalCreationTime(Instant formalCreationTime) {
-		this.formalCreationTime = formalCreationTime;
-	}
-
 	public PreferredWayOfPayment getPreferredWayOfPayment() {
 		return preferredWayOfPayment;
 	}
@@ -286,28 +253,19 @@ public class ApiPayment extends ApiBaseEntity {
 		this.productionDate = productionDate;
 	}
 
-
-	public ApiCompany getPayingCompany() {
-		return payingCompany;
-	}
-
-	public void setPayingCompany(ApiCompany payingCompany) {
-		this.payingCompany = payingCompany;
-	}
-
-	public ApiCompany getRecipientCompany() {
+	public ApiCompanyBase getRecipientCompany() {
 		return recipientCompany;
 	}
 
-	public void setRecipientCompany(ApiCompany recipientCompany) {
+	public void setRecipientCompany(ApiCompanyBase recipientCompany) {
 		this.recipientCompany = recipientCompany;
 	}
 
-	public ApiCompany getRepresentativeOfRecipientCompany() {
+	public ApiCompanyBase getRepresentativeOfRecipientCompany() {
 		return representativeOfRecipientCompany;
 	}
 
-	public void setRepresentativeOfRecipientCompany(ApiCompany representativeOfRecipientCompany) {
+	public void setRepresentativeOfRecipientCompany(ApiCompanyBase representativeOfRecipientCompany) {
 		this.representativeOfRecipientCompany = representativeOfRecipientCompany;
 	}
 

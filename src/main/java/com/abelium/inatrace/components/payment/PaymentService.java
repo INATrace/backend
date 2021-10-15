@@ -14,7 +14,9 @@ import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.db.entities.payment.*;
+import com.abelium.inatrace.db.entities.payment.BulkPayment;
+import com.abelium.inatrace.db.entities.payment.Payment;
+import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderActivityProof;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -174,7 +176,6 @@ public class PaymentService extends BaseService {
 
 			// Values from request
 			entity.setReceiptDocumentType(apiPayment.getReceiptDocumentType());
-			entity.setPaymentConfirmedAtTime(apiPayment.getPaymentConfirmedAtTime());
 			entity.setFormalCreationTime(apiPayment.getFormalCreationTime());
 			entity.setPaymentPurposeType(apiPayment.getPaymentPurposeType());
 			entity.setPaymentStatus(apiPayment.getPaymentStatus());
@@ -229,72 +230,95 @@ public class PaymentService extends BaseService {
 	
 
 	@Transactional
-	public ApiBaseEntity createOrUpdateBulkPayment(ApiBulkPayment apiBulkPayment, Long userId) throws ApiException {
+	public ApiBaseEntity createBulkPayment(ApiBulkPayment apiBulkPayment, Long userId) throws ApiException {
 
 		BulkPayment entity = null;
 
-		if (apiBulkPayment.getId() != null) {
+		// If method is POST, let's create a bulk payment from scratch
+		// Important to consider that when a bulk payment is created,
+		// the purchase order related needs to inherit the activity proofs created within the bulk payment
+		entity = new BulkPayment();
 
-			// If method is PUT, Coffee Matheo doesn't allow us to update bulk payments
-			// entity = fetchBulkPayment(apiBulkPayment.getId());
+		List<Long> stockOrdersIds = apiBulkPayment.getStockOrders();
+		StockOrder purchase = null;
+		for (Long purchaseId: stockOrdersIds) {
 
-		} else {
+			purchase = stockOrderService.fetchEntity(purchaseId, StockOrder.class);
+			if (purchase != null) {
 
-			// If method is POST, let's create a bulk payment from scratch
-			// Important to consider that when a bulk payment is created,
-			// the purchase order related needs to inherit the activity proofs created within the bulk payment
-			entity = new BulkPayment();
+				purchase.setBulkPayment(entity);
 
-			List<Long> stockOrdersIds = apiBulkPayment.getStockOrders();
-			StockOrder purchase = null;
-			for (Long purchaseId: stockOrdersIds) {
+                for (ApiActivityProof apiAP : apiBulkPayment.getAdditionalProofs()) {
 
-				purchase = fetchEntity(purchaseId, StockOrder.class);
-				if (purchase != null) {
+                    Document activityProofDoc = stockOrderService.fetchEntity(apiAP.getDocument().getId(), Document.class);
 
-					purchase.setBulkPayment(entity);
+                    StockOrderActivityProof stockOrderActivityProof = new StockOrderActivityProof();
+                    stockOrderActivityProof.setStockOrder(purchase);
+                    stockOrderActivityProof.setActivityProof(new ActivityProof());
+                    stockOrderActivityProof.getActivityProof().setDocument(activityProofDoc);
+                    stockOrderActivityProof.getActivityProof().setFormalCreationDate(apiAP.getFormalCreationDate());
+                    stockOrderActivityProof.getActivityProof().setType(apiAP.getType());
+                    stockOrderActivityProof.getActivityProof().setValidUntil(apiAP.getValidUntil());
 
-	                for (ApiActivityProof apiAP : apiBulkPayment.getAdditionalProofs()) {
+                    purchase.getActivityProofs().add(stockOrderActivityProof);
+                }
 
-	                    Document activityProofDoc = fetchEntity(apiAP.getDocument().getId(), Document.class);
+				entity.getStockOrders().add(purchase);
 
-	                    StockOrderActivityProof stockOrderActivityProof = new StockOrderActivityProof();
-	                    stockOrderActivityProof.setStockOrder(purchase);
-	                    stockOrderActivityProof.setActivityProof(new ActivityProof());
-	                    stockOrderActivityProof.getActivityProof().setDocument(activityProofDoc);
-	                    stockOrderActivityProof.getActivityProof().setFormalCreationDate(apiAP.getFormalCreationDate());
-	                    stockOrderActivityProof.getActivityProof().setType(apiAP.getType());
-	                    stockOrderActivityProof.getActivityProof().setValidUntil(apiAP.getValidUntil());
-
-	                    purchase.getActivityProofs().add(stockOrderActivityProof);
-	                }
-
-					entity.getStockOrders().add(purchase);
-
-				} else {
-					throw new ApiException(ApiStatus.INVALID_REQUEST, "A purchase order is required in order to create a bulk payment.");
-				}
+			} else {
+				throw new ApiException(ApiStatus.INVALID_REQUEST, "A purchase order is required in order to create a bulk payment.");
 			}
-
-			entity.setAdditionalCost(apiBulkPayment.getAdditionalCost());
-			entity.setAdditionalCostDescription(apiBulkPayment.getAdditionalCostDescription());
-			entity.setCreatedBy(userService.fetchUserById(apiBulkPayment.getCreatedBy()));
-			entity.setCurrency(apiBulkPayment.getCurrency());
-			entity.setFormalCreationTime(Instant.now());
-			entity.setPayingCompany(purchase.getCompany());
-			entity.setPaymentDescription(apiBulkPayment.getPaymentDescription());
-			entity.setPaymentPurposeType(apiBulkPayment.getPaymentPurposeType());
-			entity.setReceiptNumber(apiBulkPayment.getReceiptNumber());
-			entity.getStockOrders().add(purchase);
-			entity.setTotalAmount(apiBulkPayment.getTotalAmount());
-
 		}
+
+		entity.setAdditionalCost(apiBulkPayment.getAdditionalCost());
+		entity.setAdditionalCostDescription(apiBulkPayment.getAdditionalCostDescription());
+		entity.setCreatedBy(userService.fetchUserById(apiBulkPayment.getCreatedBy()));
+		entity.setCurrency(apiBulkPayment.getCurrency());
+		entity.setFormalCreationTime(Instant.now());
+		entity.setPayingCompany(purchase.getCompany());
+		entity.setPaymentDescription(apiBulkPayment.getPaymentDescription());
+		entity.setPaymentPurposeType(apiBulkPayment.getPaymentPurposeType());
+		entity.setReceiptNumber(apiBulkPayment.getReceiptNumber());
+		entity.getStockOrders().add(purchase);
+		entity.setTotalAmount(apiBulkPayment.getTotalAmount());
+
 
 		if (entity.getId() == null) {
 			em.persist(entity);
 		}
 
 		return new ApiBaseEntity(entity);
+	}
+
+	public ApiBulkPayment getBulkPayment(Long id) throws ApiException {
+		return BulkPaymentMapper.toApiBulkPayment(fetchBulkPayment(id));
+	}
+
+	public BulkPayment fetchBulkPayment(Long id) throws ApiException {
+
+		BulkPayment bulkPayment = Queries.get(em, BulkPayment.class, id);
+		if (bulkPayment == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid bulk payment ID");
+		}
+		return bulkPayment;
+	}
+
+	public ApiPaginatedList<ApiBulkPayment> listBulkPaymentsByCompany(Long companyId, ApiPaginatedRequest request) {
+
+		TypedQuery<BulkPayment> bulkPaymentsQuery =
+			em.createNamedQuery("BulkPayment.listBulkPaymentsByCompanyId", BulkPayment.class)
+				.setParameter("companyId", companyId)
+				.setFirstResult(request.getOffset())
+				.setMaxResults(request.getLimit());
+
+		List<BulkPayment> bulkPayments = bulkPaymentsQuery.getResultList();
+
+		Long count =
+			em.createNamedQuery("BulkPayment.countBulkPaymentsByCompanyId", Long.class)
+				.setParameter("companyId", companyId).getSingleResult();
+
+		return new ApiPaginatedList<>(
+				bulkPayments.stream().map(BulkPaymentMapper::toApiBulkPayment).collect(Collectors.toList()), count);
 	}
 
 }
