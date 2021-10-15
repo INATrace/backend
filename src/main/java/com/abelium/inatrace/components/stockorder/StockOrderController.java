@@ -4,7 +4,8 @@ package com.abelium.inatrace.components.stockorder;
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
-import com.abelium.inatrace.components.stockorder.converters.SimpleDateConverter;
+import com.abelium.inatrace.tools.converters.SimpleDateConverter;
+import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import io.swagger.annotations.ApiOperation;
@@ -91,10 +92,12 @@ public class StockOrderController {
                 new StockOrderQueryRequest(
                         null,
                         facilityId,
+                        null,
                         isOpenBalanceOnly,
                         isPurchaseOrderOnly,
                         isWomenShare,
                         wayOfPayment,
+                        null,
                         productionDateStart != null ? productionDateStart.toInstant() : null,
                         productionDateEnd != null ? productionDateEnd.toInstant() : null,
                         producerUserCustomerName
@@ -107,10 +110,12 @@ public class StockOrderController {
     public ApiPaginatedResponse<ApiStockOrder> getStockOrderListByCompanyId(
             @Valid ApiPaginatedRequest request,
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @ApiParam(value = "Farmer (UserCustomer) ID") @RequestParam(value = "farmerId", required = false) Long farmerId,
             @Valid @ApiParam(value = "Is open balance only") @RequestParam(value = "isOpenBalanceOnly", required = false) Boolean isOpenBalanceOnly,
             @Valid @ApiParam(value = "Is purchase orders only") @RequestParam(value = "isPurchaseOrderOnly", required = false) Boolean isPurchaseOrderOnly,
             @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
             @Valid @ApiParam(value = "Way of payment") @RequestParam(value = "wayOfPayment", required = false) PreferredWayOfPayment wayOfPayment,
+            @Valid @ApiParam(value = "Order type") @RequestParam(value = "orderType", required = false) OrderType orderType,
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
             @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName,
@@ -122,10 +127,12 @@ public class StockOrderController {
                 new StockOrderQueryRequest(
                         companyId,
                         null,
+                        farmerId,
                         isOpenBalanceOnly,
                         isPurchaseOrderOnly,
                         isWomenShare,
                         wayOfPayment,
+                        orderType,
                         productionDateStart != null ? productionDateStart.toInstant() : null,
                         productionDateEnd != null ? productionDateEnd.toInstant() : null,
                         producerUserCustomerName

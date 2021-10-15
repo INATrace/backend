@@ -1,8 +1,8 @@
-package com.abelium.inatrace.components.product.mapper;
+package com.abelium.inatrace.components.usercustomer.mappers;
 
 import com.abelium.inatrace.components.company.mappers.AddressMapper;
-import com.abelium.inatrace.components.product.api.ApiUserCustomer;
-import com.abelium.inatrace.components.product.api.ApiUserCustomerLocation;
+import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomer;
+import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomerLocation;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 
 public class UserCustomerMapper {

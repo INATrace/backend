@@ -67,6 +67,9 @@ public class StockOrderService extends BaseService {
 
 
         // Query parameter filters
+        if(queryRequest.farmerId != null)
+            condition.and(stockOrderProxy.getProducerUserCustomer()).isNotNull()
+                    .and(stockOrderProxy.getProducerUserCustomer().getId()).eq(queryRequest.farmerId);
         if(queryRequest.semiProductId != null)
             condition.and(stockOrderProxy.getSemiProduct()).isNotNull()
                     .and(stockOrderProxy.getSemiProduct().getId()).eq(queryRequest.semiProductId);
@@ -84,6 +87,9 @@ public class StockOrderService extends BaseService {
 
         if(queryRequest.wayOfPayment != null)
             condition.and(stockOrderProxy.getPreferredWayOfPayment()).eq(queryRequest.wayOfPayment);
+
+        if(queryRequest.orderType != null)
+            condition.and(stockOrderProxy.getOrderType()).eq(queryRequest.orderType);
 
         if(queryRequest.productionDateStart != null)
             condition.and(stockOrderProxy.getProductionDate()).gte(queryRequest.productionDateStart);
@@ -246,7 +252,7 @@ public class StockOrderService extends BaseService {
         em.remove(stockOrder);
     }
 
-    private <E> E fetchEntity(Long id, Class<E> entityClass) throws ApiException {
+    public <E> E fetchEntity(Long id, Class<E> entityClass) throws ApiException {
 
         E entity = Queries.get(em, entityClass, id);
         if (entity == null) {

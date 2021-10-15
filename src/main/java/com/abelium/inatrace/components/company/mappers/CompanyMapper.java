@@ -6,6 +6,7 @@ import com.abelium.inatrace.db.entities.company.Company;
 public class CompanyMapper {
 
     public static ApiCompany toApiCompanyBase(Company entity) {
+        if (entity == null) return null;
 
         ApiCompany apiCompany = new ApiCompany();
         apiCompany.setId(entity.getId());
