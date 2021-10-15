@@ -1,4 +1,4 @@
-package com.abelium.inatrace.components.product.api;
+package com.abelium.inatrace.components.usercustomer.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.company.api.ApiCompany;

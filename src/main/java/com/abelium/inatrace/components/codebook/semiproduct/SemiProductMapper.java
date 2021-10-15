@@ -38,6 +38,7 @@ public final class SemiProductMapper {
 	 * @return API model entity.
 	 */
 	public static ApiSemiProduct toApiSemiProductBase(SemiProduct entity) {
+		if(entity == null) return null;
 
 		ApiSemiProduct apiSemiProduct = new ApiSemiProduct();
 		apiSemiProduct.setId(entity.getId());
@@ -54,6 +55,7 @@ public final class SemiProductMapper {
 	 * @return API model entity.
 	 */
 	public static ApiSemiProduct toApiSemiProduct(SemiProduct entity) {
+		if(entity == null) return null;
 
 		ApiSemiProduct apiSemiProduct = SemiProductMapper.toApiSemiProductBase(entity);
 

@@ -140,7 +140,10 @@ public class Payment extends TimestampEntity {
     
     @Column
     private Instant paymentConfirmedAtTime;
-	
+
+    @Column
+	private Instant formalCreationTime;
+
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
 	private PreferredWayOfPayment preferredWayOfPayment; // cash cooperative, cash collector, bank transfer
@@ -370,6 +373,14 @@ public class Payment extends TimestampEntity {
 
 	public void setPaymentConfirmedAtTime(Instant paymentConfirmedAtTime) {
 		this.paymentConfirmedAtTime = paymentConfirmedAtTime;
+	}
+
+	public Instant getFormalCreationTime() {
+		return formalCreationTime;
+	}
+
+	public void setFormalCreationTime(Instant formalCreationTime) {
+		this.formalCreationTime = formalCreationTime;
 	}
 
 	public PreferredWayOfPayment getPreferredWayOfPayment() {

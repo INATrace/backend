@@ -1,4 +1,4 @@
-package com.abelium.inatrace.components.stockorder.converters;
+package com.abelium.inatrace.tools.converters;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

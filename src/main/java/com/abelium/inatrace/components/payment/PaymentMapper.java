@@ -3,9 +3,9 @@ package com.abelium.inatrace.components.payment;
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
-import com.abelium.inatrace.components.product.mapper.UserCustomerMapper;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
+import com.abelium.inatrace.components.usercustomer.mappers.UserCustomerMapper;
 import com.abelium.inatrace.db.entities.payment.Payment;
 
 /**

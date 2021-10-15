@@ -133,7 +133,8 @@ public class PaymentService extends BaseService {
 			// Important to consider that a purchase order must exist, since we will extract information from it
 			entity = new Payment();
 			// Get purchase order to which you will generate a payment
-			stockOrder = (StockOrder) em.createNamedQuery("StockOrder.getPurchaseOrderById")
+			stockOrder = 
+				(StockOrder) em.createNamedQuery("StockOrder.getPurchaseOrderByIdAndType")
 					.setParameter("stockOrderId", apiPayment.getStockOrder().getId())
 					.getSingleResult();
 			if (stockOrder != null) {
@@ -141,9 +142,7 @@ public class PaymentService extends BaseService {
 				// the company who creates a purchase should be the one who pays for it, right?
 				payingCompany = stockOrder.getCompany();
 				// company who receives the payment - could this be client property on stock order?
-				recipientCompany = (Company) em.createNamedQuery("Company.getCompanyById")
-						.setParameter("companyId", apiPayment.getRecipientCompany().getId())
-						.getSingleResult();
+				recipientCompany = em.find(Company.class, apiPayment.getRecipientCompany().getId());
 				// collector (representative) who is getting the payment
 				payableToCollector = stockOrder.getRepresentativeOfProducerUserCustomer();
 				// farmer who is getting the payment

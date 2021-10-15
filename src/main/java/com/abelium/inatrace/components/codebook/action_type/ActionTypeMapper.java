@@ -15,6 +15,7 @@ public final class ActionTypeMapper {
 	}
 
 	public static ApiActionType toApiActionType(ActionType entity) {
+		if (entity == null) return null;
 
 		ApiActionType apiActionType = new ApiActionType();
 		apiActionType.setId(entity.getId());

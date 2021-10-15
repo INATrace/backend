@@ -6,8 +6,8 @@ import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
-import com.abelium.inatrace.components.product.api.ApiUserCustomer;
-import com.abelium.inatrace.components.stockorder.converters.SimpleDateConverter;
+import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomer;
+import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
@@ -152,7 +152,7 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     // Relevant only for order type: STOCK_ORDER
 //    @ApiModelProperty(value = "Input transactions for stock order. Read only.")
-//    public List<ApiTransaction> apiTransactions;
+//    public List<ApiTransaction> inputTransactions;
 
 //    @ApiModelProperty(value = "Date when product has been started drying", position = 37)
 //    public Instant startOfDrying;

@@ -2,9 +2,7 @@ package com.abelium.inatrace.components.company;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.codebook.currencies.CurrencyTypeMapper;
 import com.abelium.inatrace.components.codebook.currencies.CurrencyTypeService;
-import com.abelium.inatrace.components.codebook.currencies.api.ApiCurrencyType;
 import com.abelium.inatrace.components.common.CommonApiTools;
 import com.abelium.inatrace.components.common.CommonService;
 import com.abelium.inatrace.components.common.api.ApiCertification;
@@ -15,6 +13,10 @@ import com.abelium.inatrace.components.company.types.CompanyTranslatables;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.user.UserApiTools;
 import com.abelium.inatrace.components.user.UserQueries;
+import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomer;
+import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomerAssociation;
+import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomerCooperative;
+import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomerLocation;
 import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.*;
 import com.abelium.inatrace.tools.ListTools;
@@ -305,7 +307,6 @@ public class CompanyApiTools {
 
 	public ApiBankInformation toApiBankInformation(BankInformation bankInformation) {
 		if (bankInformation == null) return null;
-
 		ApiBankInformation apiBankInformation = new ApiBankInformation();
 		apiBankInformation.setAccountHolderName(bankInformation.getAccountHolderName());
 		apiBankInformation.setAccountNumber(bankInformation.getAccountNumber());
@@ -317,7 +318,6 @@ public class CompanyApiTools {
 
 	public ApiFarmInformation toApiFarmInformation(FarmInformation farmInformation) {
 		if (farmInformation == null) return null;
-
 		ApiFarmInformation apiFarmInformation = new ApiFarmInformation();
 		apiFarmInformation.setAreaOrganicCertified(farmInformation.getAreaOrganicCertified());
 		apiFarmInformation.setCoffeeCultivatedArea(farmInformation.getCoffeeCultivatedArea());
@@ -331,7 +331,6 @@ public class CompanyApiTools {
 
 	public ApiUserCustomerAssociation toApiUserCustomerAssociation(UserCustomerAssociation userCustomerAssociation) {
 		if (userCustomerAssociation == null) return null;
-
 		ApiUserCustomerAssociation apiUserCustomerAssociation = new ApiUserCustomerAssociation();
 		apiUserCustomerAssociation.setId(userCustomerAssociation.getId());
 		apiUserCustomerAssociation.setCompany(toApiCompany(userCustomerAssociation.getCompany()));
@@ -355,6 +354,7 @@ public class CompanyApiTools {
 	}
 
 	public ApiUserCustomerLocation toApiUserCustomerLocation(UserCustomerLocation userCustomerLocation) {
+		if (userCustomerLocation == null) return null;
 		ApiUserCustomerLocation apiUserCustomerLocation = new ApiUserCustomerLocation();
 		apiUserCustomerLocation.setAddress(toApiAddress(userCustomerLocation.getAddress()));
 		apiUserCustomerLocation.setLatitude(userCustomerLocation.getLatitude());
@@ -365,6 +365,7 @@ public class CompanyApiTools {
 	}
 
 	public ApiAddress toApiAddress(Address address) {
+		if(address == null) return null;
 		ApiAddress apiAddress = new ApiAddress();
 		apiAddress.setAddress(address.getAddress());
 		apiAddress.setCell(address.getCell());
@@ -383,6 +384,7 @@ public class CompanyApiTools {
 	}
 
 	public ApiCountry toApiCountry(Country country) {
+		if(country == null) return null;
 		ApiCountry apiCountry = new ApiCountry();
 		apiCountry.setId(country.getId());
 		apiCountry.setCode(country.getCode());
@@ -406,6 +408,7 @@ public class CompanyApiTools {
 	}
 
 	public ApiCompanyCustomer toApiCompanyCustomer(CompanyCustomer companyCustomer) {
+		if (companyCustomer == null) return null;
 		ApiCompanyCustomer apiCompanyCustomer = new ApiCompanyCustomer();
 		apiCompanyCustomer.setId(companyCustomer.getId());
 		apiCompanyCustomer.setCompanyId(companyCustomer.getCompany().getId());
@@ -421,6 +424,7 @@ public class CompanyApiTools {
 	}
 
 	public ApiLocation toApiLocation(Location location) {
+		if (location == null) return null;
 		ApiLocation apiLocation = new ApiLocation();
 		apiLocation.setAddress(toApiAddress(location.getAddress()));
 
@@ -428,6 +432,7 @@ public class CompanyApiTools {
 	}
 
 	public ApiGeoAddress toApiGeoAddress(GeoAddress geoAddress) {
+		if(geoAddress == null) return null;
 		ApiGeoAddress apiGeoAddress = new ApiGeoAddress();
 		apiGeoAddress.setAddress(geoAddress.getAddress());
 		apiGeoAddress.setCell(geoAddress.getCell());
