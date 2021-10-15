@@ -19,6 +19,7 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderActivityProof;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderLocation;
+import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -72,22 +73,34 @@ public class StockOrderService extends BaseService {
         if(queryRequest.semiProductId != null)
             condition.and(stockOrderProxy.getSemiProduct()).isNotNull()
                     .and(stockOrderProxy.getSemiProduct().getId()).eq(queryRequest.semiProductId);
+
         if(queryRequest.isOpenBalanceOnly != null && queryRequest.isOpenBalanceOnly)
             condition.and(stockOrderProxy.getBalance()).isNotNull()
                     .and(stockOrderProxy.getBalance()).gt(BigDecimal.ZERO);
+
+        if (queryRequest.isPurchaseOrderOnly != null && queryRequest.isPurchaseOrderOnly) {
+            condition.and(stockOrderProxy.getOrderType()).eq(OrderType.PURCHASE_ORDER);
+        }
+
         if(queryRequest.isWomenShare != null)
             condition.and(stockOrderProxy.getWomenShare()).eq(queryRequest.isWomenShare);
+
         if(queryRequest.wayOfPayment != null)
             condition.and(stockOrderProxy.getPreferredWayOfPayment()).eq(queryRequest.wayOfPayment);
+
         if(queryRequest.orderType != null)
             condition.and(stockOrderProxy.getOrderType()).eq(queryRequest.orderType);
+
         if(queryRequest.productionDateStart != null)
             condition.and(stockOrderProxy.getProductionDate()).gte(queryRequest.productionDateStart);
+
         if(queryRequest.productionDateEnd != null)
             condition.and(stockOrderProxy.getProductionDate()).lte(queryRequest.productionDateEnd);
+
         if(queryRequest.producerUserCustomerName != null) // Search by farmers name (query)
             condition.and(stockOrderProxy.getProducerUserCustomer().getName())
                     .like().startsWith(queryRequest.producerUserCustomerName);
+
         if(queryRequest.isAvailable != null && queryRequest.isAvailable)
             condition.and(stockOrderProxy.getAvailableQuantity()).gt(0);
 
@@ -135,6 +148,7 @@ public class StockOrderService extends BaseService {
         entity.setCurrency(apiStockOrder.getCurrency());
         entity.setPricePerUnit(apiStockOrder.getPricePerUnit());
         entity.setPreferredWayOfPayment(apiStockOrder.getPreferredWayOfPayment());
+        entity.setSacNumber(apiStockOrder.getSacNumber());
         entity.setProductionDate(apiStockOrder.getProductionDate());
         entity.setInternalLotNumber(apiStockOrder.getInternalLotNumber());
         entity.setWomenShare(apiStockOrder.getWomenShare());

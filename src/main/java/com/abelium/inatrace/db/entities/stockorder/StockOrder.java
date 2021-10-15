@@ -13,7 +13,6 @@ import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.payment.BulkPayment;
 import com.abelium.inatrace.db.entities.payment.Payment;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
@@ -75,22 +74,19 @@ public class StockOrder extends TimestampEntity {
 	private StockOrderLocation productionLocation;
 	
 	@OneToOne
-	private CompanyCustomer consumerCompanyCustomer; // probably not used for purchase
+	private CompanyCustomer consumerCompanyCustomer;
 	
 	@ManyToOne
 	private SemiProduct semiProduct;
 	
 	@ManyToOne
 	private Facility facility;
-	
-	@ManyToOne
-	private ProcessingAction processingActionDef;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	private BulkPayment bulkPayment;
 
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Certification> certifications; // probably not used for purchase
+	private List<Certification> certifications;
 
 	// The required processing evidence fields values - the available values are sourced from the
 	// selected Processing action definition;
@@ -105,7 +101,7 @@ public class StockOrder extends TimestampEntity {
 	// Activity proofs that were provided while creating or updating a purchase order
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<StockOrderActivityProof> activityProofs;
-	
+
 	// A stock (purchase) order can be divided in many payments
 	@OneToMany(mappedBy = "payingCompany", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Payment> payments = new ArrayList<>();
@@ -165,7 +161,7 @@ public class StockOrder extends TimestampEntity {
 	@Column(length = Lengths.ENUM)
 	private OrderType orderType;
 	
-	@OneToOne
+	@ManyToOne
 	private GradeAbbreviationType gradeAbbreviation;
 	
 	@Column
@@ -209,7 +205,7 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private String flavourProfile;
 	
-	@OneToOne // Verify relationship
+	@ManyToOne
 	private ProcessingOrder processingOrder;
 	
 	@Enumerated(EnumType.STRING)
@@ -521,7 +517,7 @@ public class StockOrder extends TimestampEntity {
 	public void setSalesPricePerUnit(BigDecimal salesPricePerUnit) {
 		this.salesPricePerUnit = salesPricePerUnit;
 	}
-	
+
 	public List<Payment> getPayments() {
 		return payments;
 	}
@@ -674,14 +670,6 @@ public class StockOrder extends TimestampEntity {
 		this.flavourProfile = flavourProfile;
 	}
 
-	public ProcessingAction getProcessingActionDef() {
-		return processingActionDef;
-	}
-
-	public void setProcessingActionDef(ProcessingAction processingAction) {
-		this.processingActionDef = processingAction;
-	}
-	
 	public BulkPayment getBulkPayment() {
 		return bulkPayment;
 	}

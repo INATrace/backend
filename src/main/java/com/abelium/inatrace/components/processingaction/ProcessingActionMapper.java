@@ -1,6 +1,7 @@
 package com.abelium.inatrace.components.processingaction;
 
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
+import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
@@ -50,16 +51,9 @@ public final class ProcessingActionMapper {
 		ApiCompanyBase apiCompany = new ApiCompanyBase();
 		apiCompany.setId(entity.getCompany().getId());
 		apiCompany.setName(entity.getCompany().getName());
-		
-		ApiSemiProduct apiInputSemiProduct = new ApiSemiProduct();
-		apiInputSemiProduct.setId(entity.getInputSemiProduct().getId());
-		apiInputSemiProduct.setName(entity.getInputSemiProduct().getName());
 
-		ApiSemiProduct apiOutputSemiProduct = new ApiSemiProduct();
-		if(entity.getOutputSemiProduct() != null) {
-			apiOutputSemiProduct.setId(entity.getOutputSemiProduct().getId());
-			apiOutputSemiProduct.setName(entity.getOutputSemiProduct().getName());
-		}
+		ApiSemiProduct apiInputSemiProduct = SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct());
+		ApiSemiProduct apiOutputSemiProduct = SemiProductMapper.toApiSemiProduct(entity.getOutputSemiProduct());
 		
 		List<ApiProcessingEvidenceField> apiRequiredEvidenceFields = new ArrayList<>();
 		List<ProcessingActionPEF> processingActionProcessingEvidenceFields = entity.getProcessingEvidenceFields();
