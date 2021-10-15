@@ -1,6 +1,10 @@
 package com.abelium.inatrace.components.company;
 
-import com.abelium.inatrace.api.*;
+import com.abelium.inatrace.api.ApiBaseEntity;
+import com.abelium.inatrace.api.ApiDefaultResponse;
+import com.abelium.inatrace.api.ApiPaginatedResponse;
+import com.abelium.inatrace.api.ApiResponse;
+import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
