@@ -174,8 +174,8 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Preferred way of payment", position = 41)
     private PreferredWayOfPayment preferredWayOfPayment;
 
-//    @ApiModelProperty(value = "SAC number", position = 42)
-//    private Integer sacNumber;
+    @ApiModelProperty(value = "SAC number", position = 42)
+    private Integer sacNumber;
 
 //    @ApiModelProperty(value = "Is order open", position = 43)
 //    private Boolean isOpenOrder;
@@ -538,4 +538,13 @@ public class ApiStockOrder extends ApiBaseEntity {
     public void setPreferredWayOfPayment(PreferredWayOfPayment preferredWayOfPayment) {
         this.preferredWayOfPayment = preferredWayOfPayment;
     }
+
+    public Integer getSacNumber() {
+        return sacNumber;
+    }
+
+    public void setSacNumber(Integer sacNumber) {
+        this.sacNumber = sacNumber;
+    }
+
 }

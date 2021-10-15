@@ -80,7 +80,7 @@ public class StockOrderMapper {
         apiStockOrder.setFlavourProfile(entity.getFlavourProfile());
 //        apiStockOrder.setProcessingAction(ProcessingActionMapper.toApiProcessingAction(entity.getProcessingAction()));
         apiStockOrder.setPreferredWayOfPayment(entity.getPreferredWayOfPayment());
-//        apiStockOrder.setSacNumber(entity.getSacNumber());
+        apiStockOrder.setSacNumber(entity.getSacNumber());
 //        apiStockOrder.setOpenOrder(entity.getOpenOrder());
 //        apiStockOrder.setQuoteFacility(entity.getQuoteFacility());
 //        apiStockOrder.setQuoteCompany(entity.getQuoteCompany());
