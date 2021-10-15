@@ -8,6 +8,9 @@ import java.util.Date;
 
 @Validated
 public class ApiFarmInformation {
+    
+    @ApiModelProperty(value = "Area unit")
+    public String areaUnit;
 
     @ApiModelProperty(value = "Total cultivated area (ha)")
     public BigDecimal totalCultivatedArea;
@@ -73,5 +76,13 @@ public class ApiFarmInformation {
 
     public void setStartTransitionToOrganic(Date startTransitionToOrganic) {
         this.startTransitionToOrganic = startTransitionToOrganic;
+    }
+    
+    public String getAreaUnit() {
+        return areaUnit;
+    }
+    
+    public void setAreaUnit(String areaUnit) {
+        this.areaUnit = areaUnit;
     }
 }
