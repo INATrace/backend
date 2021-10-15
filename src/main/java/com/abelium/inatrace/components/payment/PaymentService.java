@@ -14,9 +14,7 @@ import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.db.entities.payment.BulkPayment;
-import com.abelium.inatrace.db.entities.payment.Payment;
-import com.abelium.inatrace.db.entities.payment.PaymentStatus;
+import com.abelium.inatrace.db.entities.payment.*;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderActivityProof;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -150,6 +148,20 @@ public class PaymentService extends BaseService {
 				throw new ApiException(ApiStatus.INVALID_REQUEST, "A purchase order (StockOrder) is required in order to create a payment.");
 			}
 
+			// Verify document is provided, if payment purpose is FIRST_INSTALLMENT
+			if (apiPayment.getPaymentPurposeType() == PaymentPurposeType.FIRST_INSTALLMENT && apiPayment.getReceiptDocument() == null)
+				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Receipt document has to be provided!");
+
+			// Receipt document (note: Storage key needs to be unique)
+			if(apiPayment.getReceiptDocument() != null) {
+				Document receiptDocument = new Document();
+				receiptDocument.setContentType(apiPayment.getReceiptDocument().getContentType());
+				receiptDocument.setName(apiPayment.getReceiptDocument().getName());
+				receiptDocument.setSize(apiPayment.getReceiptDocument().getSize());
+				receiptDocument.setStorageKey(apiPayment.getReceiptDocument().getStorageKey());
+				entity.setReceiptDocument(receiptDocument);
+			}
+
 			// Values from StockOrder
 			entity.setStockOrder(stockOrder);
 			entity.setOrderReference(stockOrder.getIdentifier());
@@ -160,22 +172,15 @@ public class PaymentService extends BaseService {
 			entity.setRecipientUserCustomer(stockOrder.getProducerUserCustomer()); // farmer
 			entity.setRepresentativeOfRecipientUserCustomer(stockOrder.getRepresentativeOfProducerUserCustomer()); // collector
 
-			// Storage key needs to be unique
-//			Document receiptDocument = new Document();
-//			receiptDocument.setContentType(apiPayment.getReceiptDocument().getContentType());
-//			receiptDocument.setName(apiPayment.getReceiptDocument().getName());
-//			receiptDocument.setSize(apiPayment.getReceiptDocument().getSize());
-//			receiptDocument.setStorageKey(apiPayment.getReceiptDocument().getStorageKey());
-//			entity.setReceiptDocument(receiptDocument);
-
+			// Values from request
 			entity.setReceiptDocumentType(apiPayment.getReceiptDocumentType());
 			entity.setPaymentConfirmedAtTime(apiPayment.getPaymentConfirmedAtTime());
 			entity.setFormalCreationTime(apiPayment.getFormalCreationTime());
 			entity.setPaymentPurposeType(apiPayment.getPaymentPurposeType());
 			entity.setPaymentStatus(apiPayment.getPaymentStatus());
 			entity.setPaymentType(apiPayment.getPaymentType());
-			entity.setReceiptNumber(apiPayment.getReceiptNumber());
 			entity.setRecipientType(apiPayment.getRecipientType());
+			entity.setReceiptNumber(apiPayment.getReceiptNumber());
 			entity.setCurrency(apiPayment.getCurrency());
 
 			entity.setTotalPaid(apiPayment.getAmountPaidToTheFarmer()); // ?

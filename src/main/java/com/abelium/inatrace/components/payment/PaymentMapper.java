@@ -1,8 +1,8 @@
 package com.abelium.inatrace.components.payment;
 
+import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
-import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.components.user.mappers.UserMapper;
 import com.abelium.inatrace.components.usercustomer.mappers.UserCustomerMapper;
@@ -46,21 +46,18 @@ public final class PaymentMapper {
 		apiPayment.setPaymentConfirmedByUser(UserMapper.toSimpleApiUser(entity.getPaymentConfirmedByUser()));
 		apiPayment.setStockOrder(StockOrderMapper.toApiStockOrderBase(entity.getStockOrder()));
 
-		ApiStockOrder apiStockOrder = new ApiStockOrder();
-		apiStockOrder.setId(entity.getStockOrder().getId());
-		apiStockOrder.setIdentifier(entity.getStockOrder().getIdentifier());
-		apiPayment.setStockOrder(apiStockOrder);
-
 //		ApiCompanyCustomer apiRecipientCompanyCustomer = new ApiCompanyCustomer();
 //		apiRecipientCompanyCustomer.setId(entity.getRecipientCompanyCustomer().getId());
 //		apiRecipientCompanyCustomer.setName(entity.getRecipientCompanyCustomer().getName());
 //		apiPayment.setRecipientCompanyCustomer(apiRecipientCompanyCustomer);
-		
-//		ApiDocument apiReceiptDocument = new ApiDocument();
-//		apiReceiptDocument.setId(entity.getReceiptDocument().getId());
-//		apiReceiptDocument.setName(entity.getReceiptDocument().getName());
-//		apiReceiptDocument.setStorageKey(entity.getReceiptDocument().getStorageKey());
-//		apiPayment.setReceiptDocument(apiReceiptDocument);
+
+		if (entity.getReceiptDocument() != null) {
+			ApiDocument apiReceiptDocument = new ApiDocument();
+			apiReceiptDocument.setId(entity.getReceiptDocument().getId());
+			apiReceiptDocument.setName(entity.getReceiptDocument().getName());
+			apiReceiptDocument.setStorageKey(entity.getReceiptDocument().getStorageKey());
+			apiPayment.setReceiptDocument(apiReceiptDocument);
+		}
 
 		return apiPayment;
 	}
