@@ -69,7 +69,7 @@ public class Payment extends TimestampEntity {
 	private String currency; // not chooseable on the frontend
 	
 	@Column
-	private BigDecimal purchased; // stock order quantity
+	private Integer purchased; // stock order quantity
 
 	@Column
 	private BigDecimal amountPaidToTheFarmer; // same as stock order balance
@@ -207,11 +207,11 @@ public class Payment extends TimestampEntity {
 		this.amountPaidToTheCollector = amountPaidToTheCollector;
 	}
 	
-	public BigDecimal getPurchased() {
+	public Integer getPurchased() {
 		return purchased;
 	}
 
-	public void setPurchased(BigDecimal purchased) {
+	public void setPurchased(Integer purchased) {
 		this.purchased = purchased;
 	}
 

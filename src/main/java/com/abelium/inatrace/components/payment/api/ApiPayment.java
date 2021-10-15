@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.payment.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.common.api.ApiDocument;
+import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
@@ -17,15 +18,23 @@ import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import java.math.BigDecimal;
 import java.time.Instant;
 
+import com.abelium.inatrace.tools.converters.SimpleDateConverter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
 
 public class ApiPayment extends ApiBaseEntity {
 
+	// From BaseEntity
+	@ApiModelProperty(value = "Last updated timestamp")
+	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
+	private Instant updatedTimestamp;
+
 	@ApiModelProperty(value = "Payment created by user")
-	private Long createdBy;
+	private ApiUser createdBy;
 	
 	@ApiModelProperty(value = "Payment updated by user")
-	private Long updatedBy;
+	private ApiUser updatedBy;
 
 	@ApiModelProperty(value = "Payment type")
 	private PaymentType paymentType;
@@ -34,7 +43,7 @@ public class ApiPayment extends ApiBaseEntity {
 	private String currency;
 	
 	@ApiModelProperty(value = "Quantity purchased to be paid")
-	private BigDecimal purchased;
+	private Integer purchased;
 
 	@ApiModelProperty(value = "Payment amount paid to the farmer")
 	private BigDecimal amountPaidToTheFarmer;
@@ -76,13 +85,25 @@ public class ApiPayment extends ApiBaseEntity {
 	private ApiUser paymentConfirmedByUser;
 	
 	@ApiModelProperty(value = "Payment time confirmation")
+	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
+	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
     private Instant paymentConfirmedAtTime;
+
+	@ApiModelProperty(value = "Formal creation time (for example: date on receipt)")
+	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
+	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
+	private Instant formalCreationTime;
 	
 	@ApiModelProperty(value = "Preferred way of payment")
 	private PreferredWayOfPayment preferredWayOfPayment;
 	
 	@ApiModelProperty(value = "Production date")
+	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
+	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
     private Instant productionDate;
+
+	@ApiModelProperty(value = "Paying company")
+	private ApiCompany payingCompany;
 	
 	// The next properties can be extracted from the purchase (stock order) on the way back
 	
@@ -101,19 +122,27 @@ public class ApiPayment extends ApiBaseEntity {
 	@ApiModelProperty(value = "Company customer that receives the payment")
 	private ApiCompanyCustomer recipientCompanyCustomer;
 
-	public Long getCreatedBy() {
+	public Instant getUpdatedTimestamp() {
+		return updatedTimestamp;
+	}
+
+	public void setUpdatedTimestamp(Instant updatedTimestamp) {
+		this.updatedTimestamp = updatedTimestamp;
+	}
+
+	public ApiUser getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreatedBy(Long createdBy) {
+	public void setCreatedBy(ApiUser createdBy) {
 		this.createdBy = createdBy;
 	}
 	
-	public Long getUpdatedBy() {
+	public ApiUser getUpdatedBy() {
 		return updatedBy;
 	}
 
-	public void setUpdatedBy(Long updatedBy) {
+	public void setUpdatedBy(ApiUser updatedBy) {
 		this.updatedBy = updatedBy;
 	}
 
@@ -133,11 +162,11 @@ public class ApiPayment extends ApiBaseEntity {
 		this.currency = currency;
 	}
 
-	public BigDecimal getPurchased() {
+	public Integer getPurchased() {
 		return purchased;
 	}
 
-	public void setPurchased(BigDecimal purchased) {
+	public void setPurchased(Integer purchased) {
 		this.purchased = purchased;
 	}
 
@@ -209,7 +238,7 @@ public class ApiPayment extends ApiBaseEntity {
 		return paymentPurposeType;
 	}
 
-	public void setPaymentPurporseType(PaymentPurposeType paymentPurposeType) {
+	public void setPaymentPurposeType(PaymentPurposeType paymentPurposeType) {
 		this.paymentPurposeType = paymentPurposeType;
 	}
 
@@ -237,6 +266,14 @@ public class ApiPayment extends ApiBaseEntity {
 		this.paymentConfirmedAtTime = paymentConfirmedAtTime;
 	}
 
+	public Instant getFormalCreationTime() {
+		return formalCreationTime;
+	}
+
+	public void setFormalCreationTime(Instant formalCreationTime) {
+		this.formalCreationTime = formalCreationTime;
+	}
+
 	public PreferredWayOfPayment getPreferredWayOfPayment() {
 		return preferredWayOfPayment;
 	}
@@ -251,6 +288,14 @@ public class ApiPayment extends ApiBaseEntity {
 
 	public void setProductionDate(Instant productionDate) {
 		this.productionDate = productionDate;
+	}
+
+	public ApiCompany getPayingCompany() {
+		return payingCompany;
+	}
+
+	public void setPayingCompany(ApiCompany payingCompany) {
+		this.payingCompany = payingCompany;
 	}
 
 	public ApiCompanyBase getRecipientCompany() {
