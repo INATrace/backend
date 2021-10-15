@@ -47,6 +47,21 @@ public class Facility extends TimestampEntity {
 	@Column
 	private Boolean isPublic;
 
+	@Column
+	private Boolean displayMayInvolveCollectors;
+
+	@Column
+	private Boolean displayOrganic;
+
+	@Column
+	private Boolean displayPriceDeductionDamage;
+
+	@Column
+	private Boolean displayTare;
+
+	@Column
+	private Boolean displayWomenOnly;
+
 	@OneToOne(cascade = CascadeType.ALL)
 	private FacilityLocation facilityLocation;
 
@@ -84,6 +99,46 @@ public class Facility extends TimestampEntity {
 
 	public void setIsPublic(Boolean isPublic) {
 		this.isPublic = isPublic;
+	}
+
+	public Boolean getDisplayMayInvolveCollectors() {
+		return displayMayInvolveCollectors;
+	}
+
+	public void setDisplayMayInvolveCollectors(Boolean displayMayInvolveCollectors) {
+		this.displayMayInvolveCollectors = displayMayInvolveCollectors;
+	}
+
+	public Boolean getDisplayOrganic() {
+		return displayOrganic;
+	}
+
+	public void setDisplayOrganic(Boolean displayOrganic) {
+		this.displayOrganic = displayOrganic;
+	}
+
+	public Boolean getDisplayPriceDeductionDamage() {
+		return displayPriceDeductionDamage;
+	}
+
+	public void setDisplayPriceDeductionDamage(Boolean displayPriceDeductionDamage) {
+		this.displayPriceDeductionDamage = displayPriceDeductionDamage;
+	}
+
+	public Boolean getDisplayTare() {
+		return displayTare;
+	}
+
+	public void setDisplayTare(Boolean displayTare) {
+		this.displayTare = displayTare;
+	}
+
+	public Boolean getDisplayWomenOnly() {
+		return displayWomenOnly;
+	}
+
+	public void setDisplayWomenOnly(Boolean displayWomenOnly) {
+		this.displayWomenOnly = displayWomenOnly;
 	}
 
 	public FacilityLocation getFacilityLocation() {

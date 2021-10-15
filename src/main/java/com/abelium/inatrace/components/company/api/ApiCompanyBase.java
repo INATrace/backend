@@ -34,6 +34,12 @@ public class ApiCompanyBase extends ApiBaseEntity {
 	@Length(max = Lengths.URL_PATH)
 	@ApiModelProperty(value = "webpage", position = 7)
 	public String webPage;
+
+	@ApiModelProperty(value = "Display preferred way of payment on purchase order form")
+	public Boolean displayPrefferedWayOfPayment;
+
+	@ApiModelProperty(value = "Enable adding multiple farmers for one proof document on purchase order form")
+	public Boolean purchaseProofDocumentMultipleFarmers;
 	
 	@Length(max = Lengths.EMAIL)
 	@Email

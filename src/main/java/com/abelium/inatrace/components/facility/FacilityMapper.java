@@ -33,6 +33,11 @@ public final class FacilityMapper {
 		apiFacility.setName(entity.getName());
 		apiFacility.setIsCollectionFacility(entity.getIsCollectionFacility());
 		apiFacility.setIsPublic(entity.getIsPublic());
+		apiFacility.setDisplayMayInvolveCollectors(entity.getDisplayMayInvolveCollectors());
+		apiFacility.setDisplayOrganic(entity.getDisplayOrganic());
+		apiFacility.setDisplayPriceDeductionDamage(entity.getDisplayPriceDeductionDamage());
+		apiFacility.setDisplayTare(entity.getDisplayTare());
+		apiFacility.setDisplayWomenOnly(entity.getDisplayWomenOnly());
 
 		apiFacility.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
 

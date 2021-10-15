@@ -151,6 +151,9 @@ public class StockOrderService extends BaseService {
         entity.setDeliveryTime(apiStockOrder.getDeliveryTime());
         entity.setAvailable(entity.getAvailableQuantity() > 0);
         entity.setSemiProduct(fetchEntity(apiStockOrder.getSemiProduct().getId(), SemiProduct.class));
+        entity.setOrganic(apiStockOrder.getOrganic());
+        entity.setTare(apiStockOrder.getTare());
+        entity.setDamagedPriceDeduction(apiStockOrder.getDamagedPriceDeduction());
 
         if(entity.getSemiProduct() != null)
             entity.setMeasurementUnitType(entity.getSemiProduct().getMeasurementUnitType());

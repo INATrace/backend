@@ -235,6 +235,15 @@ public class ApiStockOrder extends ApiBaseEntity {
 //    @ApiModelProperty(value = "Arrived at date to destination port", position = 63)
 //    private Instant arrivedAtDateToDestinationPort;
 
+    @ApiModelProperty(value = "Organic")
+    private Boolean organic;
+
+    @ApiModelProperty(value = "Tare")
+    private BigDecimal tare;
+
+    @ApiModelProperty(value = "Damaged price deduction")
+    private BigDecimal damagedPriceDeduction;
+
     public String getIdentifier() {
         return identifier;
     }
@@ -468,5 +477,29 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setPreferredWayOfPayment(PreferredWayOfPayment preferredWayOfPayment) {
         this.preferredWayOfPayment = preferredWayOfPayment;
+    }
+
+    public Boolean getOrganic() {
+        return organic;
+    }
+
+    public void setOrganic(Boolean organic) {
+        this.organic = organic;
+    }
+
+    public BigDecimal getTare() {
+        return tare;
+    }
+
+    public void setTare(BigDecimal tare) {
+        this.tare = tare;
+    }
+
+    public BigDecimal getDamagedPriceDeduction() {
+        return damagedPriceDeduction;
+    }
+
+    public void setDamagedPriceDeduction(BigDecimal damagedPriceDeduction) {
+        this.damagedPriceDeduction = damagedPriceDeduction;
     }
 }
