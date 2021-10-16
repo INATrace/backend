@@ -221,28 +221,46 @@ public class ProcessingOrderService extends BaseService {
             }
         }
 
-        // List in which targetStockOrderIds are inserted in same sequence as they are received in JSON
-        List<Long> sequentialIdsOfInsertedTargetStockOrders = new ArrayList<>();
-
-        // Create new or update existing target StockOrders
-        for (ApiStockOrder apiStockOrder: apiProcessingOrder.getTargetStockOrders()) {
-            Long insertedTargetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiStockOrder, userId).getId();
-            StockOrder insertedTargetStockOrder = fetchEntity(insertedTargetStockOrderId, StockOrder.class);
-            entity.getTargetStockOrders().add(insertedTargetStockOrder);
-            sequentialIdsOfInsertedTargetStockOrders.add(insertedTargetStockOrderId);
-        }
-
         // Create new or update existing input Transactions
         for (int i = 0; i < apiProcessingOrder.getInputTransactions().size(); i++) {
 
             ApiTransaction apiTransaction = apiProcessingOrder.getInputTransactions().get(i);
             Boolean isProcessing = processingAction.getType() == ProcessingActionType.PROCESSING;
-            Long targetStockOrderId = !isProcessing ? sequentialIdsOfInsertedTargetStockOrders.get(i) : null;
 
-            ApiBaseEntity insertedApiTransaction = transactionService.createOrUpdateTransaction(apiTransaction, isProcessing, targetStockOrderId);
+            ApiBaseEntity insertedApiTransaction = transactionService.createOrUpdateTransaction(apiTransaction, isProcessing);
+            Transaction insertedTransaction = fetchEntity(insertedApiTransaction.getId(), Transaction.class);
+            insertedTransaction.setTargetProcessingOrder(entity);
+            entity.getInputTransactions().add(insertedTransaction);
 
-            // TODO: Reference on ProcessingOrder if needed
-            entity.getInputTransactions().add(fetchEntity(insertedApiTransaction.getId(), Transaction.class));
+            // Set targetStockOrders for TRANSFER
+            if (processingAction.getType() == ProcessingActionType.TRANSFER) {
+                Long targetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiProcessingOrder.getTargetStockOrders().get(i), userId, entity).getId();
+                StockOrder targetStockOrder = fetchEntity(targetStockOrderId, StockOrder.class);
+
+                insertedTransaction.setTargetStockOrder(targetStockOrder);
+                insertedTransaction.setOutputMeasureUnitType(targetStockOrder.getMeasurementUnitType());
+                insertedTransaction.setTargetFacility(targetStockOrder.getFacility());
+            }
+
+        }
+
+        // Create new or update existing target for PROCESSING
+        if (processingAction.getType() != ProcessingActionType.TRANSFER) {
+
+            Long insertedTargetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiProcessingOrder.getTargetStockOrders().get(0), userId, entity).getId();
+            StockOrder targetStockOrder = fetchEntity(insertedTargetStockOrderId, StockOrder.class);
+            entity.getTargetStockOrders().add(targetStockOrder);
+
+            // Set target stockOrder and facility
+            for (Transaction t: entity.getInputTransactions()) {
+                t.setTargetStockOrder(targetStockOrder);
+                t.setTargetFacility(targetStockOrder.getFacility());
+            }
+        }
+
+        // Create or update source stock orders
+        for (ApiTransaction t: apiProcessingOrder.getInputTransactions()) {
+            stockOrderService.createOrUpdateStockOrder(t.getSourceStockOrder(), userId, entity);
         }
 
         if (entity.getId() == null)
