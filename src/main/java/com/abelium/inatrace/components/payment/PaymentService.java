@@ -157,8 +157,8 @@ public class PaymentService extends BaseService {
 				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Receipt document has to be provided!");
 
 			// Verify totalPaid (amount paid to the farmer) is not negative
-			if (apiPayment.getAmountPaidToTheFarmer().compareTo(BigDecimal.ZERO) >= 0)
-				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Total amount paid cannot be negative	");
+			if (apiPayment.getAmountPaidToTheFarmer().compareTo(BigDecimal.ZERO) < 0)
+				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Total amount paid cannot be negative");
 
 			// Receipt document (note: Storage key needs to be unique)
 			if(apiPayment.getReceiptDocument() != null) {
