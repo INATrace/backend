@@ -34,7 +34,6 @@ public class TransactionService extends BaseService {
      *
      * @param apiTransaction - API transaction request
      * @param isProcessing - Is transaction part of ProcessingAction with type PROCESSING?
-     * @param targetStockOrderId - Target StockOrder ID (only applies for ProcessingAction with type TRANSFER)
      * @return Inserted transactions
      * @throws ApiException - When something goes wrong..
      */

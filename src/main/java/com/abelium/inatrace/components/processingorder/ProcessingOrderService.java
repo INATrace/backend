@@ -27,7 +27,6 @@ import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -232,6 +231,9 @@ public class ProcessingOrderService extends BaseService {
             insertedTransaction.setTargetProcessingOrder(entity);
             entity.getInputTransactions().add(insertedTransaction);
 
+            // Update source StockOrder
+            stockOrderService.createOrUpdateStockOrder(apiTransaction.getSourceStockOrder(), userId, entity);
+
             // Set targetStockOrders for TRANSFER
             if (processingAction.getType() == ProcessingActionType.TRANSFER) {
                 Long targetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiProcessingOrder.getTargetStockOrders().get(i), userId, entity).getId();
@@ -256,11 +258,6 @@ public class ProcessingOrderService extends BaseService {
                 t.setTargetStockOrder(targetStockOrder);
                 t.setTargetFacility(targetStockOrder.getFacility());
             }
-        }
-
-        // Create or update source stock orders
-        for (ApiTransaction t: apiProcessingOrder.getInputTransactions()) {
-            stockOrderService.createOrUpdateStockOrder(t.getSourceStockOrder(), userId, entity);
         }
 
         if (entity.getId() == null)

@@ -158,16 +158,16 @@ public class StockOrderService extends BaseService {
 
         // Calculate quantities
 
-        entity.setAvailableQuantity(apiStockOrder.getAvailableQuantity());
-        entity.setFulfilledQuantity(apiStockOrder.getFulfilledQuantity());
+        Integer lastTotalQuantity = entity.getTotalQuantity();
         entity.setTotalQuantity(apiStockOrder.getTotalQuantity());
-        entity.setPricePerUnit(apiStockOrder.getPricePerUnit());
+        if (entity.getTotalQuantity() != null && lastTotalQuantity != null && entity.getAvailableQuantity() != null){
+            entity.setAvailableQuantity(apiStockOrder.getTotalQuantity() - (lastTotalQuantity - entity.getAvailableQuantity()));
+        } else {
+            entity.setAvailableQuantity(entity.getTotalQuantity());
+        }
+        entity.setFulfilledQuantity(entity.getFulfilledQuantity());
         entity.setDamagedPriceDeduction(apiStockOrder.getDamagedPriceDeduction());
-        entity.setPaid(apiStockOrder.getPaid());
         entity.setCurrency(apiStockOrder.getCurrency());
-
-        // TODO: TBD
-//        entity.setBalance(calculateBalanceForPurchaseOrder(entity));
 
         if (processingOrder != null && entity.getId() != null) {
             entity.setProcessingOrder(processingOrder);
@@ -175,7 +175,7 @@ public class StockOrderService extends BaseService {
             // Calculate quantities based on input transactions
             List<Transaction> inputTxs = processingOrder.getInputTransactions();
             if (inputTxs != null && !inputTxs.isEmpty()) {
-                System.out.println("Input txs size: " + inputTxs.size());
+
                 if (apiStockOrder.getOrderType() == OrderType.SALES_ORDER || apiStockOrder.getOrderType() == OrderType.GENERAL_ORDER)
                     entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs, entity.getId()));
                 else
@@ -184,13 +184,19 @@ public class StockOrderService extends BaseService {
                 if (apiStockOrder.getOrderType() != OrderType.SALES_ORDER)
                     entity.setAvailableQuantity(entity.getFulfilledQuantity() - calculateUsedQuantity(inputTxs, entity.getId()));
             }
+        }
 
-            // Validate quantities
+        // Validate quantities
+        if (entity.getAvailableQuantity() != null) {
+
             if (entity.getAvailableQuantity() < 0)
                 throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity resulted in negative number.");
-            if (entity.getFulfilledQuantity() < entity.getAvailableQuantity())
-                throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity (" + entity.getAvailableQuantity()
-                        + ") cannot be bigger then fulfilled quantity (" + entity.getFulfilledQuantity() + ").");
+
+            if (entity.getFulfilledQuantity() != null) {
+                if (entity.getFulfilledQuantity() < entity.getAvailableQuantity())
+                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity (" + entity.getAvailableQuantity()
+                            + ") cannot be bigger then fulfilled quantity (" + entity.getFulfilledQuantity() + ").");
+            }
         }
 
         entity.setAvailable(entity.getAvailableQuantity() != null && entity.getAvailableQuantity() > 0);
@@ -235,8 +241,14 @@ public class StockOrderService extends BaseService {
                     if (apiStockOrder.getPricePerUnit() == null)
                         throw new ApiException(ApiStatus.VALIDATION_ERROR, "Price per unit needs to be provided!");
 //                }
-
+                entity.setPricePerUnit(apiStockOrder.getPricePerUnit());
                 entity.setCost(entity.getPricePerUnit().multiply(BigDecimal.valueOf(entity.getTotalQuantity())));
+                if (processingOrder == null) {
+                    entity.setBalance(calculateBalanceForPurchaseOrder(entity));
+                } else if (entity.getId() == null){
+                    entity.setBalance(entity.getCost());
+                }
+                entity.setPaid(entity.getCost().subtract(entity.getBalance()));
 
                 entity.setProducerUserCustomer(fetchEntity(apiStockOrder.getProducerUserCustomer().getId(), UserCustomer.class));
                 entity.setPurchaseOrder(true);
