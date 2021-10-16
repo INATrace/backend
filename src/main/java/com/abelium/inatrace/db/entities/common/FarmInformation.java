@@ -11,6 +11,9 @@ import java.util.Date;
 @Embeddable
 @MappedSuperclass
 public class FarmInformation {
+    
+    @Column
+    private String areaUnit;
 
     @Column(length = Lengths.DEFAULT)
     private BigDecimal totalCultivatedArea;
@@ -76,5 +79,13 @@ public class FarmInformation {
 
     public void setStartTransitionToOrganic(Date startTransitionToOrganic) {
         this.startTransitionToOrganic = startTransitionToOrganic;
+    }
+    
+    public String getAreaUnit() {
+        return areaUnit;
+    }
+    
+    public void setAreaUnit(String areaUnit) {
+        this.areaUnit = areaUnit;
     }
 }

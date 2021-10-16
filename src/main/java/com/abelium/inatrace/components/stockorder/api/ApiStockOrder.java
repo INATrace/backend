@@ -1,6 +1,8 @@
 package com.abelium.inatrace.components.stockorder.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
+import com.abelium.inatrace.components.codebook.action_type.api.ApiActionType;
+import com.abelium.inatrace.components.codebook.grade_abbreviation.api.ApiGradeAbbreviation;
 import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
@@ -120,23 +122,26 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Order type", position = 26)
     public OrderType orderType;
 
+    @ApiModelProperty(value = "Grade abbreviation")
+    public ApiGradeAbbreviation gradeAbbreviation;
+
     @ApiModelProperty(value = "Internal LOT number", position = 27)
     public String internalLotNumber;
 
-//    @ApiModelProperty(value = "LOT number", position = 28)
-//    public String lotNumber;
+    @ApiModelProperty(value = "LOT number", position = 28)
+    public String lotNumber;
 
-//    @ApiModelProperty(value = "LOT label", position = 29)
-//    public String lotLabel;
+    @ApiModelProperty(value = "LOT label", position = 29)
+    public String lotLabel;
 
-//    @ApiModelProperty(value = "Screen size", position = 30)
-//    public String screenSize;
+    @ApiModelProperty(value = "Screen size", position = 30)
+    public String screenSize;
 
-//    @ApiModelProperty(value = "Comments", position = 31)
-//    public String comments;
+    @ApiModelProperty(value = "Comments", position = 31)
+    public String comments;
 
-//    @ApiModelProperty(value = "Action type", position = 32)
-//    public ApiActionType actionType;
+    @ApiModelProperty(value = "Action type", position = 32)
+    public ApiActionType actionType;
 
     @ApiModelProperty(value = "Is women share", position = 33)
     private Boolean womenShare;
@@ -154,14 +159,14 @@ public class ApiStockOrder extends ApiBaseEntity {
 //    @ApiModelProperty(value = "Input transactions for stock order. Read only.")
 //    public List<ApiTransaction> inputTransactions;
 
-//    @ApiModelProperty(value = "Date when product has been started drying", position = 37)
-//    public Instant startOfDrying;
+    @ApiModelProperty(value = "Date when product has been started drying", position = 37)
+    public Instant startOfDrying;
 
 //    @ApiModelProperty(value = "Client company", position = 38)
 //    public ApiCompany client;
 
-//    @ApiModelProperty(value = "Flavour profile", position = 39)
-//    public String flavourProfile;
+    @ApiModelProperty(value = "Flavour profile", position = 39)
+    public String flavourProfile;
 
 //    @ApiModelProperty(value = "Processing action", position = 40)
 //    public ApiProcessingAction processingAction;
@@ -169,8 +174,8 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Preferred way of payment", position = 41)
     private PreferredWayOfPayment preferredWayOfPayment;
 
-//    @ApiModelProperty(value = "SAC number", position = 42)
-//    private Integer sacNumber;
+    @ApiModelProperty(value = "SAC number", position = 42)
+    private Integer sacNumber;
 
 //    @ApiModelProperty(value = "Is order open", position = 43)
 //    private Boolean isOpenOrder;
@@ -234,6 +239,15 @@ public class ApiStockOrder extends ApiBaseEntity {
 
 //    @ApiModelProperty(value = "Arrived at date to destination port", position = 63)
 //    private Instant arrivedAtDateToDestinationPort;
+
+    @ApiModelProperty(value = "Organic")
+    private Boolean organic;
+
+    @ApiModelProperty(value = "Tare")
+    private BigDecimal tare;
+
+    @ApiModelProperty(value = "Damaged price deduction")
+    private BigDecimal damagedPriceDeduction;
 
     public String getIdentifier() {
         return identifier;
@@ -422,12 +436,76 @@ public class ApiStockOrder extends ApiBaseEntity {
         this.orderType = orderType;
     }
 
+    public ApiGradeAbbreviation getGradeAbbreviation() {
+        return gradeAbbreviation;
+    }
+
+    public void setGradeAbbreviation(ApiGradeAbbreviation gradeAbbreviation) {
+        this.gradeAbbreviation = gradeAbbreviation;
+    }
+
     public String getInternalLotNumber() {
         return internalLotNumber;
     }
 
     public void setInternalLotNumber(String internalLotNumber) {
         this.internalLotNumber = internalLotNumber;
+    }
+
+    public String getLotNumber() {
+        return lotNumber;
+    }
+
+    public void setLotNumber(String lotNumber) {
+        this.lotNumber = lotNumber;
+    }
+
+    public String getLotLabel() {
+        return lotLabel;
+    }
+
+    public void setLotLabel(String lotLabel) {
+        this.lotLabel = lotLabel;
+    }
+
+    public String getScreenSize() {
+        return screenSize;
+    }
+
+    public void setScreenSize(String screenSize) {
+        this.screenSize = screenSize;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    public ApiActionType getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(ApiActionType actionType) {
+        this.actionType = actionType;
+    }
+
+    public Instant getStartOfDrying() {
+        return startOfDrying;
+    }
+
+    public void setStartOfDrying(Instant startOfDrying) {
+        this.startOfDrying = startOfDrying;
+    }
+
+    public String getFlavourProfile() {
+        return flavourProfile;
+    }
+
+    public void setFlavourProfile(String flavourProfile) {
+        this.flavourProfile = flavourProfile;
     }
 
     public Boolean getWomenShare() {
@@ -469,4 +547,37 @@ public class ApiStockOrder extends ApiBaseEntity {
     public void setPreferredWayOfPayment(PreferredWayOfPayment preferredWayOfPayment) {
         this.preferredWayOfPayment = preferredWayOfPayment;
     }
+
+    public Integer getSacNumber() {
+        return sacNumber;
+    }
+
+    public void setSacNumber(Integer sacNumber) {
+        this.sacNumber = sacNumber;
+    }
+
+    public Boolean getOrganic() {
+        return organic;
+    }
+
+    public void setOrganic(Boolean organic) {
+        this.organic = organic;
+    }
+
+    public BigDecimal getTare() {
+        return tare;
+    }
+
+    public void setTare(BigDecimal tare) {
+        this.tare = tare;
+    }
+
+    public BigDecimal getDamagedPriceDeduction() {
+        return damagedPriceDeduction;
+    }
+
+    public void setDamagedPriceDeduction(BigDecimal damagedPriceDeduction) {
+        this.damagedPriceDeduction = damagedPriceDeduction;
+    }
+
 }

@@ -42,7 +42,7 @@ public class StorageService extends BaseService
 
         if (Files.notExists(path)) {
             try {
-                Files.createDirectory(path);
+                Files.createDirectories(path);
             } catch (IOException e) {
                 logger.error("Error creating type directory", e);
                 throw new ApiException(ApiStatus.ERROR, "Error saving file");
@@ -168,7 +168,7 @@ public class StorageService extends BaseService
 	    	Path path = Paths.get(root, DocumentType.IMAGE.toString() + "/" + is.name);
 	        if (Files.notExists(path)) {
 	            try {
-	                Files.createDirectory(path);
+	                Files.createDirectories(path);
 	            } catch (IOException e) {
 	                logger.error("Error creating type directory", e);
 	                throw new ApiException(ApiStatus.ERROR, "Error saving file");
