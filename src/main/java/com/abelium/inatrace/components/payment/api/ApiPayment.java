@@ -7,7 +7,7 @@ import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
-import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomer;
+import com.abelium.inatrace.components.company.api.ApiUserCustomer;
 import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
 import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.payment.PaymentType;
