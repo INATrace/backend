@@ -107,7 +107,19 @@ public class StockOrderService extends BaseService {
         Torpedo.where(condition);
 
         // Order by
-        QueryTools.orderBy(request.sort, stockOrderProxy.getId());
+        switch (request.sortBy) {
+            case "date":
+                QueryTools.orderBy(request.sort, stockOrderProxy.getProductionDate());
+                break;
+            case "deliveryTime":
+                QueryTools.orderBy(request.sort, stockOrderProxy.getDeliveryTime());
+                break;
+            case "updateTimestamp":
+                QueryTools.orderBy(request.sort, stockOrderProxy.getUpdateTimestamp());
+                break;
+            default:
+                QueryTools.orderBy(request.sort, stockOrderProxy.getId());
+        }
 
         return stockOrderProxy;
     }
