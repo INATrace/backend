@@ -12,6 +12,9 @@ import io.swagger.annotations.ApiModelProperty;
  */
 public class ApiProcessingEvidenceField extends ApiBaseEntity {
 
+	@ApiModelProperty(value = "Processing evidence field name")
+	private String fieldName;
+
 	@ApiModelProperty(value = "Processing evidence field label")
 	private String label;
 	
@@ -35,7 +38,15 @@ public class ApiProcessingEvidenceField extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Processing evidence field type")
 	private ProcessingEvidenceFieldType type;
-	
+
+	public String getFieldName() {
+		return fieldName;
+	}
+
+	public void setFieldName(String fieldName) {
+		this.fieldName = fieldName;
+	}
+
 	public String getLabel() {
 		return label;
 	}
@@ -83,14 +94,6 @@ public class ApiProcessingEvidenceField extends ApiBaseEntity {
 	public void setStringValue(String stringValue) {
 		this.stringValue = stringValue;
 	}
-
-//	public Object getObjectValue() {
-//		return objectValue;
-//	}
-//
-//	public void setObjectValue(Object objectValue) {
-//		this.objectValue = objectValue;
-//	}
 
 	public Integer getFileMultiplicity() {
 		return fileMultiplicity;

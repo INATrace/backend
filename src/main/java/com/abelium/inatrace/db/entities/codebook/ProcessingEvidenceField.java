@@ -27,6 +27,9 @@ public class ProcessingEvidenceField extends TimestampEntity {
 	@Version
 	private Long entityVersion;
 
+	@Column(nullable = false)
+	private String fieldName;
+
 	@Column
 	private String label;
 	
@@ -39,6 +42,14 @@ public class ProcessingEvidenceField extends TimestampEntity {
 
 	@OneToMany(mappedBy = "processingEvidenceField", orphanRemoval = true, cascade = CascadeType.ALL)
 	private List<ValueChainProcessingEvidenceField> valueChains;
+
+	public String getFieldName() {
+		return fieldName;
+	}
+
+	public void setFieldName(String fieldName) {
+		this.fieldName = fieldName;
+	}
 
 	public String getLabel() {
 		return label;
