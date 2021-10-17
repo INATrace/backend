@@ -62,7 +62,9 @@ public final class ProcessingActionMapper {
 
 				ApiProcessingEvidenceField apiProcessingEvidenceField = new ApiProcessingEvidenceField();
 				apiProcessingEvidenceField.setId(processingActionProcessingEvidenceField.getProcessingEvidenceField().getId());
+				apiProcessingEvidenceField.setFieldName(processingActionProcessingEvidenceField.getProcessingEvidenceField().getFieldName());
 				apiProcessingEvidenceField.setLabel(processingActionProcessingEvidenceField.getProcessingEvidenceField().getLabel());
+				apiProcessingEvidenceField.setType(processingActionProcessingEvidenceField.getProcessingEvidenceField().getType());
 				apiProcessingEvidenceField.setMandatory(processingActionProcessingEvidenceField.getMandatory());
 				apiProcessingEvidenceField.setRequiredOnQuote(processingActionProcessingEvidenceField.getRequiredOnQuote());
 				apiRequiredEvidenceFields.add(apiProcessingEvidenceField);
