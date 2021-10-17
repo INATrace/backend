@@ -18,9 +18,6 @@ public class ApiProcessingEvidenceField extends ApiBaseEntity {
 	@ApiModelProperty(value = "Processing evidence field label")
 	private String label;
 	
-	@ApiModelProperty(value = "Processing evidence field required")
-	private Boolean required;
-	
 	@ApiModelProperty(value = "Processing evidence field mandatory")
 	private Boolean mandatory;
 	
@@ -53,14 +50,6 @@ public class ApiProcessingEvidenceField extends ApiBaseEntity {
 
 	public void setLabel(String label) {
 		this.label = label;
-	}
-
-	public Boolean getRequired() {
-		return required;
-	}
-
-	public void setRequired(Boolean required) {
-		this.required = required;
 	}
 
 	public Boolean getMandatory() {
@@ -111,11 +100,10 @@ public class ApiProcessingEvidenceField extends ApiBaseEntity {
 		this.type = type;
 	}
 
-	public ApiProcessingEvidenceField(String label, Boolean required, Boolean mandatory, Boolean requiredOnQuote,
+	public ApiProcessingEvidenceField(String label, Boolean mandatory, Boolean requiredOnQuote,
 			Integer numericValue, String stringValue, Integer fileMultiplicity, ProcessingEvidenceFieldType type) {
 		super();
 		this.label = label;
-		this.required = required;
 		this.mandatory = mandatory;
 		this.requiredOnQuote = requiredOnQuote;
 		this.numericValue = numericValue;
