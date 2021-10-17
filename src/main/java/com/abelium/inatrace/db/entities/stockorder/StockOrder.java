@@ -2,8 +2,6 @@ package com.abelium.inatrace.db.entities.stockorder;
 
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
-import com.abelium.inatrace.db.entities.codebook.ActionType;
-import com.abelium.inatrace.db.entities.codebook.GradeAbbreviationType;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.User;
@@ -17,24 +15,11 @@ import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Version;
 
 @Entity
 @Table
@@ -161,23 +146,11 @@ public class StockOrder extends TimestampEntity {
 	@Column(length = Lengths.ENUM)
 	private OrderType orderType;
 	
-	@ManyToOne
-	private GradeAbbreviationType gradeAbbreviation;
-	
 	@Column
 	private String internalLotNumber;
 
 	@Column
-	private String lotNumber;
-
-	@Column
-	private String screenSize;
-
-	@Column
 	private String comments;
-
-	@OneToOne
-	private ActionType actionType;
 	
 	@Column
 	private Boolean womenShare;
@@ -192,18 +165,9 @@ public class StockOrder extends TimestampEntity {
 
 	@Column
 	private BigDecimal balance;
-
-	@Column
-	private String lotLabel;
-	
-	@Column
-    private Instant startOfDrying;
 	
 	@ManyToOne
 	private Company client;
-	
-	@Column
-	private String flavourProfile;
 	
 	@ManyToOne
 	private ProcessingOrder processingOrder;
@@ -284,9 +248,6 @@ public class StockOrder extends TimestampEntity {
 	
 	@Column
     private Boolean requiredWomensCoffee;
-	
-	@ManyToOne // verify relationship
-    private GradeAbbreviationType requiredQuality;
 	
 	@Column
     private Instant shippedAtDateFromOriginPort;
@@ -558,14 +519,6 @@ public class StockOrder extends TimestampEntity {
 		this.orderType = orderType;
 	}
 
-	public GradeAbbreviationType getGradeAbbreviation() {
-		return gradeAbbreviation;
-	}
-
-	public void setGradeAbbreviation(GradeAbbreviationType gradeAbbreviation) {
-		this.gradeAbbreviation = gradeAbbreviation;
-	}
-
 	public String getInternalLotNumber() {
 		return internalLotNumber;
 	}
@@ -574,36 +527,12 @@ public class StockOrder extends TimestampEntity {
 		this.internalLotNumber = internalLotNumber;
 	}
 
-	public String getLotNumber() {
-		return lotNumber;
-	}
-
-	public void setLotNumber(String lotNumber) {
-		this.lotNumber = lotNumber;
-	}
-
-	public String getScreenSize() {
-		return screenSize;
-	}
-
-	public void setScreenSize(String screenSize) {
-		this.screenSize = screenSize;
-	}
-
 	public String getComments() {
 		return comments;
 	}
 
 	public void setComments(String comments) {
 		this.comments = comments;
-	}
-
-	public ActionType getActionType() {
-		return actionType;
-	}
-
-	public void setActionType(ActionType actionType) {
-		this.actionType = actionType;
 	}
 
 	public Boolean getWomenShare() {
@@ -638,36 +567,12 @@ public class StockOrder extends TimestampEntity {
 		this.balance = balance;
 	}
 
-	public String getLotLabel() {
-		return lotLabel;
-	}
-
-	public void setLotLabel(String lotLabel) {
-		this.lotLabel = lotLabel;
-	}
-
-	public Instant getStartOfDrying() {
-		return startOfDrying;
-	}
-
-	public void setStartOfDrying(Instant startOfDrying) {
-		this.startOfDrying = startOfDrying;
-	}
-
 	public Company getClient() {
 		return client;
 	}
 
 	public void setClient(Company client) {
 		this.client = client;
-	}
-
-	public String getFlavourProfile() {
-		return flavourProfile;
-	}
-
-	public void setFlavourProfile(String flavourProfile) {
-		this.flavourProfile = flavourProfile;
 	}
 
 	public BulkPayment getBulkPayment() {
@@ -868,14 +773,6 @@ public class StockOrder extends TimestampEntity {
 
 	public void setRequiredWomensCoffee(Boolean requiredWomensCoffee) {
 		this.requiredWomensCoffee = requiredWomensCoffee;
-	}
-
-	public GradeAbbreviationType getRequiredQuality() {
-		return requiredQuality;
-	}
-
-	public void setRequiredQuality(GradeAbbreviationType requiredQuality) {
-		this.requiredQuality = requiredQuality;
 	}
 
 	public Instant getShippedAtDateFromOriginPort() {
