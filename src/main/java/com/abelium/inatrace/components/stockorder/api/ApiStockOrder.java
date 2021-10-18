@@ -58,6 +58,9 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Activity proofs", position = 7)
     public List<ApiActivityProof> activityProofs;
 
+    @ApiModelProperty(value = "Processing evidence fields stored values for this stock order")
+    public List<ApiStockOrderEvidenceFieldValue> requiredEvidenceFieldValues;
+
     @ApiModelProperty(value = "Semi product", position = 7)
     public ApiSemiProduct semiProduct;
 
@@ -299,6 +302,17 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setActivityProofs(List<ApiActivityProof> activityProofs) {
         this.activityProofs = activityProofs;
+    }
+
+    public List<ApiStockOrderEvidenceFieldValue> getRequiredEvidenceFieldValues() {
+        if (requiredEvidenceFieldValues == null) {
+            requiredEvidenceFieldValues = new ArrayList<>();
+        }
+        return requiredEvidenceFieldValues;
+    }
+
+    public void setRequiredEvidenceFieldValues(List<ApiStockOrderEvidenceFieldValue> requiredEvidenceFieldValues) {
+        this.requiredEvidenceFieldValues = requiredEvidenceFieldValues;
     }
 
     public ApiSemiProduct getSemiProduct() {

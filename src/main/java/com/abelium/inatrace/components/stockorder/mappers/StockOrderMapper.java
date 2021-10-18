@@ -15,7 +15,10 @@ import java.util.stream.Collectors;
 public class StockOrderMapper {
 
     public static ApiStockOrder toApiStockOrderBase(StockOrder entity) {
-        if(entity == null) return null;
+
+        if(entity == null) {
+            return null;
+        }
 
         ApiStockOrder apiStockOrder = new ApiStockOrder();
         apiStockOrder.setId(entity.getId());
@@ -24,7 +27,10 @@ public class StockOrderMapper {
     }
 
     public static ApiStockOrder toApiStockOrder(StockOrder entity, Long userId) {
-        if(entity == null) return null;
+
+        if (entity == null) {
+            return null;
+        }
 
         ApiStockOrder apiStockOrder = new ApiStockOrder();
         apiStockOrder.setId(entity.getId());
@@ -42,13 +48,22 @@ public class StockOrderMapper {
 //                .map(CertificationMapper::toApiCertification)
 //                .collect(Collectors.toList()));
 
+        // Map the activity proofs
         if (!entity.getActivityProofs().isEmpty()) {
             apiStockOrder.setActivityProofs(entity.getActivityProofs().stream()
                     .map(ap -> ActivityProofMapper.toApiActivityProof(ap.getActivityProof(), userId))
                     .collect(Collectors.toList()));
         }
 
-        if(entity.getSemiProduct() != null) {
+        // Map the instances (values) of processing evidence fields
+        if (!entity.getProcessingEFValues().isEmpty()) {
+            apiStockOrder.setRequiredEvidenceFieldValues(entity.getProcessingEFValues().stream()
+                    .map(StockOrderEvidenceFieldValueMapper::toApiStockOrderEvidenceFieldValue)
+                    .collect(Collectors.toList()));
+        }
+
+        // Map the semi-product that is represented by this stock order
+        if (entity.getSemiProduct() != null) {
             apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct()));
         }
 

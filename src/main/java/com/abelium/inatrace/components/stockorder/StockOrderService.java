@@ -8,7 +8,9 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.facility.FacilityService;
+import com.abelium.inatrace.components.processingevidencefield.ProcessingEvidenceFieldService;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
+import com.abelium.inatrace.components.stockorder.api.ApiStockOrderEvidenceFieldValue;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrderLocation;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
@@ -19,6 +21,7 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderActivityProof;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderLocation;
+import com.abelium.inatrace.db.entities.stockorder.StockOrderPEFieldValue;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
@@ -31,13 +34,21 @@ import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Lazy
 @Service
 public class StockOrderService extends BaseService {
 
+    private final FacilityService facilityService;
+
+    private final ProcessingEvidenceFieldService procEvidenceFieldService;
+
     @Autowired
-    private FacilityService facilityService;
+    public StockOrderService(FacilityService facilityService, ProcessingEvidenceFieldService procEvidenceFieldService) {
+        this.facilityService = facilityService;
+        this.procEvidenceFieldService = procEvidenceFieldService;
+    }
 
     public ApiStockOrder getStockOrder(long id, Long userId) throws ApiException {
         return StockOrderMapper.toApiStockOrder(fetchEntity(id, StockOrder.class), userId);
@@ -139,11 +150,11 @@ public class StockOrderService extends BaseService {
         }
 
         // Validation of required fields
-        if(apiStockOrder.getOrderType() == null)
+        if (apiStockOrder.getOrderType() == null)
             throw new ApiException(ApiStatus.INVALID_REQUEST, "OrderType needs to be provided!");
-        if(apiStockOrder.getFacility() == null)
+        if (apiStockOrder.getFacility() == null)
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Facility needs to be provided!");
-        if(apiStockOrder.getSemiProduct() == null)
+        if (apiStockOrder.getSemiProduct() == null)
             throw new ApiException(ApiStatus.INVALID_REQUEST, "SemiProduct needs to be provided!");
 
         entity.setOrderType(apiStockOrder.getOrderType());
@@ -171,12 +182,12 @@ public class StockOrderService extends BaseService {
         entity.setTare(apiStockOrder.getTare());
         entity.setDamagedPriceDeduction(apiStockOrder.getDamagedPriceDeduction());
 
-        if(entity.getSemiProduct() != null)
+        if (entity.getSemiProduct() != null)
             entity.setMeasurementUnitType(entity.getSemiProduct().getMeasurementUnitType());
 
         // Production location
         ApiStockOrderLocation apiProdLocation = apiStockOrder.getProductionLocation();
-        if(apiProdLocation != null) {
+        if (apiProdLocation != null) {
 
             StockOrderLocation stockOrderLocation = fetchEntityOrElse(apiProdLocation.getId(), StockOrderLocation.class, null);
 
@@ -234,6 +245,9 @@ public class StockOrderService extends BaseService {
                 break;
         }
 
+        // Create/update processing evidence fields instances (values)
+        createOrUpdateEvidenceFieldValues(apiStockOrder.getRequiredEvidenceFieldValues(), entity);
+
         // Remove documents not present in API request
 //                entity.getDocumentRequirements().removeIf(dr -> apiStockOrder.getDocumentRequirements()
 //                                .stream().noneMatch(apiDr -> dr.getId().equals(apiDr.getId())));
@@ -276,6 +290,26 @@ public class StockOrderService extends BaseService {
     private <E> E fetchEntityOrElse(Long id, Class<E> entityClass, E defaultValue) {
         E entity = Queries.get(em, entityClass, id);
         return entity == null ? defaultValue : entity;
+    }
+
+    private void createOrUpdateEvidenceFieldValues(List<ApiStockOrderEvidenceFieldValue> apiEvidenceFieldValues, StockOrder entity) throws ApiException {
+
+        entity.getProcessingEFValues().clear();
+
+        for (ApiStockOrderEvidenceFieldValue apiEFV : apiEvidenceFieldValues) {
+
+            StockOrderPEFieldValue stockOrderPEFieldValue = new StockOrderPEFieldValue();
+            stockOrderPEFieldValue.setStockOrder(entity);
+            stockOrderPEFieldValue.setProcessingEvidenceField(
+                    procEvidenceFieldService.fetchProcessingEvidenceField(apiEFV.getEvidenceFieldId()));
+            stockOrderPEFieldValue.setBooleanValue(apiEFV.getBooleanValue());
+            stockOrderPEFieldValue.setStringValue(apiEFV.getStringValue());
+            stockOrderPEFieldValue.setInstantValue(apiEFV.getDateValue());
+            stockOrderPEFieldValue.setNumericValue(apiEFV.getNumericValue());
+            stockOrderPEFieldValue.setStringValue(apiEFV.getStringValue());
+
+            entity.getProcessingEFValues().add(stockOrderPEFieldValue);
+        }
     }
 
 }
