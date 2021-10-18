@@ -415,10 +415,12 @@ public class UserService extends BaseService {
 		
 		List<Long> companyIds = companyQueries.fetchCompanyIdsForUser(userId, 
 				Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED));
+
+		List<Long> companyIdsAdmin = companyQueries.fetchCompanyIdsForUserAdmin(userId);
 		
 		if (companyIds.size() == 0) actions.add(UserAction.CREATE_COMPANY);
 		
-		return UserApiTools.toApiUserGet(user, actions, companyIds);
+		return UserApiTools.toApiUserGet(user, actions, companyIds, companyIdsAdmin);
 	}
     
     @Transactional
@@ -431,6 +433,8 @@ public class UserService extends BaseService {
 		
 		List<Long> companyIds = companyQueries.fetchCompanyIdsForUser(userId, 
 				Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED));
+
+		List<Long> companyIdsAdmin = companyQueries.fetchCompanyIdsForUserAdmin(userId);
 
 		if (!authUser.getUserId().equals(userId)) {
 			switch (user.getStatus()) {
@@ -446,7 +450,7 @@ public class UserService extends BaseService {
 			}
 		}
 		
-		return UserApiTools.toApiUserGet(user, actions, companyIds);
+		return UserApiTools.toApiUserGet(user, actions, companyIds, companyIdsAdmin);
 	}
 
     @Transactional
