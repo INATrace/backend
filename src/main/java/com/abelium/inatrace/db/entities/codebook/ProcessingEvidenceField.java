@@ -36,9 +36,6 @@ public class ProcessingEvidenceField extends TimestampEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM, nullable = false)
 	private ProcessingEvidenceFieldType type = ProcessingEvidenceFieldType.STRING;
-	
-	@Column
-	private Integer fileMultiplicity;
 
 	@OneToMany(mappedBy = "processingEvidenceField", orphanRemoval = true, cascade = CascadeType.ALL)
 	private List<ValueChainProcessingEvidenceField> valueChains;
@@ -65,14 +62,6 @@ public class ProcessingEvidenceField extends TimestampEntity {
 
 	public void setType(ProcessingEvidenceFieldType type) {
 		this.type = type;
-	}
-
-	public Integer getFileMultiplicity() {
-		return fileMultiplicity;
-	}
-
-	public void setFileMultiplicity(Integer fileMultiplicity) {
-		this.fileMultiplicity = fileMultiplicity;
 	}
 
 	public List<ValueChainProcessingEvidenceField> getValueChains() {

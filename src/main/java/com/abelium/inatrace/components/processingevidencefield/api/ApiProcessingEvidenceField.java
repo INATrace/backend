@@ -24,15 +24,6 @@ public class ApiProcessingEvidenceField extends ApiBaseEntity {
 	@ApiModelProperty(value = "Processing evidence field required on quote")
 	private Boolean requiredOnQuote;
 	
-	@ApiModelProperty(value = "Processing evidence field numeric value")
-	private Integer numericValue;
-	
-	@ApiModelProperty(value = "Processing evidence field string value")
-	private String stringValue;
-	
-	@ApiModelProperty(value = "Processing evidence field file multiplicity")
-	private Integer fileMultiplicity;
-	
 	@ApiModelProperty(value = "Processing evidence field type")
 	private ProcessingEvidenceFieldType type;
 
@@ -68,30 +59,6 @@ public class ApiProcessingEvidenceField extends ApiBaseEntity {
 		this.requiredOnQuote = requiredOnQuote;
 	}
 
-	public Integer getNumericValue() {
-		return numericValue;
-	}
-
-	public void setNumericValue(Integer numericValue) {
-		this.numericValue = numericValue;
-	}
-	
-	public String getStringValue() {
-		return stringValue;
-	}
-
-	public void setStringValue(String stringValue) {
-		this.stringValue = stringValue;
-	}
-
-	public Integer getFileMultiplicity() {
-		return fileMultiplicity;
-	}
-
-	public void setFileMultiplicity(Integer fileMultiplicity) {
-		this.fileMultiplicity = fileMultiplicity;
-	}
-
 	public ProcessingEvidenceFieldType getType() {
 		return type;
 	}
@@ -101,15 +68,11 @@ public class ApiProcessingEvidenceField extends ApiBaseEntity {
 	}
 
 	public ApiProcessingEvidenceField(String label, Boolean mandatory, Boolean requiredOnQuote,
-			Integer numericValue, String stringValue, Integer fileMultiplicity, ProcessingEvidenceFieldType type) {
+	                                  ProcessingEvidenceFieldType type) {
 		super();
 		this.label = label;
 		this.mandatory = mandatory;
 		this.requiredOnQuote = requiredOnQuote;
-		this.numericValue = numericValue;
-		this.stringValue = stringValue;
-//		this.objectValue = objectValue;
-		this.fileMultiplicity = fileMultiplicity;
 		this.type = type;
 	}
 
