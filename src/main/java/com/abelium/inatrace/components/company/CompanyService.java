@@ -615,4 +615,17 @@ public class CompanyService extends BaseService {
 		return em.find(Country.class, id);
 	}
 
+	public boolean isSystemAdmin(CustomUserDetails customUserDetails) {
+		return UserRole.ADMIN.equals(customUserDetails.getUserRole());
+	}
+
+	public boolean isCompanyAdmin(CustomUserDetails customUserDetails, Long companyId) {
+		CompanyUser companyUser = Torpedo.from(CompanyUser.class);
+		Torpedo.where(companyUser.getCompany().getId()).eq(companyId).
+				and(companyUser.getUser().getId()).eq(customUserDetails.getUserId()).
+				and(companyUser.getRole()).eq(CompanyUserRole.ADMIN);
+		List<CompanyUser> companyUserList = Torpedo.select(companyUser).list(em);
+		return !companyUserList.isEmpty();
+	}
+
 }
