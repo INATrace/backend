@@ -8,7 +8,6 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.facility.FacilityService;
-import com.abelium.inatrace.components.payment.PaymentService;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrderLocation;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
@@ -170,7 +169,6 @@ public class StockOrderService extends BaseService {
         entity.setCurrency(apiStockOrder.getCurrency());
 
         if (processingOrder != null && entity.getId() != null) {
-            entity.setProcessingOrder(processingOrder);
 
             // Calculate quantities based on input transactions
             List<Transaction> inputTxs = processingOrder.getInputTransactions();
@@ -229,18 +227,11 @@ public class StockOrderService extends BaseService {
                 // Required
                 if(apiStockOrder.getProducerUserCustomer() == null)
                     throw new ApiException(ApiStatus.INVALID_REQUEST, "Producer user customer is required for purchase orders!");
+                if (apiStockOrder.getTotalQuantity() == null)
+                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Total quantity needs to be provided!");
+                if (apiStockOrder.getPricePerUnit() == null)
+                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Price per unit needs to be provided!");
 
-                // For new StockOrder set fresh values (after that only calculations are possible)
-//                if (entity.getId() == null) {
-//                    if (apiStockOrder.getFulfilledQuantity() == null)
-//                        throw new ApiException(ApiStatus.VALIDATION_ERROR, "Fulfilled quantity needs to be provided!");
-                    if (apiStockOrder.getTotalQuantity() == null)
-                        throw new ApiException(ApiStatus.VALIDATION_ERROR, "Total quantity needs to be provided!");
-//                    if (apiStockOrder.getAvailableQuantity() == null)
-//                        throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity needs to be provided!");
-                    if (apiStockOrder.getPricePerUnit() == null)
-                        throw new ApiException(ApiStatus.VALIDATION_ERROR, "Price per unit needs to be provided!");
-//                }
                 entity.setPricePerUnit(apiStockOrder.getPricePerUnit());
                 entity.setCost(entity.getPricePerUnit().multiply(BigDecimal.valueOf(entity.getTotalQuantity())));
                 if (processingOrder == null) {
@@ -331,23 +322,36 @@ public class StockOrderService extends BaseService {
     }
 
     private BigDecimal calculateBalanceForPurchaseOrder(StockOrder stockOrder) {
+
         if (stockOrder.getOrderType() != OrderType.PURCHASE_ORDER || stockOrder.getCost() == null)
             return null;
-
 
         List<Payment> paymentList = em.createNamedQuery("Payment.listPaymentsByPurchaseId", Payment.class)
                 .setParameter("purchaseId", stockOrder.getId())
                 .getResultList();
 
-        return stockOrder.getCost()
-                .subtract(paymentList.stream()
-                        .map(payment -> payment.getPaymentPurposeType() == PaymentPurposeType.FIRST_INSTALLMENT
-                                ? payment.getAmountPaidToTheFarmer().add(
-                                        payment.getPreferredWayOfPayment() != PreferredWayOfPayment.CASH_VIA_COLLECTOR
-                                                ? payment.getAmountPaidToTheCollector()
-                                                : BigDecimal.ZERO)
-                                : BigDecimal.ZERO)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add));
+        BigDecimal balance = stockOrder.getCost();
+        for (Payment payment : paymentList) {
+
+            if (payment.getPaymentPurposeType() == PaymentPurposeType.FIRST_INSTALLMENT) {
+                balance = balance.subtract(payment.getAmountPaidToTheFarmer());
+
+                if (payment.getPreferredWayOfPayment() != PreferredWayOfPayment.CASH_VIA_COLLECTOR) {
+                    balance = balance.subtract(payment.getAmountPaidToTheCollector());
+                }
+            }
+        }
+        return balance;
+
+//        return stockOrder.getCost()
+//                .subtract(paymentList.stream()
+//                        .map(payment -> payment.getPaymentPurposeType() == PaymentPurposeType.FIRST_INSTALLMENT
+//                                ? payment.getAmountPaidToTheFarmer().add(
+//                                        payment.getPreferredWayOfPayment() != PreferredWayOfPayment.CASH_VIA_COLLECTOR
+//                                                ? payment.getAmountPaidToTheCollector()
+//                                                : BigDecimal.ZERO)
+//                                : BigDecimal.ZERO)
+//                        .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     private Integer calculateFulfilledQuantity(List<Transaction> inputTransactions, Long stockOrderId){

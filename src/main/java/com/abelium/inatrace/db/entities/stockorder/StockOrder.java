@@ -205,7 +205,7 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private String flavourProfile;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private ProcessingOrder processingOrder;
 	
 	@Enumerated(EnumType.STRING)

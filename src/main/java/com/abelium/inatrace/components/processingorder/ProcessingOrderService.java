@@ -238,10 +238,12 @@ public class ProcessingOrderService extends BaseService {
             if (processingAction.getType() == ProcessingActionType.TRANSFER) {
                 Long targetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiProcessingOrder.getTargetStockOrders().get(i), userId, entity).getId();
                 StockOrder targetStockOrder = fetchEntity(targetStockOrderId, StockOrder.class);
+                targetStockOrder.setProcessingOrder(entity);
 
-                insertedTransaction.setTargetStockOrder(targetStockOrder);
                 insertedTransaction.setOutputMeasureUnitType(targetStockOrder.getMeasurementUnitType());
                 insertedTransaction.setTargetFacility(targetStockOrder.getFacility());
+                insertedTransaction.setTargetStockOrder(targetStockOrder);
+                entity.getTargetStockOrders().add(targetStockOrder);
             }
 
         }
@@ -251,6 +253,8 @@ public class ProcessingOrderService extends BaseService {
 
             Long insertedTargetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiProcessingOrder.getTargetStockOrders().get(0), userId, entity).getId();
             StockOrder targetStockOrder = fetchEntity(insertedTargetStockOrderId, StockOrder.class);
+            targetStockOrder.setProcessingOrder(entity);
+
             entity.getTargetStockOrders().add(targetStockOrder);
 
             // Set target stockOrder and facility
