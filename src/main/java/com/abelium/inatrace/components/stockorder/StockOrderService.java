@@ -186,7 +186,16 @@ public class StockOrderService extends BaseService {
         } else {
             entity.setAvailableQuantity(entity.getTotalQuantity());
         }
-        entity.setFulfilledQuantity(entity.getFulfilledQuantity());
+
+        switch (apiStockOrder.getOrderType()) {
+            case PURCHASE_ORDER:
+            case PROCESSING_ORDER:
+            case TRANSFER_ORDER:
+                entity.setFulfilledQuantity(apiStockOrder.getTotalQuantity());
+            default:
+                entity.setFulfilledQuantity(entity.getFulfilledQuantity());
+        }
+
         entity.setDamagedPriceDeduction(apiStockOrder.getDamagedPriceDeduction());
         entity.setCurrency(apiStockOrder.getCurrency());
 
