@@ -41,6 +41,7 @@ public final class PaymentMapper {
 		apiPayment.setPreferredWayOfPayment(entity.getPreferredWayOfPayment());
 		apiPayment.setProductionDate(entity.getProductionDate());
 		apiPayment.setRecipientUserCustomer(UserCustomerMapper.toApiUserCustomerBase(entity.getRecipientUserCustomer()));
+		apiPayment.setRepresentativeOfRecipientUserCustomer(UserCustomerMapper.toApiUserCustomerBase(entity.getRepresentativeOfRecipientUserCustomer()));
 		apiPayment.setRecipientCompany(CompanyMapper.toApiCompanyBase(entity.getRecipientCompany()));
 		apiPayment.setPayingCompany(CompanyMapper.toApiCompanyBase(entity.getPayingCompany()));
 		apiPayment.setPaymentConfirmedByUser(UserMapper.toSimpleApiUser(entity.getPaymentConfirmedByUser()));
