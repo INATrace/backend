@@ -176,28 +176,23 @@ public class StockOrderService extends BaseService {
         entity.setOrganic(apiStockOrder.getOrganic());
         entity.setTare(apiStockOrder.getTare());
         entity.setWomenShare(apiStockOrder.getWomenShare());
+        entity.setDamagedPriceDeduction(apiStockOrder.getDamagedPriceDeduction());
+        entity.setCurrency(apiStockOrder.getCurrency());
 
         // Calculate quantities
 
-        Integer lastTotalQuantity = entity.getTotalQuantity();
+        Integer lastUsedQuantity = (entity.getTotalQuantity() != null && entity.getAvailableQuantity() != null)
+                ? entity.getTotalQuantity() - entity.getAvailableQuantity()
+                : 0;
+
         entity.setTotalQuantity(apiStockOrder.getTotalQuantity());
-        if (entity.getTotalQuantity() != null && lastTotalQuantity != null && entity.getAvailableQuantity() != null){
-            entity.setAvailableQuantity(apiStockOrder.getTotalQuantity() - (lastTotalQuantity - entity.getAvailableQuantity()));
-        } else {
-            entity.setAvailableQuantity(entity.getTotalQuantity());
-        }
 
         switch (apiStockOrder.getOrderType()) {
             case PURCHASE_ORDER:
             case PROCESSING_ORDER:
             case TRANSFER_ORDER:
-                entity.setFulfilledQuantity(apiStockOrder.getTotalQuantity());
-            default:
-                entity.setFulfilledQuantity(entity.getFulfilledQuantity());
+                entity.setFulfilledQuantity(entity.getTotalQuantity());
         }
-
-        entity.setDamagedPriceDeduction(apiStockOrder.getDamagedPriceDeduction());
-        entity.setCurrency(apiStockOrder.getCurrency());
 
         if (processingOrder != null && entity.getId() != null) {
 
@@ -205,26 +200,35 @@ public class StockOrderService extends BaseService {
             List<Transaction> inputTxs = processingOrder.getInputTransactions();
             if (inputTxs != null && !inputTxs.isEmpty()) {
 
-                if (apiStockOrder.getOrderType() == OrderType.SALES_ORDER || apiStockOrder.getOrderType() == OrderType.GENERAL_ORDER)
+                if (apiStockOrder.getOrderType() == OrderType.SALES_ORDER || apiStockOrder.getOrderType() == OrderType.GENERAL_ORDER) {
                     entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs, entity.getId()));
-                else
-                    entity.setFulfilledQuantity(entity.getTotalQuantity());
+                }
 
-                if (apiStockOrder.getOrderType() != OrderType.SALES_ORDER)
-                    entity.setAvailableQuantity(entity.getFulfilledQuantity() - calculateUsedQuantity(inputTxs, entity.getId()));
+                if (apiStockOrder.getOrderType() != OrderType.SALES_ORDER) {
+                    entity.setAvailableQuantity(entity.getFulfilledQuantity() - lastUsedQuantity - calculateUsedQuantity(inputTxs, entity.getId()));
+                }
             }
+
+        } else if (entity.getTotalQuantity() != null && entity.getAvailableQuantity() != null){
+            entity.setAvailableQuantity(apiStockOrder.getTotalQuantity() - lastUsedQuantity);
+
+        } else {
+            // For new StockOrders set available quantity to total quantity
+            entity.setAvailableQuantity(entity.getTotalQuantity());
         }
 
         // Validate quantities
         if (entity.getAvailableQuantity() != null) {
 
-            if (entity.getAvailableQuantity() < 0)
+            if (entity.getAvailableQuantity() < 0) {
                 throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity resulted in negative number.");
+            }
 
             if (entity.getFulfilledQuantity() != null) {
-                if (entity.getFulfilledQuantity() < entity.getAvailableQuantity())
+                if (entity.getFulfilledQuantity() < entity.getAvailableQuantity()) {
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity (" + entity.getAvailableQuantity()
                             + ") cannot be bigger then fulfilled quantity (" + entity.getFulfilledQuantity() + ").");
+                }
             }
         }
 
@@ -233,8 +237,9 @@ public class StockOrderService extends BaseService {
 
         // END: Calculate quantities
 
-        if (entity.getSemiProduct() != null)
+        if (entity.getSemiProduct() != null) {
             entity.setMeasurementUnitType(entity.getSemiProduct().getMeasurementUnitType());
+        }
 
         // Production location
         ApiStockOrderLocation apiProdLocation = apiStockOrder.getProductionLocation();
@@ -242,8 +247,9 @@ public class StockOrderService extends BaseService {
 
             StockOrderLocation stockOrderLocation = fetchEntityOrElse(apiProdLocation.getId(), StockOrderLocation.class, null);
 
-            if(stockOrderLocation == null)
+            if(stockOrderLocation == null) {
                 stockOrderLocation = new StockOrderLocation();
+            }
 
             stockOrderLocation.setLatitude(apiProdLocation.getLatitude());
             stockOrderLocation.setLongitude(apiProdLocation.getLongitude());
@@ -389,7 +395,9 @@ public class StockOrderService extends BaseService {
     }
 
     private Integer calculateFulfilledQuantity(List<Transaction> inputTransactions, Long stockOrderId){
-        if (stockOrderId == null) return null;
+        if (stockOrderId == null)
+            return null;
+
         return inputTransactions.stream()
                 .filter(t -> t.getSourceStockOrder() != null && stockOrderId.equals(t.getSourceStockOrder().getId()))
                 .map(Transaction::getInputQuantity)
@@ -397,7 +405,9 @@ public class StockOrderService extends BaseService {
     }
 
     private Integer calculateUsedQuantity(List<Transaction> inputTransactions, Long stockOrderId){
-        if (stockOrderId == null) return null;
+        if (stockOrderId == null)
+            return null;
+
         return inputTransactions.stream()
                 .filter(t -> t.getSourceStockOrder() != null && stockOrderId.equals(t.getSourceStockOrder().getId()))
                 .map(Transaction::getOutputQuantity)
