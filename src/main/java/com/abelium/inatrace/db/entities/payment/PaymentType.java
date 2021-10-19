@@ -2,6 +2,9 @@ package com.abelium.inatrace.db.entities.payment;
 
 public enum PaymentType 
 {
-	CASH, 
-	BANK
+	CASH,
+	CASH_VIA_COLLECTOR,
+	BANK_TRANSFER,
+	CHEQUE,
+	OFFSETTING
 }
