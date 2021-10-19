@@ -154,7 +154,7 @@ public class StockOrderController {
             @Valid @RequestBody ApiStockOrder apiStockOrder,
             @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-        return new ApiResponse<>(stockOrderService.createOrUpdateStockOrder(apiStockOrder, authUser.getUserId()));
+        return new ApiResponse<>(stockOrderService.createOrUpdateStockOrder(apiStockOrder, authUser.getUserId(), null));
     }
 
     @DeleteMapping("{id}")

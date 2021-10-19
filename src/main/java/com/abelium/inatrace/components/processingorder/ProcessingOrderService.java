@@ -27,7 +27,6 @@ import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -221,28 +220,48 @@ public class ProcessingOrderService extends BaseService {
             }
         }
 
-        // List in which targetStockOrderIds are inserted in same sequence as they are received in JSON
-        List<Long> sequentialIdsOfInsertedTargetStockOrders = new ArrayList<>();
-
-        // Create new or update existing target StockOrders
-        for (ApiStockOrder apiStockOrder: apiProcessingOrder.getTargetStockOrders()) {
-            Long insertedTargetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiStockOrder, userId).getId();
-            StockOrder insertedTargetStockOrder = fetchEntity(insertedTargetStockOrderId, StockOrder.class);
-            entity.getTargetStockOrders().add(insertedTargetStockOrder);
-            sequentialIdsOfInsertedTargetStockOrders.add(insertedTargetStockOrderId);
-        }
-
         // Create new or update existing input Transactions
         for (int i = 0; i < apiProcessingOrder.getInputTransactions().size(); i++) {
 
             ApiTransaction apiTransaction = apiProcessingOrder.getInputTransactions().get(i);
             Boolean isProcessing = processingAction.getType() == ProcessingActionType.PROCESSING;
-            Long targetStockOrderId = !isProcessing ? sequentialIdsOfInsertedTargetStockOrders.get(i) : null;
 
-            ApiBaseEntity insertedApiTransaction = transactionService.createOrUpdateTransaction(apiTransaction, isProcessing, targetStockOrderId);
+            ApiBaseEntity insertedApiTransaction = transactionService.createOrUpdateTransaction(apiTransaction, isProcessing);
+            Transaction insertedTransaction = fetchEntity(insertedApiTransaction.getId(), Transaction.class);
+            insertedTransaction.setTargetProcessingOrder(entity);
+            entity.getInputTransactions().add(insertedTransaction);
 
-            // TODO: Reference on ProcessingOrder if needed
-            entity.getInputTransactions().add(fetchEntity(insertedApiTransaction.getId(), Transaction.class));
+            // Update source StockOrder
+            stockOrderService.createOrUpdateStockOrder(apiTransaction.getSourceStockOrder(), userId, entity);
+
+            // Set targetStockOrders for TRANSFER
+            if (processingAction.getType() == ProcessingActionType.TRANSFER) {
+                Long targetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiProcessingOrder.getTargetStockOrders().get(i), userId, entity).getId();
+                StockOrder targetStockOrder = fetchEntity(targetStockOrderId, StockOrder.class);
+                targetStockOrder.setProcessingOrder(entity);
+
+                insertedTransaction.setOutputMeasureUnitType(targetStockOrder.getMeasurementUnitType());
+                insertedTransaction.setTargetFacility(targetStockOrder.getFacility());
+                insertedTransaction.setTargetStockOrder(targetStockOrder);
+                entity.getTargetStockOrders().add(targetStockOrder);
+            }
+
+        }
+
+        // Create new or update existing target for PROCESSING
+        if (processingAction.getType() != ProcessingActionType.TRANSFER) {
+
+            Long insertedTargetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiProcessingOrder.getTargetStockOrders().get(0), userId, entity).getId();
+            StockOrder targetStockOrder = fetchEntity(insertedTargetStockOrderId, StockOrder.class);
+            targetStockOrder.setProcessingOrder(entity);
+
+            entity.getTargetStockOrders().add(targetStockOrder);
+
+            // Set target stockOrder and facility
+            for (Transaction t: entity.getInputTransactions()) {
+                t.setTargetStockOrder(targetStockOrder);
+                t.setTargetFacility(targetStockOrder.getFacility());
+            }
         }
 
         if (entity.getId() == null)
@@ -253,7 +272,22 @@ public class ProcessingOrderService extends BaseService {
 
     @Transactional
     public void deleteProcessingOrder(Long id) throws ApiException {
-        em.remove(fetchEntity(id, ProcessingOrder.class));
+
+        // TODO: Should entities be deleted instead of detached?
+
+        ProcessingOrder entity = fetchEntity(id, ProcessingOrder.class);
+
+        // Manually detach all related transactions
+        for (Transaction t: entity.getInputTransactions()) {
+            t.setTargetProcessingOrder(null);
+        }
+
+        // Detach target stock orders
+        for (StockOrder so: entity.getTargetStockOrders()) {
+            so.setProcessingOrder(null);
+        }
+
+        em.remove(entity);
     }
 
     private <E> E fetchEntity(Long id, Class<E> entityClass) throws ApiException {

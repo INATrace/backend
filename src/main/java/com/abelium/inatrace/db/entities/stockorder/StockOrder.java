@@ -145,7 +145,7 @@ public class StockOrder extends TimestampEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
 	private OrderType orderType;
-	
+
 	@Column
 	private String internalLotNumber;
 
@@ -165,11 +165,11 @@ public class StockOrder extends TimestampEntity {
 
 	@Column
 	private BigDecimal balance;
-	
+
 	@ManyToOne
 	private Company client;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private ProcessingOrder processingOrder;
 	
 	@Enumerated(EnumType.STRING)
@@ -248,7 +248,7 @@ public class StockOrder extends TimestampEntity {
 	
 	@Column
     private Boolean requiredWomensCoffee;
-	
+
 	@Column
     private Instant shippedAtDateFromOriginPort;
 	

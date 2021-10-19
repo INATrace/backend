@@ -26,13 +26,12 @@ public class PaymentQueryRequest {
     }
 
     public Long companyId;
-    public Long purchaseId;
+    public Long purchaseId; // StockOrder.id
     public PreferredWayOfPayment preferredWayOfPayment;
     public PaymentStatus paymentStatus;
     public Instant productionDateStart;
     public Instant productionDateEnd;
-    // representativeOfRecipientUserCustomer.name
-    public String farmerName;
+    public String farmerName; // RepresentativeOfRecipientUserCustomer.name
 
     @Override
     public String toString() {

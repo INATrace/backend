@@ -68,9 +68,9 @@ public class PaymentService extends BaseService {
 		OnGoingLogicalCondition condition = Torpedo.condition();
 
 		// Applies only when fetching list by PurchaseID or CompanyID
-		if(queryRequest.companyId != null) {
+		if (queryRequest.companyId != null)
 			condition.and(paymentProxy.getStockOrder().getCompany().getId()).eq(queryRequest.companyId);
-		} else if (queryRequest.purchaseId != null)
+		else if (queryRequest.purchaseId != null)
 			condition.and(paymentProxy.getStockOrder().getId()).eq(queryRequest.purchaseId);
 
 		// Query parameter filters

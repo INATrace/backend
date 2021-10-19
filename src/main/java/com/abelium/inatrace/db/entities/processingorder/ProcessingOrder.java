@@ -25,7 +25,7 @@ public class ProcessingOrder extends TimestampEntity {
     @ManyToOne
     private ProcessingAction processingAction;
 
-    @OneToMany(mappedBy = "targetProcessingOrder", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "targetProcessingOrder")
     private List<Transaction> inputTransactions;
 
     @OneToMany(mappedBy = "processingOrder")
