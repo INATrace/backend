@@ -40,7 +40,8 @@ public class UserApiTools {
 	
 	public static ApiUserGet toApiUserGet(User user, 
 			List<UserAction> actions,
-			List<Long> companyIds) {
+			List<Long> companyIds,
+			List<Long> companyIdsAdmin) {
 		if (user == null) return null;
 		
 		ApiUserGet apiUser = new ApiUserGet();
@@ -48,6 +49,7 @@ public class UserApiTools {
 		// Add more
 		apiUser.actions = actions;
 		apiUser.companyIds = companyIds;
+		apiUser.companyIdsAdmin = companyIdsAdmin;
 		return apiUser;
 	}
 	

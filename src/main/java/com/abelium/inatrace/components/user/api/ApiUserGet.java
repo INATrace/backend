@@ -14,6 +14,9 @@ public class ApiUserGet extends ApiUser {
 
 	@ApiModelProperty("User's company ids")
 	public List<Long> companyIds = new ArrayList<>();
+
+	@ApiModelProperty("User's company ids where user is company admin")
+	public List<Long> companyIdsAdmin = new ArrayList<>();
 	
 	public List<UserAction> getActions() {
 		return actions;
@@ -29,5 +32,13 @@ public class ApiUserGet extends ApiUser {
 
 	public void setCompanyIds(List<Long> companyIds) {
 		this.companyIds = companyIds;
+	}
+
+	public List<Long> getCompanyIdsAdmin() {
+		return companyIdsAdmin;
+	}
+
+	public void setCompanyIdsAdmin(List<Long> companyIdsAdmin) {
+		this.companyIdsAdmin = companyIdsAdmin;
 	}
 }
