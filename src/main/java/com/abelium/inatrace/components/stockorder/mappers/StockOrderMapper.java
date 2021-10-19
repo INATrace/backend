@@ -24,8 +24,15 @@ public class StockOrderMapper {
         apiStockOrder.setId(entity.getId());
         apiStockOrder.setIdentifier(entity.getIdentifier());
         apiStockOrder.setCurrency(entity.getCurrency());
+        apiStockOrder.setPreferredWayOfPayment(entity.getPreferredWayOfPayment());
+        apiStockOrder.setFulfilledQuantity(entity.getFulfilledQuantity());
+        apiStockOrder.setBalance(entity.getBalance());
         apiStockOrder.setMeasureUnitType(
                 MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(entity.getMeasurementUnitType()));
+
+        // Collector
+        apiStockOrder.setRepresentativeOfProducerUserCustomer(
+                UserCustomerMapper.toApiUserCustomerBase(entity.getRepresentativeOfProducerUserCustomer()));
 
         return apiStockOrder;
     }
