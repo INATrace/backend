@@ -272,7 +272,22 @@ public class ProcessingOrderService extends BaseService {
 
     @Transactional
     public void deleteProcessingOrder(Long id) throws ApiException {
-        em.remove(fetchEntity(id, ProcessingOrder.class));
+
+        // TODO: Should entities be deleted instead of detached?
+
+        ProcessingOrder entity = fetchEntity(id, ProcessingOrder.class);
+
+        // Manually detach all related transactions
+        for (Transaction t: entity.getInputTransactions()) {
+            t.setTargetProcessingOrder(null);
+        }
+
+        // Detach target stock orders
+        for (StockOrder so: entity.getTargetStockOrders()) {
+            so.setProcessingOrder(null);
+        }
+
+        em.remove(entity);
     }
 
     private <E> E fetchEntity(Long id, Class<E> entityClass) throws ApiException {
