@@ -17,9 +17,11 @@ import com.abelium.inatrace.types.UserCustomerType;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -183,6 +185,16 @@ public class CompanyController {
             @Valid ApiPaginatedRequest request
     ) {
         return new ApiPaginatedResponse<>(companyService.getAssociations(id, request));
+    }
+
+    @PostMapping(value = "/userCustomers/import/farmers/{companyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @ApiOperation(value = "Upload .xls or .xlsx spreadsheet of farmers to import into DB")
+    public ApiDefaultResponse importFarmersSpreadsheet(
+            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @RequestParam("file") MultipartFile file) {
+        companyService.importFarmersSpreadsheet(companyId, file);
+        return new ApiDefaultResponse();
     }
 
 }

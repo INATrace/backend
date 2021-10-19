@@ -7,6 +7,7 @@ import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
+import com.abelium.inatrace.components.common.UserCustomerImportService;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
@@ -44,6 +45,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
@@ -63,6 +65,9 @@ public class CompanyService extends BaseService {
 
 	@Autowired
 	private UserQueries userQueries;
+
+	@Autowired
+	private UserCustomerImportService userCustomerImportService;
 
 	private Company companyListQueryObject(ApiListCompaniesRequest request) {
 		Company cProxy = Torpedo.from(Company.class);
@@ -626,6 +631,10 @@ public class CompanyService extends BaseService {
 				and(companyUser.getRole()).eq(CompanyUserRole.ADMIN);
 		List<CompanyUser> companyUserList = Torpedo.select(companyUser).list(em);
 		return !companyUserList.isEmpty();
+	}
+
+	public void importFarmersSpreadsheet(Long companyId, MultipartFile file) {
+		userCustomerImportService.importFarmersSpreadsheet(companyId, file);
 	}
 
 }
