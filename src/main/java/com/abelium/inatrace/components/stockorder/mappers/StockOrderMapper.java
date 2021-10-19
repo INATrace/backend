@@ -23,6 +23,10 @@ public class StockOrderMapper {
         ApiStockOrder apiStockOrder = new ApiStockOrder();
         apiStockOrder.setId(entity.getId());
         apiStockOrder.setIdentifier(entity.getIdentifier());
+        apiStockOrder.setCurrency(entity.getCurrency());
+        apiStockOrder.setMeasureUnitType(
+                MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(entity.getMeasurementUnitType()));
+
         return apiStockOrder;
     }
 
