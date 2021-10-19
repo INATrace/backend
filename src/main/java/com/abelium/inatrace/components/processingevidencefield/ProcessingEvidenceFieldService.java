@@ -11,16 +11,14 @@ import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceField;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
-
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service for processing evidence field entity.
@@ -64,8 +62,8 @@ public class ProcessingEvidenceFieldService extends BaseService {
 		}
 
 		// ApiProcessingEvidenceField object
+		entity.setFieldName(apiProcessingEvidenceField.getFieldName());
 		entity.setLabel(apiProcessingEvidenceField.getLabel());
-		entity.setFileMultiplicity(apiProcessingEvidenceField.getFileMultiplicity());
 		entity.setType(apiProcessingEvidenceField.getType());
 		
 		if (entity.getId() == null) {

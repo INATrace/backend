@@ -28,6 +28,8 @@ public class StockOrderQueryRequest {
                                   Long farmerId,
                                   Boolean isOpenBalanceOnly,
                                   Boolean isPurchaseOrderOnly,
+                                  Boolean isAvailable,
+                                  Long semiProductId,
                                   Boolean isWomenShare,
                                   PreferredWayOfPayment wayOfPayment,
                                   OrderType orderType,
@@ -39,6 +41,8 @@ public class StockOrderQueryRequest {
         this.farmerId = farmerId;
         this.isOpenBalanceOnly = isOpenBalanceOnly;
         this.isPurchaseOrderOnly = isPurchaseOrderOnly;
+        this.isAvailable = isAvailable;
+        this.semiProductId = semiProductId;
         this.isWomenShare = isWomenShare;
         this.wayOfPayment = wayOfPayment;
         this.orderType = orderType;

@@ -10,6 +10,7 @@ import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.CompanyStatus;
+import com.abelium.inatrace.types.CompanyUserRole;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserRole;
 import org.springframework.context.annotation.Lazy;
@@ -39,7 +40,7 @@ public class CompanyQueries extends BaseService {
 		Torpedo.where(cuProxy.getUser().getId()).eq(userId).
 			and(cuProxy.getCompany().getStatus()).in(statuses);
 		return Torpedo.select(cuProxy.getCompany().getId()).list(em);
-	}	
+	}
 
 	@Transactional
 	public List<Long> fetchUserIdsForCompany(Long companyId) throws ApiException {
@@ -83,6 +84,13 @@ public class CompanyQueries extends BaseService {
 		ct.setCompany(c);
 		em.persist(ct);
 		return ct;
+	}
+
+	public List<Long> fetchCompanyIdsForUserAdmin(Long userId) {
+		CompanyUser companyUser = Torpedo.from(CompanyUser.class);
+		Torpedo.where(companyUser.getUser().getId()).eq(userId).
+				and(companyUser.getRole()).eq(CompanyUserRole.ADMIN);
+		return Torpedo.select(companyUser.getCompany().getId()).list(em);
 	}
 
 }

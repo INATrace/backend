@@ -7,9 +7,7 @@ public enum ProcessingEvidenceFieldType {
     INTEGER,
     DATE,
     OBJECT,
-    ARRAY,
     PRICE,
     EXCHANGE_RATE,
-    TIMESTAMP,
-    FILE
+    TIMESTAMP
 }

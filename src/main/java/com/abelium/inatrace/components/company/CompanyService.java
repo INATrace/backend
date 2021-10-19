@@ -10,9 +10,9 @@ import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
-import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomer;
-import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomerAssociation;
-import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomerCooperative;
+import com.abelium.inatrace.components.company.api.ApiUserCustomer;
+import com.abelium.inatrace.components.company.api.ApiUserCustomerAssociation;
+import com.abelium.inatrace.components.company.api.ApiUserCustomerCooperative;
 import com.abelium.inatrace.components.user.UserQueries;
 import com.abelium.inatrace.db.entities.common.Address;
 import com.abelium.inatrace.db.entities.common.BankInformation;
@@ -613,6 +613,19 @@ public class CompanyService extends BaseService {
 
 	private Country getCountry(Long id) {
 		return em.find(Country.class, id);
+	}
+
+	public boolean isSystemAdmin(CustomUserDetails customUserDetails) {
+		return UserRole.ADMIN.equals(customUserDetails.getUserRole());
+	}
+
+	public boolean isCompanyAdmin(CustomUserDetails customUserDetails, Long companyId) {
+		CompanyUser companyUser = Torpedo.from(CompanyUser.class);
+		Torpedo.where(companyUser.getCompany().getId()).eq(companyId).
+				and(companyUser.getUser().getId()).eq(customUserDetails.getUserId()).
+				and(companyUser.getRole()).eq(CompanyUserRole.ADMIN);
+		List<CompanyUser> companyUserList = Torpedo.select(companyUser).list(em);
+		return !companyUserList.isEmpty();
 	}
 
 }

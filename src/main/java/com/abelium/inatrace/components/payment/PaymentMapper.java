@@ -5,7 +5,7 @@ import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.components.user.mappers.UserMapper;
-import com.abelium.inatrace.components.usercustomer.mappers.UserCustomerMapper;
+import com.abelium.inatrace.components.company.mappers.UserCustomerMapper;
 import com.abelium.inatrace.db.entities.payment.Payment;
 
 /**

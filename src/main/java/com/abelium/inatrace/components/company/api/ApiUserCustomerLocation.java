@@ -1,4 +1,4 @@
-package com.abelium.inatrace.components.usercustomer.api;
+package com.abelium.inatrace.components.company.api;
 
 import com.abelium.inatrace.components.product.api.ApiLocation;
 import io.swagger.annotations.ApiModelProperty;

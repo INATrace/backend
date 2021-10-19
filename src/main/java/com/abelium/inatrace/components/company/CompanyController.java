@@ -5,11 +5,12 @@ import com.abelium.inatrace.api.ApiDefaultResponse;
 import com.abelium.inatrace.api.ApiPaginatedResponse;
 import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
+import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
-import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomer;
+import com.abelium.inatrace.components.company.api.ApiUserCustomer;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserCustomerType;
@@ -78,12 +79,15 @@ public class CompanyController {
     }
     
     @PostMapping(value = "/execute/{action}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     @ApiOperation(value = "Execute company action. Must be an administrator")
-    public ApiDefaultResponse executeAction(@Valid @RequestBody ApiCompanyActionRequest request, 
+    public ApiDefaultResponse executeAction(@AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @RequestBody ApiCompanyActionRequest request,
     		@Valid @PathVariable(value = "action", required = true) CompanyAction action) throws ApiException {
-    	companyService.executeAction(request, action);
-    	return new ApiDefaultResponse();
+        if (companyService.isSystemAdmin(authUser) || companyService.isCompanyAdmin(authUser, request.getCompanyId())) {
+            companyService.executeAction(request, action);
+            return new ApiDefaultResponse();
+        }
+    	throw new ApiException(ApiStatus.UNAUTHORIZED, "User must be system or company admin");
     }
 
     @GetMapping(value = "/userCustomers/{id}")

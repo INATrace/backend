@@ -13,10 +13,10 @@ import com.abelium.inatrace.components.company.types.CompanyTranslatables;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.user.UserApiTools;
 import com.abelium.inatrace.components.user.UserQueries;
-import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomer;
-import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomerAssociation;
-import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomerCooperative;
-import com.abelium.inatrace.components.usercustomer.api.ApiUserCustomerLocation;
+import com.abelium.inatrace.components.company.api.ApiUserCustomer;
+import com.abelium.inatrace.components.company.api.ApiUserCustomerAssociation;
+import com.abelium.inatrace.components.company.api.ApiUserCustomerCooperative;
+import com.abelium.inatrace.components.company.api.ApiUserCustomerLocation;
 import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.*;
 import com.abelium.inatrace.tools.ListTools;
@@ -323,6 +323,7 @@ public class CompanyApiTools {
 	public ApiFarmInformation toApiFarmInformation(FarmInformation farmInformation) {
 		if (farmInformation == null) return null;
 		ApiFarmInformation apiFarmInformation = new ApiFarmInformation();
+		apiFarmInformation.setAreaUnit(farmInformation.getAreaUnit());
 		apiFarmInformation.setAreaOrganicCertified(farmInformation.getAreaOrganicCertified());
 		apiFarmInformation.setCoffeeCultivatedArea(farmInformation.getCoffeeCultivatedArea());
 		apiFarmInformation.setNumberOfTrees(farmInformation.getNumberOfTrees());
