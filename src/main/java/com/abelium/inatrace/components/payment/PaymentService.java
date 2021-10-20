@@ -49,17 +49,17 @@ public class PaymentService extends BaseService {
 	@Autowired
 	private UserService userService;
 
-	public ApiPayment getPayment(Long id) throws ApiException {
-		return PaymentMapper.toApiPayment(fetchEntity(id, Payment.class));
+	public ApiPayment getPayment(Long id, Long userId) throws ApiException {
+		return PaymentMapper.toApiPayment(fetchEntity(id, Payment.class), userId);
 	}
 
 	public ApiBulkPayment getBulkPayment(Long id) throws ApiException {
 		return BulkPaymentMapper.toApiBulkPayment(fetchEntity(id, BulkPayment.class));
 	}
 
-	public ApiPaginatedList<ApiPayment> getPaymentList(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
+	public ApiPaginatedList<ApiPayment> getPaymentList(ApiPaginatedRequest request, PaymentQueryRequest queryRequest, Long userId) {
 		return PaginationTools.createPaginatedResponse(em, request, () -> paymentQueryObject(
-				request, queryRequest), PaymentMapper::toApiPayment);
+				request, queryRequest), payment -> PaymentMapper.toApiPayment(payment, userId));
 	}
 
 	private Payment paymentQueryObject(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
@@ -162,12 +162,7 @@ public class PaymentService extends BaseService {
 
 			// Receipt document (note: Storage key needs to be unique)
 			if(apiPayment.getReceiptDocument() != null) {
-				Document receiptDocument = new Document();
-				receiptDocument.setContentType(apiPayment.getReceiptDocument().getContentType());
-				receiptDocument.setName(apiPayment.getReceiptDocument().getName());
-				receiptDocument.setSize(apiPayment.getReceiptDocument().getSize());
-				receiptDocument.setStorageKey(apiPayment.getReceiptDocument().getStorageKey());
-				entity.setReceiptDocument(receiptDocument);
+				entity.setReceiptDocument(fetchEntity(apiPayment.getReceiptDocument().getId(), Document.class));
 			}
 
 			// Values from StockOrder
