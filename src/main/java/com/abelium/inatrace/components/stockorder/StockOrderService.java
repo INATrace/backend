@@ -315,8 +315,10 @@ public class StockOrderService extends BaseService {
                 // Create/update processing evidence fields instances (values)
                 createOrUpdateEvidenceFieldValues(apiStockOrder.getRequiredEvidenceFieldValues(), entity);
 
-                // Create/update processing evidence types instances (values)
-                createOrUpdateEvidenceTypeValues(apiStockOrder.getRequiredEvidenceTypeValues(), entity);
+                // Create/update processing evidence types instances (values) - both required and other evidences
+                entity.getDocumentRequirements().clear();
+                createOrUpdateEvidenceTypeValues(apiStockOrder.getRequiredEvidenceTypeValues(), entity, false);
+                createOrUpdateEvidenceTypeValues(apiStockOrder.getOtherEvidenceDocuments(), entity, true);
         }
 
         if (entity.getId() == null) {
@@ -419,9 +421,7 @@ public class StockOrderService extends BaseService {
         }
     }
 
-    private void createOrUpdateEvidenceTypeValues(List<ApiStockOrderEvidenceTypeValue> apiEvidenceTypeValues, StockOrder entity) throws ApiException {
-
-        entity.getDocumentRequirements().clear();
+    private void createOrUpdateEvidenceTypeValues(List<ApiStockOrderEvidenceTypeValue> apiEvidenceTypeValues, StockOrder entity, boolean otherEvidence) throws ApiException {
 
         for (ApiStockOrderEvidenceTypeValue apiETV : apiEvidenceTypeValues) {
 
@@ -431,6 +431,7 @@ public class StockOrderService extends BaseService {
                     procEvidenceTypeService.fetchProcessingEvidenceType(apiETV.getEvidenceTypeId()));
             stockOrderPETypeValue.setDate(apiETV.getDate());
             stockOrderPETypeValue.setDocument(fetchEntity(apiETV.getDocument().getId(), Document.class));
+            stockOrderPETypeValue.setOtherEvidence(otherEvidence);
 
             entity.getDocumentRequirements().add(stockOrderPETypeValue);
         }

@@ -22,6 +22,9 @@ public class StockOrderPETypeValue extends TimestampEntity {
 
 	@ManyToOne
 	private Document document;
+
+	@Column
+	private Boolean otherEvidence;
 	
 	@ManyToOne
 	@NotNull
@@ -45,6 +48,22 @@ public class StockOrderPETypeValue extends TimestampEntity {
 
 	public void setDocument(Document document) {
 		this.document = document;
+	}
+
+	public Long getEntityVersion() {
+		return entityVersion;
+	}
+
+	public void setEntityVersion(Long entityVersion) {
+		this.entityVersion = entityVersion;
+	}
+
+	public Boolean getOtherEvidence() {
+		return otherEvidence;
+	}
+
+	public void setOtherEvidence(Boolean otherEvidence) {
+		this.otherEvidence = otherEvidence;
 	}
 
 	public StockOrder getStockOrder() {

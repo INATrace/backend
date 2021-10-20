@@ -64,6 +64,9 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Processing evidence types stored values for this stock order")
     public List<ApiStockOrderEvidenceTypeValue> requiredEvidenceTypeValues;
 
+    @ApiModelProperty(value = "Other processing evidence documents - evidence types that can be provided but are not mandatory")
+    public List<ApiStockOrderEvidenceTypeValue> otherEvidenceDocuments;
+
     @ApiModelProperty(value = "Semi product", position = 7)
     public ApiSemiProduct semiProduct;
 
@@ -327,6 +330,17 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setRequiredEvidenceTypeValues(List<ApiStockOrderEvidenceTypeValue> requiredEvidenceTypeValues) {
         this.requiredEvidenceTypeValues = requiredEvidenceTypeValues;
+    }
+
+    public List<ApiStockOrderEvidenceTypeValue> getOtherEvidenceDocuments() {
+        if (otherEvidenceDocuments == null) {
+            otherEvidenceDocuments = new ArrayList<>();
+        }
+        return otherEvidenceDocuments;
+    }
+
+    public void setOtherEvidenceDocuments(List<ApiStockOrderEvidenceTypeValue> otherEvidenceDocuments) {
+        this.otherEvidenceDocuments = otherEvidenceDocuments;
     }
 
     public ApiSemiProduct getSemiProduct() {
