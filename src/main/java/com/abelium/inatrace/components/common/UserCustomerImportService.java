@@ -51,11 +51,6 @@ public class UserCustomerImportService extends BaseService {
 
         XSSFSheet mainSheet = mainWorkbook.getSheetAt(0);
 
-        Workbook successWorkbook = new XSSFWorkbook();
-        Workbook failWorkbook = new XSSFWorkbook();
-        Sheet successSheet = successWorkbook.createSheet();
-        Sheet failSheet = failWorkbook.createSheet();
-
         int rowIndex = 5;
 
         while (true) {
