@@ -199,8 +199,11 @@ public class StockOrderService extends BaseService {
                 }
 
             default:
-                entity.setFulfilledQuantity(apiStockOrder.getFulfilledQuantity());
-                entity.setAvailableQuantity(apiStockOrder.getFulfilledQuantity());
+                // Applies only for new Quote StockOrders
+                if (entity.getId() == null) {
+                    entity.setFulfilledQuantity(apiStockOrder.getFulfilledQuantity());
+                    entity.setAvailableQuantity(apiStockOrder.getFulfilledQuantity());
+                }
         }
 
         if (processingOrder != null && entity.getId() != null) {
