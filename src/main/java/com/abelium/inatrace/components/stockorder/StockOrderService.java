@@ -9,9 +9,7 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.facility.FacilityService;
 import com.abelium.inatrace.components.processingevidencefield.ProcessingEvidenceFieldService;
-import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
-import com.abelium.inatrace.components.stockorder.api.ApiStockOrderEvidenceFieldValue;
-import com.abelium.inatrace.components.stockorder.api.ApiStockOrderLocation;
+import com.abelium.inatrace.components.stockorder.api.*;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.ActivityProof;
@@ -133,6 +131,68 @@ public class StockOrderService extends BaseService {
         }
 
         return stockOrderProxy;
+    }
+
+    @Transactional
+    public ApiPurchaseOrder createPurchaseBulkOrder(ApiPurchaseOrder apiPurchaseOrder, Long userId) throws ApiException {
+
+        // Validation
+        if (apiPurchaseOrder == null) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "ApiPurchaseOrder needs to be provided!");
+        }
+        if (apiPurchaseOrder.getFarmers() == null || apiPurchaseOrder.getFarmers().isEmpty()){
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Farmers needs to be provided!");
+        }
+
+        // Update stocks of type Purchase, one by one
+        for (ApiPurchaseOrderFarmer farmer : apiPurchaseOrder.getFarmers()) {
+
+            // convert to ApiStockOrder of type PURCHASE_ORDER
+            ApiStockOrder apiStockOrder = convertPurchaseOrderFarmerToStockOrder(apiPurchaseOrder, farmer);
+
+            // write to db
+            ApiBaseEntity apiBaseEntity = createOrUpdateStockOrder(apiStockOrder, userId);
+
+            // set Id in response
+            farmer.setId(apiBaseEntity.getId());
+        }
+
+        return apiPurchaseOrder;
+    }
+
+    private ApiStockOrder convertPurchaseOrderFarmerToStockOrder(ApiPurchaseOrder apiPurchaseOrder, ApiPurchaseOrderFarmer farmer){
+
+        ApiStockOrder apiStockOrder = new ApiStockOrder();
+
+        if (apiPurchaseOrder != null) {
+
+            apiStockOrder.setOrderType(OrderType.PURCHASE_ORDER);
+
+            // copy common attributes
+            apiStockOrder.setCreatorId(apiPurchaseOrder.getCreatorId());
+            apiStockOrder.setDeliveryTime(apiPurchaseOrder.getDeliveryTime());
+            apiStockOrder.setFacility(apiPurchaseOrder.getFacility());
+            apiStockOrder.setPreferredWayOfPayment(apiPurchaseOrder.getPreferredWayOfPayment());
+            apiStockOrder.setRepresentativeOfProducerUserCustomer(apiPurchaseOrder.getRepresentativeOfProducerUserCustomer());
+            apiStockOrder.setProductionDate(apiPurchaseOrder.getProductionDate());
+            apiStockOrder.setCurrency(apiPurchaseOrder.getCurrency());
+
+            // copy farmer attributes
+            apiStockOrder.setIdentifier(farmer.getIdentifier());
+            apiStockOrder.setOrganic(farmer.getOrganic());
+            apiStockOrder.setDamagedPriceDeduction(farmer.getDamagedPriceDeduction());
+            apiStockOrder.setSemiProduct(farmer.getSemiProduct());
+            apiStockOrder.setTare(farmer.getTare());
+            apiStockOrder.setPricePerUnit(farmer.getPricePerUnit());
+            apiStockOrder.setProducerUserCustomer(farmer.getProducerUserCustomer());
+            apiStockOrder.setWomenShare(farmer.getWomenShare());
+            apiStockOrder.setTotalQuantity(farmer.getTotalQuantity());
+            apiStockOrder.setAvailableQuantity(farmer.getAvailableQuantity());
+            apiStockOrder.setFulfilledQuantity(farmer.getFulfilledQuantity());
+
+        }
+
+        return apiStockOrder;
     }
 
     @Transactional
