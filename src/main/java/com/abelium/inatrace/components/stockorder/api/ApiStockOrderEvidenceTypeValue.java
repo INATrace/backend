@@ -16,7 +16,7 @@ public class ApiStockOrderEvidenceTypeValue {
 	private Long evidenceTypeId;
 
 	@ApiModelProperty(value = "The field name of the Processing evidence type from the codebook", position = 2)
-	private String evidenceTypedCode;
+	private String evidenceTypeCode;
 
 	@ApiModelProperty(value = "The date of the document upload", position = 1)
 	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
@@ -34,12 +34,12 @@ public class ApiStockOrderEvidenceTypeValue {
 		this.evidenceTypeId = evidenceTypeId;
 	}
 
-	public String getEvidenceTypedCode() {
-		return evidenceTypedCode;
+	public String getEvidenceTypeCode() {
+		return evidenceTypeCode;
 	}
 
-	public void setEvidenceTypedCode(String evidenceTypedCode) {
-		this.evidenceTypedCode = evidenceTypedCode;
+	public void setEvidenceTypeCode(String evidenceTypeCode) {
+		this.evidenceTypeCode = evidenceTypeCode;
 	}
 
 	public Instant getDate() {

@@ -23,7 +23,7 @@ public final class StockOrderEvidenceTypeValueMapper {
 
 		ApiStockOrderEvidenceTypeValue apiSOEvidenceTypeValue = new ApiStockOrderEvidenceTypeValue();
 		apiSOEvidenceTypeValue.setEvidenceTypeId(entity.getProcessingEvidenceType().getId());
-		apiSOEvidenceTypeValue.setEvidenceTypedCode(entity.getProcessingEvidenceType().getCode());
+		apiSOEvidenceTypeValue.setEvidenceTypeCode(entity.getProcessingEvidenceType().getCode());
 		apiSOEvidenceTypeValue.setDate(entity.getDate());
 		apiSOEvidenceTypeValue.setDocument(CommonApiTools.toApiDocument(entity.getDocument(), userId));
 

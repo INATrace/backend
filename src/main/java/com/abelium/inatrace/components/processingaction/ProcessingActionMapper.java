@@ -80,12 +80,12 @@ public final class ProcessingActionMapper {
 				
 				ApiProcessingEvidenceType apiRequiredDocumentType = new ApiProcessingEvidenceType();
 				apiRequiredDocumentType.setId(processingActionProcessingEvidenceType.getProcessingEvidenceType().getId());
+				apiRequiredDocumentType.setCode(processingActionProcessingEvidenceType.getProcessingEvidenceType().getCode());
 				apiRequiredDocumentType.setLabel(processingActionProcessingEvidenceType.getProcessingEvidenceType().getLabel());
 				apiRequiredDocumentType.setMandatory(processingActionProcessingEvidenceType.getMandatory());
 				apiRequiredDocumentType.setRequiredOnQuote(processingActionProcessingEvidenceType.getRequiredOnQuote());
 				apiRequiredDocumentType.setRequiredOneOfGroupIdForQuote(processingActionProcessingEvidenceType.getRequiredOneOfGroupIdForQuote());
 				apiRequiredDocumentTypes.add(apiRequiredDocumentType);
-				
 			}
 		);
 		
