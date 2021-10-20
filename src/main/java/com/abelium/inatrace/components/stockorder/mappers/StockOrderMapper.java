@@ -73,6 +73,13 @@ public class StockOrderMapper {
                     .collect(Collectors.toList()));
         }
 
+        // Map the instances (values) of processing evidence types
+        if (!entity.getDocumentRequirements().isEmpty()) {
+            apiStockOrder.setRequiredEvidenceTypeValues(entity.getDocumentRequirements().stream()
+                    .map(stockOrderPETypeValue -> StockOrderEvidenceTypeValueMapper.toApiStockOrderEvidenceTypeValue(
+                            stockOrderPETypeValue, userId)).collect(Collectors.toList()));
+        }
+
         // Map the semi-product that is represented by this stock order
         if (entity.getSemiProduct() != null) {
             apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct()));
