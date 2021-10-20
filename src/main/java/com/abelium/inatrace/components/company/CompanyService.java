@@ -633,8 +633,8 @@ public class CompanyService extends BaseService {
 		return !companyUserList.isEmpty();
 	}
 
-	public void importFarmersSpreadsheet(Long companyId, MultipartFile file) {
-		userCustomerImportService.importFarmersSpreadsheet(companyId, file);
+	public void importFarmersSpreadsheet(Long companyId, Long documentId) throws ApiException {
+		userCustomerImportService.importFarmersSpreadsheet(companyId, documentId);
 	}
 
 }

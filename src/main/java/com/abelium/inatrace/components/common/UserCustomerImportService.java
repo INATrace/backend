@@ -1,5 +1,6 @@
 package com.abelium.inatrace.components.common;
 
+import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.company.CompanyService;
 import com.abelium.inatrace.components.company.api.ApiAddress;
 import com.abelium.inatrace.components.company.api.ApiUserCustomer;
@@ -7,6 +8,7 @@ import com.abelium.inatrace.components.company.api.ApiUserCustomerLocation;
 import com.abelium.inatrace.components.product.api.ApiBankInformation;
 import com.abelium.inatrace.components.product.api.ApiFarmInformation;
 import com.abelium.inatrace.db.entities.common.Country;
+import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.types.Gender;
 import com.abelium.inatrace.types.UserCustomerType;
 import org.apache.poi.ss.usermodel.*;
@@ -15,9 +17,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.torpedoquery.jpa.Torpedo;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -31,14 +33,16 @@ public class UserCustomerImportService extends BaseService {
     @Autowired
     private CompanyService companyService;
 
-    public void importFarmersSpreadsheet(Long companyId, MultipartFile file) {
-        System.out.println("Starting import");
+    @Autowired
+    private StorageService storageService;
 
+    public void importFarmersSpreadsheet(Long companyId, Long documentId) throws ApiException {
+        DocumentData documentData = storageService.downloadDocument(em.find(Document.class, documentId).getStorageKey());
         InputStream inputStream;
         XSSFWorkbook mainWorkbook;
 
         try {
-            inputStream = file.getInputStream();
+            inputStream = new ByteArrayInputStream(documentData.file);
             mainWorkbook = new XSSFWorkbook(inputStream);
         } catch (IOException e) {
             System.out.println("Could not read file");
@@ -224,7 +228,7 @@ public class UserCustomerImportService extends BaseService {
             case STRING:
                 return cell.getStringCellValue();
             case NUMERIC:
-                return String.valueOf(cell.getNumericCellValue());
+                return String.valueOf(Double.valueOf(cell.getNumericCellValue()).longValue());
             default:
                 return null;
         }

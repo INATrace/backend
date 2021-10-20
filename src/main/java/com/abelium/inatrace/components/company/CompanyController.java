@@ -187,13 +187,13 @@ public class CompanyController {
         return new ApiPaginatedResponse<>(companyService.getAssociations(id, request));
     }
 
-    @PostMapping(value = "/userCustomers/import/farmers/{companyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/userCustomers/import/farmers/{companyId}/{documentId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ApiOperation(value = "Upload .xls or .xlsx spreadsheet of farmers to import into DB")
     public ApiDefaultResponse importFarmersSpreadsheet(
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
-            @RequestParam("file") MultipartFile file) {
-        companyService.importFarmersSpreadsheet(companyId, file);
+            @Valid @ApiParam(value = "Document ID", required = true) @PathVariable("documentId") Long documentId) throws ApiException {
+        companyService.importFarmersSpreadsheet(companyId, documentId);
         return new ApiDefaultResponse();
     }
 
