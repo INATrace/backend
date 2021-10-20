@@ -25,9 +25,6 @@ public class ApiProcessingEvidenceType extends ApiCodebookBaseEntity {
 	@ApiModelProperty(value = "if evidence is of quality type")
 	private Boolean quality;
 
-	@ApiModelProperty(value = "whether the evidence is required")
-	private Boolean required;
-
 	@ApiModelProperty(value = "whether the evidence is mandatory")
 	private Boolean mandatory;
 
@@ -67,14 +64,6 @@ public class ApiProcessingEvidenceType extends ApiCodebookBaseEntity {
 
 	public void setQuality(Boolean quality) {
 		this.quality = quality;
-	}
-
-	public Boolean getRequired() {
-		return required;
-	}
-
-	public void setRequired(Boolean required) {
-		this.required = required;
 	}
 
 	public Boolean getMandatory() {
