@@ -184,6 +184,8 @@ public class StockOrderService extends BaseService {
             apiStockOrder.setSemiProduct(farmer.getSemiProduct());
             apiStockOrder.setTare(farmer.getTare());
             apiStockOrder.setPricePerUnit(farmer.getPricePerUnit());
+            apiStockOrder.setCost(farmer.getCost());
+            apiStockOrder.setBalance(farmer.getBalance());
             apiStockOrder.setProducerUserCustomer(farmer.getProducerUserCustomer());
             apiStockOrder.setWomenShare(farmer.getWomenShare());
             apiStockOrder.setTotalQuantity(farmer.getTotalQuantity());

@@ -44,6 +44,12 @@ public class ApiPurchaseOrderFarmer extends ApiBaseEntity {
 	@ApiModelProperty(value = "Women only")
 	private Boolean womenShare;
 
+	@ApiModelProperty(value = "Cost")
+	public BigDecimal cost;
+
+	@ApiModelProperty(value = "Balance")
+	public BigDecimal balance;
+
 	public String getIdentifier() {
 		return identifier;
 	}
@@ -130,5 +136,21 @@ public class ApiPurchaseOrderFarmer extends ApiBaseEntity {
 
 	public void setWomenShare(Boolean womenShare) {
 		this.womenShare = womenShare;
+	}
+
+	public BigDecimal getCost() {
+		return cost;
+	}
+
+	public void setCost(BigDecimal cost) {
+		this.cost = cost;
+	}
+
+	public BigDecimal getBalance() {
+		return balance;
+	}
+
+	public void setBalance(BigDecimal balance) {
+		this.balance = balance;
 	}
 }
