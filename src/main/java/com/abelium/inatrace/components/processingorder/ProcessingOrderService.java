@@ -94,15 +94,7 @@ public class ProcessingOrderService extends BaseService {
 
             // SHIPMENT is actually QUOTE
             case SHIPMENT:
-                if (apiProcessingOrder.getTargetStockOrders().size() < 1)
-                    throw new ApiException(ApiStatus.INVALID_REQUEST,
-                            "At least one target StockOrder should be present in the request.");
-
-//                ApiStockOrder targetStockOrder = apiProcessingOrder.getTargetStockOrders().get(0);
-                // targetStockOrder.setProcessingOrder(...); / .setProcessingOrderId(...);
-                // targetStockOrder.setProcessingAction(...); / .setProcessingActionId(...);
-
-                break;
+                return createOrUpdateQuoteOrder(entity, apiProcessingOrder, userId);
 
             case PROCESSING:
                 // Validate that there is no transaction that is referencing current ProcessingOrder (via targetStockOrder)
@@ -212,11 +204,11 @@ public class ProcessingOrderService extends BaseService {
                     .orElseThrow(() -> new ApiException(ApiStatus.ERROR,
                             "Inappropriate deletion of target StockOrders that are not present in request!"));
 
-            // TODO: Explain validation??? Is it even necessary???
-            if (targetStockOrder.getTotalQuantity() - apiTargetStockOrder.getTotalQuantity() < 0) {
-                Integer usedQuantity = targetStockOrder.getFulfilledQuantity() - targetStockOrder.getAvailableQuantity();
+            // Prevent new quantity to be less then already used quantity
+            if (apiTargetStockOrder.getTotalQuantity() - targetStockOrder.getTotalQuantity() < 0) {
+                Integer usedQuantity = apiTargetStockOrder.getFulfilledQuantity() - apiTargetStockOrder.getAvailableQuantity();
                 if(targetStockOrder.getTotalQuantity() < usedQuantity)
-                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Cannot delete used stock order.");
+                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Cannot reduce total quantity below already used quantity.");
             }
         }
 
@@ -266,6 +258,54 @@ public class ProcessingOrderService extends BaseService {
 
         if (entity.getId() == null)
             em.persist(entity);
+
+        return new ApiBaseEntity(entity);
+    }
+
+    @Transactional
+    public ApiBaseEntity createOrUpdateQuoteOrder(ProcessingOrder entity, ApiProcessingOrder apiProcessingOrder, Long userId) throws ApiException {
+
+        if (apiProcessingOrder.getTargetStockOrders().size() < 1)
+            throw new ApiException(ApiStatus.INVALID_REQUEST,
+                    "At least one target StockOrder should be present in the request.");
+
+        // Remove transactions that are not present in request
+        if(entity.getId() != null) {
+            List<Transaction> transactionsToBeDeleted = entity.getInputTransactions()
+                    .stream()
+                    .filter(transaction -> apiProcessingOrder.getInputTransactions()
+                            .stream()
+                            .noneMatch(apiTransaction -> transaction.getId().equals(apiTransaction.getId())))
+                    .collect(Collectors.toList());
+
+            for (Transaction t: transactionsToBeDeleted) {
+                transactionService.deleteTransaction(t.getId(), userId);
+            }
+        }
+
+        // Create new or update existing input Transactions
+        for (int i = 0; i < apiProcessingOrder.getInputTransactions().size(); i++) {
+
+            ApiTransaction apiTransaction = apiProcessingOrder.getInputTransactions().get(i);
+            Boolean isProcessing = entity.getProcessingAction().getType() == ProcessingActionType.PROCESSING;
+
+            ApiBaseEntity insertedApiTransaction = transactionService.createOrUpdateTransaction(apiTransaction, isProcessing);
+            Transaction insertedTransaction = fetchEntity(insertedApiTransaction.getId(), Transaction.class);
+            insertedTransaction.setTargetProcessingOrder(entity);
+            entity.getInputTransactions().add(insertedTransaction);
+
+            // Update source StockOrder
+//            stockOrderService.createOrUpdateStockOrder(apiTransaction.getSourceStockOrder(), userId, entity);
+        }
+
+        ApiStockOrder apiTargetStockOrder = apiProcessingOrder.getTargetStockOrders().get(0);
+        StockOrder quoteStockOrder = stockOrderService.createOrUpdateQuoteStockOrder(apiTargetStockOrder, userId, entity);
+        quoteStockOrder.setProcessingOrder(entity);
+        entity.setTargetStockOrders(List.of(quoteStockOrder));
+
+        if (entity.getId() == null) {
+            em.persist(entity);
+        }
 
         return new ApiBaseEntity(entity);
     }
