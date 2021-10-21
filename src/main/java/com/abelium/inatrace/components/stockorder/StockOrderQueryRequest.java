@@ -6,8 +6,34 @@ import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import java.time.Instant;
 
 public class StockOrderQueryRequest {
-    
+
+    public Long companyId;
+    public Long facilityId;
+    public Long quoteFacilityId;
+    public Long farmerId;
+    public Long semiProductId;
+    public Long companyCustomerId;
+    public OrderType orderType;
+    public Boolean isOpenBalanceOnly;
+    public Boolean isPurchaseOrderOnly;
+    public Boolean isWomenShare;
+    public PreferredWayOfPayment wayOfPayment;
+    public Instant productionDateStart;
+    public Instant productionDateEnd;
+    public String producerUserCustomerName;
+    public Boolean isAvailable;
+    public Boolean isOpenOnly;
+
     public StockOrderQueryRequest() {}
+
+    public StockOrderQueryRequest(Long facilityId, Long quoteFacilityId, Long semiProductId, Long companyCustomerId,
+                                  Boolean isOpenOnly) {
+        this.facilityId = facilityId;
+        this.quoteFacilityId = quoteFacilityId;
+        this.semiProductId = semiProductId;
+        this.companyCustomerId = companyCustomerId;
+        this.isOpenOnly = isOpenOnly;
+    }
 
     public StockOrderQueryRequest(Long facilityId,
                                   Long semiProductId,
@@ -50,19 +76,5 @@ public class StockOrderQueryRequest {
         this.productionDateEnd = productionDateEnd;
         this.producerUserCustomerName = producerUserCustomerName;
     }
-
-    public Long companyId;
-    public Long facilityId;
-    public Long farmerId;
-    public Long semiProductId;
-    public Boolean isOpenBalanceOnly;
-    public Boolean isPurchaseOrderOnly;
-    public Boolean isWomenShare;
-    public PreferredWayOfPayment wayOfPayment;
-    public OrderType orderType;
-    public Instant productionDateStart;
-    public Instant productionDateEnd;
-    public String producerUserCustomerName;
-    public Boolean isAvailable;
 
 }

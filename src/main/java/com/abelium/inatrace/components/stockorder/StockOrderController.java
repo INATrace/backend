@@ -107,6 +107,7 @@ public class StockOrderController {
     }
 
     @GetMapping("list/facility/{facilityId}/orders-for-customers")
+    @ApiOperation("Get a paginated list of stock orders by facility ID for customers.")
     public ApiPaginatedResponse<ApiStockOrder> getStockOrdersInFacilityForCustomer(
             @Valid ApiPaginatedRequest request,
             @Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("facilityId") Long facilityId,
@@ -114,7 +115,20 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Return only open stock orders") @RequestParam(value = "openOnly", required = false) Boolean openOnly,
             @AuthenticationPrincipal CustomUserDetails authUser) {
 
-        return null;
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request,
+                new StockOrderQueryRequest(facilityId, null, null, companyCustomerId, openOnly), authUser.getUserId()));
+    }
+
+    @GetMapping("list/facility/{facilityId}/quote-orders")
+    public ApiPaginatedResponse<ApiStockOrder> getQuoteOrdersInFacility(
+            @Valid ApiPaginatedRequest request,
+            @Valid @ApiParam(value = "Quote facility ID", required = true) @PathVariable("facilityId") Long facilityId,
+            @Valid @ApiParam(value = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+            @Valid @ApiParam(value = "Return only open stock orders") @RequestParam(value = "openOnly", required = false) Boolean openOnly,
+            @AuthenticationPrincipal CustomUserDetails authUser) {
+
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request,
+                new StockOrderQueryRequest(null, facilityId, semiProductId, null, openOnly), authUser.getUserId()));
     }
 
     @GetMapping("list/company/{companyId}")
