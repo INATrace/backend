@@ -176,6 +176,7 @@ public class StockOrderService extends BaseService {
             apiStockOrder.setRepresentativeOfProducerUserCustomer(apiPurchaseOrder.getRepresentativeOfProducerUserCustomer());
             apiStockOrder.setProductionDate(apiPurchaseOrder.getProductionDate());
             apiStockOrder.setCurrency(apiPurchaseOrder.getCurrency());
+            apiStockOrder.setActivityProofs(apiPurchaseOrder.getActivityProofs());
 
             // copy farmer attributes
             apiStockOrder.setIdentifier(farmer.getIdentifier());
