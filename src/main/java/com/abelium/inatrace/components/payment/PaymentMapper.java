@@ -1,11 +1,11 @@
 package com.abelium.inatrace.components.payment;
 
-import com.abelium.inatrace.components.common.api.ApiDocument;
+import com.abelium.inatrace.components.common.CommonApiTools;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
+import com.abelium.inatrace.components.company.mappers.UserCustomerMapper;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.components.user.mappers.UserMapper;
-import com.abelium.inatrace.components.company.mappers.UserCustomerMapper;
 import com.abelium.inatrace.db.entities.payment.Payment;
 
 /**
@@ -19,7 +19,7 @@ public final class PaymentMapper {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static ApiPayment toApiPayment(Payment entity) {
+	public static ApiPayment toApiPayment(Payment entity, Long userId) {
 
 		// Simplest apiPayment object
 		ApiPayment apiPayment = new ApiPayment();
@@ -53,11 +53,7 @@ public final class PaymentMapper {
 //		apiPayment.setRecipientCompanyCustomer(apiRecipientCompanyCustomer);
 
 		if (entity.getReceiptDocument() != null) {
-			ApiDocument apiReceiptDocument = new ApiDocument();
-			apiReceiptDocument.setId(entity.getReceiptDocument().getId());
-			apiReceiptDocument.setName(entity.getReceiptDocument().getName());
-			apiReceiptDocument.setStorageKey(entity.getReceiptDocument().getStorageKey());
-			apiPayment.setReceiptDocument(apiReceiptDocument);
+			apiPayment.setReceiptDocument(CommonApiTools.toApiDocument(entity.getReceiptDocument(), userId));
 		}
 
 		return apiPayment;

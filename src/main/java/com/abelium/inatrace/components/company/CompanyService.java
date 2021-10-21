@@ -8,6 +8,7 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.company.api.*;
+import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
 import com.abelium.inatrace.components.company.api.ApiUserCustomer;
@@ -421,7 +422,7 @@ public class CompanyService extends BaseService {
 	}
 
 	public ApiPaginatedList<ApiCompanyCustomer> listCompanyCustomers(CustomUserDetails authUser, Long companyId, ApiListCustomersRequest request) throws ApiException {
-		return PaginationTools.createPaginatedResponse(em, request, () -> customerListQueryObject(companyId, request), companyApiTools::toApiCompanyCustomer);
+		return PaginationTools.createPaginatedResponse(em, request, () -> customerListQueryObject(companyId, request), CompanyCustomerMapper::toApiCompanyCustomer);
 	}
 
 	private TorpedoProjector<ProductCompany, ApiCompanyListResponse> associationsCompanyListQueryObject(Long companyId, ApiPaginatedRequest request) {
@@ -469,7 +470,7 @@ public class CompanyService extends BaseService {
 	}
 
 	public ApiCompanyCustomer getCompanyCustomer(Long companyCustomerId) {
-		return companyApiTools.toApiCompanyCustomer(em.find(CompanyCustomer.class, companyCustomerId));
+		return CompanyCustomerMapper.toApiCompanyCustomer(em.find(CompanyCustomer.class, companyCustomerId));
 	}
 
 	@Transactional
@@ -486,7 +487,7 @@ public class CompanyService extends BaseService {
 		companyCustomer.setVatId(apiCompanyCustomer.getVatId());
 
 		em.persist(companyCustomer);
-		return companyApiTools.toApiCompanyCustomer(companyCustomer);
+		return CompanyCustomerMapper.toApiCompanyCustomer(companyCustomer);
 	}
 
 	@Transactional
@@ -507,7 +508,7 @@ public class CompanyService extends BaseService {
 		companyCustomer.setPhone(apiCompanyCustomer.getPhone());
 		companyCustomer.setVatId(apiCompanyCustomer.getVatId());
 
-		return companyApiTools.toApiCompanyCustomer(companyCustomer);
+		return CompanyCustomerMapper.toApiCompanyCustomer(companyCustomer);
 	}
 
 	@Transactional

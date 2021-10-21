@@ -5,6 +5,7 @@ import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasure
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.company.api.ApiCompany;
+import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.company.api.ApiUserCustomer;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.user.api.ApiUser;
@@ -60,6 +61,12 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     @ApiModelProperty(value = "Processing evidence fields stored values for this stock order")
     public List<ApiStockOrderEvidenceFieldValue> requiredEvidenceFieldValues;
+
+    @ApiModelProperty(value = "Processing evidence types stored values for this stock order")
+    public List<ApiStockOrderEvidenceTypeValue> requiredEvidenceTypeValues;
+
+    @ApiModelProperty(value = "Other processing evidence documents - evidence types that can be provided but are not mandatory")
+    public List<ApiStockOrderEvidenceTypeValue> otherEvidenceDocuments;
 
     @ApiModelProperty(value = "Semi product", position = 7)
     public ApiSemiProduct semiProduct;
@@ -157,14 +164,14 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "SAC number", position = 42)
     private Integer sacNumber;
 
-//    @ApiModelProperty(value = "Is order open", position = 43)
-//    private Boolean isOpenOrder;
+    @ApiModelProperty(value = "Is order open", position = 43)
+    private Boolean isOpenOrder;
 
-//    @ApiModelProperty(value = "Quote facility", position = 44)
-//    private Facility quoteFacility;
+    @ApiModelProperty(value = "Quote facility")
+    private ApiFacility quoteFacility;
 
-//    @ApiModelProperty(value = "Quote Company", position = 45)
-//    private Company quoteCompany;
+    @ApiModelProperty(value = "The company customer for whom the stock order is created")
+    private ApiCompanyCustomer consumerCompanyCustomer;
 
 //    @ApiModelProperty(value = "Price per unit for owner", position = 46)
 //    private BigDecimal pricePerUnitForOwner;
@@ -313,6 +320,28 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setRequiredEvidenceFieldValues(List<ApiStockOrderEvidenceFieldValue> requiredEvidenceFieldValues) {
         this.requiredEvidenceFieldValues = requiredEvidenceFieldValues;
+    }
+
+    public List<ApiStockOrderEvidenceTypeValue> getRequiredEvidenceTypeValues() {
+        if (requiredEvidenceTypeValues == null) {
+            requiredEvidenceTypeValues = new ArrayList<>();
+        }
+        return requiredEvidenceTypeValues;
+    }
+
+    public void setRequiredEvidenceTypeValues(List<ApiStockOrderEvidenceTypeValue> requiredEvidenceTypeValues) {
+        this.requiredEvidenceTypeValues = requiredEvidenceTypeValues;
+    }
+
+    public List<ApiStockOrderEvidenceTypeValue> getOtherEvidenceDocuments() {
+        if (otherEvidenceDocuments == null) {
+            otherEvidenceDocuments = new ArrayList<>();
+        }
+        return otherEvidenceDocuments;
+    }
+
+    public void setOtherEvidenceDocuments(List<ApiStockOrderEvidenceTypeValue> otherEvidenceDocuments) {
+        this.otherEvidenceDocuments = otherEvidenceDocuments;
     }
 
     public ApiSemiProduct getSemiProduct() {
@@ -489,6 +518,30 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setSacNumber(Integer sacNumber) {
         this.sacNumber = sacNumber;
+    }
+
+    public Boolean getOpenOrder() {
+        return isOpenOrder;
+    }
+
+    public void setOpenOrder(Boolean openOrder) {
+        isOpenOrder = openOrder;
+    }
+
+    public ApiFacility getQuoteFacility() {
+        return quoteFacility;
+    }
+
+    public void setQuoteFacility(ApiFacility quoteFacility) {
+        this.quoteFacility = quoteFacility;
+    }
+
+    public ApiCompanyCustomer getConsumerCompanyCustomer() {
+        return consumerCompanyCustomer;
+    }
+
+    public void setConsumerCompanyCustomer(ApiCompanyCustomer consumerCompanyCustomer) {
+        this.consumerCompanyCustomer = consumerCompanyCustomer;
     }
 
     public Boolean getOrganic() {

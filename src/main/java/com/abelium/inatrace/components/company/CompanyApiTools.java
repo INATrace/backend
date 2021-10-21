@@ -6,17 +6,15 @@ import com.abelium.inatrace.components.codebook.currencies.CurrencyTypeService;
 import com.abelium.inatrace.components.common.CommonApiTools;
 import com.abelium.inatrace.components.common.CommonService;
 import com.abelium.inatrace.components.common.api.ApiCertification;
-import com.abelium.inatrace.components.common.api.ApiCountry;
+import com.abelium.inatrace.components.common.mappers.CountryMapper;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.company.types.CompanyTranslatables;
-import com.abelium.inatrace.components.product.api.*;
+import com.abelium.inatrace.components.product.api.ApiBankInformation;
+import com.abelium.inatrace.components.product.api.ApiFarmInformation;
+import com.abelium.inatrace.components.product.api.ApiLocation;
 import com.abelium.inatrace.components.user.UserApiTools;
 import com.abelium.inatrace.components.user.UserQueries;
-import com.abelium.inatrace.components.company.api.ApiUserCustomer;
-import com.abelium.inatrace.components.company.api.ApiUserCustomerAssociation;
-import com.abelium.inatrace.components.company.api.ApiUserCustomerCooperative;
-import com.abelium.inatrace.components.company.api.ApiUserCustomerLocation;
 import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.*;
 import com.abelium.inatrace.tools.ListTools;
@@ -375,7 +373,7 @@ public class CompanyApiTools {
 		apiAddress.setAddress(address.getAddress());
 		apiAddress.setCell(address.getCell());
 		apiAddress.setCity(address.getCity());
-		apiAddress.setCountry(toApiCountry(address.getCountry()));
+		apiAddress.setCountry(CountryMapper.toApiCountry(address.getCountry()));
 		apiAddress.setHondurasDepartment(address.getHondurasDepartment());
 		apiAddress.setHondurasFarm(address.getHondurasFarm());
 		apiAddress.setHondurasMunicipality(address.getHondurasMunicipality());
@@ -386,16 +384,6 @@ public class CompanyApiTools {
 		apiAddress.setZip(address.getZip());
 
 		return apiAddress;
-	}
-
-	public ApiCountry toApiCountry(Country country) {
-		if(country == null) return null;
-		ApiCountry apiCountry = new ApiCountry();
-		apiCountry.setId(country.getId());
-		apiCountry.setCode(country.getCode());
-		apiCountry.setName(country.getName());
-
-		return apiCountry;
 	}
 
 	public List<ApiUserCustomerAssociation> toApiUserCustomerAssociationList(List<UserCustomerAssociation> userCustomerAssociationList) {
@@ -412,49 +400,12 @@ public class CompanyApiTools {
 		return userCustomerCooperativeList.stream().map(this::toApiUserCustomerCooperative).collect(Collectors.toList());
 	}
 
-	public ApiCompanyCustomer toApiCompanyCustomer(CompanyCustomer companyCustomer) {
-		if (companyCustomer == null) return null;
-		ApiCompanyCustomer apiCompanyCustomer = new ApiCompanyCustomer();
-		apiCompanyCustomer.setId(companyCustomer.getId());
-		apiCompanyCustomer.setCompanyId(companyCustomer.getCompany().getId());
-		apiCompanyCustomer.setContact(companyCustomer.getContact());
-		apiCompanyCustomer.setEmail(companyCustomer.getEmail());
-		apiCompanyCustomer.setLocation(toApiGeoAddress(companyCustomer.getLocation()));
-		apiCompanyCustomer.setName(companyCustomer.getName());
-		apiCompanyCustomer.setOfficialCompanyName(companyCustomer.getOfficialCompanyName());
-		apiCompanyCustomer.setPhone(companyCustomer.getPhone());
-		apiCompanyCustomer.setVatId(companyCustomer.getVatId());
-
-		return apiCompanyCustomer;
-	}
-
 	public ApiLocation toApiLocation(Location location) {
 		if (location == null) return null;
 		ApiLocation apiLocation = new ApiLocation();
 		apiLocation.setAddress(toApiAddress(location.getAddress()));
 
 		return apiLocation;
-	}
-
-	public ApiGeoAddress toApiGeoAddress(GeoAddress geoAddress) {
-		if(geoAddress == null) return null;
-		ApiGeoAddress apiGeoAddress = new ApiGeoAddress();
-		apiGeoAddress.setAddress(geoAddress.getAddress());
-		apiGeoAddress.setCell(geoAddress.getCell());
-		apiGeoAddress.setCity(geoAddress.getCity());
-		apiGeoAddress.setCountry(toApiCountry(geoAddress.getCountry()));
-		apiGeoAddress.setHondurasDepartment(geoAddress.getHondurasDepartment());
-		apiGeoAddress.setHondurasFarm(geoAddress.getHondurasFarm());
-		apiGeoAddress.setHondurasMunicipality(geoAddress.getHondurasMunicipality());
-		apiGeoAddress.setHondurasVillage(geoAddress.getHondurasVillage());
-		apiGeoAddress.setLatitude(geoAddress.getLatitude());
-		apiGeoAddress.setLongitude(geoAddress.getLongitude());
-		apiGeoAddress.setSector(geoAddress.getSector());
-		apiGeoAddress.setState(geoAddress.getState());
-		apiGeoAddress.setVillage(geoAddress.getVillage());
-		apiGeoAddress.setZip(geoAddress.getZip());
-
-		return apiGeoAddress;
 	}
 				
 }

@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
 
 @Entity
 public class StockOrderPETypeValue extends TimestampEntity {
@@ -17,13 +18,13 @@ public class StockOrderPETypeValue extends TimestampEntity {
 	private Long entityVersion;
 	
 	@Column
-	private String name;
-	
-	@Column
-	private String description;
+	private Instant date;
 
 	@ManyToOne
 	private Document document;
+
+	@Column
+	private Boolean otherEvidence;
 	
 	@ManyToOne
 	@NotNull
@@ -33,20 +34,12 @@ public class StockOrderPETypeValue extends TimestampEntity {
 	@NotNull
 	private ProcessingEvidenceType processingEvidenceType;
 
-	public String getName() {
-		return name;
+	public Instant getDate() {
+		return date;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
+	public void setDate(Instant date) {
+		this.date = date;
 	}
 
 	public Document getDocument() {
@@ -55,6 +48,22 @@ public class StockOrderPETypeValue extends TimestampEntity {
 
 	public void setDocument(Document document) {
 		this.document = document;
+	}
+
+	public Long getEntityVersion() {
+		return entityVersion;
+	}
+
+	public void setEntityVersion(Long entityVersion) {
+		this.entityVersion = entityVersion;
+	}
+
+	public Boolean getOtherEvidence() {
+		return otherEvidence;
+	}
+
+	public void setOtherEvidence(Boolean otherEvidence) {
+		this.otherEvidence = otherEvidence;
 	}
 
 	public StockOrder getStockOrder() {

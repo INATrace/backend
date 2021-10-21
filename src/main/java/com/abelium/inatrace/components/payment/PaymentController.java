@@ -1,10 +1,6 @@
 package com.abelium.inatrace.components.payment;
 
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiDefaultResponse;
-import com.abelium.inatrace.api.ApiPaginatedRequest;
-import com.abelium.inatrace.api.ApiPaginatedResponse;
-import com.abelium.inatrace.api.ApiResponse;
+import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.payment.api.ApiBulkPayment;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
@@ -12,26 +8,15 @@ import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.converters.SimpleDateConverter;
-
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Date;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import java.util.Date;
 
 /**
  * REST controller for payment entity.
@@ -51,8 +36,10 @@ public class PaymentController {
 
 	@GetMapping("{id}")
 	@ApiOperation("Get a single payment with the provided ID.")
-	public ApiResponse<ApiPayment> getPayment(@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id) throws ApiException {
-		return new ApiResponse<>(paymentService.getPayment(id));
+	public ApiResponse<ApiPayment> getPayment(
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id) throws ApiException {
+		return new ApiResponse<>(paymentService.getPayment(id, authUser.getUserId()));
 	}
 	
 	@GetMapping("bulk-payment/{id}")
@@ -64,13 +51,16 @@ public class PaymentController {
 
 	@GetMapping("list")
 	@ApiOperation("Get a paginated list of payments.")
-	public ApiPaginatedResponse<ApiPayment> getPaymentList(@Valid ApiPaginatedRequest request) {
-		return new ApiPaginatedResponse<>(paymentService.getPaymentList(request, new PaymentQueryRequest()));
+	public ApiPaginatedResponse<ApiPayment> getPaymentList(
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid ApiPaginatedRequest request) {
+		return new ApiPaginatedResponse<>(paymentService.getPaymentList(request, new PaymentQueryRequest(), authUser.getUserId()));
 	}
 
 	@GetMapping("list/purchase/{id}")
 	@ApiOperation("Get a list of payments by purchase order (stock order) ID.")
 	public ApiPaginatedResponse<ApiPayment> listPaymentsByPurchase(
+			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid ApiPaginatedRequest request,
 			@Valid @ApiParam(value = "Purchase ID", required = true) @PathVariable("id") Long purchaseId,
 			@Valid @ApiParam(value = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
@@ -89,13 +79,15 @@ public class PaymentController {
 						productionDateStart != null ? productionDateStart.toInstant() : null,
 						productionDateEnd != null ? productionDateEnd.toInstant() : null,
 						farmerName
-				)
+				),
+				authUser.getUserId()
 		));
 	}
 
 	@GetMapping("list/company/{id}")
 	@ApiOperation("Get a list of payments by company ID.")
 	public ApiPaginatedResponse<ApiPayment> listPaymentsByCompany(
+			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid ApiPaginatedRequest request,
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
 			@Valid @ApiParam(value = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
@@ -114,7 +106,7 @@ public class PaymentController {
 						productionDateStart != null ? productionDateStart.toInstant() : null,
 						productionDateEnd != null ? productionDateEnd.toInstant() : null,
 						farmerName
-				)
+				), authUser.getUserId()
 		));
 	}
 
