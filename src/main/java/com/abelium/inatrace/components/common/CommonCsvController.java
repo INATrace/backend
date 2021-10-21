@@ -34,7 +34,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 /**
- * REST controller for payments csv generator.
+ * REST controller for csv generators.
  *
  * @author Rene Flores, Sunesis d.o.o.
  */
