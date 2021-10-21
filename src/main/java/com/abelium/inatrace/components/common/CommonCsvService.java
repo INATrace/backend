@@ -33,7 +33,7 @@ public class CommonCsvService extends BaseService {
 		Company company = companyQueries.fetchCompany(companyId);
 
         // Create CSV file
-		FileWriter fileWriter = new FileWriter("./payments_" + company.getName() + ".csv", false);
+		FileWriter fileWriter = new FileWriter("./payments_" + company.getName().toLowerCase().replaceAll(" ", "_") + ".csv", false);
 		try (CSVPrinter csvPrinter = new CSVPrinter(fileWriter, CSVFormat.RFC4180)) {
 			
 			// Headers
@@ -42,7 +42,7 @@ public class CommonCsvService extends BaseService {
 			for (ApiPayment p : apiPayments) {
 				csvPrinter.printRecord(
 					p.getPaymentPurposeType(), p.getAmountPaidToTheFarmer(), 
-					p.getRecipientUserCustomer().getName(), "TBD",
+					p.getRecipientUserCustomer().getName() + " " + p.getRecipientUserCustomer().getSurname(), p.getRecipientCompany().getName(),
 					p.getProductionDate(), p.getFormalCreationTime(), 
 					p.getPreferredWayOfPayment());
 			}
@@ -56,17 +56,18 @@ public class CommonCsvService extends BaseService {
 		Company company = companyQueries.fetchCompany(companyId);
 
         // Create CSV file
-		FileWriter fileWriter = new FileWriter("./purchases_" + company.getName() + ".csv", false);
+		FileWriter fileWriter = new FileWriter("./purchases_" + company.getName().toLowerCase().replaceAll(" ", "_") + ".csv", false);
 		try (CSVPrinter csvPrinter = new CSVPrinter(fileWriter, CSVFormat.RFC4180)) {
 			
 			// Headers
-			csvPrinter.printRecord("Delivery date", "Farmer name", "Quantity", "Payable", "Open Balance",  "Way of payment");
+			csvPrinter.printRecord("Delivery date", "Farmer name", "Semi-product", "Quantity", "Payable", "Open Balance",  "Way of payment");
 			// Data
 			for (ApiStockOrder p : apiStockOrders) {
 				csvPrinter.printRecord(
-					p.getProductionDate(),
-					p.getProducerUserCustomer().getName(), p.getTotalQuantity(),
-					p.getPaid(), p.getBalance(), 
+					p.getDeliveryTime(),
+					p.getProducerUserCustomer().getName() + " " + p.getProducerUserCustomer().getSurname(), 
+					p.semiProduct.getName(), p.getTotalQuantity(),
+					p.getCost(), p.getBalance(), 
 					p.getPreferredWayOfPayment());
 			}
 			
