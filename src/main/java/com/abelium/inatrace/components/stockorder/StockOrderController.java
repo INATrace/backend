@@ -1,13 +1,12 @@
 package com.abelium.inatrace.components.stockorder;
 
-
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
-import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,18 +46,16 @@ public class StockOrderController {
                 request, new StockOrderQueryRequest(), authUser.getUserId()));
     }
 
-    @GetMapping("listAvailableStockForSemiProductInFacility")
+    @GetMapping("/list/facility/{facilityId}/semi-product/{semiProductId}/available")
     @ApiOperation("Get a paginated list of stock orders for provided semi product ID and facility ID.")
     public ApiPaginatedResponse<ApiStockOrder> getAvailableStockForSemiProductInFacility(
             @Valid ApiPaginatedRequest request,
-            @Valid @ApiParam(value = "Facility ID", required = true) @RequestParam("facilityId") Long facilityId,
-            @Valid @ApiParam(value = "SemiProduct ID", required = true) @RequestParam("semiProductId") Long semiProductId,
+            @Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("facilityId") Long facilityId,
+            @Valid @ApiParam(value = "SemiProduct ID", required = true) @PathVariable("semiProductId") Long semiProductId,
             @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
             @AuthenticationPrincipal CustomUserDetails authUser) {
-
-        // TODO: Should company be verified (if facility is part of user's company)
 
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
                 request,
@@ -109,6 +106,17 @@ public class StockOrderController {
                 authUser.getUserId()));
     }
 
+    @GetMapping("list/facility/{facilityId}/orders-for-customers")
+    public ApiPaginatedResponse<ApiStockOrder> getStockOrdersInFacilityForCustomer(
+            @Valid ApiPaginatedRequest request,
+            @Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("facilityId") Long facilityId,
+            @Valid @ApiParam(value = "Company customer ID") @RequestParam(value = "companyCustomerId", required = false) Long companyCustomerId,
+            @Valid @ApiParam(value = "Return only open stock orders") @RequestParam(value = "openOnly", required = false) Boolean openOnly,
+            @AuthenticationPrincipal CustomUserDetails authUser) {
+
+        return null;
+    }
+
     @GetMapping("list/company/{companyId}")
     @ApiOperation("Get a paginated list of stock orders by company ID.")
     public ApiPaginatedResponse<ApiStockOrder> getStockOrderListByCompanyId(
@@ -125,9 +133,8 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
             @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName,
-            @AuthenticationPrincipal CustomUserDetails authUser
+            @AuthenticationPrincipal CustomUserDetails authUser) {
 
-    ) {
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
                 request,
                 new StockOrderQueryRequest(

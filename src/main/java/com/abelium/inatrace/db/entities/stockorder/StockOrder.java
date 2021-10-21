@@ -57,7 +57,8 @@ public class StockOrder extends TimestampEntity {
 	
 	@OneToOne(cascade = CascadeType.ALL)
 	private StockOrderLocation productionLocation;
-	
+
+	// The comopany customer for which the stock order was placed
 	@OneToOne
 	private CompanyCustomer consumerCompanyCustomer;
 	
@@ -188,13 +189,16 @@ public class StockOrder extends TimestampEntity {
 	
 //	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 //	private List<StockOrder> inputOrders = new ArrayList<>();
-	
+
+	// Used in case where we have Quote order - the quote order is open when total quantity > fulfilled quantity
 	@Column
 	private Boolean isOpenOrder;
-	
+
+	// The facility that is quoted for total quantity of the provided semi-product
 	@ManyToOne
 	private Facility quoteFacility;
-	
+
+	// The company of the quoted facility (this should be set automatically from the facility company)
 	@ManyToOne
 	private Company quoteCompany;
 	

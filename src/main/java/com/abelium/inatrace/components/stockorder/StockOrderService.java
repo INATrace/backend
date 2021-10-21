@@ -186,7 +186,7 @@ public class StockOrderService extends BaseService {
 
         Integer lastUsedQuantity = (entity.getTotalQuantity() != null && entity.getAvailableQuantity() != null)
                 ? entity.getTotalQuantity() - entity.getAvailableQuantity()
-                : 0;
+                : null;
 
         entity.setTotalQuantity(apiStockOrder.getTotalQuantity());
 
@@ -195,6 +195,18 @@ public class StockOrderService extends BaseService {
             case PROCESSING_ORDER:
             case TRANSFER_ORDER:
                 entity.setFulfilledQuantity(entity.getTotalQuantity());
+
+                // For new StockOrders set available quantity to total quantity
+                if (entity.getId() == null) {
+                    entity.setAvailableQuantity(entity.getTotalQuantity());
+                }
+
+            default:
+                // Applies only for new Quote StockOrders
+                if (entity.getId() == null) {
+                    entity.setFulfilledQuantity(apiStockOrder.getFulfilledQuantity());
+                    entity.setAvailableQuantity(apiStockOrder.getFulfilledQuantity());
+                }
         }
 
         if (processingOrder != null && entity.getId() != null) {
@@ -204,20 +216,21 @@ public class StockOrderService extends BaseService {
             if (inputTxs != null && !inputTxs.isEmpty()) {
 
                 if (apiStockOrder.getOrderType() == OrderType.SALES_ORDER || apiStockOrder.getOrderType() == OrderType.GENERAL_ORDER) {
+                    // TODO: May happen that old transactions are not counted
                     entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs, entity.getId()));
                 }
 
                 if (apiStockOrder.getOrderType() != OrderType.SALES_ORDER) {
+                    if(lastUsedQuantity == null) {
+                        lastUsedQuantity = 0;
+                    }
                     entity.setAvailableQuantity(entity.getFulfilledQuantity() - lastUsedQuantity - calculateUsedQuantity(inputTxs, entity.getId()));
                 }
             }
 
-        } else if (entity.getTotalQuantity() != null && entity.getAvailableQuantity() != null){
+        } else if (entity.getTotalQuantity() != null && lastUsedQuantity != null && entity.getAvailableQuantity() != null){
             entity.setAvailableQuantity(apiStockOrder.getTotalQuantity() - lastUsedQuantity);
 
-        } else {
-            // For new StockOrders set available quantity to total quantity
-            entity.setAvailableQuantity(entity.getTotalQuantity());
         }
 
         // Validate quantities
@@ -326,6 +339,45 @@ public class StockOrderService extends BaseService {
         }
 
         return new ApiBaseEntity(entity);
+    }
+
+    // Should be called only from ProcessingOrderService
+    @Transactional
+    public StockOrder createOrUpdateQuoteStockOrder(ApiStockOrder apiQuoteStockOrder, Long userId, ProcessingOrder processingOrder) throws ApiException {
+
+        StockOrder entity;
+        boolean inserted = false;
+
+        if (apiQuoteStockOrder.getId() != null) {
+            entity = fetchEntity(apiQuoteStockOrder.getId(), StockOrder.class);
+
+        } else {
+            if (apiQuoteStockOrder.getFulfilledQuantity() != null && apiQuoteStockOrder.getFulfilledQuantity() != 0) {
+                throw new ApiException(ApiStatus.INVALID_REQUEST, "Fulfilled quantity must be 0");
+            }
+
+            Long insertedStockOrderId = createOrUpdateStockOrder(apiQuoteStockOrder, userId, processingOrder).getId();
+            entity = fetchEntity(insertedStockOrderId, StockOrder.class);
+            inserted = true;
+        }
+
+        if (apiQuoteStockOrder.getOrderType() != OrderType.GENERAL_ORDER && apiQuoteStockOrder.getOrderType() != OrderType.SALES_ORDER) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Order must be of orderType " +  OrderType.GENERAL_ORDER
+                    + " or " + OrderType.SALES_ORDER + " to allow input transactions");
+        }
+
+        if (!inserted) {
+
+            // Do not mess with quantities - transactions will take care of it.
+            apiQuoteStockOrder.setTotalQuantity(entity.getTotalQuantity());
+            apiQuoteStockOrder.setAvailableQuantity(entity.getAvailableQuantity());
+            apiQuoteStockOrder.setFulfilledQuantity(entity.getFulfilledQuantity());
+
+            createOrUpdateStockOrder(apiQuoteStockOrder, userId, processingOrder);
+            return fetchEntity(apiQuoteStockOrder.getId(), StockOrder.class);
+        }
+
+        return entity;
     }
 
     @Transactional

@@ -1,6 +1,7 @@
 package com.abelium.inatrace.components.product;
 
 import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeMapper;
 import com.abelium.inatrace.components.common.CommonApiTools;
 import com.abelium.inatrace.components.common.CommonService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
@@ -761,7 +762,17 @@ public class ProductApiTools {
 		fb.setPrivacyPolicyConsent(afb.privacyPolicyConsent);
 		fb.setTermsOfUseConsent(afb.termsOfUseConsent);
 		fb.setQuestionnaireAnswers(afb.questionnaireAnswers);
-	}	
-	
+	}
+
+	public static ApiFinalProduct toApiFinalProduct(FinalProduct entity) {
+		if (entity == null) return null;
+
+		ApiFinalProduct apiFinalProduct = new ApiFinalProduct();
+		apiFinalProduct.setId(entity.getId());
+		apiFinalProduct.setName(entity.getName());
+		apiFinalProduct.setDescription(entity.getDescription());
+		apiFinalProduct.setMeasurementUnitType(MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(entity.getMeasurementUnitType()));
+		return apiFinalProduct;
+	}
 	
 }
