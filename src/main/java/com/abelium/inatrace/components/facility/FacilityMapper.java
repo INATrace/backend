@@ -104,10 +104,13 @@ public final class FacilityMapper {
 	}
 
 	public static ApiFacility toApiFacilityDetail(Facility facility) {
-		if (facility == null) {
+
+		ApiFacility apiFacility = toApiFacility(facility);
+
+		if (apiFacility == null) {
 			return null;
 		}
-		ApiFacility apiFacility = toApiFacility(facility);
+
 		apiFacility.setTranslations(facility.getFacilityTranslations().stream().map(FacilityMapper::toApiFacilityTranslation).collect(Collectors.toList()));
 
 		return apiFacility;
