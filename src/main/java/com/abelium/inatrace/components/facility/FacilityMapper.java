@@ -28,24 +28,40 @@ public final class FacilityMapper {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static ApiFacility toApiFacility(Facility entity) {
-		if (entity == null) return null;
+	public static ApiFacility toApiFacilityBase(Facility entity) {
+
+		if (entity == null) {
+			return null;
+		}
 
 		FacilityTranslation facilityTranslation = entity.getFacilityTranslations().stream().findFirst().orElse(new FacilityTranslation());
 
-		// Simplest apiFacility object
 		ApiFacility apiFacility = new ApiFacility();
+
 		apiFacility.setId(entity.getId());
 		apiFacility.setName(facilityTranslation.getName());
 		apiFacility.setIsCollectionFacility(entity.getIsCollectionFacility());
 		apiFacility.setIsPublic(entity.getIsPublic());
+
+		apiFacility.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
+
+		return apiFacility;
+	}
+
+	public static ApiFacility toApiFacility(Facility entity) {
+
+		// Simplest apiFacility object
+		ApiFacility apiFacility = toApiFacilityBase(entity);
+
+		if (apiFacility == null) {
+			return null;
+		}
+
 		apiFacility.setDisplayMayInvolveCollectors(entity.getDisplayMayInvolveCollectors());
 		apiFacility.setDisplayOrganic(entity.getDisplayOrganic());
 		apiFacility.setDisplayPriceDeductionDamage(entity.getDisplayPriceDeductionDamage());
 		apiFacility.setDisplayTare(entity.getDisplayTare());
 		apiFacility.setDisplayWomenOnly(entity.getDisplayWomenOnly());
-
-		apiFacility.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
 
 		ApiFacilityLocation apiFacilityLocation = new ApiFacilityLocation();
 		ApiAddress apiAddress = new ApiAddress();
