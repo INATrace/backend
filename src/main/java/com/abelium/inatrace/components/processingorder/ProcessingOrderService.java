@@ -243,16 +243,16 @@ public class ProcessingOrderService extends BaseService {
         // Create new or update existing target for PROCESSING
         if (processingAction.getType() != ProcessingActionType.TRANSFER) {
 
-            Long insertedTargetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiProcessingOrder.getTargetStockOrders().get(0), userId, entity).getId();
-            StockOrder targetStockOrder = fetchEntity(insertedTargetStockOrderId, StockOrder.class);
-            targetStockOrder.setProcessingOrder(entity);
+            for (ApiStockOrder apiTargetStockOrder: apiProcessingOrder.getTargetStockOrders()) {
+                Long insertedTargetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiTargetStockOrder, userId, entity).getId();
+                StockOrder targetStockOrder = fetchEntity(insertedTargetStockOrderId, StockOrder.class);
+                targetStockOrder.setProcessingOrder(entity);
+                entity.getTargetStockOrders().add(targetStockOrder);
+            }
 
-            entity.getTargetStockOrders().add(targetStockOrder);
-
-            // Set target stockOrder and facility
-            for (Transaction t: entity.getInputTransactions()) {
-                t.setTargetStockOrder(targetStockOrder);
-                t.setTargetFacility(targetStockOrder.getFacility());
+            // Set target facility to transactions
+            for (Transaction t : entity.getInputTransactions()) {
+                t.setTargetFacility(entity.getTargetStockOrders().get(0).getFacility());
             }
         }
 
