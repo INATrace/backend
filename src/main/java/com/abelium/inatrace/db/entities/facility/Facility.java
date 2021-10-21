@@ -10,14 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(indexes = { @Index(columnList = "name") })
+@Table
 @NamedQueries({
-	@NamedQuery(name = "Facility.listFacilitiesByCompany", query = "SELECT f FROM Facility f INNER JOIN f.company c WHERE c.id = :companyId"),
+	@NamedQuery(name = "Facility.listFacilitiesByCompany", query = "SELECT f FROM Facility f INNER JOIN FETCH f.facilityTranslations t INNER JOIN f.company c WHERE c.id = :companyId AND t.language = :language"),
 	@NamedQuery(name = "Facility.countFacilitiesByCompany", query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId"),
 
 	@NamedQuery(name = "Facility.listCollectingFacilitiesByCompany",
-				query = "SELECT f FROM Facility f INNER JOIN f.company c WHERE c.id = :companyId AND f.isCollectionFacility = true"),
-	@NamedQuery(name = "Facility.listSellingFacilitiesByCompany", query = "SELECT f FROM Facility f INNER JOIN f.company c WHERE c.id = :companyId AND f.isPublic = true"),
+				query = "SELECT f FROM Facility f INNER JOIN FETCH f.facilityTranslations t INNER JOIN f.company c WHERE c.id = :companyId AND f.isCollectionFacility = true AND t.language = :language"),
+	@NamedQuery(name = "Facility.listSellingFacilitiesByCompany",
+				query = "SELECT f FROM Facility f INNER JOIN FETCH f.facilityTranslations t INNER JOIN f.company c WHERE c.id = :companyId AND f.isPublic = true AND t.language = :language"),
 
 	@NamedQuery(name = "Facility.countCollectingFacilitiesByCompany", query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId AND f.isCollectionFacility = true"),
 	@NamedQuery(name = "Facility.countSellingFacilitiesByCompany", query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId AND f.isPublic = true")
@@ -65,6 +66,9 @@ public class Facility extends TimestampEntity {
 	
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL)
 	private List<StockOrder> stockOrders = new ArrayList<>();
+
+	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<FacilityTranslation> facilityTranslations = new ArrayList<>();
 
 	public String getName() {
 		return name;
@@ -170,13 +174,21 @@ public class Facility extends TimestampEntity {
 		this.stockOrders = stockOrders;
 	}
 
+	public List<FacilityTranslation> getFacilityTranslations() {
+		return facilityTranslations;
+	}
+
+	public void setFacilityTranslations(List<FacilityTranslation> facilityTranslations) {
+		this.facilityTranslations = facilityTranslations;
+	}
+
 	public Facility() {
 		super();
 	}
 
 	public Facility(String name, Boolean isCollectionFacility, Boolean isPublic,
 			FacilityLocation facilityLocation, Company company, FacilityType facilityType,
-			List<FacilitySemiProduct> facilitySemiProducts, List<StockOrder> stockOrders) {
+			List<FacilitySemiProduct> facilitySemiProducts, List<StockOrder> stockOrders, List<FacilityTranslation> facilityTranslations) {
 		super();
 		this.name = name;
 		this.isCollectionFacility = isCollectionFacility;
@@ -186,6 +198,7 @@ public class Facility extends TimestampEntity {
 		this.facilityType = facilityType;
 		this.facilitySemiProducts = facilitySemiProducts;
 		this.stockOrders = stockOrders;
+		this.facilityTranslations = facilityTranslations;
 	}
 
 }

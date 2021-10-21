@@ -3,6 +3,7 @@ package com.abelium.inatrace.components.facility;
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
+import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +29,10 @@ public class FacilityController {
 
 	@GetMapping("list")
 	@ApiOperation("Get a paginated list of facilities.")
-	public ApiPaginatedResponse<ApiFacility> getFacilityList(@Valid ApiPaginatedRequest request) {
-
-		return new ApiPaginatedResponse<>(facilityService.getFacilityList(request));
+	public ApiPaginatedResponse<ApiFacility> getFacilityList(
+			@Valid @ApiParam(value = "Language", required = false) @RequestParam(value = "language", defaultValue = "EN") String language,
+			@Valid ApiPaginatedRequest request) {
+		return new ApiPaginatedResponse<>(facilityService.getFacilityList(request, Language.valueOf(language)));
 	}
 	
 	@GetMapping("list/company/{id}")
@@ -38,18 +40,20 @@ public class FacilityController {
 	public ApiPaginatedResponse<ApiFacility> listFacilitiesByCompany(
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
 			@Valid @ApiParam(value = "Semi product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+			@Valid @ApiParam(value = "Language", required = false) @RequestParam(value = "language", defaultValue = "EN") String language,
 			@Valid ApiPaginatedRequest request) {
 
-		return new ApiPaginatedResponse<>(facilityService.listFacilitiesByCompany(companyId, semiProductId, request));
+		return new ApiPaginatedResponse<>(facilityService.listFacilitiesByCompany(companyId, semiProductId, request, Language.valueOf(language)));
 	}
 	
 	@GetMapping("list/collecting/company/{id}")
 	@ApiOperation("Get a list of collecting facilities by company ID.")
 	public ApiPaginatedResponse<ApiFacility> listCollectingFacilitiesByCompany(
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @ApiParam(value = "Language", required = false) @RequestParam(value = "language", defaultValue = "EN") String language,
 			@Valid ApiPaginatedRequest request) {
 
-		return new ApiPaginatedResponse<>(facilityService.listCollectingFacilitiesByCompany(companyId, request));
+		return new ApiPaginatedResponse<>(facilityService.listCollectingFacilitiesByCompany(companyId, request, Language.valueOf(language)));
 	}
 
 	@GetMapping("list/selling/company/{id}")
@@ -57,9 +61,10 @@ public class FacilityController {
 	public ApiPaginatedResponse<ApiFacility> listSellingFacilitiesByCompany(
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
 			@Valid @ApiParam(value = "Semi product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+			@Valid @ApiParam(value = "Language", required = false) @RequestParam(value = "language", defaultValue = "EN") String language,
 			@Valid ApiPaginatedRequest request) {
 
-		return new ApiPaginatedResponse<>(facilityService.listSellingFacilitiesByCompany(companyId, semiProductId, request));
+		return new ApiPaginatedResponse<>(facilityService.listSellingFacilitiesByCompany(companyId, semiProductId, request, Language.valueOf(language)));
 	}
 
 	@GetMapping("{id}")
@@ -68,6 +73,13 @@ public class FacilityController {
 
 		return new ApiResponse<>(facilityService.getFacility(id));
 
+	}
+
+	@GetMapping("{id}/detail")
+	@ApiOperation("Get a single facility with translations for the provided ID.")
+	public ApiResponse<ApiFacility> getFacilityDetail(
+			@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) throws ApiException {
+		return new ApiResponse<>(facilityService.getFacilityDetail(id));
 	}
 
 	@PutMapping

@@ -17,9 +17,11 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.facility.FacilityLocation;
 import com.abelium.inatrace.db.entities.facility.FacilitySemiProduct;
+import com.abelium.inatrace.db.entities.facility.FacilityTranslation;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+import com.abelium.inatrace.types.Language;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -42,15 +44,20 @@ public class FacilityService extends BaseService {
 	@Autowired
 	private SemiProductService semiProductService;
 
-	public ApiPaginatedList<ApiFacility> getFacilityList(ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiFacility> getFacilityList(ApiPaginatedRequest request, Language language) {
 
-		return PaginationTools.createPaginatedResponse(em, request, () -> facilityQueryObject(request), FacilityMapper::toApiFacility);
+		return PaginationTools.createPaginatedResponse(em, request, () -> facilityQueryObject(request, language), FacilityMapper::toApiFacility);
 
 	}
 
-	private Facility facilityQueryObject(ApiPaginatedRequest request) {
+	private Facility facilityQueryObject(ApiPaginatedRequest request, Language language) {
 
 		Facility facilityProxy = Torpedo.from(Facility.class);
+
+		FacilityTranslation ft = Torpedo.innerJoin(facilityProxy.getFacilityTranslations());
+
+		Torpedo.where(ft.getLanguage()).eq(language);
+
 		if ("name".equals(request.sortBy)) {
 			QueryTools.orderBy(request.sort, facilityProxy.getName());
 		} else {
@@ -62,6 +69,10 @@ public class FacilityService extends BaseService {
 
 	public ApiFacility getFacility(Long id) throws ApiException {
 		return FacilityMapper.toApiFacility(fetchFacility(id));
+	}
+
+	public ApiFacility getFacilityDetail(Long id) throws ApiException {
+		return FacilityMapper.toApiFacilityDetail(fetchFacility(id));
 	}
 
 	@Transactional
@@ -84,7 +95,6 @@ public class FacilityService extends BaseService {
 			company = (Company) em.createNamedQuery("Company.getCompanyById").setParameter("companyId", apiFacility.getCompany().getId()).getSingleResult();
 		}
 
-		entity.setName(apiFacility.getName());
 		entity.setIsCollectionFacility(apiFacility.getIsCollectionFacility());
 		entity.setIsPublic(apiFacility.getIsPublic());
 		entity.setDisplayMayInvolveCollectors(apiFacility.getDisplayMayInvolveCollectors() != null ? apiFacility.getDisplayMayInvolveCollectors() : Boolean.FALSE);
@@ -132,6 +142,18 @@ public class FacilityService extends BaseService {
 			entity.getFacilitySemiProducts().add(facilitySemiProduct);
 		}
 
+		// remove translations not in request
+		entity.getFacilityTranslations().removeIf(facilityTranslation -> apiFacility.getTranslations().stream().noneMatch(apiFacilityTranslation -> facilityTranslation.getLanguage().equals(apiFacilityTranslation.getLanguage())));
+
+		// add or update existing
+		apiFacility.getTranslations().forEach(apiFacilityTranslation -> {
+			FacilityTranslation translation = entity.getFacilityTranslations().stream().filter(facilityTranslation -> facilityTranslation.getLanguage().equals(apiFacilityTranslation.getLanguage())).findFirst().orElse(new FacilityTranslation());
+			translation.setName(apiFacilityTranslation.getName());
+			translation.setLanguage(apiFacilityTranslation.getLanguage());
+			translation.setFacility(entity);
+			entity.getFacilityTranslations().add(translation);
+		});
+
 		return new ApiBaseEntity(entity);
 	}
 
@@ -154,7 +176,7 @@ public class FacilityService extends BaseService {
 
 	}
 	
-	public ApiPaginatedList<ApiFacility> listFacilitiesByCompany(Long companyId, Long semiProductId, ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiFacility> listFacilitiesByCompany(Long companyId, Long semiProductId, ApiPaginatedRequest request, Language language) {
 
 		TypedQuery<Facility> facilitiesQuery;
 		Long count;
@@ -164,6 +186,7 @@ public class FacilityService extends BaseService {
 			facilitiesQuery = em.createNamedQuery("Facility.listFacilitiesByCompanyAndSemiProduct", Facility.class)
 					.setParameter("companyId", companyId)
 					.setParameter("semiProductId", semiProductId)
+					.setParameter("language", language)
 					.setFirstResult(request.getOffset())
 					.setMaxResults(request.getLimit());
 
@@ -175,6 +198,7 @@ public class FacilityService extends BaseService {
 
 			facilitiesQuery = em.createNamedQuery("Facility.listFacilitiesByCompany", Facility.class)
 					.setParameter("companyId", companyId)
+					.setParameter("language", language)
 					.setFirstResult(request.getOffset())
 					.setMaxResults(request.getLimit());
 
@@ -188,11 +212,12 @@ public class FacilityService extends BaseService {
 				facilities.stream().map(FacilityMapper::toApiFacility).collect(Collectors.toList()), count);
 	}
 	
-	public ApiPaginatedList<ApiFacility> listCollectingFacilitiesByCompany(Long companyId, ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiFacility> listCollectingFacilitiesByCompany(Long companyId, ApiPaginatedRequest request, Language language) {
 
 		TypedQuery<Facility> collectingFacilitiesQuery = em.createNamedQuery("Facility.listCollectingFacilitiesByCompany",
 						Facility.class)
 				.setParameter("companyId", companyId)
+				.setParameter("language", language)
 				.setFirstResult(request.getOffset())
 				.setMaxResults(request.getLimit());
 
@@ -205,7 +230,7 @@ public class FacilityService extends BaseService {
 				facilities.stream().map(FacilityMapper::toApiFacility).collect(Collectors.toList()), count);
 	}
 
-	public ApiPaginatedList<ApiFacility> listSellingFacilitiesByCompany(Long companyId, Long semiProductId, ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiFacility> listSellingFacilitiesByCompany(Long companyId, Long semiProductId, ApiPaginatedRequest request, Language language) {
 
 		TypedQuery<Facility> collectingFacilitiesQuery;
 		Long count;
@@ -216,6 +241,7 @@ public class FacilityService extends BaseService {
 							Facility.class)
 					.setParameter("companyId", companyId)
 					.setParameter("semiProductId", semiProductId)
+					.setParameter("language", language)
 					.setFirstResult(request.getOffset())
 					.setMaxResults(request.getLimit());
 
@@ -229,6 +255,7 @@ public class FacilityService extends BaseService {
 			collectingFacilitiesQuery = em.createNamedQuery("Facility.listSellingFacilitiesByCompany",
 							Facility.class)
 					.setParameter("companyId", companyId)
+					.setParameter("language", language)
 					.setFirstResult(request.getOffset())
 					.setMaxResults(request.getLimit());
 
