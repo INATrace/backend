@@ -7,8 +7,10 @@ import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.company.mappers.UserCustomerMapper;
 import com.abelium.inatrace.components.facility.FacilityMapper;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
+import com.abelium.inatrace.components.stockorder.api.ApiStockOrderEvidenceTypeValue;
 import com.abelium.inatrace.components.user.mappers.UserMapper;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+import org.apache.commons.lang3.BooleanUtils;
 
 import java.util.stream.Collectors;
 
@@ -72,6 +74,19 @@ public class StockOrderMapper {
                     .map(StockOrderEvidenceFieldValueMapper::toApiStockOrderEvidenceFieldValue)
                     .collect(Collectors.toList()));
         }
+
+        // Map the instances (values) of processing evidence types (both required and other evidences)
+        entity.getDocumentRequirements().forEach(stockOrderPETypeValue -> {
+
+            ApiStockOrderEvidenceTypeValue apiEvidenceTypeValue = StockOrderEvidenceTypeValueMapper.toApiStockOrderEvidenceTypeValue(
+                    stockOrderPETypeValue, userId);
+
+            if (BooleanUtils.isTrue(stockOrderPETypeValue.getOtherEvidence())) {
+                apiStockOrder.getOtherEvidenceDocuments().add(apiEvidenceTypeValue);
+            } else {
+                apiStockOrder.getRequiredEvidenceTypeValues().add(apiEvidenceTypeValue);
+            }
+        });
 
         // Map the semi-product that is represented by this stock order
         if (entity.getSemiProduct() != null) {
