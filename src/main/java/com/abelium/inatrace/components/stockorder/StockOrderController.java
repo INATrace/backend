@@ -47,12 +47,12 @@ public class StockOrderController {
                 request, new StockOrderQueryRequest(), authUser.getUserId()));
     }
 
-    @GetMapping("listAvailableStockForSemiProductInFacility")
+    @GetMapping("/list/facility/{facilityId}/semi-product/{semiProductId}/available")
     @ApiOperation("Get a paginated list of stock orders for provided semi product ID and facility ID.")
     public ApiPaginatedResponse<ApiStockOrder> getAvailableStockForSemiProductInFacility(
             @Valid ApiPaginatedRequest request,
-            @Valid @ApiParam(value = "Facility ID", required = true) @RequestParam("facilityId") Long facilityId,
-            @Valid @ApiParam(value = "SemiProduct ID", required = true) @RequestParam("semiProductId") Long semiProductId,
+            @Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("facilityId") Long facilityId,
+            @Valid @ApiParam(value = "SemiProduct ID", required = true) @PathVariable("semiProductId") Long semiProductId,
             @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
