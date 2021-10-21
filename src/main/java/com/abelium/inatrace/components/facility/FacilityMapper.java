@@ -8,11 +8,14 @@ import com.abelium.inatrace.components.company.api.ApiAddress;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.facility.api.ApiFacilityLocation;
+import com.abelium.inatrace.components.facility.api.ApiFacilityTranslation;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.facility.FacilitySemiProduct;
+import com.abelium.inatrace.db.entities.facility.FacilityTranslation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Mapper for Facility entity.
@@ -31,10 +34,12 @@ public final class FacilityMapper {
 			return null;
 		}
 
+		FacilityTranslation facilityTranslation = entity.getFacilityTranslations().stream().findFirst().orElse(new FacilityTranslation());
+
 		ApiFacility apiFacility = new ApiFacility();
 
 		apiFacility.setId(entity.getId());
-		apiFacility.setName(entity.getName());
+		apiFacility.setName(facilityTranslation.getName());
 		apiFacility.setIsCollectionFacility(entity.getIsCollectionFacility());
 		apiFacility.setIsPublic(entity.getIsPublic());
 
@@ -96,5 +101,25 @@ public final class FacilityMapper {
 		apiFacility.setFacilitySemiProductList(apiSemiProductList);
 
 		return apiFacility;
+	}
+
+	public static ApiFacility toApiFacilityDetail(Facility facility) {
+
+		ApiFacility apiFacility = toApiFacility(facility);
+
+		if (apiFacility == null) {
+			return null;
+		}
+
+		apiFacility.setTranslations(facility.getFacilityTranslations().stream().map(FacilityMapper::toApiFacilityTranslation).collect(Collectors.toList()));
+
+		return apiFacility;
+	}
+
+	public static ApiFacilityTranslation toApiFacilityTranslation(FacilityTranslation facilityTranslation) {
+		ApiFacilityTranslation apiFacilityTranslation = new ApiFacilityTranslation();
+		apiFacilityTranslation.setName(facilityTranslation.getName());
+		apiFacilityTranslation.setLanguage(facilityTranslation.getLanguage());
+		return apiFacilityTranslation;
 	}
 }
