@@ -285,7 +285,6 @@ public class StockOrderService extends BaseService {
         entity.setCurrency(apiStockOrder.getCurrency());
 
         // Calculate quantities
-
         BigDecimal lastUsedQuantity = (entity.getTotalQuantity() != null && entity.getAvailableQuantity() != null)
                 ? entity.getTotalQuantity().subtract(entity.getAvailableQuantity())
                 : null;
@@ -296,6 +295,7 @@ public class StockOrderService extends BaseService {
             case PURCHASE_ORDER:
             case PROCESSING_ORDER:
             case TRANSFER_ORDER:
+
                 entity.setFulfilledQuantity(entity.getTotalQuantity());
 
                 // For new StockOrders set available quantity to total quantity
@@ -303,11 +303,13 @@ public class StockOrderService extends BaseService {
                     entity.setAvailableQuantity(entity.getTotalQuantity());
                 }
 
+                break;
             default:
+
                 // Applies only for new Quote StockOrders
                 if (entity.getId() == null) {
                     entity.setFulfilledQuantity(apiStockOrder.getFulfilledQuantity());
-                    entity.setAvailableQuantity(apiStockOrder.getFulfilledQuantity());
+                    entity.setAvailableQuantity(apiStockOrder.getAvailableQuantity());
                 }
         }
 
