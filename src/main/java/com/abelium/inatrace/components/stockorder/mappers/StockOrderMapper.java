@@ -111,6 +111,7 @@ public class StockOrderMapper {
 
         // Set the stock order quantities
         apiStockOrder.setTotalQuantity(entity.getTotalQuantity());
+        apiStockOrder.setTotalGrossQuantity(entity.getTotalGrossQuantity());
         apiStockOrder.setFulfilledQuantity(entity.getFulfilledQuantity());
         apiStockOrder.setAvailableQuantity(entity.getAvailableQuantity());
         apiStockOrder.setTare(entity.getTare());

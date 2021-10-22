@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -188,7 +189,8 @@ public class ProcessingOrderService extends BaseService {
             for (StockOrder targetStockOrder : targetStockOrdersToBeDeleted) {
 
                 // Used quantity cannot be negative: "fulfilledQuantity - availableQuantity >= 0"
-                if (targetStockOrder.getTotalQuantity() - targetStockOrder.getAvailableQuantity() < 0)
+                if (targetStockOrder.getTotalQuantity().subtract(targetStockOrder.getAvailableQuantity())
+                        .compareTo(BigDecimal.ZERO) < 0)
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Target StockOrder with ID '"
                             + targetStockOrder.getId() + "' cannot be deleted!");
             }
@@ -205,10 +207,12 @@ public class ProcessingOrderService extends BaseService {
                     .orElseThrow(() -> new ApiException(ApiStatus.ERROR,
                             "Inappropriate deletion of target StockOrders that are not present in request!"));
 
-            // Prevent new quantity to be less then already used quantity
-            if (apiTargetStockOrder.getTotalQuantity() - targetStockOrder.getTotalQuantity() < 0) {
-                Integer usedQuantity = apiTargetStockOrder.getFulfilledQuantity() - apiTargetStockOrder.getAvailableQuantity();
-                if(targetStockOrder.getTotalQuantity() < usedQuantity)
+            // TODO: Explain validation??? Is it even necessary???
+            if (apiTargetStockOrder.getTotalQuantity().subtract(targetStockOrder.getTotalQuantity())
+                    .compareTo(BigDecimal.ZERO) < 0) {
+                BigDecimal usedQuantity = apiTargetStockOrder.getFulfilledQuantity()
+                        .subtract(apiTargetStockOrder.getAvailableQuantity());
+                if (targetStockOrder.getTotalQuantity().compareTo(usedQuantity) < 0)
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Cannot reduce total quantity below already used quantity.");
             }
         }

@@ -81,18 +81,21 @@ public class ApiStockOrder extends ApiBaseEntity {
     public ApiMeasureUnitType measureUnitType;
 
     @ApiModelProperty(value = "Total quantity", position = 11)
-    public Integer totalQuantity;
+    public BigDecimal totalQuantity;
 
-    @ApiModelProperty(value = "Fulfilled quantity", position = 12)
-    public Integer fulfilledQuantity;
+    @ApiModelProperty(value = "Total gross quantity", position = 12)
+    public BigDecimal totalGrossQuantity;
 
-    @ApiModelProperty(value = "Available quantity", position = 13)
-    public Integer availableQuantity;
+    @ApiModelProperty(value = "Fulfilled quantity", position = 13)
+    public BigDecimal fulfilledQuantity;
 
-    @ApiModelProperty(value = "Is stock available", position = 14)
+    @ApiModelProperty(value = "Available quantity", position = 14)
+    public BigDecimal availableQuantity;
+
+    @ApiModelProperty(value = "Is stock available", position = 15)
     public Boolean isAvailable;
 
-    @ApiModelProperty(value = "Production date", position = 15)
+    @ApiModelProperty(value = "Production date", position = 16)
     @JsonSerialize(converter = SimpleDateConverter.Serialize.class)
     @JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
     public Instant productionDate;
@@ -376,27 +379,35 @@ public class ApiStockOrder extends ApiBaseEntity {
         this.measureUnitType = measureUnitType;
     }
 
-    public Integer getTotalQuantity() {
+    public BigDecimal getTotalQuantity() {
         return totalQuantity;
     }
 
-    public void setTotalQuantity(Integer totalQuantity) {
+    public void setTotalQuantity(BigDecimal totalQuantity) {
         this.totalQuantity = totalQuantity;
     }
 
-    public Integer getFulfilledQuantity() {
+    public BigDecimal getTotalGrossQuantity() {
+        return totalGrossQuantity;
+    }
+
+    public void setTotalGrossQuantity(BigDecimal totalGrossQuantity) {
+        this.totalGrossQuantity = totalGrossQuantity;
+    }
+
+    public BigDecimal getFulfilledQuantity() {
         return fulfilledQuantity;
     }
 
-    public void setFulfilledQuantity(Integer fulfilledQuantity) {
+    public void setFulfilledQuantity(BigDecimal fulfilledQuantity) {
         this.fulfilledQuantity = fulfilledQuantity;
     }
 
-    public Integer getAvailableQuantity() {
+    public BigDecimal getAvailableQuantity() {
         return availableQuantity;
     }
 
-    public void setAvailableQuantity(Integer availableQuantity) {
+    public void setAvailableQuantity(BigDecimal availableQuantity) {
         this.availableQuantity = availableQuantity;
     }
 

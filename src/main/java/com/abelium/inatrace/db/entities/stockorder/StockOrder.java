@@ -97,15 +97,20 @@ public class StockOrder extends TimestampEntity {
 	
 	@ManyToOne
 	private MeasureUnitType measurementUnitType;
+
+	// contains net quantity
+	@Column
+	private BigDecimal totalQuantity;
+
+	// contains gross quantity
+	@Column
+	private BigDecimal totalGrossQuantity;
 	
 	@Column
-	private Integer totalQuantity;
+	private BigDecimal fulfilledQuantity;
 	
 	@Column
-	private Integer fulfilledQuantity;
-	
-	@Column
-	private Integer availableQuantity;
+	private BigDecimal availableQuantity;
 	
 	@Column
 	private Boolean isAvailable;
@@ -366,27 +371,35 @@ public class StockOrder extends TimestampEntity {
 		this.measurementUnitType = measurementUnitType;
 	}
 
-	public Integer getTotalQuantity() {
+	public BigDecimal getTotalQuantity() {
 		return totalQuantity;
 	}
 
-	public void setTotalQuantity(Integer totalQuantity) {
+	public void setTotalQuantity(BigDecimal totalQuantity) {
 		this.totalQuantity = totalQuantity;
 	}
 
-	public Integer getFulfilledQuantity() {
+	public BigDecimal getTotalGrossQuantity() {
+		return totalGrossQuantity;
+	}
+
+	public void setTotalGrossQuantity(BigDecimal totalGrossQuantity) {
+		this.totalGrossQuantity = totalGrossQuantity;
+	}
+
+	public BigDecimal getFulfilledQuantity() {
 		return fulfilledQuantity;
 	}
 
-	public void setFulfilledQuantity(Integer fulfilledQuantity) {
+	public void setFulfilledQuantity(BigDecimal fulfilledQuantity) {
 		this.fulfilledQuantity = fulfilledQuantity;
 	}
 
-	public Integer getAvailableQuantity() {
+	public BigDecimal getAvailableQuantity() {
 		return availableQuantity;
 	}
 
-	public void setAvailableQuantity(Integer availableQuantity) {
+	public void setAvailableQuantity(BigDecimal availableQuantity) {
 		this.availableQuantity = availableQuantity;
 	}
 

@@ -14,6 +14,7 @@ import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrderEvidenceFieldValue;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrderEvidenceTypeValue;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrderLocation;
+import com.abelium.inatrace.components.stockorder.api.*;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.ActivityProof;
@@ -151,7 +152,7 @@ public class StockOrderService extends BaseService {
 
         // Get only stock orders that have available quantity
         if (BooleanUtils.isTrue(queryRequest.isAvailable)) {
-            condition.and(stockOrderProxy.getAvailableQuantity()).gt(0);
+            condition.and(stockOrderProxy.getAvailableQuantity()).gt(BigDecimal.ZERO);
         }
 
         // Used for fetching open quote orders
@@ -177,6 +178,71 @@ public class StockOrderService extends BaseService {
         }
 
         return stockOrderProxy;
+    }
+
+    @Transactional
+    public ApiPurchaseOrder createPurchaseBulkOrder(ApiPurchaseOrder apiPurchaseOrder, Long userId) throws ApiException {
+
+        // Validation
+        if (apiPurchaseOrder == null) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "ApiPurchaseOrder needs to be provided!");
+        }
+        if (apiPurchaseOrder.getFarmers() == null || apiPurchaseOrder.getFarmers().isEmpty()){
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Farmers needs to be provided!");
+        }
+
+        // Update stocks of type Purchase, one by one
+        for (ApiPurchaseOrderFarmer farmer : apiPurchaseOrder.getFarmers()) {
+
+            // convert to ApiStockOrder of type PURCHASE_ORDER
+            ApiStockOrder apiStockOrder = convertPurchaseOrderFarmerToStockOrder(apiPurchaseOrder, farmer);
+
+            // write to db
+            ApiBaseEntity apiBaseEntity = createOrUpdateStockOrder(apiStockOrder, userId, null);
+
+            // set Id in response
+            farmer.setId(apiBaseEntity.getId());
+        }
+
+        return apiPurchaseOrder;
+    }
+
+    private ApiStockOrder convertPurchaseOrderFarmerToStockOrder(ApiPurchaseOrder apiPurchaseOrder, ApiPurchaseOrderFarmer farmer){
+
+        ApiStockOrder apiStockOrder = new ApiStockOrder();
+
+        if (apiPurchaseOrder != null) {
+
+            apiStockOrder.setOrderType(OrderType.PURCHASE_ORDER);
+
+            // copy common attributes
+            apiStockOrder.setCreatorId(apiPurchaseOrder.getCreatorId());
+            apiStockOrder.setDeliveryTime(apiPurchaseOrder.getDeliveryTime());
+            apiStockOrder.setFacility(apiPurchaseOrder.getFacility());
+            apiStockOrder.setPreferredWayOfPayment(apiPurchaseOrder.getPreferredWayOfPayment());
+            apiStockOrder.setRepresentativeOfProducerUserCustomer(apiPurchaseOrder.getRepresentativeOfProducerUserCustomer());
+            apiStockOrder.setProductionDate(apiPurchaseOrder.getProductionDate());
+            apiStockOrder.setCurrency(apiPurchaseOrder.getCurrency());
+            apiStockOrder.setActivityProofs(apiPurchaseOrder.getActivityProofs());
+
+            // copy farmer attributes
+            apiStockOrder.setIdentifier(farmer.getIdentifier());
+            apiStockOrder.setOrganic(farmer.getOrganic());
+            apiStockOrder.setDamagedPriceDeduction(farmer.getDamagedPriceDeduction());
+            apiStockOrder.setSemiProduct(farmer.getSemiProduct());
+            apiStockOrder.setTare(farmer.getTare());
+            apiStockOrder.setPricePerUnit(farmer.getPricePerUnit());
+            apiStockOrder.setCost(farmer.getCost());
+            apiStockOrder.setBalance(farmer.getBalance());
+            apiStockOrder.setProducerUserCustomer(farmer.getProducerUserCustomer());
+            apiStockOrder.setWomenShare(farmer.getWomenShare());
+            apiStockOrder.setAvailableQuantity(farmer.getAvailableQuantity());
+            apiStockOrder.setFulfilledQuantity(farmer.getFulfilledQuantity());
+            apiStockOrder.setTotalGrossQuantity(farmer.getTotalGrossQuantity());
+
+        }
+
+        return apiStockOrder;
     }
 
     @Transactional
@@ -220,8 +286,8 @@ public class StockOrderService extends BaseService {
 
         // Calculate quantities
 
-        Integer lastUsedQuantity = (entity.getTotalQuantity() != null && entity.getAvailableQuantity() != null)
-                ? entity.getTotalQuantity() - entity.getAvailableQuantity()
+        BigDecimal lastUsedQuantity = (entity.getTotalQuantity() != null && entity.getAvailableQuantity() != null)
+                ? entity.getTotalQuantity().subtract(entity.getAvailableQuantity())
                 : null;
 
         entity.setTotalQuantity(apiStockOrder.getTotalQuantity());
@@ -258,34 +324,34 @@ public class StockOrderService extends BaseService {
 
                 if (apiStockOrder.getOrderType() != OrderType.SALES_ORDER) {
                     if(lastUsedQuantity == null) {
-                        lastUsedQuantity = 0;
+                        lastUsedQuantity = BigDecimal.ZERO;
                     }
-                    entity.setAvailableQuantity(entity.getFulfilledQuantity() - lastUsedQuantity - calculateUsedQuantity(inputTxs, entity.getId()));
+                    entity.setAvailableQuantity(entity.getFulfilledQuantity().subtract(lastUsedQuantity).subtract(calculateUsedQuantity(inputTxs, entity.getId())));
                 }
             }
 
         } else if (entity.getTotalQuantity() != null && lastUsedQuantity != null && entity.getAvailableQuantity() != null){
-            entity.setAvailableQuantity(apiStockOrder.getTotalQuantity() - lastUsedQuantity);
+            entity.setAvailableQuantity(apiStockOrder.getTotalQuantity().subtract(lastUsedQuantity));
 
         }
 
         // Validate quantities
         if (entity.getAvailableQuantity() != null) {
 
-            if (entity.getAvailableQuantity() < 0) {
+            if (entity.getAvailableQuantity().compareTo(BigDecimal.ZERO) < 0) {
                 throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity resulted in negative number.");
             }
 
             if (entity.getFulfilledQuantity() != null) {
-                if (entity.getFulfilledQuantity() < entity.getAvailableQuantity()) {
+                if (entity.getFulfilledQuantity().compareTo(entity.getAvailableQuantity()) < 0) {
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity (" + entity.getAvailableQuantity()
                             + ") cannot be bigger then fulfilled quantity (" + entity.getFulfilledQuantity() + ").");
                 }
             }
         }
 
-        entity.setAvailable(entity.getAvailableQuantity() != null && entity.getAvailableQuantity() > 0);
-        entity.setOpenOrder(entity.getOrderType() == OrderType.GENERAL_ORDER && entity.getTotalQuantity() > entity.getFulfilledQuantity());
+        entity.setAvailable(entity.getAvailableQuantity() != null && entity.getAvailableQuantity().compareTo(BigDecimal.ZERO) > 0);
+        entity.setOpenOrder(entity.getOrderType() == OrderType.GENERAL_ORDER && entity.getTotalQuantity().compareTo(entity.getFulfilledQuantity()) > 0);
 
         // END: Calculate quantities
 
@@ -313,6 +379,15 @@ public class StockOrderService extends BaseService {
         switch (apiStockOrder.getOrderType()) {
             case PURCHASE_ORDER:
 
+                // on purchase order, Total quantity is calculated by total gross quantity and tare
+                if (apiStockOrder.getTare() != null) {
+                    apiStockOrder.setTotalQuantity(apiStockOrder.getTotalGrossQuantity().subtract(apiStockOrder.getTare()));
+                } else {
+                    apiStockOrder.setTotalQuantity(apiStockOrder.getTotalGrossQuantity());
+                }
+                entity.setTotalQuantity(apiStockOrder.getTotalQuantity());
+                entity.setTotalGrossQuantity(apiStockOrder.getTotalGrossQuantity());
+
                 // Required
                 if(apiStockOrder.getProducerUserCustomer() == null)
                     throw new ApiException(ApiStatus.INVALID_REQUEST, "Producer user customer is required for purchase orders!");
@@ -322,7 +397,11 @@ public class StockOrderService extends BaseService {
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Price per unit needs to be provided!");
 
                 entity.setPricePerUnit(apiStockOrder.getPricePerUnit());
-                entity.setCost(entity.getPricePerUnit().multiply(BigDecimal.valueOf(entity.getTotalQuantity())));
+                BigDecimal pricePerUnitReduced = entity.getPricePerUnit();
+                if (entity.getDamagedPriceDeduction() != null){
+                    pricePerUnitReduced = entity.getPricePerUnit().subtract(entity.getDamagedPriceDeduction());
+                }
+                entity.setCost(pricePerUnitReduced.multiply(entity.getTotalQuantity()));
                 if (processingOrder == null) {
                     entity.setBalance(calculateBalanceForPurchaseOrder(entity));
                 } else if (entity.getId() == null){
@@ -388,7 +467,7 @@ public class StockOrderService extends BaseService {
             entity = fetchEntity(apiQuoteStockOrder.getId(), StockOrder.class);
 
         } else {
-            if (apiQuoteStockOrder.getFulfilledQuantity() != null && apiQuoteStockOrder.getFulfilledQuantity() != 0) {
+            if (apiQuoteStockOrder.getFulfilledQuantity() != null && apiQuoteStockOrder.getFulfilledQuantity().compareTo(BigDecimal.ZERO) != 0) {
                 throw new ApiException(ApiStatus.INVALID_REQUEST, "Fulfilled quantity must be 0");
             }
 
@@ -469,24 +548,24 @@ public class StockOrderService extends BaseService {
 //                        .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
-    private Integer calculateFulfilledQuantity(List<Transaction> inputTransactions, Long stockOrderId){
+    private BigDecimal calculateFulfilledQuantity(List<Transaction> inputTransactions, Long stockOrderId){
         if (stockOrderId == null)
             return null;
 
         return inputTransactions.stream()
                 .filter(t -> t.getSourceStockOrder() != null && stockOrderId.equals(t.getSourceStockOrder().getId()))
                 .map(Transaction::getInputQuantity)
-                .reduce(0, Integer::sum);
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private Integer calculateUsedQuantity(List<Transaction> inputTransactions, Long stockOrderId){
+    private BigDecimal calculateUsedQuantity(List<Transaction> inputTransactions, Long stockOrderId){
         if (stockOrderId == null)
             return null;
 
         return inputTransactions.stream()
                 .filter(t -> t.getSourceStockOrder() != null && stockOrderId.equals(t.getSourceStockOrder().getId()))
                 .map(Transaction::getOutputQuantity)
-                .reduce(0, Integer::sum);
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private void createOrUpdateEvidenceFieldValues(List<ApiStockOrderEvidenceFieldValue> apiEvidenceFieldValues, StockOrder entity) throws ApiException {
