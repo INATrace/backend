@@ -377,6 +377,15 @@ public class StockOrderService extends BaseService {
         switch (apiStockOrder.getOrderType()) {
             case PURCHASE_ORDER:
 
+                // on purchase order, Total quantity is calculated by total gross quantity and tare
+                if (apiStockOrder.getTare() != null) {
+                    apiStockOrder.setTotalQuantity(apiStockOrder.getTotalGrossQuantity().subtract(apiStockOrder.getTare()));
+                } else {
+                    apiStockOrder.setTotalQuantity(apiStockOrder.getTotalGrossQuantity());
+                }
+                entity.setTotalQuantity(apiStockOrder.getTotalQuantity());
+                entity.setTotalGrossQuantity(apiStockOrder.getTotalGrossQuantity());
+
                 // Required
                 if(apiStockOrder.getProducerUserCustomer() == null)
                     throw new ApiException(ApiStatus.INVALID_REQUEST, "Producer user customer is required for purchase orders!");
@@ -396,12 +405,6 @@ public class StockOrderService extends BaseService {
 
                 entity.setProducerUserCustomer(fetchEntity(apiStockOrder.getProducerUserCustomer().getId(), UserCustomer.class));
                 entity.setPurchaseOrder(true);
-
-                if (apiStockOrder.getTare() != null) {
-                    entity.setTotalQuantity(apiStockOrder.getTotalGrossQuantity().subtract(apiStockOrder.getTare()));
-                } else {
-                    entity.setTotalQuantity(apiStockOrder.getTotalGrossQuantity());
-                }
 
                 // Optional
                 if(apiStockOrder.getRepresentativeOfProducerUserCustomer() != null)
