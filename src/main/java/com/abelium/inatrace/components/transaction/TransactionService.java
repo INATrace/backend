@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 
 @Lazy
 @Service
@@ -90,19 +91,15 @@ public class TransactionService extends BaseService {
 
         // Set source StockOrder available quantity
         if (sourceStockOrder != null) {
-            sourceStockOrder.setAvailableQuantity(Math.min(
-                    sourceStockOrder.getAvailableQuantity() + transaction.getInputQuantity(),
-                    sourceStockOrder.getTotalQuantity()
-            ));
+            BigDecimal subtotal = sourceStockOrder.getAvailableQuantity().add(transaction.getInputQuantity());
+            sourceStockOrder.setAvailableQuantity(subtotal.min(transaction.getInputQuantity()));
             stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(sourceStockOrder, userId), userId);
         }
 
         // Set target StockOrder fulfilled quantity
         if (!transaction.getIsProcessing() && targetStockOrder != null) {
-            targetStockOrder.setFulfilledQuantity(Math.max(
-                    targetStockOrder.getFulfilledQuantity() - transaction.getOutputQuantity(),
-                    0
-            ));
+            BigDecimal subtotal = targetStockOrder.getFulfilledQuantity().subtract(transaction.getOutputQuantity());
+            targetStockOrder.setFulfilledQuantity(subtotal.max(BigDecimal.ZERO));
             stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(targetStockOrder, userId), userId);
         }
 

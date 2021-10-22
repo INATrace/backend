@@ -21,13 +21,16 @@ public class ApiPurchaseOrderFarmer extends ApiBaseEntity {
 	private ApiSemiProduct semiProduct;
 
 	@ApiModelProperty(value = "Total quantity")
-	private Integer totalQuantity;
+	private BigDecimal totalQuantity;
+
+	@ApiModelProperty(value = "Total gross quantity")
+	private BigDecimal totalGrossQuantity;
 
 	@ApiModelProperty(value = "Fulfilled quantity")
-	public Integer fulfilledQuantity;
+	private BigDecimal fulfilledQuantity;
 
 	@ApiModelProperty(value = "Available quantity")
-	public Integer availableQuantity;
+	private BigDecimal availableQuantity;
 
 	@ApiModelProperty(value = "Price per unit")
 	private BigDecimal pricePerUnit;
@@ -74,27 +77,35 @@ public class ApiPurchaseOrderFarmer extends ApiBaseEntity {
 		this.semiProduct = semiProduct;
 	}
 
-	public Integer getTotalQuantity() {
+	public BigDecimal getTotalQuantity() {
 		return totalQuantity;
 	}
 
-	public void setTotalQuantity(Integer totalQuantity) {
+	public void setTotalQuantity(BigDecimal totalQuantity) {
 		this.totalQuantity = totalQuantity;
 	}
 
-	public Integer getFulfilledQuantity() {
+	public BigDecimal getTotalGrossQuantity() {
+		return totalGrossQuantity;
+	}
+
+	public void setTotalGrossQuantity(BigDecimal totalGrossQuantity) {
+		this.totalGrossQuantity = totalGrossQuantity;
+	}
+
+	public BigDecimal getFulfilledQuantity() {
 		return fulfilledQuantity;
 	}
 
-	public void setFulfilledQuantity(Integer fulfilledQuantity) {
+	public void setFulfilledQuantity(BigDecimal fulfilledQuantity) {
 		this.fulfilledQuantity = fulfilledQuantity;
 	}
 
-	public Integer getAvailableQuantity() {
+	public BigDecimal getAvailableQuantity() {
 		return availableQuantity;
 	}
 
-	public void setAvailableQuantity(Integer availableQuantity) {
+	public void setAvailableQuantity(BigDecimal availableQuantity) {
 		this.availableQuantity = availableQuantity;
 	}
 

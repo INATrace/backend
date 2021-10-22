@@ -111,7 +111,7 @@ public class StockOrderService extends BaseService {
                     .like().startsWith(queryRequest.producerUserCustomerName);
 
         if(queryRequest.isAvailable != null && queryRequest.isAvailable)
-            condition.and(stockOrderProxy.getAvailableQuantity()).gt(0);
+            condition.and(stockOrderProxy.getAvailableQuantity()).gt(BigDecimal.ZERO);
 
         Torpedo.where(condition);
 
@@ -189,9 +189,9 @@ public class StockOrderService extends BaseService {
             apiStockOrder.setBalance(farmer.getBalance());
             apiStockOrder.setProducerUserCustomer(farmer.getProducerUserCustomer());
             apiStockOrder.setWomenShare(farmer.getWomenShare());
-            apiStockOrder.setTotalQuantity(farmer.getTotalQuantity());
             apiStockOrder.setAvailableQuantity(farmer.getAvailableQuantity());
             apiStockOrder.setFulfilledQuantity(farmer.getFulfilledQuantity());
+            apiStockOrder.setTotalGrossQuantity(farmer.getTotalGrossQuantity());
 
         }
 
@@ -227,7 +227,7 @@ public class StockOrderService extends BaseService {
         entity.setIdentifier(apiStockOrder.getIdentifier());
         entity.setAvailableQuantity(apiStockOrder.getAvailableQuantity());
         entity.setFulfilledQuantity(apiStockOrder.getFulfilledQuantity());
-        entity.setTotalQuantity(apiStockOrder.getTotalQuantity());
+        entity.setTotalGrossQuantity(apiStockOrder.getTotalGrossQuantity());
         entity.setBalance(apiStockOrder.getBalance());
         entity.setPaid(apiStockOrder.getPaid());
         entity.setCost(apiStockOrder.getCost());
@@ -239,11 +239,18 @@ public class StockOrderService extends BaseService {
         entity.setInternalLotNumber(apiStockOrder.getInternalLotNumber());
         entity.setWomenShare(apiStockOrder.getWomenShare());
         entity.setDeliveryTime(apiStockOrder.getDeliveryTime());
-        entity.setAvailable(entity.getAvailableQuantity() > 0);
+        entity.setAvailable(entity.getAvailableQuantity().compareTo(BigDecimal.ZERO) > 0); // availableQuantity > 0
         entity.setSemiProduct(fetchEntity(apiStockOrder.getSemiProduct().getId(), SemiProduct.class));
         entity.setOrganic(apiStockOrder.getOrganic());
         entity.setTare(apiStockOrder.getTare());
         entity.setDamagedPriceDeduction(apiStockOrder.getDamagedPriceDeduction());
+
+        // set total quantity
+        if (apiStockOrder.getTare() != null) {
+            entity.setTotalQuantity(apiStockOrder.getTotalGrossQuantity().subtract(apiStockOrder.getTare()));
+        } else {
+            entity.setTotalQuantity(apiStockOrder.getTotalGrossQuantity());
+        }
 
         if (entity.getSemiProduct() != null)
             entity.setMeasurementUnitType(entity.getSemiProduct().getMeasurementUnitType());

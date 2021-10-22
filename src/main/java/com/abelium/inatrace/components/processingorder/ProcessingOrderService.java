@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -196,7 +197,8 @@ public class ProcessingOrderService extends BaseService {
             for (StockOrder targetStockOrder : targetStockOrdersToBeDeleted) {
 
                 // Used quantity cannot be negative: "fulfilledQuantity - availableQuantity >= 0"
-                if (targetStockOrder.getTotalQuantity() - targetStockOrder.getAvailableQuantity() < 0)
+                if (targetStockOrder.getTotalQuantity().subtract(targetStockOrder.getAvailableQuantity())
+                        .compareTo(BigDecimal.ZERO) < 0)
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Target StockOrder with ID '"
                             + targetStockOrder.getId() + "' cannot be deleted!");
             }
@@ -214,9 +216,11 @@ public class ProcessingOrderService extends BaseService {
                             "Inappropriate deletion of target StockOrders that are not present in request!"));
 
             // TODO: Explain validation??? Is it even necessary???
-            if (targetStockOrder.getTotalQuantity() - apiTargetStockOrder.getTotalQuantity() < 0) {
-                Integer usedQuantity = targetStockOrder.getFulfilledQuantity() - targetStockOrder.getAvailableQuantity();
-                if(targetStockOrder.getTotalQuantity() < usedQuantity)
+            if (targetStockOrder.getTotalQuantity().subtract(apiTargetStockOrder.getTotalQuantity())
+                    .compareTo(BigDecimal.ZERO) < 0) {
+                BigDecimal usedQuantity = targetStockOrder.getFulfilledQuantity()
+                        .subtract(targetStockOrder.getAvailableQuantity());
+                if (targetStockOrder.getTotalQuantity().compareTo(usedQuantity) < 0)
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Cannot delete used stock order.");
             }
         }
