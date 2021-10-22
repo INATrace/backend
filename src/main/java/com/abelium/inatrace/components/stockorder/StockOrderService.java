@@ -5,10 +5,15 @@ import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.codebook.processing_evidence_type.ProcessingEvidenceTypeService;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.facility.FacilityService;
 import com.abelium.inatrace.components.processingevidencefield.ProcessingEvidenceFieldService;
+import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
+import com.abelium.inatrace.components.stockorder.api.ApiStockOrderEvidenceFieldValue;
+import com.abelium.inatrace.components.stockorder.api.ApiStockOrderEvidenceTypeValue;
+import com.abelium.inatrace.components.stockorder.api.ApiStockOrderLocation;
 import com.abelium.inatrace.components.stockorder.api.*;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
@@ -16,14 +21,16 @@ import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
-import com.abelium.inatrace.db.entities.stockorder.StockOrder;
-import com.abelium.inatrace.db.entities.stockorder.StockOrderActivityProof;
-import com.abelium.inatrace.db.entities.stockorder.StockOrderLocation;
-import com.abelium.inatrace.db.entities.stockorder.StockOrderPEFieldValue;
+import com.abelium.inatrace.db.entities.payment.Payment;
+import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
+import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
+import com.abelium.inatrace.db.entities.stockorder.*;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
+import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -42,10 +49,15 @@ public class StockOrderService extends BaseService {
 
     private final ProcessingEvidenceFieldService procEvidenceFieldService;
 
+    private final ProcessingEvidenceTypeService procEvidenceTypeService;
+
     @Autowired
-    public StockOrderService(FacilityService facilityService, ProcessingEvidenceFieldService procEvidenceFieldService) {
+    public StockOrderService(FacilityService facilityService,
+                             ProcessingEvidenceFieldService procEvidenceFieldService,
+                             ProcessingEvidenceTypeService procEvidenceTypeService) {
         this.facilityService = facilityService;
         this.procEvidenceFieldService = procEvidenceFieldService;
+        this.procEvidenceTypeService = procEvidenceTypeService;
     }
 
     public ApiStockOrder getStockOrder(long id, Long userId) throws ApiException {
@@ -69,49 +81,82 @@ public class StockOrderService extends BaseService {
         OnGoingLogicalCondition condition = Torpedo.condition();
 
         // Only present when listing by facility or company
-        if(queryRequest.companyId != null)
+        if (queryRequest.companyId != null) {
             condition = condition.and(stockOrderProxy.getCompany().getId()).eq(queryRequest.companyId);
-        else if (queryRequest.facilityId != null)
+        } else if (queryRequest.facilityId != null) {
             condition = condition.and(stockOrderProxy.getFacility().getId()).eq(queryRequest.facilityId);
+        }
 
+        // Used for fetching quote orders
+        if (queryRequest.quoteFacilityId != null) {
+            condition = condition.and(stockOrderProxy.getQuoteFacility().getId()).eq(queryRequest.quoteFacilityId);
+        }
+
+        // Used for fetching quote orders
+        if (queryRequest.companyCustomerId != null) {
+            condition = condition
+                    .and(stockOrderProxy.getConsumerCompanyCustomer()).isNotNull()
+                    .and(stockOrderProxy.getConsumerCompanyCustomer().getId()).eq(queryRequest.companyCustomerId);
+        }
 
         // Query parameter filters
-        if(queryRequest.farmerId != null)
-            condition.and(stockOrderProxy.getProducerUserCustomer()).isNotNull()
+        if(queryRequest.farmerId != null) {
+            condition
+                    .and(stockOrderProxy.getProducerUserCustomer()).isNotNull()
                     .and(stockOrderProxy.getProducerUserCustomer().getId()).eq(queryRequest.farmerId);
-        if(queryRequest.semiProductId != null)
-            condition.and(stockOrderProxy.getSemiProduct()).isNotNull()
-                    .and(stockOrderProxy.getSemiProduct().getId()).eq(queryRequest.semiProductId);
+        }
 
-        if(queryRequest.isOpenBalanceOnly != null && queryRequest.isOpenBalanceOnly)
-            condition.and(stockOrderProxy.getBalance()).isNotNull()
+        if(queryRequest.semiProductId != null) {
+            condition
+                    .and(stockOrderProxy.getSemiProduct()).isNotNull()
+                    .and(stockOrderProxy.getSemiProduct().getId()).eq(queryRequest.semiProductId);
+        }
+
+        if(queryRequest.isOpenBalanceOnly != null && queryRequest.isOpenBalanceOnly) {
+            condition
+                    .and(stockOrderProxy.getBalance()).isNotNull()
                     .and(stockOrderProxy.getBalance()).gt(BigDecimal.ZERO);
+        }
 
         if (queryRequest.isPurchaseOrderOnly != null && queryRequest.isPurchaseOrderOnly) {
             condition.and(stockOrderProxy.getOrderType()).eq(OrderType.PURCHASE_ORDER);
         }
 
-        if(queryRequest.isWomenShare != null)
+        if (queryRequest.isWomenShare != null) {
             condition.and(stockOrderProxy.getWomenShare()).eq(queryRequest.isWomenShare);
+        }
 
-        if(queryRequest.wayOfPayment != null)
+        if (queryRequest.wayOfPayment != null) {
             condition.and(stockOrderProxy.getPreferredWayOfPayment()).eq(queryRequest.wayOfPayment);
+        }
 
-        if(queryRequest.orderType != null)
+        if (queryRequest.orderType != null) {
             condition.and(stockOrderProxy.getOrderType()).eq(queryRequest.orderType);
+        }
 
-        if(queryRequest.productionDateStart != null)
+        if (queryRequest.productionDateStart != null) {
             condition.and(stockOrderProxy.getProductionDate()).gte(queryRequest.productionDateStart);
+        }
 
-        if(queryRequest.productionDateEnd != null)
+        if (queryRequest.productionDateEnd != null) {
             condition.and(stockOrderProxy.getProductionDate()).lte(queryRequest.productionDateEnd);
+        }
 
-        if(queryRequest.producerUserCustomerName != null) // Search by farmers name (query)
-            condition.and(stockOrderProxy.getProducerUserCustomer().getName())
-                    .like().startsWith(queryRequest.producerUserCustomerName);
+        // Search by farmers name (query)
+        if (queryRequest.producerUserCustomerName != null) {
+            condition.and(stockOrderProxy.getProducerUserCustomer().getName()).like()
+                    .startsWith(queryRequest.producerUserCustomerName);
+        }
 
-        if(queryRequest.isAvailable != null && queryRequest.isAvailable)
+        // Get only stock orders that have available quantity
+        if (BooleanUtils.isTrue(queryRequest.isAvailable)) {
             condition.and(stockOrderProxy.getAvailableQuantity()).gt(BigDecimal.ZERO);
+        }
+
+        // Used for fetching open quote orders
+        if (BooleanUtils.isTrue(queryRequest.isOpenOnly)) {
+            condition.and(stockOrderProxy.getTotalQuantity()).gt(stockOrderProxy.getFulfilledQuantity());
+        }
 
         Torpedo.where(condition);
 
@@ -199,13 +244,14 @@ public class StockOrderService extends BaseService {
     }
 
     @Transactional
-    public ApiBaseEntity createOrUpdateStockOrder(ApiStockOrder apiStockOrder, Long userId) throws ApiException {
+    public ApiBaseEntity createOrUpdateStockOrder(ApiStockOrder apiStockOrder, Long userId, ProcessingOrder processingOrder) throws ApiException {
 
         StockOrder entity;
 
         if (apiStockOrder.getId() != null) {
             entity = fetchEntity(apiStockOrder.getId(), StockOrder.class);
             entity.setUpdatedBy(fetchEntity(userId, User.class));
+
         } else {
             entity = new StockOrder();
             entity.setCreatedBy(fetchEntity(userId, User.class));
@@ -223,27 +269,20 @@ public class StockOrderService extends BaseService {
         entity.setOrderType(apiStockOrder.getOrderType());
         entity.setFacility(facilityService.fetchFacility(apiStockOrder.getFacility().getId()));
         entity.setCompany(entity.getFacility().getCompany());
-
         entity.setIdentifier(apiStockOrder.getIdentifier());
-        entity.setAvailableQuantity(apiStockOrder.getAvailableQuantity());
-        entity.setFulfilledQuantity(apiStockOrder.getFulfilledQuantity());
-        entity.setTotalGrossQuantity(apiStockOrder.getTotalGrossQuantity());
-        entity.setBalance(apiStockOrder.getBalance());
-        entity.setPaid(apiStockOrder.getPaid());
-        entity.setCost(apiStockOrder.getCost());
-        entity.setCurrency(apiStockOrder.getCurrency());
-        entity.setPricePerUnit(apiStockOrder.getPricePerUnit());
         entity.setPreferredWayOfPayment(apiStockOrder.getPreferredWayOfPayment());
         entity.setSacNumber(apiStockOrder.getSacNumber());
         entity.setProductionDate(apiStockOrder.getProductionDate());
         entity.setInternalLotNumber(apiStockOrder.getInternalLotNumber());
-        entity.setWomenShare(apiStockOrder.getWomenShare());
         entity.setDeliveryTime(apiStockOrder.getDeliveryTime());
-        entity.setAvailable(entity.getAvailableQuantity().compareTo(BigDecimal.ZERO) > 0); // availableQuantity > 0
         entity.setSemiProduct(fetchEntity(apiStockOrder.getSemiProduct().getId(), SemiProduct.class));
         entity.setOrganic(apiStockOrder.getOrganic());
         entity.setTare(apiStockOrder.getTare());
+        entity.setWomenShare(apiStockOrder.getWomenShare());
         entity.setDamagedPriceDeduction(apiStockOrder.getDamagedPriceDeduction());
+        entity.setCurrency(apiStockOrder.getCurrency());
+
+        // Calculate quantities
 
         // set total quantity
         if (apiStockOrder.getTare() != null) {
@@ -252,8 +291,78 @@ public class StockOrderService extends BaseService {
             entity.setTotalQuantity(apiStockOrder.getTotalGrossQuantity());
         }
 
-        if (entity.getSemiProduct() != null)
+        Integer lastUsedQuantity = (entity.getTotalQuantity() != null && entity.getAvailableQuantity() != null)
+                ? entity.getTotalQuantity() - entity.getAvailableQuantity()
+                : null;
+
+        entity.setTotalQuantity(apiStockOrder.getTotalQuantity());
+
+        switch (apiStockOrder.getOrderType()) {
+            case PURCHASE_ORDER:
+            case PROCESSING_ORDER:
+            case TRANSFER_ORDER:
+                entity.setFulfilledQuantity(entity.getTotalQuantity());
+
+                // For new StockOrders set available quantity to total quantity
+                if (entity.getId() == null) {
+                    entity.setAvailableQuantity(entity.getTotalQuantity());
+                }
+
+            default:
+                // Applies only for new Quote StockOrders
+                if (entity.getId() == null) {
+                    entity.setFulfilledQuantity(apiStockOrder.getFulfilledQuantity());
+                    entity.setAvailableQuantity(apiStockOrder.getFulfilledQuantity());
+                }
+        }
+
+        if (processingOrder != null && entity.getId() != null) {
+
+            // Calculate quantities based on input transactions
+            List<Transaction> inputTxs = processingOrder.getInputTransactions();
+            if (inputTxs != null && !inputTxs.isEmpty()) {
+
+                if (apiStockOrder.getOrderType() == OrderType.SALES_ORDER || apiStockOrder.getOrderType() == OrderType.GENERAL_ORDER) {
+                    // TODO: May happen that old transactions are not counted
+                    entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs, entity.getId()));
+                }
+
+                if (apiStockOrder.getOrderType() != OrderType.SALES_ORDER) {
+                    if(lastUsedQuantity == null) {
+                        lastUsedQuantity = 0;
+                    }
+                    entity.setAvailableQuantity(entity.getFulfilledQuantity() - lastUsedQuantity - calculateUsedQuantity(inputTxs, entity.getId()));
+                }
+            }
+
+        } else if (entity.getTotalQuantity() != null && lastUsedQuantity != null && entity.getAvailableQuantity() != null){
+            entity.setAvailableQuantity(apiStockOrder.getTotalQuantity() - lastUsedQuantity);
+
+        }
+
+        // Validate quantities
+        if (entity.getAvailableQuantity() != null) {
+
+            if (entity.getAvailableQuantity() < 0) {
+                throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity resulted in negative number.");
+            }
+
+            if (entity.getFulfilledQuantity() != null) {
+                if (entity.getFulfilledQuantity() < entity.getAvailableQuantity()) {
+                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity (" + entity.getAvailableQuantity()
+                            + ") cannot be bigger then fulfilled quantity (" + entity.getFulfilledQuantity() + ").");
+                }
+            }
+        }
+
+        entity.setAvailable(entity.getAvailableQuantity() != null && entity.getAvailableQuantity() > 0);
+        entity.setOpenOrder(entity.getOrderType() == OrderType.GENERAL_ORDER && entity.getTotalQuantity() > entity.getFulfilledQuantity());
+
+        // END: Calculate quantities
+
+        if (entity.getSemiProduct() != null) {
             entity.setMeasurementUnitType(entity.getSemiProduct().getMeasurementUnitType());
+        }
 
         // Production location
         ApiStockOrderLocation apiProdLocation = apiStockOrder.getProductionLocation();
@@ -261,14 +370,14 @@ public class StockOrderService extends BaseService {
 
             StockOrderLocation stockOrderLocation = fetchEntityOrElse(apiProdLocation.getId(), StockOrderLocation.class, null);
 
-            if(stockOrderLocation == null)
+            if(stockOrderLocation == null) {
                 stockOrderLocation = new StockOrderLocation();
+            }
 
             stockOrderLocation.setLatitude(apiProdLocation.getLatitude());
             stockOrderLocation.setLongitude(apiProdLocation.getLongitude());
             stockOrderLocation.setNumberOfFarmers(apiProdLocation.getNumberOfFarmers());
             stockOrderLocation.setPinName(apiProdLocation.getPinName());
-            // stockOrderLocation.setAddress();
             entity.setProductionLocation(stockOrderLocation);
         }
 
@@ -278,6 +387,19 @@ public class StockOrderService extends BaseService {
                 // Required
                 if(apiStockOrder.getProducerUserCustomer() == null)
                     throw new ApiException(ApiStatus.INVALID_REQUEST, "Producer user customer is required for purchase orders!");
+                if (apiStockOrder.getTotalQuantity() == null)
+                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Total quantity needs to be provided!");
+                if (apiStockOrder.getPricePerUnit() == null)
+                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Price per unit needs to be provided!");
+
+                entity.setPricePerUnit(apiStockOrder.getPricePerUnit());
+                entity.setCost(entity.getPricePerUnit().multiply(BigDecimal.valueOf(entity.getTotalQuantity())));
+                if (processingOrder == null) {
+                    entity.setBalance(calculateBalanceForPurchaseOrder(entity));
+                } else if (entity.getId() == null){
+                    entity.setBalance(entity.getCost());
+                }
+                entity.setPaid(entity.getCost().subtract(entity.getBalance()));
 
                 entity.setProducerUserCustomer(fetchEntity(apiStockOrder.getProducerUserCustomer().getId(), UserCustomer.class));
                 entity.setPurchaseOrder(true);
@@ -306,40 +428,63 @@ public class StockOrderService extends BaseService {
 
                 break;
             case SALES_ORDER:
-                break;
             case GENERAL_ORDER:
-                break;
             case TRANSFER_ORDER:
-                break;
             case PROCESSING_ORDER:
-                break;
+
+                // Create/update processing evidence fields instances (values)
+                createOrUpdateEvidenceFieldValues(apiStockOrder.getRequiredEvidenceFieldValues(), entity);
+
+                // Create/update processing evidence types instances (values) - both required and other evidences
+                entity.getDocumentRequirements().clear();
+                createOrUpdateEvidenceTypeValues(apiStockOrder.getRequiredEvidenceTypeValues(), entity, false);
+                createOrUpdateEvidenceTypeValues(apiStockOrder.getOtherEvidenceDocuments(), entity, true);
         }
-
-        // Create/update processing evidence fields instances (values)
-        createOrUpdateEvidenceFieldValues(apiStockOrder.getRequiredEvidenceFieldValues(), entity);
-
-        // Remove documents not present in API request
-//                entity.getDocumentRequirements().removeIf(dr -> apiStockOrder.getDocumentRequirements()
-//                                .stream().noneMatch(apiDr -> dr.getId().equals(apiDr.getId())));
-
-        // Add or update other documents
-//                apiStockOrder.getDocumentRequirements().forEach(apiDr -> {
-//
-//                    StockOrderPETypeValue dr = fetchEntityOrElse(apiDr.getId(), StockOrderPETypeValue.class, new StockOrderPETypeValue());
-//                    entity.getDocumentRequirements().remove(dr);
-//                    dr.setName(apiDr.getName());
-//                    dr.setDescription(apiDr.getDescription());
-//                    // doc.setScoreTarget();
-//                    // doc.setFields();
-//                    // doc.setScoreTarget();
-//                    entity.getDocumentRequirements().add(dr);
-//                });
 
         if (entity.getId() == null) {
             em.persist(entity);
         }
 
         return new ApiBaseEntity(entity);
+    }
+
+    // Should be called only from ProcessingOrderService
+    @Transactional
+    public StockOrder createOrUpdateQuoteStockOrder(ApiStockOrder apiQuoteStockOrder, Long userId, ProcessingOrder processingOrder) throws ApiException {
+
+        StockOrder entity;
+        boolean inserted = false;
+
+        if (apiQuoteStockOrder.getId() != null) {
+            entity = fetchEntity(apiQuoteStockOrder.getId(), StockOrder.class);
+
+        } else {
+            if (apiQuoteStockOrder.getFulfilledQuantity() != null && apiQuoteStockOrder.getFulfilledQuantity() != 0) {
+                throw new ApiException(ApiStatus.INVALID_REQUEST, "Fulfilled quantity must be 0");
+            }
+
+            Long insertedStockOrderId = createOrUpdateStockOrder(apiQuoteStockOrder, userId, processingOrder).getId();
+            entity = fetchEntity(insertedStockOrderId, StockOrder.class);
+            inserted = true;
+        }
+
+        if (apiQuoteStockOrder.getOrderType() != OrderType.GENERAL_ORDER && apiQuoteStockOrder.getOrderType() != OrderType.SALES_ORDER) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Order must be of orderType " +  OrderType.GENERAL_ORDER
+                    + " or " + OrderType.SALES_ORDER + " to allow input transactions");
+        }
+
+        if (!inserted) {
+
+            // Do not mess with quantities - transactions will take care of it.
+            apiQuoteStockOrder.setTotalQuantity(entity.getTotalQuantity());
+            apiQuoteStockOrder.setAvailableQuantity(entity.getAvailableQuantity());
+            apiQuoteStockOrder.setFulfilledQuantity(entity.getFulfilledQuantity());
+
+            createOrUpdateStockOrder(apiQuoteStockOrder, userId, processingOrder);
+            return fetchEntity(apiQuoteStockOrder.getId(), StockOrder.class);
+        }
+
+        return entity;
     }
 
     @Transactional
@@ -362,6 +507,59 @@ public class StockOrderService extends BaseService {
         return entity == null ? defaultValue : entity;
     }
 
+    private BigDecimal calculateBalanceForPurchaseOrder(StockOrder stockOrder) {
+
+        if (stockOrder.getOrderType() != OrderType.PURCHASE_ORDER || stockOrder.getCost() == null)
+            return null;
+
+        List<Payment> paymentList = em.createNamedQuery("Payment.listPaymentsByPurchaseId", Payment.class)
+                .setParameter("purchaseId", stockOrder.getId())
+                .getResultList();
+
+        BigDecimal balance = stockOrder.getCost();
+        for (Payment payment : paymentList) {
+
+            if (payment.getPaymentPurposeType() == PaymentPurposeType.FIRST_INSTALLMENT) {
+                balance = balance.subtract(payment.getAmountPaidToTheFarmer());
+
+                if (payment.getPreferredWayOfPayment() != PreferredWayOfPayment.CASH_VIA_COLLECTOR) {
+                    balance = balance.subtract(payment.getAmountPaidToTheCollector());
+                }
+            }
+        }
+        return balance;
+
+//        return stockOrder.getCost()
+//                .subtract(paymentList.stream()
+//                        .map(payment -> payment.getPaymentPurposeType() == PaymentPurposeType.FIRST_INSTALLMENT
+//                                ? payment.getAmountPaidToTheFarmer().add(
+//                                        payment.getPreferredWayOfPayment() != PreferredWayOfPayment.CASH_VIA_COLLECTOR
+//                                                ? payment.getAmountPaidToTheCollector()
+//                                                : BigDecimal.ZERO)
+//                                : BigDecimal.ZERO)
+//                        .reduce(BigDecimal.ZERO, BigDecimal::add));
+    }
+
+    private Integer calculateFulfilledQuantity(List<Transaction> inputTransactions, Long stockOrderId){
+        if (stockOrderId == null)
+            return null;
+
+        return inputTransactions.stream()
+                .filter(t -> t.getSourceStockOrder() != null && stockOrderId.equals(t.getSourceStockOrder().getId()))
+                .map(Transaction::getInputQuantity)
+                .reduce(0, Integer::sum);
+    }
+
+    private Integer calculateUsedQuantity(List<Transaction> inputTransactions, Long stockOrderId){
+        if (stockOrderId == null)
+            return null;
+
+        return inputTransactions.stream()
+                .filter(t -> t.getSourceStockOrder() != null && stockOrderId.equals(t.getSourceStockOrder().getId()))
+                .map(Transaction::getOutputQuantity)
+                .reduce(0, Integer::sum);
+    }
+
     private void createOrUpdateEvidenceFieldValues(List<ApiStockOrderEvidenceFieldValue> apiEvidenceFieldValues, StockOrder entity) throws ApiException {
 
         entity.getProcessingEFValues().clear();
@@ -379,6 +577,22 @@ public class StockOrderService extends BaseService {
             stockOrderPEFieldValue.setStringValue(apiEFV.getStringValue());
 
             entity.getProcessingEFValues().add(stockOrderPEFieldValue);
+        }
+    }
+
+    private void createOrUpdateEvidenceTypeValues(List<ApiStockOrderEvidenceTypeValue> apiEvidenceTypeValues, StockOrder entity, boolean otherEvidence) throws ApiException {
+
+        for (ApiStockOrderEvidenceTypeValue apiETV : apiEvidenceTypeValues) {
+
+            StockOrderPETypeValue stockOrderPETypeValue = new StockOrderPETypeValue();
+            stockOrderPETypeValue.setStockOrder(entity);
+            stockOrderPETypeValue.setProcessingEvidenceType(
+                    procEvidenceTypeService.fetchProcessingEvidenceType(apiETV.getEvidenceTypeId()));
+            stockOrderPETypeValue.setDate(apiETV.getDate());
+            stockOrderPETypeValue.setDocument(fetchEntity(apiETV.getDocument().getId(), Document.class));
+            stockOrderPETypeValue.setOtherEvidence(otherEvidence);
+
+            entity.getDocumentRequirements().add(stockOrderPETypeValue);
         }
     }
 

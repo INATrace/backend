@@ -35,14 +35,12 @@ public class TransactionService extends BaseService {
      *
      * @param apiTransaction - API transaction request
      * @param isProcessing - Is transaction part of ProcessingAction with type PROCESSING?
-     * @param targetStockOrderId - Target StockOrder ID (only applies for ProcessingAction with type TRANSFER)
      * @return Inserted transactions
      * @throws ApiException - When something goes wrong..
      */
     @Transactional
     public ApiBaseEntity createOrUpdateTransaction(ApiTransaction apiTransaction,
-                                                    Boolean isProcessing,
-                                                    Long targetStockOrderId) throws ApiException {
+                                                   Boolean isProcessing) throws ApiException {
 
         Transaction transaction = apiTransaction.getId() != null
                 ? fetchEntity(apiTransaction.getId(), Transaction.class)
@@ -58,19 +56,7 @@ public class TransactionService extends BaseService {
         transaction.setSourceFacility(transaction.getSourceStockOrder().getFacility());
         transaction.setInputMeasureUnitType(transaction.getSourceStockOrder().getMeasurementUnitType());
         transaction.setSemiProduct(transaction.getSourceStockOrder().getSemiProduct());
-//        transaction.setTargetProcessingOrder(entity);
-
-        // If ProcessingActionType is TRANSFER, set target StockOrder
-        if (!transaction.getIsProcessing()) {
-            StockOrder targetStockOrder = fetchEntity(targetStockOrderId, StockOrder.class);
-            transaction.setTargetStockOrder(targetStockOrder);
-            transaction.setOutputMeasureUnitType(targetStockOrder.getMeasurementUnitType());
-            transaction.setTargetFacility(targetStockOrder.getFacility());
-
-        } else {
-            transaction.setOutputMeasureUnitType(transaction.getInputMeasureUnitType());
-            transaction.setTargetFacility(transaction.getSourceFacility()); // TODO: As in nodeJS code, this should be fetched from ProcessingOrder which does not have a Facility?
-        }
+        transaction.setOutputMeasureUnitType(transaction.getInputMeasureUnitType());
 
         if (!transaction.getIsProcessing() && (transaction.getSemiProduct() == null || !transaction.getSemiProduct().equals(transaction.getSourceStockOrder().getSemiProduct())))
             throw new ApiException(ApiStatus.VALIDATION_ERROR, "Target SemiProduct has to match source SemiProduct.");
@@ -93,14 +79,14 @@ public class TransactionService extends BaseService {
         if (sourceStockOrder != null) {
             BigDecimal subtotal = sourceStockOrder.getAvailableQuantity().add(transaction.getInputQuantity());
             sourceStockOrder.setAvailableQuantity(subtotal.min(transaction.getInputQuantity()));
-            stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(sourceStockOrder, userId), userId);
+            stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(sourceStockOrder, userId), userId, null);
         }
 
         // Set target StockOrder fulfilled quantity
         if (!transaction.getIsProcessing() && targetStockOrder != null) {
             BigDecimal subtotal = targetStockOrder.getFulfilledQuantity().subtract(transaction.getOutputQuantity());
             targetStockOrder.setFulfilledQuantity(subtotal.max(BigDecimal.ZERO));
-            stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(targetStockOrder, userId), userId);
+            stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(targetStockOrder, userId), userId, null);
         }
 
         em.remove(transaction);

@@ -47,6 +47,9 @@ public class ApiFacility extends ApiBaseEntity {
 	@ApiModelProperty(value = "List of semi product ID's for this facility")
 	private List<ApiSemiProduct> facilitySemiProductList;
 
+	@ApiModelProperty(value = "List of facility translations")
+	private List<ApiFacilityTranslation> translations;
+
 	public String getName() {
 		return name;
 	}
@@ -143,12 +146,21 @@ public class ApiFacility extends ApiBaseEntity {
 		this.facilitySemiProductList = facilitySemiProductList;
 	}
 
+	public List<ApiFacilityTranslation> getTranslations() {
+		return translations;
+	}
+
+	public void setTranslations(List<ApiFacilityTranslation> translations) {
+		this.translations = translations;
+	}
+
 	public ApiFacility() {
 		super();
 	}
 
 	public ApiFacility(String name, Boolean isCollectionFacility, Boolean isPublic,
-			ApiFacilityLocation facilityLocation, ApiCompanyBase company, ApiFacilityType facilityType) {
+			ApiFacilityLocation facilityLocation, ApiCompanyBase company, ApiFacilityType facilityType,
+			List<ApiSemiProduct> facilitySemiProductList, List<ApiFacilityTranslation> facilityTranslationList) {
 		super();
 		this.name = name;
 		this.isCollectionFacility = isCollectionFacility;
@@ -156,6 +168,8 @@ public class ApiFacility extends ApiBaseEntity {
 		this.facilityLocation = facilityLocation;
 		this.company = company;
 		this.facilityType = facilityType;
+		this.facilitySemiProductList = facilitySemiProductList;
+		this.translations = facilityTranslationList;
 	}
 
 }

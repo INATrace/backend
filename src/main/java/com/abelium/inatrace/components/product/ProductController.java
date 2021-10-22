@@ -1,10 +1,6 @@
 package com.abelium.inatrace.components.product;
 
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiDefaultResponse;
-import com.abelium.inatrace.api.ApiPaginatedRequest;
-import com.abelium.inatrace.api.ApiPaginatedResponse;
-import com.abelium.inatrace.api.ApiResponse;
+import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.product.api.*;
@@ -284,5 +280,45 @@ public class ProductController {
     	productEngine.deleteProductLabelFeedback(authUser, id);
     	return new ApiDefaultResponse();
     }
-    
+
+    @GetMapping(value = "/{productId}/finalProduct/{finalProductId}")
+    @ApiOperation(value = "Get final product by ID.")
+    public ApiResponse<ApiFinalProduct> getFinalProduct(
+            @Valid @ApiParam(value = "Product ID", required = true) @PathVariable("productId") Long productId,
+            @Valid @ApiParam(value = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId) throws ApiException {
+        return new ApiResponse<>(productEngine.getFinalProduct(productId, finalProductId));
+    }
+
+    @GetMapping(value = "/{productId}/finalProduct/list")
+    @ApiOperation(value = "Get final product list by product ID.")
+    public ApiPaginatedResponse<ApiFinalProduct> getFinalProductList(
+            @Valid @ApiParam(value = "Product ID", required = true) @PathVariable("productId") Long productId,
+            @Valid ApiPaginatedRequest request) {
+
+        return new ApiPaginatedResponse<>(productEngine.getFinalProductList(
+                request,
+                new FinalProductQueryRequest(productId)
+        ));
+    }
+
+    @PutMapping(value = "/{productId}/finalProduct")
+    @ApiOperation(value = "Create or update final product.")
+    public ApiResponse<ApiBaseEntity> createOrUpdateFinalProduct(
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "Product ID", required = true) @PathVariable("productId") Long productId,
+            @Valid @RequestBody ApiFinalProduct apiFinalProduct) throws ApiException {
+
+        return new ApiResponse<>(productEngine.createOrUpdateFinalProduct(authUser, productId, apiFinalProduct));
+    }
+
+    @DeleteMapping(value = "/{productId}/finalProduct/{finalProductId}")
+    @ApiOperation(value = "Deletes a final product")
+    public ApiDefaultResponse deleteFinalProduct(
+            @Valid @ApiParam(value = "Product ID", required = true) @PathVariable("productId") Long productId,
+            @Valid @ApiParam(value = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId) throws ApiException {
+
+        productEngine.deleteFinalProduct(productId, finalProductId);
+        return new ApiDefaultResponse();
+    }
+
 }

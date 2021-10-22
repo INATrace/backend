@@ -14,6 +14,11 @@ import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
 import javax.persistence.*;
 import java.math.BigDecimal;
 
+
+@NamedQuery(
+		name = "Transaction.getTransactionsByStockOrderId",
+		query = "SELECT t FROM Transaction t WHERE t.sourceStockOrder.id = :stockOrderId"
+)
 @Entity
 public class Transaction extends TimestampEntity {
 	
