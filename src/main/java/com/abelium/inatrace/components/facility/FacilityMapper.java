@@ -29,24 +29,40 @@ public final class FacilityMapper {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static ApiFacility toApiFacility(Facility entity, Language language) {
-		if (entity == null) return null;
+	public static ApiFacility toApiFacilityBase(Facility entity, Language language) {
+
+		if (entity == null) {
+			return null;
+		}
 
 		FacilityTranslation translation = entity.getFacilityTranslations().stream().filter(facilityTranslation -> facilityTranslation.getLanguage().equals(language)).findFirst().orElse(new FacilityTranslation());
 
-		// Simplest apiFacility object
 		ApiFacility apiFacility = new ApiFacility();
+
 		apiFacility.setId(entity.getId());
 		apiFacility.setName(translation.getName());
 		apiFacility.setIsCollectionFacility(entity.getIsCollectionFacility());
 		apiFacility.setIsPublic(entity.getIsPublic());
+
+		apiFacility.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
+
+		return apiFacility;
+	}
+
+	public static ApiFacility toApiFacility(Facility entity, Language language) {
+
+		// Simplest apiFacility object
+		ApiFacility apiFacility = toApiFacilityBase(entity, language);
+
+		if (apiFacility == null) {
+			return null;
+		}
+
 		apiFacility.setDisplayMayInvolveCollectors(entity.getDisplayMayInvolveCollectors());
 		apiFacility.setDisplayOrganic(entity.getDisplayOrganic());
 		apiFacility.setDisplayPriceDeductionDamage(entity.getDisplayPriceDeductionDamage());
 		apiFacility.setDisplayTare(entity.getDisplayTare());
 		apiFacility.setDisplayWomenOnly(entity.getDisplayWomenOnly());
-
-		apiFacility.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
 
 		ApiFacilityLocation apiFacilityLocation = new ApiFacilityLocation();
 		ApiAddress apiAddress = new ApiAddress();
@@ -89,10 +105,13 @@ public final class FacilityMapper {
 	}
 
 	public static ApiFacility toApiFacilityDetail(Facility facility, Language language) {
-		if (facility == null) {
+
+		ApiFacility apiFacility = toApiFacility(facility, language);
+
+		if (apiFacility == null) {
 			return null;
 		}
-		ApiFacility apiFacility = toApiFacility(facility, language);
+
 		apiFacility.setTranslations(facility.getFacilityTranslations().stream().map(FacilityMapper::toApiFacilityTranslation).collect(Collectors.toList()));
 
 		return apiFacility;

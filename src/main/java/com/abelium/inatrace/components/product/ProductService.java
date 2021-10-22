@@ -1,20 +1,29 @@
 package com.abelium.inatrace.components.product;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
-import javax.persistence.criteria.Root;
-import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
-
 import com.abelium.inatrace.api.*;
+import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.analytics.AnalyticsEngine;
+import com.abelium.inatrace.components.analytics.RequestLogService;
+import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeService;
+import com.abelium.inatrace.components.common.BaseService;
+import com.abelium.inatrace.components.common.StorageKeyCache;
+import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
+import com.abelium.inatrace.components.product.api.*;
+import com.abelium.inatrace.components.product.types.ProductLabelAction;
+import com.abelium.inatrace.db.entities.common.Document;
+import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.company.CompanyCustomer;
+import com.abelium.inatrace.db.entities.company.CompanyUser;
+import com.abelium.inatrace.db.entities.product.*;
+import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.tools.PaginationTools;
+import com.abelium.inatrace.tools.Queries;
+import com.abelium.inatrace.tools.QueryTools;
+import com.abelium.inatrace.tools.TorpedoProjector;
 import com.abelium.inatrace.types.ProductCompanyType;
+import com.abelium.inatrace.types.ProductLabelStatus;
+import com.abelium.inatrace.types.RequestLogType;
+import com.abelium.inatrace.types.UserRole;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -22,55 +31,17 @@ import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
-import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.analytics.AnalyticsEngine;
-import com.abelium.inatrace.components.analytics.RequestLogService;
-import com.abelium.inatrace.components.common.BaseService;
-import com.abelium.inatrace.components.common.StorageKeyCache;
-import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
-import com.abelium.inatrace.components.product.api.ApiKnowledgeBlog;
-import com.abelium.inatrace.components.product.api.ApiKnowledgeBlogBase;
-import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
-import com.abelium.inatrace.components.product.api.ApiListKnowledgeBlogRequest;
-import com.abelium.inatrace.components.product.api.ApiListProductLabelBatchesRequest;
-import com.abelium.inatrace.components.product.api.ApiListProductLabelFeedbackRequest;
-import com.abelium.inatrace.components.product.api.ApiListProductsRequest;
-import com.abelium.inatrace.components.product.api.ApiLocation;
-import com.abelium.inatrace.components.product.api.ApiProduct;
-import com.abelium.inatrace.components.product.api.ApiProductLabel;
-import com.abelium.inatrace.components.product.api.ApiProductLabelAnalytics;
-import com.abelium.inatrace.components.product.api.ApiProductLabelBase;
-import com.abelium.inatrace.components.product.api.ApiProductLabelBatch;
-import com.abelium.inatrace.components.product.api.ApiProductLabelBatchCheckAuthenticity;
-import com.abelium.inatrace.components.product.api.ApiProductLabelBatchCheckOrigin;
-import com.abelium.inatrace.components.product.api.ApiProductLabelContent;
-import com.abelium.inatrace.components.product.api.ApiProductLabelFeedback;
-import com.abelium.inatrace.components.product.api.ApiProductLabelValues;
-import com.abelium.inatrace.components.product.api.ApiProductLabelValuesExtended;
-import com.abelium.inatrace.components.product.api.ApiProductLabelUpdateValues;
-import com.abelium.inatrace.components.product.api.ApiProductListResponse;
-import com.abelium.inatrace.components.product.types.ProductLabelAction;
-import com.abelium.inatrace.db.entities.company.CompanyUser;
-import com.abelium.inatrace.db.entities.product.ComparisonOfPrice;
-import com.abelium.inatrace.db.entities.common.Document;
-import com.abelium.inatrace.db.entities.product.KnowledgeBlog;
-import com.abelium.inatrace.db.entities.product.Product;
-import com.abelium.inatrace.db.entities.product.ProductCompany;
-import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.db.entities.company.CompanyCustomer;
-import com.abelium.inatrace.db.entities.product.ProductLabel;
-import com.abelium.inatrace.db.entities.product.ProductLabelBatch;
-import com.abelium.inatrace.db.entities.product.ProductLabelContent;
-import com.abelium.inatrace.db.entities.product.ProductLabelFeedback;
-import com.abelium.inatrace.db.entities.product.ProductSettings;
-import com.abelium.inatrace.security.service.CustomUserDetails;
-import com.abelium.inatrace.tools.PaginationTools;
-import com.abelium.inatrace.tools.Queries;
-import com.abelium.inatrace.tools.QueryTools;
-import com.abelium.inatrace.tools.TorpedoProjector;
-import com.abelium.inatrace.types.ProductLabelStatus;
-import com.abelium.inatrace.types.RequestLogType;
-import com.abelium.inatrace.types.UserRole;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Lazy
@@ -91,6 +62,9 @@ public class ProductService extends BaseService {
 
 	@Autowired
 	private ProductMapper productMapper;
+
+	@Autowired
+	private MeasureUnitTypeService measureUnitTypeService;
 	
     private Product productListQueryObject(ApiListProductsRequest request) {
         Product pProxy = Torpedo.from(Product.class);
@@ -590,7 +564,66 @@ public class ProductService extends BaseService {
     	ProductApiTools.updateProductLabelFeedback(fb, request);
     	em.persist(fb);
 	}
-    
+
+	public ApiFinalProduct getFinalProduct(Long productId, Long finalProductId) throws ApiException {
+    	return ProductApiTools.toApiFinalProduct(fetchFinalProduct(productId, finalProductId));
+	}
+
+	public ApiPaginatedList<ApiFinalProduct> getFinalProductList(ApiPaginatedRequest request,
+											   FinalProductQueryRequest queryRequest) {
+
+		return PaginationTools.createPaginatedResponse(em, request, () -> finalProductQueryObject(request, queryRequest),
+				ProductApiTools::toApiFinalProduct);
+	}
+
+	private FinalProduct finalProductQueryObject(ApiPaginatedRequest request,
+												 FinalProductQueryRequest queryRequest) {
+
+    	FinalProduct finalProductProxy = Torpedo.from(FinalProduct.class);
+    	OnGoingLogicalCondition condition = Torpedo.condition();
+
+    	if (queryRequest.productId != null) {
+    		condition.and(finalProductProxy.getProduct().getId()).eq(queryRequest.productId);
+		}
+
+    	Torpedo.where(condition);
+    	QueryTools.orderBy(request.sort, finalProductProxy);
+    	return finalProductProxy;
+	}
+
+	@Transactional
+	public ApiBaseEntity createOrUpdateFinalProduct(CustomUserDetails authUser, Long productId, ApiFinalProduct apiFinalProduct) throws ApiException {
+
+    	Product product = fetchProduct(authUser, productId);
+
+		FinalProduct entity = apiFinalProduct.getId() != null
+				? fetchFinalProduct(productId, apiFinalProduct.getId())
+				: new FinalProduct();
+
+		// Required fields
+		if (apiFinalProduct.getName() == null)
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Final product name needs to be provided.");
+		if (apiFinalProduct.getDescription() == null)
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Final product description needs to be provided.");
+		if (apiFinalProduct.getMeasurementUnitType() == null || apiFinalProduct.getMeasurementUnitType().getId() == null)
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Measurement unit type ID needs to be provided.");
+
+		entity.setProduct(product);
+		entity.setName(apiFinalProduct.getName());
+		entity.setDescription(apiFinalProduct.getDescription());
+		entity.setMeasurementUnitType(measureUnitTypeService.fetchMeasureUnitType(apiFinalProduct.getMeasurementUnitType().getId()));
+
+		if (entity.getId() == null) {
+			em.persist(entity);
+		}
+		return new ApiBaseEntity(entity);
+	}
+
+	@Transactional
+	public void deleteFinalProduct(Long productId, Long finalProductId) throws ApiException {
+    	em.remove(fetchFinalProduct(productId, finalProductId));
+	}
+
     private void checkProductPermission(CustomUserDetails authUser, Long productId) throws ApiException {
 		if (authUser.getUserRole() == UserRole.ADMIN) return;
     
@@ -741,5 +774,21 @@ public class ProductService extends BaseService {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid batch id");
 		}		
 		return plb;
+	}
+
+	private FinalProduct fetchFinalProduct(Long productId, Long finalProductId) throws ApiException {
+
+		FinalProduct entity = Queries.get(em, FinalProduct.class, finalProductId);
+
+		// If FinalProduct is found, but productIds does not match, return entity not found
+		if (entity == null
+				|| productId == null
+				|| entity.getProduct() == null
+				|| !productId.equals(entity.getProduct().getId())) {
+
+			throw new ApiException(ApiStatus.INVALID_REQUEST,
+					"FinalProduct entity with ID '" + finalProductId  + "' not found.");
+		}
+		return entity;
 	}
 }
