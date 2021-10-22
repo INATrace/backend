@@ -391,12 +391,17 @@ public class StockOrderService extends BaseService {
                 entity.setTotalGrossQuantity(apiStockOrder.getTotalGrossQuantity());
 
                 // Required
-                if(apiStockOrder.getProducerUserCustomer() == null)
+                if (apiStockOrder.getProducerUserCustomer() == null) {
                     throw new ApiException(ApiStatus.INVALID_REQUEST, "Producer user customer is required for purchase orders!");
-                if (apiStockOrder.getTotalQuantity() == null)
+                }
+
+                if (apiStockOrder.getTotalQuantity() == null) {
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Total quantity needs to be provided!");
-                if (apiStockOrder.getPricePerUnit() == null)
+                }
+
+                if (apiStockOrder.getPricePerUnit() == null) {
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Price per unit needs to be provided!");
+                }
 
                 entity.setPricePerUnit(apiStockOrder.getPricePerUnit());
                 BigDecimal pricePerUnitReduced = entity.getPricePerUnit();
