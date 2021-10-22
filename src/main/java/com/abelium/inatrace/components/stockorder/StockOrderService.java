@@ -397,7 +397,11 @@ public class StockOrderService extends BaseService {
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Price per unit needs to be provided!");
 
                 entity.setPricePerUnit(apiStockOrder.getPricePerUnit());
-                entity.setCost(entity.getPricePerUnit().multiply(entity.getTotalQuantity()));
+                BigDecimal pricePerUnitReduced = entity.getPricePerUnit();
+                if (entity.getDamagedPriceDeduction() != null){
+                    pricePerUnitReduced = entity.getPricePerUnit().subtract(entity.getDamagedPriceDeduction());
+                }
+                entity.setCost(pricePerUnitReduced.multiply(entity.getTotalQuantity()));
                 if (processingOrder == null) {
                     entity.setBalance(calculateBalanceForPurchaseOrder(entity));
                 } else if (entity.getId() == null){
