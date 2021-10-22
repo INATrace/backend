@@ -8,6 +8,7 @@ import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.converters.SimpleDateConverter;
+import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,18 +34,20 @@ public class StockOrderController {
     @ApiOperation("Get a single stock order with the provided ID.")
     public ApiResponse<ApiStockOrder> getStockOrder(
             @Valid @ApiParam(value = "StockOrder ID", required = true) @PathVariable("id") Long id,
-            @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-        return new ApiResponse<>(stockOrderService.getStockOrder(id, authUser.getUserId()));
+        return new ApiResponse<>(stockOrderService.getStockOrder(id, authUser.getUserId(), language));
     }
 
     @GetMapping("/list")
     @ApiOperation("Get a paginated list of stock orders.")
     public ApiPaginatedResponse<ApiStockOrder> getStockOrderList(
             @Valid ApiPaginatedRequest request,
-            @AuthenticationPrincipal CustomUserDetails authUser) {
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
-                request, new StockOrderQueryRequest(), authUser.getUserId()));
+                request, new StockOrderQueryRequest(), authUser.getUserId(), language));
     }
 
     @GetMapping("/list/facility/{facilityId}/semi-product/{semiProductId}/available")
@@ -56,7 +59,8 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
-            @AuthenticationPrincipal CustomUserDetails authUser) {
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
 
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
                 request,
@@ -68,7 +72,8 @@ public class StockOrderController {
                         productionDateStart != null ? productionDateStart.toInstant() : null,
                         productionDateEnd != null ? productionDateEnd.toInstant() : null
                 ),
-                authUser.getUserId()));
+                authUser.getUserId(),
+                language));
     }
 
     @GetMapping("list/facility/{facilityId}")
@@ -85,7 +90,8 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
             @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName,
-            @AuthenticationPrincipal CustomUserDetails authUser) {
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
 
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
                 request,
@@ -104,7 +110,8 @@ public class StockOrderController {
                         productionDateEnd != null ? productionDateEnd.toInstant() : null,
                         producerUserCustomerName
                 ),
-                authUser.getUserId()));
+                authUser.getUserId(),
+                language));
     }
 
     @GetMapping("list/facility/{facilityId}/orders-for-customers")
@@ -114,10 +121,11 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("facilityId") Long facilityId,
             @Valid @ApiParam(value = "Company customer ID") @RequestParam(value = "companyCustomerId", required = false) Long companyCustomerId,
             @Valid @ApiParam(value = "Return only open stock orders") @RequestParam(value = "openOnly", required = false) Boolean openOnly,
-            @AuthenticationPrincipal CustomUserDetails authUser) {
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
 
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request,
-                new StockOrderQueryRequest(facilityId, null, null, companyCustomerId, openOnly), authUser.getUserId()));
+                new StockOrderQueryRequest(facilityId, null, null, companyCustomerId, openOnly), authUser.getUserId(), language));
     }
 
     @GetMapping("list/facility/{facilityId}/quote-orders")
@@ -126,10 +134,11 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Quote facility ID", required = true) @PathVariable("facilityId") Long facilityId,
             @Valid @ApiParam(value = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
             @Valid @ApiParam(value = "Return only open stock orders") @RequestParam(value = "openOnly", required = false) Boolean openOnly,
-            @AuthenticationPrincipal CustomUserDetails authUser) {
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
 
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request,
-                new StockOrderQueryRequest(null, facilityId, semiProductId, null, openOnly), authUser.getUserId()));
+                new StockOrderQueryRequest(null, facilityId, semiProductId, null, openOnly), authUser.getUserId(), language));
     }
 
     @GetMapping("list/company/{companyId}")
@@ -148,8 +157,8 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
             @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName,
-            @AuthenticationPrincipal CustomUserDetails authUser) {
-
+            @AuthenticationPrincipal CustomUserDetails authUser,
+        @RequestHeader(value = "language" ,defaultValue = "EN", required = false) Language language) {
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
                 request,
                 new StockOrderQueryRequest(
@@ -167,7 +176,8 @@ public class StockOrderController {
                         productionDateEnd != null ? productionDateEnd.toInstant() : null,
                         producerUserCustomerName
                 ),
-                authUser.getUserId()));
+                authUser.getUserId(),
+                language));
     }
 
     @PostMapping("bulk-purchase")

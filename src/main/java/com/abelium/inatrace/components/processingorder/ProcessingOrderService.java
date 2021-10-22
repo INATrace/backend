@@ -19,6 +19,7 @@ import com.abelium.inatrace.db.entities.stockorder.Transaction;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -41,13 +42,13 @@ public class ProcessingOrderService extends BaseService {
     @Autowired
     private TransactionService transactionService;
 
-    public ApiProcessingOrder getProcessingOrder(Long id) throws ApiException {
-        return ProcessingOrderMapper.toApiProcessingOrder(fetchEntity(id, ProcessingOrder.class));
+    public ApiProcessingOrder getProcessingOrder(Long id, Language language) throws ApiException {
+        return ProcessingOrderMapper.toApiProcessingOrder(fetchEntity(id, ProcessingOrder.class), language);
     }
 
-    public ApiPaginatedList<ApiProcessingOrder> getProcessingOrderList(ApiPaginatedRequest request) {
+    public ApiPaginatedList<ApiProcessingOrder> getProcessingOrderList(ApiPaginatedRequest request, Language language) {
         return PaginationTools.createPaginatedResponse(em, request,
-                () -> processingOrderQueryObject(request), ProcessingOrderMapper::toApiProcessingOrder);
+                () -> processingOrderQueryObject(request), processingOrder -> ProcessingOrderMapper.toApiProcessingOrder(processingOrder, language));
     }
 
     private ProcessingOrder processingOrderQueryObject(ApiPaginatedRequest request) {
@@ -66,7 +67,7 @@ public class ProcessingOrderService extends BaseService {
      * @throws ApiException - You know... when something goes wrong it's nice to have a feedback
      */
     @Transactional
-    public ApiBaseEntity createOrUpdateProcessingOrder(ApiProcessingOrder apiProcessingOrder, Long userId) throws ApiException {
+    public ApiBaseEntity createOrUpdateProcessingOrder(ApiProcessingOrder apiProcessingOrder, Long userId, Language language) throws ApiException {
 
         ProcessingOrder entity = fetchEntityOrElse(apiProcessingOrder.getId(), ProcessingOrder.class, new ProcessingOrder());
 
@@ -95,7 +96,7 @@ public class ProcessingOrderService extends BaseService {
 
             // SHIPMENT is actually QUOTE
             case SHIPMENT:
-                return createOrUpdateQuoteOrder(entity, apiProcessingOrder, userId);
+                return createOrUpdateQuoteOrder(entity, apiProcessingOrder, userId, language);
 
             case PROCESSING:
                 // Validate that there is no transaction that is referencing current ProcessingOrder (via targetStockOrder)
@@ -174,7 +175,7 @@ public class ProcessingOrderService extends BaseService {
                     .collect(Collectors.toList());
 
             for (Transaction t: transactionsToBeDeleted)
-                transactionService.deleteTransaction(t.getId(), userId);
+                transactionService.deleteTransaction(t.getId(), userId, language);
 
             // Find target StockOrders that are not present in request
             List<StockOrder> targetStockOrdersToBeDeleted = entity.getTargetStockOrders()
@@ -267,7 +268,7 @@ public class ProcessingOrderService extends BaseService {
     }
 
     @Transactional
-    public ApiBaseEntity createOrUpdateQuoteOrder(ProcessingOrder entity, ApiProcessingOrder apiProcessingOrder, Long userId) throws ApiException {
+    public ApiBaseEntity createOrUpdateQuoteOrder(ProcessingOrder entity, ApiProcessingOrder apiProcessingOrder, Long userId, Language language) throws ApiException {
 
         if (apiProcessingOrder.getTargetStockOrders().size() < 1)
             throw new ApiException(ApiStatus.INVALID_REQUEST,
@@ -283,7 +284,7 @@ public class ProcessingOrderService extends BaseService {
                     .collect(Collectors.toList());
 
             for (Transaction t: transactionsToBeDeleted) {
-                transactionService.deleteTransaction(t.getId(), userId);
+                transactionService.deleteTransaction(t.getId(), userId, language);
             }
         }
 

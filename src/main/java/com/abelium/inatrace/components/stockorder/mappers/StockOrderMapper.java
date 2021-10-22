@@ -11,6 +11,7 @@ import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrderEvidenceTypeValue;
 import com.abelium.inatrace.components.user.mappers.UserMapper;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+import com.abelium.inatrace.types.Language;
 import org.apache.commons.lang3.BooleanUtils;
 
 import java.util.stream.Collectors;
@@ -40,7 +41,7 @@ public class StockOrderMapper {
         return apiStockOrder;
     }
 
-    public static ApiStockOrder toApiStockOrder(StockOrder entity, Long userId) {
+    public static ApiStockOrder toApiStockOrder(StockOrder entity, Long userId, Language language) {
 
         if (entity == null) {
             return null;
@@ -95,14 +96,14 @@ public class StockOrderMapper {
         }
 
         // Set the facility and company of the stock order
-        apiStockOrder.setFacility(FacilityMapper.toApiFacilityBase(entity.getFacility()));
+        apiStockOrder.setFacility(FacilityMapper.toApiFacility(entity.getFacility(), language));
         apiStockOrder.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
 
         // Set the measure unit of the stock order
         apiStockOrder.setMeasureUnitType(MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getMeasurementUnitType()));
 
         // Set the quoted facility
-        apiStockOrder.setQuoteFacility(FacilityMapper.toApiFacilityBase(entity.getQuoteFacility()));
+        apiStockOrder.setQuoteFacility(FacilityMapper.toApiFacility(entity.getQuoteFacility(), language));
 
         // Set the company customer for whom the stock order was created
         apiStockOrder.setConsumerCompanyCustomer(CompanyCustomerMapper.toApiCompanyCustomer(
