@@ -70,10 +70,10 @@ public class Transaction extends TimestampEntity {
 	private MeasureUnitType outputMeasureUnitType;
 	
 	@Column
-	private Integer inputQuantity;
+	private BigDecimal inputQuantity;
 
 	@Column
-	private Integer outputQuantity;
+	private BigDecimal outputQuantity;
 	
 	@Column
 	private BigDecimal pricePerUnit;
@@ -199,19 +199,19 @@ public class Transaction extends TimestampEntity {
 		this.outputMeasureUnitType = outputMeasureUnitType;
 	}
 
-	public Integer getInputQuantity() {
+	public BigDecimal getInputQuantity() {
 		return inputQuantity;
 	}
 
-	public void setInputQuantity(Integer inputQuantity) {
+	public void setInputQuantity(BigDecimal inputQuantity) {
 		this.inputQuantity = inputQuantity;
 	}
 
-	public Integer getOutputQuantity() {
+	public BigDecimal getOutputQuantity() {
 		return outputQuantity;
 	}
 
-	public void setOutputQuantity(Integer outputQuantity) {
+	public void setOutputQuantity(BigDecimal outputQuantity) {
 		this.outputQuantity = outputQuantity;
 	}
 

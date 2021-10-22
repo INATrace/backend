@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.stockorder;
 
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.stockorder.api.ApiPurchaseOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
@@ -177,6 +178,15 @@ public class StockOrderController {
                 ),
                 authUser.getUserId(),
                 language));
+    }
+
+    @PostMapping("bulk-purchase")
+    @ApiOperation("Creates a list of purchase orders.")
+    public ApiResponse<ApiPurchaseOrder> createPurchaseOrderBulk(
+            @Valid @RequestBody ApiPurchaseOrder apiPurchaseOrder,
+            @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
+
+        return new ApiResponse<>(stockOrderService.createPurchaseBulkOrder(apiPurchaseOrder, authUser.getUserId()));
     }
 
     @PutMapping
