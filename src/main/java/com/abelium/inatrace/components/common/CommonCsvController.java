@@ -13,26 +13,19 @@ import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.converters.SimpleDateConverter;
-
+import com.abelium.inatrace.types.Language;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-
-import javax.validation.Valid;
-
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 
 /**
  * REST controller for csv generators.
@@ -84,13 +77,14 @@ public class CommonCsvController {
 			);
 		
 		List<ApiPayment> apiPayments = paginatedPayments.getItems();
-		byte[] csvBytes = commonCsvService.createPaymentsByCompanyCsv(apiPayments, companyId);
-		return csvBytes;
+
+		return commonCsvService.createPaymentsByCompanyCsv(apiPayments, companyId);
 	}
 	
 	@PostMapping(value = "purchases/company/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	@ApiOperation("Generate a csv file with a list of filtered purchases by companyId.")
 	public @ResponseBody byte[] generatePurchasesByCompanyCsv(
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid ApiPaginatedRequest request,
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
@@ -120,12 +114,13 @@ public class CommonCsvController {
 					productionDateEnd != null ? productionDateEnd.toInstant() : null,
 					farmerName
 				), 
-				authUser.getUserId()
+				authUser.getUserId(),
+				language
 			);
 		
 		List<ApiStockOrder> apiPurchases = paginatedPurchases.getItems();
-		byte[] csvBytes = commonCsvService.createPurchasesByCompanyCsv(apiPurchases, companyId);
-		return csvBytes;
+
+		return commonCsvService.createPurchasesByCompanyCsv(apiPurchases, companyId);
 	}
 
 }
