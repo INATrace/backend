@@ -46,7 +46,7 @@ public class FacilityService extends BaseService {
 
 	public ApiPaginatedList<ApiFacility> getFacilityList(ApiPaginatedRequest request, Language language) {
 
-		return PaginationTools.createPaginatedResponse(em, request, () -> facilityQueryObject(request, language), FacilityMapper::toApiFacility);
+		return PaginationTools.createPaginatedResponse(em, request, () -> facilityQueryObject(request, language), facility -> FacilityMapper.toApiFacility(facility, language));
 
 	}
 
@@ -67,12 +67,12 @@ public class FacilityService extends BaseService {
 		return facilityProxy;
 	}
 
-	public ApiFacility getFacility(Long id) throws ApiException {
-		return FacilityMapper.toApiFacility(fetchFacility(id));
+	public ApiFacility getFacility(Long id, Language language) throws ApiException {
+		return FacilityMapper.toApiFacility(fetchFacility(id), language);
 	}
 
-	public ApiFacility getFacilityDetail(Long id) throws ApiException {
-		return FacilityMapper.toApiFacilityDetail(fetchFacility(id));
+	public ApiFacility getFacilityDetail(Long id, Language language) throws ApiException {
+		return FacilityMapper.toApiFacilityDetail(fetchFacility(id), language);
 	}
 
 	@Transactional
@@ -209,7 +209,7 @@ public class FacilityService extends BaseService {
 		List<Facility> facilities = facilitiesQuery.getResultList();
 
 		return new ApiPaginatedList<>(
-				facilities.stream().map(FacilityMapper::toApiFacility).collect(Collectors.toList()), count);
+				facilities.stream().map(facility -> FacilityMapper.toApiFacility(facility, language)).collect(Collectors.toList()), count);
 	}
 	
 	public ApiPaginatedList<ApiFacility> listCollectingFacilitiesByCompany(Long companyId, ApiPaginatedRequest request, Language language) {
@@ -227,7 +227,7 @@ public class FacilityService extends BaseService {
 				.setParameter("companyId", companyId).getSingleResult();
 
 		return new ApiPaginatedList<>(
-				facilities.stream().map(FacilityMapper::toApiFacility).collect(Collectors.toList()), count);
+				facilities.stream().map(facility -> FacilityMapper.toApiFacility(facility, language)).collect(Collectors.toList()), count);
 	}
 
 	public ApiPaginatedList<ApiFacility> listSellingFacilitiesByCompany(Long companyId, Long semiProductId, ApiPaginatedRequest request, Language language) {
@@ -266,7 +266,7 @@ public class FacilityService extends BaseService {
 		List<Facility> facilities = collectingFacilitiesQuery.getResultList();
 
 		return new ApiPaginatedList<>(
-				facilities.stream().map(FacilityMapper::toApiFacility).collect(Collectors.toList()), count);
+				facilities.stream().map(facility -> FacilityMapper.toApiFacility(facility, language)).collect(Collectors.toList()), count);
 	}
 
 }

@@ -12,6 +12,7 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
 import com.abelium.inatrace.tools.Queries;
+import com.abelium.inatrace.types.Language;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,8 @@ public class TransactionService extends BaseService {
     @Autowired
     private StockOrderService stockOrderService;
 
-    public ApiTransaction getApiTransaction(Long id) throws ApiException {
-        return TransactionMapper.toApiTransaction(fetchEntity(id, Transaction.class));
+    public ApiTransaction getApiTransaction(Long id, Language language) throws ApiException {
+        return TransactionMapper.toApiTransaction(fetchEntity(id, Transaction.class), language);
     }
 
     /**
@@ -67,7 +68,7 @@ public class TransactionService extends BaseService {
     }
 
     @Transactional
-    public void deleteTransaction(Long id, Long userId) throws ApiException {
+    public void deleteTransaction(Long id, Long userId, Language language) throws ApiException {
 
         Transaction transaction = fetchEntity(id, Transaction.class);
 
@@ -80,7 +81,7 @@ public class TransactionService extends BaseService {
                     sourceStockOrder.getAvailableQuantity() + transaction.getInputQuantity(),
                     sourceStockOrder.getTotalQuantity()
             ));
-            stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(sourceStockOrder, userId), userId, null);
+            stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(sourceStockOrder, userId, language), userId, null);
         }
 
         // Set target StockOrder fulfilled quantity
@@ -89,7 +90,7 @@ public class TransactionService extends BaseService {
                     targetStockOrder.getFulfilledQuantity() - transaction.getOutputQuantity(),
                     0
             ));
-            stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(targetStockOrder, userId), userId, null);
+            stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(targetStockOrder, userId, language), userId, null);
         }
 
         em.remove(transaction);
