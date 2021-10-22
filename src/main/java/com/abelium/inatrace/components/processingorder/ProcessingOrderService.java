@@ -95,7 +95,7 @@ public class ProcessingOrderService extends BaseService {
 
             // SHIPMENT is actually QUOTE
             case SHIPMENT:
-                return createOrUpdateQuoteOrder(entity, apiProcessingOrder, userId);
+                return createOrUpdateQuoteOrder(entity, apiProcessingOrder, userId, language);
 
             case PROCESSING:
                 // Validate that there is no transaction that is referencing current ProcessingOrder (via targetStockOrder)
@@ -264,7 +264,7 @@ public class ProcessingOrderService extends BaseService {
     }
 
     @Transactional
-    public ApiBaseEntity createOrUpdateQuoteOrder(ProcessingOrder entity, ApiProcessingOrder apiProcessingOrder, Long userId) throws ApiException {
+    public ApiBaseEntity createOrUpdateQuoteOrder(ProcessingOrder entity, ApiProcessingOrder apiProcessingOrder, Long userId, Language language) throws ApiException {
 
         if (apiProcessingOrder.getTargetStockOrders().size() < 1)
             throw new ApiException(ApiStatus.INVALID_REQUEST,
@@ -280,7 +280,7 @@ public class ProcessingOrderService extends BaseService {
                     .collect(Collectors.toList());
 
             for (Transaction t: transactionsToBeDeleted) {
-                transactionService.deleteTransaction(t.getId(), userId);
+                transactionService.deleteTransaction(t.getId(), userId, language);
             }
         }
 

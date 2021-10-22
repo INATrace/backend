@@ -96,14 +96,14 @@ public class StockOrderMapper {
         }
 
         // Set the facility and company of the stock order
-        apiStockOrder.setFacility(FacilityMapper.toApiFacility(entity.getFacility()));
+        apiStockOrder.setFacility(FacilityMapper.toApiFacility(entity.getFacility(), language));
         apiStockOrder.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
 
         // Set the measure unit of the stock order
         apiStockOrder.setMeasureUnitType(MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getMeasurementUnitType()));
 
         // Set the quoted facility
-        apiStockOrder.setQuoteFacility(FacilityMapper.toApiFacility(entity.getQuoteFacility()));
+        apiStockOrder.setQuoteFacility(FacilityMapper.toApiFacility(entity.getQuoteFacility(), language));
 
         // Set the company customer for whom the stock order was created
         apiStockOrder.setConsumerCompanyCustomer(CompanyCustomerMapper.toApiCompanyCustomer(
