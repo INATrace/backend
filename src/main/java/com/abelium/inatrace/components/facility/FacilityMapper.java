@@ -12,6 +12,7 @@ import com.abelium.inatrace.components.facility.api.ApiFacilityTranslation;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.facility.FacilitySemiProduct;
 import com.abelium.inatrace.db.entities.facility.FacilityTranslation;
+import com.abelium.inatrace.types.Language;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,15 +29,15 @@ public final class FacilityMapper {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static ApiFacility toApiFacility(Facility entity) {
+	public static ApiFacility toApiFacility(Facility entity, Language language) {
 		if (entity == null) return null;
 
-		FacilityTranslation facilityTranslation = entity.getFacilityTranslations().stream().findFirst().orElse(new FacilityTranslation());
+		FacilityTranslation translation = entity.getFacilityTranslations().stream().filter(facilityTranslation -> facilityTranslation.getLanguage().equals(language)).findFirst().orElse(new FacilityTranslation());
 
 		// Simplest apiFacility object
 		ApiFacility apiFacility = new ApiFacility();
 		apiFacility.setId(entity.getId());
-		apiFacility.setName(facilityTranslation.getName());
+		apiFacility.setName(translation.getName());
 		apiFacility.setIsCollectionFacility(entity.getIsCollectionFacility());
 		apiFacility.setIsPublic(entity.getIsPublic());
 		apiFacility.setDisplayMayInvolveCollectors(entity.getDisplayMayInvolveCollectors());
@@ -87,11 +88,11 @@ public final class FacilityMapper {
 		return apiFacility;
 	}
 
-	public static ApiFacility toApiFacilityDetail(Facility facility) {
+	public static ApiFacility toApiFacilityDetail(Facility facility, Language language) {
 		if (facility == null) {
 			return null;
 		}
-		ApiFacility apiFacility = toApiFacility(facility);
+		ApiFacility apiFacility = toApiFacility(facility, language);
 		apiFacility.setTranslations(facility.getFacilityTranslations().stream().map(FacilityMapper::toApiFacilityTranslation).collect(Collectors.toList()));
 
 		return apiFacility;
