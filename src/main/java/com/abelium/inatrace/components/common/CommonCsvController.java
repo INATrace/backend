@@ -1,6 +1,5 @@
 package com.abelium.inatrace.components.common;
 
-import com.abelium.inatrace.api.ApiDefaultResponse;
 import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.errors.ApiException;
@@ -17,11 +16,13 @@ import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -53,9 +54,9 @@ public class CommonCsvController {
 		this.commonCsvService = paymentCsvService;
 	}
 	
-	@PostMapping("payments/company/{id}")
+	@PostMapping(value = "payments/company/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	@ApiOperation("Generate a csv file with a list of filtered payments by companyId.")
-	public ApiDefaultResponse generatePaymentsByCompanyCsv(
+	public @ResponseBody byte[] generatePaymentsByCompanyCsv(
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid ApiPaginatedRequest request,
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
@@ -83,13 +84,13 @@ public class CommonCsvController {
 			);
 		
 		List<ApiPayment> apiPayments = paginatedPayments.getItems();
-		commonCsvService.createPaymentsByCompanyCsv(apiPayments, companyId);
-		return new ApiDefaultResponse();
+		byte[] csvBytes = commonCsvService.createPaymentsByCompanyCsv(apiPayments, companyId);
+		return csvBytes;
 	}
 	
-	@PostMapping("purchases/company/{id}")
+	@PostMapping(value = "purchases/company/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	@ApiOperation("Generate a csv file with a list of filtered purchases by companyId.")
-	public ApiDefaultResponse generatePurchasesByCompanyCsv(
+	public @ResponseBody byte[] generatePurchasesByCompanyCsv(
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid ApiPaginatedRequest request,
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
@@ -123,8 +124,8 @@ public class CommonCsvController {
 			);
 		
 		List<ApiStockOrder> apiPurchases = paginatedPurchases.getItems();
-		commonCsvService.createPurchasesByCompanyCsv(apiPurchases, companyId);
-		return new ApiDefaultResponse();
+		byte[] csvBytes = commonCsvService.createPurchasesByCompanyCsv(apiPurchases, companyId);
+		return csvBytes;
 	}
 
 }
