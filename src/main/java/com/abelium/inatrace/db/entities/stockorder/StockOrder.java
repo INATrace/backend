@@ -12,6 +12,7 @@ import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.payment.BulkPayment;
 import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
+import com.abelium.inatrace.db.entities.productorder.ProductOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
@@ -98,7 +99,11 @@ public class StockOrder extends TimestampEntity {
 	@ManyToOne
 	private MeasureUnitType measurementUnitType;
 
-	// contains net quantity
+	// The product order that created this stock order (this stock order represents final product item with the requested quantity)
+	@ManyToOne
+	private ProductOrder productOrder;
+
+	// Contains net quantity
 	@Column
 	private BigDecimal totalQuantity;
 
@@ -108,7 +113,7 @@ public class StockOrder extends TimestampEntity {
 	
 	@Column
 	private BigDecimal fulfilledQuantity;
-	
+
 	@Column
 	private BigDecimal availableQuantity;
 	
@@ -361,6 +366,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setCompany(Company company) {
 		this.company = company;
+	}
+
+	public ProductOrder getProductOrder() {
+		return productOrder;
+	}
+
+	public void setProductOrder(ProductOrder productOrder) {
+		this.productOrder = productOrder;
 	}
 
 	public MeasureUnitType getMeasurementUnitType() {
