@@ -6,6 +6,7 @@ import com.abelium.inatrace.components.facility.FacilityMapper;
 import com.abelium.inatrace.components.productorder.api.ApiProductOrder;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.db.entities.productorder.ProductOrder;
+import com.abelium.inatrace.types.Language;
 
 import java.util.stream.Collectors;
 
@@ -20,7 +21,7 @@ public final class ProductOrderMapper {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static ApiProductOrder toApiProductOrder(ProductOrder entity) {
+	public static ApiProductOrder toApiProductOrder(ProductOrder entity, Language language) {
 
 		if (entity == null) {
 			return null;
@@ -32,7 +33,7 @@ public final class ProductOrderMapper {
 		apiProductOrder.setDeliveryDeadline(entity.getDeliveryDeadline());
 		apiProductOrder.setRequiredWomensOnly(entity.getRequiredWomensOnly());
 		apiProductOrder.setRequiredOrganic(entity.getRequiredOrganic());
-		apiProductOrder.setFacility(FacilityMapper.toApiFacilityBase(entity.getFacility()));
+		apiProductOrder.setFacility(FacilityMapper.toApiFacilityBase(entity.getFacility(), language));
 		apiProductOrder.setCustomer(CompanyCustomerMapper.toApiCompanyCustomerBase(entity.getCustomer()));
 		apiProductOrder.setRequiredGrade(GradeAbbreviationMapper.toApiGradeAbbreviation(entity.getRequiredGrade()));
 

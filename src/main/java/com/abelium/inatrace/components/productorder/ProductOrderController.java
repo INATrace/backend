@@ -4,6 +4,7 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.productorder.api.ApiProductOrder;
+import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +31,10 @@ public class ProductOrderController {
 	@GetMapping("{id}")
 	@ApiOperation("Get a single product order with the provided ID.")
 	public ApiResponse<ApiProductOrder> getProductOrder(
-			@Valid @ApiParam(value = "Product order ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @ApiParam(value = "Product order ID", required = true) @PathVariable("id") Long id,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-		return new ApiResponse<>(productOrderService.getProductOrder(id));
+		return new ApiResponse<>(productOrderService.getProductOrder(id, language));
 	}
 
 	@PutMapping

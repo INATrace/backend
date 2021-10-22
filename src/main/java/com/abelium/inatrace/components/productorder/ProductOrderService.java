@@ -7,6 +7,7 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.productorder.api.ApiProductOrder;
 import com.abelium.inatrace.components.productorder.mappers.ProductOrderMapper;
 import com.abelium.inatrace.db.entities.productorder.ProductOrder;
+import com.abelium.inatrace.types.Language;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +20,8 @@ import org.springframework.stereotype.Service;
 @Lazy
 public class ProductOrderService extends BaseService {
 
-	public ApiProductOrder getProductOrder(Long id) throws ApiException {
-		return ProductOrderMapper.toApiProductOrder(fetchProductOrder(id));
+	public ApiProductOrder getProductOrder(Long id, Language language) throws ApiException {
+		return ProductOrderMapper.toApiProductOrder(fetchProductOrder(id), language);
 	}
 
 	public ApiBaseEntity createOrUpdateProductOrder(ApiProductOrder apiProductOrder) {
