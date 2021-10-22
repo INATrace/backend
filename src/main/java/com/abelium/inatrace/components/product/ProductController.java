@@ -271,7 +271,6 @@ public class ProductController {
     	return new ApiDefaultResponse();
     }
     
-    
     @DeleteMapping(value = "/label/feedback/{id}")
     @ApiOperation(value = "Deletes a product label feedback")
     public ApiDefaultResponse deleteProductLabelFeedback(
@@ -312,7 +311,7 @@ public class ProductController {
     }
 
     @DeleteMapping(value = "/{productId}/finalProduct/{finalProductId}")
-    @ApiOperation(value = "Deletes a final product")
+    @ApiOperation(value = "Delete a final product")
     public ApiDefaultResponse deleteFinalProduct(
             @Valid @ApiParam(value = "Product ID", required = true) @PathVariable("productId") Long productId,
             @Valid @ApiParam(value = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId) throws ApiException {
