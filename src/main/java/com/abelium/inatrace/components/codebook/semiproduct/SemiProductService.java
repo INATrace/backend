@@ -10,9 +10,13 @@ import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
+import com.abelium.inatrace.db.entities.codebook.SemiProductTranslation;
+import com.abelium.inatrace.db.entities.facility.FacilityTranslation;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+import com.abelium.inatrace.types.Language;
+import org.apache.commons.codec.language.bm.Lang;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -37,10 +41,10 @@ public class SemiProductService extends BaseService {
 		this.measureUnitTypeService = measureUnitTypeService;
 	}
 
-	public ApiPaginatedList<ApiSemiProduct> getSemiProductList(ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiSemiProduct> getSemiProductList(ApiPaginatedRequest request, Language language) {
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> semiProductQueryObject(request),
-				SemiProductMapper::toApiSemiProduct);
+				semiProduct -> SemiProductMapper.toApiSemiProduct(semiProduct, language));
 	}
 
 	private SemiProduct semiProductQueryObject(ApiPaginatedRequest request) {
@@ -64,9 +68,9 @@ public class SemiProductService extends BaseService {
 		return semiProductProxy;
 	}
 
-	public ApiSemiProduct getSemiProduct(Long id) throws ApiException {
+	public ApiSemiProduct getSemiProduct(Long id, Language language) throws ApiException {
 
-		return SemiProductMapper.toApiSemiProduct(fetchSemiProduct(id));
+		return SemiProductMapper.toApiSemiProduct(fetchSemiProduct(id), language);
 	}
 
 	@Transactional
@@ -101,6 +105,17 @@ public class SemiProductService extends BaseService {
 		if (semiProduct.getId() == null) {
 			em.persist(semiProduct);
 		}
+
+		semiProduct.getSemiProductTranslations().removeIf(semiProductTranslation -> apiSemiProduct.getTranslations().stream().noneMatch(apiSemiProductTranslation -> semiProductTranslation.getLanguage().equals(apiSemiProductTranslation.getLanguage())));
+
+		apiSemiProduct.getTranslations().forEach(apiSemiProductTranslation -> {
+			SemiProductTranslation translation = semiProduct.getSemiProductTranslations().stream().filter(semiProductTranslation -> semiProductTranslation.getLanguage().equals(apiSemiProductTranslation.getLanguage())).findFirst().orElse(new SemiProductTranslation());
+			translation.setName(apiSemiProductTranslation.getName());
+			translation.setDescription(apiSemiProductTranslation.getDescription());
+			translation.setLanguage(apiSemiProductTranslation.getLanguage());
+			translation.setSemiProduct(semiProduct);
+			semiProduct.getSemiProductTranslations().add(translation);
+		});
 
 		return new ApiBaseEntity(semiProduct);
 	}

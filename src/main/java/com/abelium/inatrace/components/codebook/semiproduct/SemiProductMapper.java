@@ -3,6 +3,8 @@ package com.abelium.inatrace.components.codebook.semiproduct;
 import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
+import com.abelium.inatrace.db.entities.codebook.SemiProductTranslation;
+import com.abelium.inatrace.types.Language;
 
 /**
  * Mapper for SemiProduct entity.
@@ -37,13 +39,15 @@ public final class SemiProductMapper {
 	 * @param entity DB entity.
 	 * @return API model entity.
 	 */
-	public static ApiSemiProduct toApiSemiProductBase(SemiProduct entity) {
+	public static ApiSemiProduct toApiSemiProductBase(SemiProduct entity, Language language) {
 		if(entity == null) return null;
+
+		SemiProductTranslation translation = entity.getSemiProductTranslations().stream().filter(semiProductTranslation -> semiProductTranslation.getLanguage().equals(language)).findFirst().orElse(new SemiProductTranslation());
 
 		ApiSemiProduct apiSemiProduct = new ApiSemiProduct();
 		apiSemiProduct.setId(entity.getId());
-		apiSemiProduct.setName(entity.getName());
-		apiSemiProduct.setDescription(entity.getDescription());
+		apiSemiProduct.setName(translation.getName());
+		apiSemiProduct.setDescription(translation.getDescription());
 
 		return apiSemiProduct;
 	}
@@ -54,10 +58,10 @@ public final class SemiProductMapper {
 	 * @param entity DB entity.
 	 * @return API model entity.
 	 */
-	public static ApiSemiProduct toApiSemiProduct(SemiProduct entity) {
+	public static ApiSemiProduct toApiSemiProduct(SemiProduct entity, Language language) {
 		if(entity == null) return null;
 
-		ApiSemiProduct apiSemiProduct = SemiProductMapper.toApiSemiProductBase(entity);
+		ApiSemiProduct apiSemiProduct = SemiProductMapper.toApiSemiProductBase(entity, language);
 
 		apiSemiProduct.setSKU(entity.getSKU());
 		apiSemiProduct.setSKUEndCustomer(entity.getSKUEndCustomer());

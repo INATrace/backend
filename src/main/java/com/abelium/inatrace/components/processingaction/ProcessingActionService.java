@@ -66,7 +66,7 @@ public class ProcessingActionService extends BaseService {
 		return new ApiPaginatedList<>(
 			processingActions
 				.stream()
-				.map(ProcessingActionMapper::toApiProcessingAction)
+				.map(processingAction -> ProcessingActionMapper.toApiProcessingAction(processingAction, language))
 				.collect(Collectors.toList()), count);
 	}
 
@@ -82,13 +82,13 @@ public class ProcessingActionService extends BaseService {
 		processingAction.getProcessingActionTranslations().clear();
 		if(translation != null)
 			processingAction.getProcessingActionTranslations().add(translation);
-		return ProcessingActionMapper.toApiProcessingAction(processingAction);
+		return ProcessingActionMapper.toApiProcessingAction(processingAction, language);
 	}
 
-	public ApiProcessingAction getProcessingActionDetail(Long id) throws ApiException {
+	public ApiProcessingAction getProcessingActionDetail(Long id, Language language) throws ApiException {
 
 		ProcessingAction processingAction = fetchProcessingAction(id);
-		return ProcessingActionMapper.toApiProcessingActionDetail(processingAction);
+		return ProcessingActionMapper.toApiProcessingActionDetail(processingAction, language);
 	}
 
 	@Transactional
@@ -274,7 +274,7 @@ public class ProcessingActionService extends BaseService {
 		return new ApiPaginatedList<>(
 			processingActions
 				.stream()
-				.map(ProcessingActionMapper::toApiProcessingAction)
+				.map(processingAction -> ProcessingActionMapper.toApiProcessingAction(processingAction, language))
 				.collect(Collectors.toList()), count);
 	}
 }

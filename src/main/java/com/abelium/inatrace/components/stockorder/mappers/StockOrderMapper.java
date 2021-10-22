@@ -11,6 +11,7 @@ import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrderEvidenceTypeValue;
 import com.abelium.inatrace.components.user.mappers.UserMapper;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+import com.abelium.inatrace.types.Language;
 import org.apache.commons.lang3.BooleanUtils;
 
 import java.util.stream.Collectors;
@@ -40,7 +41,7 @@ public class StockOrderMapper {
         return apiStockOrder;
     }
 
-    public static ApiStockOrder toApiStockOrder(StockOrder entity, Long userId) {
+    public static ApiStockOrder toApiStockOrder(StockOrder entity, Long userId, Language language) {
 
         if (entity == null) {
             return null;
@@ -91,7 +92,7 @@ public class StockOrderMapper {
 
         // Map the semi-product that is represented by this stock order
         if (entity.getSemiProduct() != null) {
-            apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct()));
+            apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct(), language));
         }
 
         // Set the facility and company of the stock order

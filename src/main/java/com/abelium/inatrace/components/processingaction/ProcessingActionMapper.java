@@ -11,6 +11,7 @@ import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionTranslation;
+import com.abelium.inatrace.types.Language;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public final class ProcessingActionMapper {
 		throw new IllegalStateException("Utility class");
 	}
 	
-	public static ApiProcessingAction toApiProcessingAction(ProcessingAction entity) {
+	public static ApiProcessingAction toApiProcessingAction(ProcessingAction entity, Language language) {
 
 		// Simplest apiProcessingAction object
 		ApiProcessingAction apiProcessingAction = new ApiProcessingAction();
@@ -52,8 +53,8 @@ public final class ProcessingActionMapper {
 		apiCompany.setId(entity.getCompany().getId());
 		apiCompany.setName(entity.getCompany().getName());
 
-		ApiSemiProduct apiInputSemiProduct = SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct());
-		ApiSemiProduct apiOutputSemiProduct = SemiProductMapper.toApiSemiProduct(entity.getOutputSemiProduct());
+		ApiSemiProduct apiInputSemiProduct = SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct(), language);
+		ApiSemiProduct apiOutputSemiProduct = SemiProductMapper.toApiSemiProduct(entity.getOutputSemiProduct(), language);
 		
 		List<ApiProcessingEvidenceField> apiRequiredEvidenceFields = new ArrayList<>();
 		List<ProcessingActionPEF> processingActionProcessingEvidenceFields = entity.getProcessingEvidenceFields();
@@ -99,8 +100,8 @@ public final class ProcessingActionMapper {
 		return apiProcessingAction;
 	}
 
-	public static ApiProcessingAction toApiProcessingActionDetail(ProcessingAction entity) {
-		ApiProcessingAction apiProcessingAction = toApiProcessingAction(entity);
+	public static ApiProcessingAction toApiProcessingActionDetail(ProcessingAction entity, Language language) {
+		ApiProcessingAction apiProcessingAction = toApiProcessingAction(entity, language);
 		apiProcessingAction.setTranslations(entity.getProcessingActionTranslations()
 				.stream()
 				.map(ProcessingActionTranslationMapper::toApiProcessingActionTranslation)
