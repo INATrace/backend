@@ -2,7 +2,6 @@ package com.abelium.inatrace.components.common;
 
 import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
-import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.payment.PaymentQueryRequest;
 import com.abelium.inatrace.components.payment.PaymentService;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
@@ -57,7 +56,7 @@ public class CommonCsvController {
 			@Valid @ApiParam(value = "Payment status") @RequestParam(value = "paymentStatus", required = false) PaymentStatus paymentStatus,
 			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
 			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
-			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws ApiException, IOException {
+			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws IOException {
 
 		request.limit = 500;
 		
@@ -78,7 +77,7 @@ public class CommonCsvController {
 		
 		List<ApiPayment> apiPayments = paginatedPayments.getItems();
 
-		return commonCsvService.createPaymentsByCompanyCsv(apiPayments, companyId);
+		return commonCsvService.createPaymentsByCompanyCsv(apiPayments);
 	}
 	
 	@PostMapping(value = "purchases/company/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -92,7 +91,7 @@ public class CommonCsvController {
 			@Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
 			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
 			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
-			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws ApiException, IOException {
+			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws IOException {
 
 		request.limit = 500;
 		
@@ -104,7 +103,7 @@ public class CommonCsvController {
 					null,
 					null,
 					null,
-					null,
+					true,
 					null,
 					null,
 					isWomenShare,
@@ -120,7 +119,7 @@ public class CommonCsvController {
 		
 		List<ApiStockOrder> apiPurchases = paginatedPurchases.getItems();
 
-		return commonCsvService.createPurchasesByCompanyCsv(apiPurchases, companyId);
+		return commonCsvService.createPurchasesByCompanyCsv(apiPurchases);
 	}
 
 }
