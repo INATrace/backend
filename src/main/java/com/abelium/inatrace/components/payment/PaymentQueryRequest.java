@@ -7,9 +7,9 @@ import java.time.Instant;
 
 public class PaymentQueryRequest {
 
-    PaymentQueryRequest() { }
+    public PaymentQueryRequest() { }
 
-    PaymentQueryRequest(Long companyId,
+    public PaymentQueryRequest(Long companyId,
                         Long purchaseId,
                         PreferredWayOfPayment preferredWayOfPayment,
                         PaymentStatus paymentStatus,
