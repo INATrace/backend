@@ -30,6 +30,7 @@ import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import org.apache.commons.lang3.BooleanUtils;
+import com.abelium.inatrace.types.Language;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -59,18 +60,19 @@ public class StockOrderService extends BaseService {
         this.procEvidenceTypeService = procEvidenceTypeService;
     }
 
-    public ApiStockOrder getStockOrder(long id, Long userId) throws ApiException {
-        return StockOrderMapper.toApiStockOrder(fetchEntity(id, StockOrder.class), userId);
+    public ApiStockOrder getStockOrder(long id, Long userId, Language language) throws ApiException {
+        return StockOrderMapper.toApiStockOrder(fetchEntity(id, StockOrder.class), userId, language);
     }
 
     public ApiPaginatedList<ApiStockOrder> getStockOrderList(ApiPaginatedRequest request,
                                                              StockOrderQueryRequest queryRequest,
-                                                             Long userId) {
+                                                             Long userId,
+                                                             Language language) {
         return PaginationTools.createPaginatedResponse(em, request,
                 () -> stockOrderQueryObject(
                         request,
                         queryRequest
-                ), stockOrder -> StockOrderMapper.toApiStockOrder(stockOrder, userId));
+                ), stockOrder -> StockOrderMapper.toApiStockOrder(stockOrder, userId, language));
     }
 
     private StockOrder stockOrderQueryObject(ApiPaginatedRequest request,
