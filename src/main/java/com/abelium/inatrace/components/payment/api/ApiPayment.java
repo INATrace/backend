@@ -5,23 +5,18 @@ import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
+import com.abelium.inatrace.components.company.api.ApiUserCustomer;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
-import com.abelium.inatrace.components.company.api.ApiUserCustomer;
-import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
-import com.abelium.inatrace.db.entities.payment.PaymentStatus;
-import com.abelium.inatrace.db.entities.payment.PaymentType;
-import com.abelium.inatrace.db.entities.payment.ReceiptDocumentType;
-import com.abelium.inatrace.db.entities.payment.RecipientType;
+import com.abelium.inatrace.db.entities.payment.*;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-
 import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.math.BigDecimal;
+import java.time.Instant;
 
 public class ApiPayment extends ApiBaseEntity {
 
@@ -64,7 +59,7 @@ public class ApiPayment extends ApiBaseEntity {
 	private RecipientType recipientType;
 	
 	@ApiModelProperty(value = "Receipt number")
-	private Long receiptNumber;
+	private String receiptNumber;
 
 	@ApiModelProperty(value = "Receipt document")
 	private ApiDocument receiptDocument;
@@ -210,11 +205,11 @@ public class ApiPayment extends ApiBaseEntity {
 		this.recipientType = recipientType;
 	}
 
-	public Long getReceiptNumber() {
+	public String getReceiptNumber() {
 		return receiptNumber;
 	}
 
-	public void setReceiptNumber(Long receiptNumber) {
+	public void setReceiptNumber(String receiptNumber) {
 		this.receiptNumber = receiptNumber;
 	}
 
