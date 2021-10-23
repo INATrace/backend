@@ -238,6 +238,7 @@ public class StockOrderService extends BaseService {
             apiStockOrder.setWomenShare(farmer.getWomenShare());
             apiStockOrder.setAvailableQuantity(farmer.getAvailableQuantity());
             apiStockOrder.setFulfilledQuantity(farmer.getFulfilledQuantity());
+            apiStockOrder.setTotalQuantity(farmer.getTotalQuantity());
             apiStockOrder.setTotalGrossQuantity(farmer.getTotalGrossQuantity());
 
         }
