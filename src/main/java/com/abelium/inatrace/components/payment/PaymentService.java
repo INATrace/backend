@@ -68,24 +68,33 @@ public class PaymentService extends BaseService {
 		OnGoingLogicalCondition condition = Torpedo.condition();
 
 		// Applies only when fetching list by PurchaseID or CompanyID
-		if (queryRequest.companyId != null)
-			condition.and(paymentProxy.getStockOrder().getCompany().getId()).eq(queryRequest.companyId);
-		else if (queryRequest.purchaseId != null)
-			condition.and(paymentProxy.getStockOrder().getId()).eq(queryRequest.purchaseId);
+		if (queryRequest.companyId != null) {
+			condition = condition.and(paymentProxy.getStockOrder().getCompany().getId()).eq(queryRequest.companyId);
+		} else if (queryRequest.purchaseId != null) {
+			condition = condition.and(paymentProxy.getStockOrder().getId()).eq(queryRequest.purchaseId);
+		}
 
 		// Query parameter filters
-		if(queryRequest.paymentStatus != null)
-			condition.and(paymentProxy.getPaymentStatus()).eq(queryRequest.paymentStatus);
-		if(queryRequest.preferredWayOfPayment != null)
-			condition.and(paymentProxy.getPreferredWayOfPayment()).eq(queryRequest.preferredWayOfPayment);
-		if(queryRequest.productionDateStart != null)
-			condition.and(paymentProxy.getProductionDate()).gte(queryRequest.productionDateStart);
-		if(queryRequest.productionDateEnd != null)
-			condition.and(paymentProxy.getProductionDate()).lte(queryRequest.productionDateEnd);
-		if(queryRequest.farmerName != null) // Search by farmers name (query)
-			condition.and(paymentProxy.getRecipientUserCustomer()).isNotNull()
-					.and(paymentProxy.getRecipientUserCustomer().getName() + " " + paymentProxy.getRecipientUserCustomer().getSurname())
-					.like().any(queryRequest.farmerName);
+		if(queryRequest.paymentStatus != null) {
+			condition = condition.and(paymentProxy.getPaymentStatus()).eq(queryRequest.paymentStatus);
+		}
+		if(queryRequest.preferredWayOfPayment != null) {
+			condition = condition.and(paymentProxy.getPreferredWayOfPayment()).eq(queryRequest.preferredWayOfPayment);
+		}
+		if(queryRequest.productionDateStart != null) {
+			condition = condition.and(paymentProxy.getProductionDate()).gte(queryRequest.productionDateStart);
+		}
+		if(queryRequest.productionDateEnd != null) {
+			condition = condition.and(paymentProxy.getProductionDate()).lte(queryRequest.productionDateEnd);
+		}
+		if(queryRequest.farmerName != null) { // Search by farmers name (query)
+			condition = condition.and(paymentProxy.getRecipientUserCustomer()).isNotNull();
+			condition = condition.and(paymentProxy.getRecipientUserCustomer().getName()).like().startsWith(queryRequest.farmerName);
+		}
+		if (queryRequest.farmerId != null) {
+			condition = condition.and(paymentProxy.getRecipientUserCustomer()).isNotNull();
+			condition = condition.and(paymentProxy.getRecipientUserCustomer().getId()).eq(queryRequest.farmerId);
+		}
 
 		Torpedo.where(condition);
 

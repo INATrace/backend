@@ -101,7 +101,7 @@ public class Payment extends TimestampEntity {
 	private RecipientType recipientType; // organization, company customer or user customer (should be default)
 	
 	@Column
-	private Long receiptNumber; // defined by user
+	private String receiptNumber; // defined by user
 
 	@OneToOne(cascade = CascadeType.ALL)
 	private Document receiptDocument; // document info
@@ -292,11 +292,11 @@ public class Payment extends TimestampEntity {
 		this.recipientType = recipientType;
 	}
 
-	public Long getReceiptNumber() {
+	public String getReceiptNumber() {
 		return receiptNumber;
 	}
 
-	public void setReceiptNumber(Long receiptNumber) {
+	public void setReceiptNumber(String receiptNumber) {
 		this.receiptNumber = receiptNumber;
 	}
 
