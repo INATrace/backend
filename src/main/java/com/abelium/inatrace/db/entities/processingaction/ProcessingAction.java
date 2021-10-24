@@ -52,10 +52,10 @@ public class ProcessingAction extends TimestampEntity {
 	@ManyToOne
 	private Company company;
 	
-	@OneToOne
+	@ManyToOne
 	private SemiProduct inputSemiProduct;
 	
-	@OneToOne
+	@ManyToOne
 	private SemiProduct outputSemiProduct;
 	
 	@Column
