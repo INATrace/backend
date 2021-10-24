@@ -8,6 +8,7 @@ import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.company.api.ApiUserCustomer;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
+import com.abelium.inatrace.components.productorder.api.ApiProductOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
@@ -26,71 +27,71 @@ import java.util.List;
 public class ApiStockOrder extends ApiBaseEntity {
 
     @ApiModelProperty(value = "Stock order identifier", position = 1)
-    public String identifier;
+    private String identifier;
 
     @ApiModelProperty(value = "Timestamp indicates when stock order have been updated", position = 2)
-    public Instant updateTimestamp;
+    private Instant updateTimestamp;
 
     @ApiModelProperty(value = "User that has created StockOrder")
-    public ApiUser createdBy;
+    private ApiUser createdBy;
 
     @ApiModelProperty(value = "User that has last updated StockOrder")
-    public ApiUser updatedBy;
+    private ApiUser updatedBy;
 
     @ApiModelProperty(value = "ID of the user who has created the stock order", position = 3)
-    public Long creatorId;
+    private Long creatorId;
 
     // Relevant only for order type: PURCHASE_ORDER
     @ApiModelProperty(value = "Representative of producer user customer. E.g. collector.", position = 4)
-    public ApiUserCustomer representativeOfProducerUserCustomer;
+    private ApiUserCustomer representativeOfProducerUserCustomer;
 
     // Relevant only for order type: PURCHASE_ORDER
     @ApiModelProperty(value = "Id of the person who has produced the entry.", position = 5)
-    public ApiUserCustomer producerUserCustomer;
+    private ApiUserCustomer producerUserCustomer;
 
     // Relevant only for order type: PURCHASE_ORDER
     @ApiModelProperty(value = "Production location", position = 6)
-    public ApiStockOrderLocation productionLocation;
+    private ApiStockOrderLocation productionLocation;
 
 //    @ApiModelProperty(value = "Certification", position = 6)
 //    @Valid
 //    public List<ApiCertification> certifications;
 
     @ApiModelProperty(value = "Activity proofs", position = 7)
-    public List<ApiActivityProof> activityProofs;
+    private List<ApiActivityProof> activityProofs;
 
     @ApiModelProperty(value = "Processing evidence fields stored values for this stock order")
-    public List<ApiStockOrderEvidenceFieldValue> requiredEvidenceFieldValues;
+    private List<ApiStockOrderEvidenceFieldValue> requiredEvidenceFieldValues;
 
     @ApiModelProperty(value = "Processing evidence types stored values for this stock order")
-    public List<ApiStockOrderEvidenceTypeValue> requiredEvidenceTypeValues;
+    private List<ApiStockOrderEvidenceTypeValue> requiredEvidenceTypeValues;
 
     @ApiModelProperty(value = "Other processing evidence documents - evidence types that can be provided but are not mandatory")
-    public List<ApiStockOrderEvidenceTypeValue> otherEvidenceDocuments;
+    private List<ApiStockOrderEvidenceTypeValue> otherEvidenceDocuments;
 
     @ApiModelProperty(value = "Semi product", position = 7)
-    public ApiSemiProduct semiProduct;
+    private ApiSemiProduct semiProduct;
 
     @ApiModelProperty(value = "Facility", position = 8)
-    public ApiFacility facility;
+    private ApiFacility facility;
 
     @ApiModelProperty(value = "Company", position = 9)
-    public ApiCompany company;
+    private ApiCompany company;
 
     @ApiModelProperty(value = "Measurement unit", position = 10)
-    public ApiMeasureUnitType measureUnitType;
+    private ApiMeasureUnitType measureUnitType;
 
     @ApiModelProperty(value = "Total quantity", position = 11)
-    public BigDecimal totalQuantity;
+    private BigDecimal totalQuantity;
 
     @ApiModelProperty(value = "Total gross quantity", position = 12)
-    public BigDecimal totalGrossQuantity;
+    private BigDecimal totalGrossQuantity;
 
     @ApiModelProperty(value = "Fulfilled quantity", position = 13)
-    public BigDecimal fulfilledQuantity;
+    private BigDecimal fulfilledQuantity;
 
     @ApiModelProperty(value = "Available quantity", position = 14)
-    public BigDecimal availableQuantity;
+    private BigDecimal availableQuantity;
 
     @ApiModelProperty(value = "Is stock available", position = 15)
     public Boolean isAvailable;
@@ -98,7 +99,7 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Production date", position = 16)
     @JsonSerialize(converter = SimpleDateConverter.Serialize.class)
     @JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
-    public Instant productionDate;
+    private Instant productionDate;
 
 //    @ApiModelProperty(value = "Expiry date", position = 16)
 //    public Instant expiryDate;
@@ -107,7 +108,7 @@ public class ApiStockOrder extends ApiBaseEntity {
 //    public Instant estimatedDeliveryDate;
 
     @ApiModelProperty(value = "Delivery time", position = 18)
-    public Instant deliveryTime;
+    private Instant deliveryTime;
 
 //    @ApiModelProperty(value = "Order ID", position = 19)
 //    public Long orderId;
@@ -115,41 +116,44 @@ public class ApiStockOrder extends ApiBaseEntity {
 //    @ApiModelProperty(value = "Global order ID", position = 20)
 //    public Long globalOrderId;
 
+    @ApiModelProperty(value = "The produrct order that triggered creation of this stock order")
+    private ApiProductOrder productOrder;
+
     @ApiModelProperty(value = "Price per unit", position = 21)
-    public BigDecimal pricePerUnit;
+    private BigDecimal pricePerUnit;
 
 //    @ApiModelProperty(value = "Sales price per unit", position = 22)
 //    public Float salesPricePerUnit;
 
     @ApiModelProperty(value = "Currency", position = 23)
-    public String currency;
+    private String currency;
 
 //    @ApiModelProperty(value = "Sales currency", position = 24)
 //    public String salesCurrency;
 
     @ApiModelProperty(value = "Is order of type PURCHASE_ORDER", position = 25)
-    public Boolean isPurchaseOrder;
+    private Boolean isPurchaseOrder;
 
     @ApiModelProperty(value = "Order type", position = 26)
-    public OrderType orderType;
+    private OrderType orderType;
 
     @ApiModelProperty(value = "Internal LOT number", position = 27)
-    public String internalLotNumber;
+    private String internalLotNumber;
 
     @ApiModelProperty(value = "Comments", position = 31)
-    public String comments;
+    private String comments;
 
     @ApiModelProperty(value = "Is women share", position = 33)
     private Boolean womenShare;
 
     @ApiModelProperty(value = "Cost", position = 34)
-    public BigDecimal cost;
+    private BigDecimal cost;
 
     @ApiModelProperty(value = "Paid", position = 35)
-    public BigDecimal paid;
+    private BigDecimal paid;
 
     @ApiModelProperty(value = "Balance", position = 36)
-    public BigDecimal balance;
+    private BigDecimal balance;
 
     // Relevant only for order type: STOCK_ORDER
 //    @ApiModelProperty(value = "Input transactions for stock order. Read only.")
@@ -436,6 +440,14 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setDeliveryTime(Instant deliveryTime) {
         this.deliveryTime = deliveryTime;
+    }
+
+    public ApiProductOrder getProductOrder() {
+        return productOrder;
+    }
+
+    public void setProductOrder(ApiProductOrder productOrder) {
+        this.productOrder = productOrder;
     }
 
     public BigDecimal getPricePerUnit() {

@@ -62,7 +62,7 @@ public class CommonCsvService extends BaseService {
 				csvPrinter.printRecord(
 						p.getProductionDate(),
 						p.getProducerUserCustomer().getName() + " " + p.getProducerUserCustomer().getSurname(),
-						p.semiProduct.getName(),
+						p.getSemiProduct().getName(),
 						p.getTotalQuantity(),
 						p.getCost(),
 						p.getBalance(),
