@@ -173,6 +173,9 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Quote facility")
     private ApiFacility quoteFacility;
 
+    @ApiModelProperty(value = "Quote company")
+    private ApiCompany quoteCompany;
+
     @ApiModelProperty(value = "The company customer for whom the stock order is created")
     private ApiCompanyCustomer consumerCompanyCustomer;
 
@@ -545,6 +548,14 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setQuoteFacility(ApiFacility quoteFacility) {
         this.quoteFacility = quoteFacility;
+    }
+
+    public ApiCompany getQuoteCompany() {
+        return quoteCompany;
+    }
+
+    public void setQuoteCompany(ApiCompany quoteCompany) {
+        this.quoteCompany = quoteCompany;
     }
 
     public ApiCompanyCustomer getConsumerCompanyCustomer() {

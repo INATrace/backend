@@ -10,10 +10,6 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.facility.FacilityService;
 import com.abelium.inatrace.components.processingevidencefield.ProcessingEvidenceFieldService;
-import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
-import com.abelium.inatrace.components.stockorder.api.ApiStockOrderEvidenceFieldValue;
-import com.abelium.inatrace.components.stockorder.api.ApiStockOrderEvidenceTypeValue;
-import com.abelium.inatrace.components.stockorder.api.ApiStockOrderLocation;
 import com.abelium.inatrace.components.stockorder.api.*;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
@@ -30,8 +26,8 @@ import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
-import org.apache.commons.lang3.BooleanUtils;
 import com.abelium.inatrace.types.Language;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -335,7 +331,6 @@ public class StockOrderService extends BaseService {
 
         } else if (entity.getTotalQuantity() != null && lastUsedQuantity != null && entity.getAvailableQuantity() != null){
             entity.setAvailableQuantity(apiStockOrder.getTotalQuantity().subtract(lastUsedQuantity));
-
         }
 
         // Validate quantities
@@ -445,6 +440,11 @@ public class StockOrderService extends BaseService {
                 break;
             case SALES_ORDER:
             case GENERAL_ORDER:
+
+                // Set the quote facility and quote company
+                entity.setQuoteFacility(facilityService.fetchFacility(apiStockOrder.getQuoteFacility().getId()));
+                entity.setQuoteCompany(entity.getQuoteFacility().getCompany());
+
             case TRANSFER_ORDER:
             case PROCESSING_ORDER:
 

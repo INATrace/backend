@@ -105,6 +105,9 @@ public class StockOrderMapper {
         // Set the quoted facility
         apiStockOrder.setQuoteFacility(FacilityMapper.toApiFacility(entity.getQuoteFacility(), language));
 
+        // Set the quote company
+        apiStockOrder.setQuoteCompany(CompanyMapper.toApiCompanyBase(entity.getQuoteCompany()));
+
         // Set the company customer for whom the stock order was created
         apiStockOrder.setConsumerCompanyCustomer(CompanyCustomerMapper.toApiCompanyCustomer(
                 entity.getConsumerCompanyCustomer()));
