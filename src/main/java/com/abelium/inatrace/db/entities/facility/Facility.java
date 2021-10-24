@@ -17,11 +17,7 @@ import java.util.List;
 
 	@NamedQuery(name = "Facility.listCollectingFacilitiesByCompany",
 				query = "SELECT f FROM Facility f INNER JOIN FETCH f.facilityTranslations t INNER JOIN f.company c WHERE c.id = :companyId AND f.isCollectionFacility = true AND t.language = :language"),
-	@NamedQuery(name = "Facility.listSellingFacilitiesByCompany",
-				query = "SELECT f FROM Facility f INNER JOIN FETCH f.facilityTranslations t INNER JOIN f.company c WHERE c.id = :companyId AND f.isPublic = true AND t.language = :language"),
-
 	@NamedQuery(name = "Facility.countCollectingFacilitiesByCompany", query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId AND f.isCollectionFacility = true"),
-	@NamedQuery(name = "Facility.countSellingFacilitiesByCompany", query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId AND f.isPublic = true")
 })
 public class Facility extends TimestampEntity {
 
@@ -58,7 +54,7 @@ public class Facility extends TimestampEntity {
 	@ManyToOne
 	private Company company;
 
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL)
 	private FacilityType facilityType;
 
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)

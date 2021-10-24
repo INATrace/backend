@@ -14,7 +14,7 @@ import javax.validation.Valid;
 /**
  * REST controller for facility entity.
  *
- * @author Rene Flores, Sunesis d.o.o.
+ * @author Rene Flores, Pece Adjievki Sunesis d.o.o.
  */
 @RestController
 @RequestMapping("/chain/facility")
@@ -45,6 +45,17 @@ public class FacilityController {
 
 		return new ApiPaginatedResponse<>(facilityService.listFacilitiesByCompany(companyId, semiProductId, request, language));
 	}
+
+	@GetMapping("list/company/{id}/available-selling")
+	@ApiOperation("Get a list of public (selling) facilities that the provided company can see")
+	public ApiPaginatedResponse<ApiFacility> listAvailableSellingFacilitiesForCompany(
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
+			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @ApiParam(value = "Semi product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+			@Valid ApiPaginatedRequest request) {
+
+		return new ApiPaginatedResponse<>(facilityService.listAvailableSellingFacilitiesForCompany(companyId, semiProductId, request, language));
+	}
 	
 	@GetMapping("list/collecting/company/{id}")
 	@ApiOperation("Get a list of collecting facilities by company ID.")
@@ -54,17 +65,6 @@ public class FacilityController {
 			@Valid ApiPaginatedRequest request) {
 
 		return new ApiPaginatedResponse<>(facilityService.listCollectingFacilitiesByCompany(companyId, request, language));
-	}
-
-	@GetMapping("list/selling/company/{id}")
-	@ApiOperation("Get a list of selling facilities by company ID.")
-	public ApiPaginatedResponse<ApiFacility> listSellingFacilitiesByCompany(
-			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
-			@Valid @ApiParam(value = "Semi product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
-			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
-			@Valid ApiPaginatedRequest request) {
-
-		return new ApiPaginatedResponse<>(facilityService.listSellingFacilitiesByCompany(companyId, semiProductId, request, language));
 	}
 
 	@GetMapping("{id}")
