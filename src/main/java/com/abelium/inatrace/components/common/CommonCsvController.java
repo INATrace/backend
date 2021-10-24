@@ -70,7 +70,8 @@ public class CommonCsvController {
 					paymentStatus,
 					productionDateStart != null ? productionDateStart.toInstant() : null,
 					productionDateEnd != null ? productionDateEnd.toInstant() : null,
-					farmerName
+					farmerName,
+					null
 				), 
 				authUser.getUserId()
 			);
