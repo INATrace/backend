@@ -10,7 +10,7 @@ import com.abelium.inatrace.components.processingevidencefield.api.ApiProcessing
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingActionTranslation;
+import com.abelium.inatrace.types.Language;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,20 +26,25 @@ public final class ProcessingActionMapper {
 	private ProcessingActionMapper() {
 		throw new IllegalStateException("Utility class");
 	}
-	
+
 	public static ApiProcessingAction toApiProcessingAction(ProcessingAction entity) {
+		return toApiProcessingAction(entity, Language.EN);
+	}
+	
+	public static ApiProcessingAction toApiProcessingAction(ProcessingAction entity, Language language) {
 
 		// Simplest apiProcessingAction object
 		ApiProcessingAction apiProcessingAction = new ApiProcessingAction();
 		apiProcessingAction.setId(entity.getId());
 
-		ProcessingActionTranslation translation = !entity.getProcessingActionTranslations().isEmpty()
-				? entity.getProcessingActionTranslations().get(0)
-				: new ProcessingActionTranslation();
+		// Set the translated name and description
+		entity.getProcessingActionTranslations().stream()
+				.filter(pat -> pat.getLanguage().equals(language)).findAny().ifPresent(pat -> {
+					apiProcessingAction.setName(pat.getName());
+					apiProcessingAction.setDescription(pat.getDescription());
+					apiProcessingAction.setLanguage(pat.getLanguage());
+				});
 
-		apiProcessingAction.setName(translation.getName());
-		apiProcessingAction.setDescription(translation.getDescription());
-		apiProcessingAction.setLanguage(translation.getLanguage());
 		apiProcessingAction.setPrefix(entity.getPrefix());
 		apiProcessingAction.setRepackedOutputs(entity.getRepackedOutputs());
 		apiProcessingAction.setMaxOutputWeight(entity.getMaxOutputWeight());
@@ -100,11 +105,13 @@ public final class ProcessingActionMapper {
 	}
 
 	public static ApiProcessingAction toApiProcessingActionDetail(ProcessingAction entity) {
+
 		ApiProcessingAction apiProcessingAction = toApiProcessingAction(entity);
 		apiProcessingAction.setTranslations(entity.getProcessingActionTranslations()
 				.stream()
 				.map(ProcessingActionTranslationMapper::toApiProcessingActionTranslation)
 				.collect(Collectors.toList()));
+
 		return apiProcessingAction;
 	}
 

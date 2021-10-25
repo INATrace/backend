@@ -14,7 +14,11 @@ import com.abelium.inatrace.types.Language;
 public class TransactionMapper {
 
     public static ApiTransaction toApiTransaction(Transaction entity, Language language) {
-        if(entity == null) return null;
+
+        if(entity == null) {
+            return null;
+        }
+
         ApiTransaction apiTransaction = new ApiTransaction();
         apiTransaction.setId(entity.getId());
         apiTransaction.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
@@ -36,6 +40,7 @@ public class TransactionMapper {
         apiTransaction.setCurrency(entity.getCurrency());
         apiTransaction.setGradeAbbreviation(GradeAbbreviationMapper.toApiGradeAbbreviation(entity.getGradeAbbreviation()));
         apiTransaction.setRejectComment(entity.getRejectComment());
+
         return apiTransaction;
     }
 
