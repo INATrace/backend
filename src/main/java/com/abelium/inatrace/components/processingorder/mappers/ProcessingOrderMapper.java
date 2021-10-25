@@ -33,7 +33,7 @@ public class ProcessingOrderMapper {
         }
 
         apiProcessingOrder.setProcessingDate(entity.getProcessingDate());
-        apiProcessingOrder.setProcessingAction(ProcessingActionMapper.toApiProcessingAction(entity.getProcessingAction()));
+        apiProcessingOrder.setProcessingAction(ProcessingActionMapper.toApiProcessingAction(entity.getProcessingAction(), language));
         apiProcessingOrder.setInputTransactions(entity.getInputTransactions().stream().map(transaction -> TransactionMapper.toApiTransaction(transaction, language)).collect(Collectors.toList()));
         apiProcessingOrder.setTargetStockOrders(entity.getTargetStockOrders().stream().map(so -> StockOrderMapper.toApiStockOrder(so ,null, language)).collect(Collectors.toList()));
 

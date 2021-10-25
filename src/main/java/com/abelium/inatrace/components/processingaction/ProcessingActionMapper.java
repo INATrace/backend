@@ -26,10 +26,6 @@ public final class ProcessingActionMapper {
 	private ProcessingActionMapper() {
 		throw new IllegalStateException("Utility class");
 	}
-
-	public static ApiProcessingAction toApiProcessingAction(ProcessingAction entity) {
-		return toApiProcessingAction(entity, Language.EN);
-	}
 	
 	public static ApiProcessingAction toApiProcessingAction(ProcessingAction entity, Language language) {
 
@@ -104,9 +100,9 @@ public final class ProcessingActionMapper {
 		return apiProcessingAction;
 	}
 
-	public static ApiProcessingAction toApiProcessingActionDetail(ProcessingAction entity) {
+	public static ApiProcessingAction toApiProcessingActionDetail(ProcessingAction entity, Language language) {
 
-		ApiProcessingAction apiProcessingAction = toApiProcessingAction(entity);
+		ApiProcessingAction apiProcessingAction = toApiProcessingAction(entity, language);
 		apiProcessingAction.setTranslations(entity.getProcessingActionTranslations()
 				.stream()
 				.map(ProcessingActionTranslationMapper::toApiProcessingActionTranslation)
