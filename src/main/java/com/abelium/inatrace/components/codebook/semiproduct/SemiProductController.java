@@ -45,6 +45,14 @@ public class SemiProductController {
 		return new ApiResponse<>(semiProductService.getSemiProduct(id, language));
 	}
 
+	@GetMapping("{id}/detail")
+	@ApiOperation("Get a single semi product with details with the provided ID.")
+	public ApiResponse<ApiSemiProduct> getSemiProductDetails(
+			@Valid @ApiParam(value = "Semi product ID", required = true) @PathVariable("id") Long id,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
+		return new ApiResponse<>(semiProductService.getSemiProductDetails(id, language));
+	}
+
 	@PutMapping
 	@ApiOperation("Create or update semi product. If ID is provided, the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateSemiProduct(@Valid @RequestBody ApiSemiProduct apiSemiProduct) throws ApiException {
