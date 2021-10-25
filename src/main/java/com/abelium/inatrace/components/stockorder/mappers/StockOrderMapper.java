@@ -7,6 +7,7 @@ import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.company.mappers.UserCustomerMapper;
 import com.abelium.inatrace.components.facility.FacilityMapper;
+import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
 import com.abelium.inatrace.components.productorder.mappers.ProductOrderMapper;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrderEvidenceTypeValue;
@@ -43,6 +44,10 @@ public class StockOrderMapper {
     }
 
     public static ApiStockOrder toApiStockOrder(StockOrder entity, Long userId, Language language) {
+        return toApiStockOrder(entity, userId, language, false);
+    }
+
+    public static ApiStockOrder toApiStockOrder(StockOrder entity, Long userId, Language language, Boolean withProcessingOrder) {
 
         if (entity == null) {
             return null;
@@ -176,6 +181,11 @@ public class StockOrderMapper {
 //        apiStockOrder.setRequiredWomensCoffee(entity.getRequiredWomensCoffee());
 //        apiStockOrder.setShippedAtDateFromOriginPort(entity.getShippedAtDateFromOriginPort());
 //        apiStockOrder.setArrivedAtDateToDestinationPort(entity.getArrivedAtDateToDestinationPort());
+
+        // If requested mapping with Processing order, map the Processing order that created this stock order
+        if (BooleanUtils.isTrue(withProcessingOrder)) {
+            apiStockOrder.setProcessingOrder(ProcessingOrderMapper.toApiProcessingOrderBase(entity.getProcessingOrder()));
+        }
 
         return apiStockOrder;
     }

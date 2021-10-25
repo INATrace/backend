@@ -57,8 +57,8 @@ public class StockOrderService extends BaseService {
         this.procEvidenceTypeService = procEvidenceTypeService;
     }
 
-    public ApiStockOrder getStockOrder(long id, Long userId, Language language) throws ApiException {
-        return StockOrderMapper.toApiStockOrder(fetchEntity(id, StockOrder.class), userId, language);
+    public ApiStockOrder getStockOrder(long id, Long userId, Language language, Boolean withProcessingOrder) throws ApiException {
+        return StockOrderMapper.toApiStockOrder(fetchEntity(id, StockOrder.class), userId, language, withProcessingOrder);
     }
 
     public ApiPaginatedList<ApiStockOrder> getStockOrderList(ApiPaginatedRequest request,

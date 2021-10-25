@@ -34,10 +34,11 @@ public class StockOrderController {
     @ApiOperation("Get a single stock order with the provided ID.")
     public ApiResponse<ApiStockOrder> getStockOrder(
             @Valid @ApiParam(value = "StockOrder ID", required = true) @PathVariable("id") Long id,
+            @Valid @ApiParam(value = "Return the processing order base data") @RequestParam(value = "withProcessingOrder", required = false) Boolean withProcessingOrder,
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-        return new ApiResponse<>(stockOrderService.getStockOrder(id, authUser.getUserId(), language));
+        return new ApiResponse<>(stockOrderService.getStockOrder(id, authUser.getUserId(), language, withProcessingOrder));
     }
 
     @GetMapping("/list")
