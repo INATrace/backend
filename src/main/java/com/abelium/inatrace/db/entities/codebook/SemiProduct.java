@@ -3,6 +3,7 @@ package com.abelium.inatrace.db.entities.codebook;
 import com.abelium.inatrace.db.base.TimestampEntity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,13 +17,13 @@ public class SemiProduct extends TimestampEntity {
 	/**
 	 * Name of the semi product
 	 */
-	@Column(nullable = false)
+	@Column
 	private String name;
 
 	/**
 	 * Description of the semi product
 	 */
-	@Column(nullable = false)
+	@Column
 	private String description;
 
 	/**
@@ -35,7 +36,7 @@ public class SemiProduct extends TimestampEntity {
 	 * Translations for semi product
 	 */
 	@OneToMany(mappedBy = "semiProduct", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<SemiProductTranslation> semiProductTranslations;
+	private List<SemiProductTranslation> semiProductTranslations = new ArrayList<>();
 
 	/**
 	 * Whether the product is considered as Stock keeping unit (at producer)

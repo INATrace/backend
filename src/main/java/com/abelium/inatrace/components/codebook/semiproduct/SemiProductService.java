@@ -11,12 +11,10 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.codebook.SemiProductTranslation;
-import com.abelium.inatrace.db.entities.facility.FacilityTranslation;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
-import org.apache.commons.codec.language.bm.Lang;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -105,6 +103,13 @@ public class SemiProductService extends BaseService {
 		if (semiProduct.getId() == null) {
 			em.persist(semiProduct);
 		}
+
+		apiSemiProduct.getTranslations().stream().filter(semiProductTranslation -> semiProductTranslation != null &&
+					Language.EN.equals(semiProductTranslation.getLanguage()) &&
+					semiProductTranslation.getName() != null &&
+					semiProductTranslation.getDescription() != null)
+				.findFirst()
+				.orElseThrow(() -> new ApiException(ApiStatus.INVALID_REQUEST, "English translation is required!"));
 
 		semiProduct.getSemiProductTranslations().removeIf(semiProductTranslation -> apiSemiProduct.getTranslations().stream().noneMatch(apiSemiProductTranslation -> semiProductTranslation.getLanguage().equals(apiSemiProductTranslation.getLanguage())));
 
