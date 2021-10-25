@@ -19,6 +19,7 @@ import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionTranslation;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
+import com.abelium.inatrace.types.ProcessingActionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -98,6 +99,18 @@ public class ProcessingActionService extends BaseService {
 				? fetchProcessingAction(apiProcessingAction.getId())
 				: new ProcessingAction();
 
+		// Validate input semi-product - should be present in every case
+		if (apiProcessingAction.getInputSemiProduct() == null || apiProcessingAction.getInputSemiProduct().getId() == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Input semi-product is required");
+		}
+
+		// Validate output semi-product - mandatory if the action type is PROCESSING (in the other cases get set automatically to be the same as the input)
+		if (ProcessingActionType.PROCESSING == apiProcessingAction.getType() &&
+				(apiProcessingAction.getOutputSemiProduct() == null ||
+						apiProcessingAction.getOutputSemiProduct().getId() == null)) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Output semi-product is required");
+		}
+
 		// Make sure English translation is present
 		apiProcessingAction.getTranslations()
 				.stream()
@@ -146,17 +159,17 @@ public class ProcessingActionService extends BaseService {
 		if (company != null) {
 			entity.setCompany(company);
 		}
-		
-		SemiProduct inputSemiProduct = semiProductService.fetchSemiProduct(apiProcessingAction.getInputSemiProduct().getId());
-		if (inputSemiProduct != null) {
-			entity.setInputSemiProduct(inputSemiProduct);
-		}
 
-		if (apiProcessingAction.getOutputSemiProduct() != null && apiProcessingAction.getOutputSemiProduct().getId() != null) {
+		// Set the input semi-product
+		SemiProduct inputSemiProduct = semiProductService.fetchSemiProduct(apiProcessingAction.getInputSemiProduct().getId());
+		entity.setInputSemiProduct(inputSemiProduct);
+
+		// Set the output semi-product (if type si other than PROCESSING, set the output semi-product to be the same with the input)
+		if (ProcessingActionType.PROCESSING == apiProcessingAction.getType()) {
 			SemiProduct outputSemiProduct = semiProductService.fetchSemiProduct(apiProcessingAction.getOutputSemiProduct().getId());
-			if (outputSemiProduct != null) {
-				entity.setOutputSemiProduct(outputSemiProduct);
-			}
+			entity.setOutputSemiProduct(outputSemiProduct);
+		} else {
+			entity.setOutputSemiProduct(inputSemiProduct);
 		}
 		
 		// Delete requiredEvidenceFields that are not present in the request

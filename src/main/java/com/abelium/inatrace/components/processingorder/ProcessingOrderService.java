@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,17 +72,19 @@ public class ProcessingOrderService extends BaseService {
         ProcessingOrder entity = fetchEntityOrElse(apiProcessingOrder.getId(), ProcessingOrder.class, new ProcessingOrder());
 
         // Custom exceptions for required fields
-        if(apiProcessingOrder.getProcessingAction() == null || apiProcessingOrder.getProcessingAction().getId() == null)
+        if (apiProcessingOrder.getProcessingAction() == null ||
+                apiProcessingOrder.getProcessingAction().getId() == null) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Processing action ID must be provided!");
-        if(apiProcessingOrder.getInputTransactions() == null || apiProcessingOrder.getInputTransactions().isEmpty())
-            throw new ApiException(ApiStatus.INVALID_REQUEST, "At least one input Transaction has to be provided!");
-        if(apiProcessingOrder.getTargetStockOrders() == null || apiProcessingOrder.getTargetStockOrders().isEmpty())
+        }
+
+        if (apiProcessingOrder.getTargetStockOrders() == null || apiProcessingOrder.getTargetStockOrders().isEmpty()) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "At least one target StockOrder has to be provided!");
+        }
 
         ProcessingAction processingAction = fetchEntity(apiProcessingOrder.getProcessingAction().getId(), ProcessingAction.class);
 
         entity.setProcessingAction(processingAction);
-        entity.setInitiatorUserId(apiProcessingOrder.getInitiatorUserId()); // TODO: Should this be set to the user who has initiated the request?
+        entity.setInitiatorUserId(apiProcessingOrder.getInitiatorUserId());
         entity.setProcessingDate(apiProcessingOrder.getProcessingDate() != null
                 ? apiProcessingOrder.getProcessingDate()
                 : Instant.now());
@@ -98,6 +101,11 @@ public class ProcessingOrderService extends BaseService {
                 return createOrUpdateQuoteOrder(entity, apiProcessingOrder, userId, language);
 
             case PROCESSING:
+
+                if (apiProcessingOrder.getInputTransactions() == null || apiProcessingOrder.getInputTransactions().isEmpty()) {
+                    throw new ApiException(ApiStatus.INVALID_REQUEST, "At least one input Transaction has to be provided!");
+                }
+
                 // Validate that there is no transaction that is referencing current ProcessingOrder (via targetStockOrder)
                 // That kind of transaction cannot be part of the same processing
                 if (entity.getId() != null) {
@@ -115,6 +123,11 @@ public class ProcessingOrderService extends BaseService {
                 break;
 
             case TRANSFER:
+
+                if (apiProcessingOrder.getInputTransactions() == null || apiProcessingOrder.getInputTransactions().isEmpty()) {
+                    throw new ApiException(ApiStatus.INVALID_REQUEST, "At least one input Transaction has to be provided!");
+                }
+
                 // When processing action is of type TRANSFER, source StockOrders (contained within each input Transaction)
                 // will be mapped to target StockOrders, so their size should be the same.
                 if (apiProcessingOrder.getInputTransactions().size() != apiProcessingOrder.getTargetStockOrders().size())
@@ -157,7 +170,7 @@ public class ProcessingOrderService extends BaseService {
                         && it.getStatus() != null
                 );
 
-        if(!areTransactionsValid){
+        if (!areTransactionsValid) {
             throw new ApiException(ApiStatus.VALIDATION_ERROR, "At least one of the provided transactions is not valid!");
         }
 
@@ -188,7 +201,8 @@ public class ProcessingOrderService extends BaseService {
             for (StockOrder targetStockOrder : targetStockOrdersToBeDeleted) {
 
                 // Used quantity cannot be negative: "fulfilledQuantity - availableQuantity >= 0"
-                if (targetStockOrder.getTotalQuantity() - targetStockOrder.getAvailableQuantity() < 0)
+                if (targetStockOrder.getTotalQuantity().subtract(targetStockOrder.getAvailableQuantity())
+                        .compareTo(BigDecimal.ZERO) < 0)
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Target StockOrder with ID '"
                             + targetStockOrder.getId() + "' cannot be deleted!");
             }
@@ -205,10 +219,12 @@ public class ProcessingOrderService extends BaseService {
                     .orElseThrow(() -> new ApiException(ApiStatus.ERROR,
                             "Inappropriate deletion of target StockOrders that are not present in request!"));
 
-            // Prevent new quantity to be less then already used quantity
-            if (apiTargetStockOrder.getTotalQuantity() - targetStockOrder.getTotalQuantity() < 0) {
-                Integer usedQuantity = apiTargetStockOrder.getFulfilledQuantity() - apiTargetStockOrder.getAvailableQuantity();
-                if(targetStockOrder.getTotalQuantity() < usedQuantity)
+            // TODO: Explain validation??? Is it even necessary???
+            if (apiTargetStockOrder.getTotalQuantity().subtract(targetStockOrder.getTotalQuantity())
+                    .compareTo(BigDecimal.ZERO) < 0) {
+                BigDecimal usedQuantity = apiTargetStockOrder.getFulfilledQuantity()
+                        .subtract(apiTargetStockOrder.getAvailableQuantity());
+                if (targetStockOrder.getTotalQuantity().compareTo(usedQuantity) < 0)
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Cannot reduce total quantity below already used quantity.");
             }
         }
@@ -238,7 +254,6 @@ public class ProcessingOrderService extends BaseService {
                 insertedTransaction.setTargetStockOrder(targetStockOrder);
                 entity.getTargetStockOrders().add(targetStockOrder);
             }
-
         }
 
         // Create new or update existing target for PROCESSING
@@ -257,8 +272,9 @@ public class ProcessingOrderService extends BaseService {
             }
         }
 
-        if (entity.getId() == null)
+        if (entity.getId() == null) {
             em.persist(entity);
+        }
 
         return new ApiBaseEntity(entity);
     }
@@ -266,12 +282,13 @@ public class ProcessingOrderService extends BaseService {
     @Transactional
     public ApiBaseEntity createOrUpdateQuoteOrder(ProcessingOrder entity, ApiProcessingOrder apiProcessingOrder, Long userId, Language language) throws ApiException {
 
-        if (apiProcessingOrder.getTargetStockOrders().size() < 1)
+        if (apiProcessingOrder.getTargetStockOrders().size() < 1) {
             throw new ApiException(ApiStatus.INVALID_REQUEST,
                     "At least one target StockOrder should be present in the request.");
+        }
 
         // Remove transactions that are not present in request
-        if(entity.getId() != null) {
+        if (entity.getId() != null) {
             List<Transaction> transactionsToBeDeleted = entity.getInputTransactions()
                     .stream()
                     .filter(transaction -> apiProcessingOrder.getInputTransactions()

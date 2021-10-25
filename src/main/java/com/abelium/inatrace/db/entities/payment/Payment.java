@@ -10,20 +10,9 @@ import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Version;
 
 @Entity
 @Table
@@ -69,7 +58,7 @@ public class Payment extends TimestampEntity {
 	private String currency; // not chooseable on the frontend
 	
 	@Column
-	private Integer purchased; // stock order quantity
+	private BigDecimal purchased; // stock order quantity
 
 	@Column
 	private BigDecimal amountPaidToTheFarmer; // same as stock order balance
@@ -112,7 +101,7 @@ public class Payment extends TimestampEntity {
 	private RecipientType recipientType; // organization, company customer or user customer (should be default)
 	
 	@Column
-	private Long receiptNumber; // defined by user
+	private String receiptNumber; // defined by user
 
 	@OneToOne(cascade = CascadeType.ALL)
 	private Document receiptDocument; // document info
@@ -207,11 +196,11 @@ public class Payment extends TimestampEntity {
 		this.amountPaidToTheCollector = amountPaidToTheCollector;
 	}
 	
-	public Integer getPurchased() {
+	public BigDecimal getPurchased() {
 		return purchased;
 	}
 
-	public void setPurchased(Integer purchased) {
+	public void setPurchased(BigDecimal purchased) {
 		this.purchased = purchased;
 	}
 
@@ -303,11 +292,11 @@ public class Payment extends TimestampEntity {
 		this.recipientType = recipientType;
 	}
 
-	public Long getReceiptNumber() {
+	public String getReceiptNumber() {
 		return receiptNumber;
 	}
 
-	public void setReceiptNumber(Long receiptNumber) {
+	public void setReceiptNumber(String receiptNumber) {
 		this.receiptNumber = receiptNumber;
 	}
 

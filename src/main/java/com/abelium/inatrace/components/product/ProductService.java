@@ -570,10 +570,13 @@ public class ProductService extends BaseService {
 	}
 
 	public ApiPaginatedList<ApiFinalProduct> getFinalProductList(ApiPaginatedRequest request,
-											   FinalProductQueryRequest queryRequest) {
+																 FinalProductQueryRequest queryRequest) {
 
-		return PaginationTools.createPaginatedResponse(em, request, () -> finalProductQueryObject(request, queryRequest),
-				ProductApiTools::toApiFinalProduct);
+		return PaginationTools.createPaginatedResponse(em, request,
+				() -> finalProductQueryObject(
+						request,
+						queryRequest
+				), ProductApiTools::toApiFinalProduct);
 	}
 
 	private FinalProduct finalProductQueryObject(ApiPaginatedRequest request,
@@ -583,11 +586,18 @@ public class ProductService extends BaseService {
     	OnGoingLogicalCondition condition = Torpedo.condition();
 
     	if (queryRequest.productId != null) {
-    		condition.and(finalProductProxy.getProduct().getId()).eq(queryRequest.productId);
+    		condition.and(finalProductProxy.getProduct()).isNotNull()
+					.and(finalProductProxy.getProduct().getId()).eq(queryRequest.productId);
 		}
 
     	Torpedo.where(condition);
-    	QueryTools.orderBy(request.sort, finalProductProxy);
+
+    	switch (request.sortBy) {
+			case "name": QueryTools.orderBy(request.sort, finalProductProxy.getName()); break;
+			case "description": QueryTools.orderBy(request.sort, finalProductProxy.getDescription()); break;
+			default: QueryTools.orderBy(request.sort, finalProductProxy.getId());
+		}
+
     	return finalProductProxy;
 	}
 

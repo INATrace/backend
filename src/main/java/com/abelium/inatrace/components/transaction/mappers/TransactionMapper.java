@@ -22,8 +22,8 @@ public class TransactionMapper {
         apiTransaction.setSourceStockOrder(StockOrderMapper.toApiStockOrder(entity.getSourceStockOrder(), null, language));
         apiTransaction.setTargetStockOrder(StockOrderMapper.toApiStockOrder(entity.getTargetStockOrder(), null, language));
         apiTransaction.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct(), language));
-        apiTransaction.setSourceFacility(FacilityMapper.toApiFacilityBase(entity.getSourceFacility()));
-        apiTransaction.setTargetFacility(FacilityMapper.toApiFacilityBase(entity.getTargetFacility()));
+        apiTransaction.setSourceFacility(FacilityMapper.toApiFacilityBase(entity.getSourceFacility(), language));
+        apiTransaction.setTargetFacility(FacilityMapper.toApiFacilityBase(entity.getTargetFacility(), language));
         apiTransaction.setIsProcessing(entity.getIsProcessing());
         apiTransaction.setActionType(ActionTypeMapper.toApiActionType(entity.getActionType()));
         apiTransaction.setStatus(entity.getStatus());

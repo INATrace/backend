@@ -6,6 +6,7 @@ import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.product.types.ProductLabelAction;
 import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,8 @@ public class ProductController {
     @GetMapping(value = "/list")
     @ApiOperation(value = "Lists all products. Sorting: name or default")
     public ApiPaginatedResponse<ApiProductListResponse> listProducts(@AuthenticationPrincipal CustomUserDetails authUser, 
-    		@Valid ApiListProductsRequest request) {
+    		@Valid ApiListProductsRequest request,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
     	return new ApiPaginatedResponse<>(productEngine.listUserProducts1(authUser.getUserId(), request));
     }
     
@@ -271,7 +273,6 @@ public class ProductController {
     	return new ApiDefaultResponse();
     }
     
-    
     @DeleteMapping(value = "/label/feedback/{id}")
     @ApiOperation(value = "Deletes a product label feedback")
     public ApiDefaultResponse deleteProductLabelFeedback(
@@ -312,7 +313,7 @@ public class ProductController {
     }
 
     @DeleteMapping(value = "/{productId}/finalProduct/{finalProductId}")
-    @ApiOperation(value = "Deletes a final product")
+    @ApiOperation(value = "Delete a final product")
     public ApiDefaultResponse deleteFinalProduct(
             @Valid @ApiParam(value = "Product ID", required = true) @PathVariable("productId") Long productId,
             @Valid @ApiParam(value = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId) throws ApiException {

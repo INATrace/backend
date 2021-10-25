@@ -12,6 +12,7 @@ import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.payment.BulkPayment;
 import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
+import com.abelium.inatrace.db.entities.productorder.ProductOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
@@ -97,15 +98,24 @@ public class StockOrder extends TimestampEntity {
 	
 	@ManyToOne
 	private MeasureUnitType measurementUnitType;
+
+	// The product order that created this stock order (this stock order represents final product item with the requested quantity)
+	@ManyToOne
+	private ProductOrder productOrder;
+
+	// Contains net quantity
+	@Column
+	private BigDecimal totalQuantity;
+
+	// contains gross quantity
+	@Column
+	private BigDecimal totalGrossQuantity;
 	
 	@Column
-	private Integer totalQuantity;
-	
+	private BigDecimal fulfilledQuantity;
+
 	@Column
-	private Integer fulfilledQuantity;
-	
-	@Column
-	private Integer availableQuantity;
+	private BigDecimal availableQuantity;
 	
 	@Column
 	private Boolean isAvailable;
@@ -358,6 +368,14 @@ public class StockOrder extends TimestampEntity {
 		this.company = company;
 	}
 
+	public ProductOrder getProductOrder() {
+		return productOrder;
+	}
+
+	public void setProductOrder(ProductOrder productOrder) {
+		this.productOrder = productOrder;
+	}
+
 	public MeasureUnitType getMeasurementUnitType() {
 		return measurementUnitType;
 	}
@@ -366,27 +384,35 @@ public class StockOrder extends TimestampEntity {
 		this.measurementUnitType = measurementUnitType;
 	}
 
-	public Integer getTotalQuantity() {
+	public BigDecimal getTotalQuantity() {
 		return totalQuantity;
 	}
 
-	public void setTotalQuantity(Integer totalQuantity) {
+	public void setTotalQuantity(BigDecimal totalQuantity) {
 		this.totalQuantity = totalQuantity;
 	}
 
-	public Integer getFulfilledQuantity() {
+	public BigDecimal getTotalGrossQuantity() {
+		return totalGrossQuantity;
+	}
+
+	public void setTotalGrossQuantity(BigDecimal totalGrossQuantity) {
+		this.totalGrossQuantity = totalGrossQuantity;
+	}
+
+	public BigDecimal getFulfilledQuantity() {
 		return fulfilledQuantity;
 	}
 
-	public void setFulfilledQuantity(Integer fulfilledQuantity) {
+	public void setFulfilledQuantity(BigDecimal fulfilledQuantity) {
 		this.fulfilledQuantity = fulfilledQuantity;
 	}
 
-	public Integer getAvailableQuantity() {
+	public BigDecimal getAvailableQuantity() {
 		return availableQuantity;
 	}
 
-	public void setAvailableQuantity(Integer availableQuantity) {
+	public void setAvailableQuantity(BigDecimal availableQuantity) {
 		this.availableQuantity = availableQuantity;
 	}
 

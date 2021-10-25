@@ -10,5 +10,5 @@ public enum ProductCompanyType {
     PROCESSOR,
     TRADER,
     // Legacy, exists for migration script
-    ROASTER,
+    ROASTER
 }

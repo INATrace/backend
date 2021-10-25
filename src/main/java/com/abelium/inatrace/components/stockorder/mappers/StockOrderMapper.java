@@ -7,6 +7,7 @@ import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.company.mappers.UserCustomerMapper;
 import com.abelium.inatrace.components.facility.FacilityMapper;
+import com.abelium.inatrace.components.productorder.mappers.ProductOrderMapper;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrderEvidenceTypeValue;
 import com.abelium.inatrace.components.user.mappers.UserMapper;
@@ -96,21 +97,28 @@ public class StockOrderMapper {
         }
 
         // Set the facility and company of the stock order
-        apiStockOrder.setFacility(FacilityMapper.toApiFacilityBase(entity.getFacility()));
+        apiStockOrder.setFacility(FacilityMapper.toApiFacility(entity.getFacility(), language));
         apiStockOrder.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
 
         // Set the measure unit of the stock order
         apiStockOrder.setMeasureUnitType(MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getMeasurementUnitType()));
 
         // Set the quoted facility
-        apiStockOrder.setQuoteFacility(FacilityMapper.toApiFacilityBase(entity.getQuoteFacility()));
+        apiStockOrder.setQuoteFacility(FacilityMapper.toApiFacility(entity.getQuoteFacility(), language));
+
+        // Set the quote company
+        apiStockOrder.setQuoteCompany(CompanyMapper.toApiCompanyBase(entity.getQuoteCompany()));
 
         // Set the company customer for whom the stock order was created
         apiStockOrder.setConsumerCompanyCustomer(CompanyCustomerMapper.toApiCompanyCustomer(
                 entity.getConsumerCompanyCustomer()));
 
+        // Set the product order that triggered the creation of this stock order
+        apiStockOrder.setProductOrder(ProductOrderMapper.toApiProductOrder(entity.getProductOrder(), language));
+
         // Set the stock order quantities
         apiStockOrder.setTotalQuantity(entity.getTotalQuantity());
+        apiStockOrder.setTotalGrossQuantity(entity.getTotalGrossQuantity());
         apiStockOrder.setFulfilledQuantity(entity.getFulfilledQuantity());
         apiStockOrder.setAvailableQuantity(entity.getAvailableQuantity());
         apiStockOrder.setTare(entity.getTare());
@@ -136,6 +144,7 @@ public class StockOrderMapper {
         apiStockOrder.setSacNumber(entity.getSacNumber());
         apiStockOrder.setPurchaseOrder(entity.getPurchaseOrder());
 
+        // Set other data fields
         apiStockOrder.setComments(entity.getComments());
         apiStockOrder.setWomenShare(entity.getWomenShare());
         apiStockOrder.setOrganic(entity.getOrganic());

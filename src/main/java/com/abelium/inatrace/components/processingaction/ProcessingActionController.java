@@ -4,19 +4,6 @@ import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.types.Language;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,26 +31,26 @@ public class ProcessingActionController {
 	@ApiOperation("Get a paginated list of processing actions.")
 	public ApiPaginatedResponse<ApiProcessingAction> getProcessingActionList(
 			@Valid ApiPaginatedRequest request,
-			@Valid @ApiParam(value = "language", required = false) @RequestParam(value = "language", defaultValue = "EN") String language) {
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
 
-		return new ApiPaginatedResponse<>(processingActionService.listProcessingActions(request, Language.valueOf(language)));
+		return new ApiPaginatedResponse<>(processingActionService.listProcessingActions(request, language));
 	}
 	
 	@GetMapping("list/company/{id}")
 	@ApiOperation("Get a list of processing actions by company ID.")
 	public ApiPaginatedResponse<ApiProcessingAction> listProcessingActionsByCompany(
 		@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long companyId,
-		@Valid @ApiParam(value = "language", required = false) @RequestParam(value = "language", defaultValue = "EN") String language,
+		@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 		@Valid ApiPaginatedRequest request) {
 
-		return new ApiPaginatedResponse<>(processingActionService.listProcessingActionsByCompany(companyId, Language.valueOf(language), request));
+		return new ApiPaginatedResponse<>(processingActionService.listProcessingActionsByCompany(companyId, language, request));
 	}
 	
 	@GetMapping("{id}")
 	@ApiOperation("Get a single processing action with the provided ID.")
 	public ApiResponse<ApiProcessingAction> getProcessingAction(
 			@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long id,
-			@Valid @ApiParam(value = "language") @RequestParam(value = "language", defaultValue = "EN") Language language) throws ApiException {
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
 		return new ApiResponse<>(processingActionService.getProcessingAction(id, language));
 	}

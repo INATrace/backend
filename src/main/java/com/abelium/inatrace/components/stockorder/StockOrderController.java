@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.stockorder;
 
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.stockorder.api.ApiPurchaseOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
@@ -121,10 +122,10 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Company customer ID") @RequestParam(value = "companyCustomerId", required = false) Long companyCustomerId,
             @Valid @ApiParam(value = "Return only open stock orders") @RequestParam(value = "openOnly", required = false) Boolean openOnly,
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language lanuage) {
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
 
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request,
-                new StockOrderQueryRequest(facilityId, null, null, companyCustomerId, openOnly), authUser.getUserId(), lanuage));
+                new StockOrderQueryRequest(facilityId, null, null, companyCustomerId, openOnly), authUser.getUserId(), language));
     }
 
     @GetMapping("list/facility/{facilityId}/quote-orders")
@@ -157,8 +158,7 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
             @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName,
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
-
+        @RequestHeader(value = "language" ,defaultValue = "EN", required = false) Language language) {
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
                 request,
                 new StockOrderQueryRequest(
@@ -178,6 +178,15 @@ public class StockOrderController {
                 ),
                 authUser.getUserId(),
                 language));
+    }
+
+    @PostMapping("bulk-purchase")
+    @ApiOperation("Creates a list of purchase orders.")
+    public ApiResponse<ApiPurchaseOrder> createPurchaseOrderBulk(
+            @Valid @RequestBody ApiPurchaseOrder apiPurchaseOrder,
+            @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
+
+        return new ApiResponse<>(stockOrderService.createPurchaseBulkOrder(apiPurchaseOrder, authUser.getUserId()));
     }
 
     @PutMapping
