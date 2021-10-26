@@ -20,7 +20,8 @@ import java.util.List;
 					+ "INNER JOIN FETCH pa.processingActionTranslations t "
 					+ "INNER JOIN pa.company c "
 					+ "WHERE c.id = :companyId "
-					+ "AND t.language = :language"),
+					+ "AND t.language = :language "
+					+ "ORDER BY pa.sortOrder ASC, pa.id ASC"),
 	@NamedQuery(name = "ProcessingAction.countProcessingActionsByCompany",
 			query = "SELECT COUNT(pa) FROM ProcessingAction pa "
 					+ "INNER JOIN pa.processingActionTranslations t "
@@ -29,7 +30,8 @@ import java.util.List;
 	@NamedQuery(name = "ProcessingAction.listProcessingActions", 
 			query = "SELECT pa FROM ProcessingAction pa "
 					+ "INNER JOIN FETCH pa.processingActionTranslations t "
-					+ "WHERE t.language = :language"),
+					+ "WHERE t.language = :language "
+					+ "ORDER BY pa.sortOrder ASC, pa.id ASC"),
 	@NamedQuery(name = "ProcessingAction.countProcessingActions",
 			query = "SELECT COUNT(pa) FROM ProcessingAction pa "
 					+ "INNER JOIN pa.processingActionTranslations t "
@@ -39,6 +41,9 @@ public class ProcessingAction extends TimestampEntity {
 
 	@Version
 	private Long entityVersion;
+
+	@Column
+	private Long sortOrder;
 
 	@Column
 	private String prefix;
@@ -80,6 +85,14 @@ public class ProcessingAction extends TimestampEntity {
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionTranslation> processingActionTranslations = new ArrayList<>();
+
+	public Long getSortOrder() {
+		return sortOrder;
+	}
+
+	public void setSortOrder(Long sortOrder) {
+		this.sortOrder = sortOrder;
+	}
 
 	public String getPrefix() {
 		return prefix;
@@ -185,12 +198,13 @@ public class ProcessingAction extends TimestampEntity {
 		this.processingActionTranslations = processingActionTranslations;
 	}
 
-	public ProcessingAction(String prefix, Boolean repackedOutputs, BigDecimal maxOutputWeight, Company company,
-			SemiProduct inputSemiProduct, SemiProduct outputSemiProduct, String publicTimelineLabel,
+	public ProcessingAction(Long sortOrder, String prefix, Boolean repackedOutputs, BigDecimal maxOutputWeight,
+			Company company, SemiProduct inputSemiProduct, SemiProduct outputSemiProduct, String publicTimelineLabel,
 			String publicTimelineLocation, ProcessingActionType type, PublicTimelineIconType publicTimelineIconType,
 			List<ProcessingActionPET> requiredDocumentTypes, List<ProcessingActionPEF> processingEvidenceFields,
 			List<ProcessingActionTranslation> processingActionTranslations) {
 		super();
+		this.sortOrder = sortOrder;
 		this.prefix = prefix;
 		this.repackedOutputs = repackedOutputs;
 		this.maxOutputWeight = maxOutputWeight;

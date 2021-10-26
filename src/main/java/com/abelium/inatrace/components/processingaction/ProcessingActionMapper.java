@@ -41,6 +41,7 @@ public final class ProcessingActionMapper {
 					apiProcessingAction.setLanguage(pat.getLanguage());
 				});
 
+		apiProcessingAction.setSortOrder(entity.getSortOrder());
 		apiProcessingAction.setPrefix(entity.getPrefix());
 		apiProcessingAction.setRepackedOutputs(entity.getRepackedOutputs());
 		apiProcessingAction.setMaxOutputWeight(entity.getMaxOutputWeight());
