@@ -23,6 +23,7 @@ import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.stockorder.*;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
+import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -282,8 +283,8 @@ public class StockOrderService extends BaseService {
         entity.setCurrency(apiStockOrder.getCurrency());
 
         // Calculate quantities
-        BigDecimal lastUsedQuantity = (entity.getTotalQuantity() != null && entity.getAvailableQuantity() != null)
-                ? entity.getTotalQuantity().subtract(entity.getAvailableQuantity())
+        BigDecimal lastUsedQuantity = (entity.getFulfilledQuantity() != null && entity.getAvailableQuantity() != null)
+                ? entity.getFulfilledQuantity().subtract(entity.getAvailableQuantity())
                 : null;
 
         entity.setTotalQuantity(apiStockOrder.getTotalQuantity());
@@ -297,7 +298,7 @@ public class StockOrderService extends BaseService {
 
                 // For new StockOrders set available quantity to total quantity
                 if (entity.getId() == null) {
-                    entity.setAvailableQuantity(entity.getTotalQuantity());
+                    entity.setAvailableQuantity(entity.getFulfilledQuantity());
                 }
 
                 break;
@@ -314,23 +315,20 @@ public class StockOrderService extends BaseService {
 
             // Calculate quantities based on input transactions
             List<Transaction> inputTxs = processingOrder.getInputTransactions();
-            if (inputTxs != null && !inputTxs.isEmpty()) {
 
-                if (apiStockOrder.getOrderType() == OrderType.SALES_ORDER || apiStockOrder.getOrderType() == OrderType.GENERAL_ORDER) {
-                    // TODO: May happen that old transactions are not counted
-                    entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs, entity.getId()));
+            if (apiStockOrder.getOrderType() == OrderType.GENERAL_ORDER) {
+                entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs, processingOrder.getId()));
+                // TODO: Used quantity needs to be reduced!
+                entity.setAvailableQuantity(calculateAvailableQuantity(inputTxs));
+            } else {
+                if (lastUsedQuantity == null) {
+                    lastUsedQuantity = BigDecimal.ZERO;
                 }
-
-                if (apiStockOrder.getOrderType() != OrderType.SALES_ORDER) {
-                    if(lastUsedQuantity == null) {
-                        lastUsedQuantity = BigDecimal.ZERO;
-                    }
-                    entity.setAvailableQuantity(entity.getFulfilledQuantity().subtract(lastUsedQuantity).subtract(calculateUsedQuantity(inputTxs, entity.getId())));
-                }
+                entity.setAvailableQuantity(entity.getFulfilledQuantity().subtract(lastUsedQuantity).subtract(calculateUsedQuantity(inputTxs, entity.getId())));
             }
 
         } else if (entity.getTotalQuantity() != null && lastUsedQuantity != null && entity.getAvailableQuantity() != null){
-            entity.setAvailableQuantity(apiStockOrder.getTotalQuantity().subtract(lastUsedQuantity));
+            entity.setAvailableQuantity(apiStockOrder.getFulfilledQuantity().subtract(lastUsedQuantity));
         }
 
         // Validate quantities
@@ -343,6 +341,10 @@ public class StockOrderService extends BaseService {
             if (entity.getFulfilledQuantity() != null) {
                 if (entity.getFulfilledQuantity().compareTo(entity.getAvailableQuantity()) < 0) {
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity (" + entity.getAvailableQuantity()
+                            + ") cannot be bigger then fulfilled quantity (" + entity.getFulfilledQuantity() + ").");
+                }
+                if (entity.getFulfilledQuantity().compareTo(entity.getTotalQuantity()) > 0) {
+                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Total quantity (" + entity.getTotalQuantity()
                             + ") cannot be bigger then fulfilled quantity (" + entity.getFulfilledQuantity() + ").");
                 }
             }
@@ -438,7 +440,6 @@ public class StockOrderService extends BaseService {
                 }
 
                 break;
-            case SALES_ORDER:
             case GENERAL_ORDER:
 
                 // Set the quote facility and quote company
@@ -484,9 +485,9 @@ public class StockOrderService extends BaseService {
             inserted = true;
         }
 
-        if (apiQuoteStockOrder.getOrderType() != OrderType.GENERAL_ORDER && apiQuoteStockOrder.getOrderType() != OrderType.SALES_ORDER) {
+        if (apiQuoteStockOrder.getOrderType() != OrderType.GENERAL_ORDER) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Order must be of orderType " +  OrderType.GENERAL_ORDER
-                    + " or " + OrderType.SALES_ORDER + " to allow input transactions");
+                    + " to allow input transactions");
         }
 
         if (!inserted) {
@@ -556,18 +557,36 @@ public class StockOrderService extends BaseService {
 //                        .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
-    private BigDecimal calculateFulfilledQuantity(List<Transaction> inputTransactions, Long stockOrderId){
-        if (stockOrderId == null)
-            return null;
+    private BigDecimal calculateFulfilledQuantity(List<Transaction> inputTransactions, Long procOrderId){
+        if (inputTransactions.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        inputTransactions.forEach(t -> {
+            System.out.println("ID: " + t.getId());
+            System.out.println("InputQ: " + t.getInputQuantity());
+            System.out.println("OutputQ: " + t.getOutputQuantity());
+        });
 
         return inputTransactions.stream()
+                .filter(t -> t.getSourceStockOrder() != null && procOrderId.equals(t.getTargetProcessingOrder().getId()))
+                .map(Transaction::getInputQuantity)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal calculateAvailableQuantity(List<Transaction> inputTransactions){
+        if (inputTransactions.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        return inputTransactions.stream()
+                .filter(t -> t.getStatus().equals(TransactionStatus.EXECUTED))
                 .map(Transaction::getInputQuantity)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private BigDecimal calculateUsedQuantity(List<Transaction> inputTransactions, Long stockOrderId){
-        if (stockOrderId == null)
-            return null;
+        if (stockOrderId == null || inputTransactions.isEmpty())
+            return BigDecimal.ZERO;
 
         return inputTransactions.stream()
                 .filter(t -> t.getSourceStockOrder() != null && stockOrderId.equals(t.getSourceStockOrder().getId()))
