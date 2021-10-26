@@ -493,7 +493,6 @@ public class StockOrderService extends BaseService {
         if (!inserted) {
 
             // Do not mess with quantities - transactions will take care of it.
-            apiQuoteStockOrder.setTotalQuantity(entity.getTotalQuantity());
             apiQuoteStockOrder.setAvailableQuantity(entity.getAvailableQuantity());
             apiQuoteStockOrder.setFulfilledQuantity(entity.getFulfilledQuantity());
 
@@ -545,29 +544,12 @@ public class StockOrderService extends BaseService {
             }
         }
         return balance;
-
-//        return stockOrder.getCost()
-//                .subtract(paymentList.stream()
-//                        .map(payment -> payment.getPaymentPurposeType() == PaymentPurposeType.FIRST_INSTALLMENT
-//                                ? payment.getAmountPaidToTheFarmer().add(
-//                                        payment.getPreferredWayOfPayment() != PreferredWayOfPayment.CASH_VIA_COLLECTOR
-//                                                ? payment.getAmountPaidToTheCollector()
-//                                                : BigDecimal.ZERO)
-//                                : BigDecimal.ZERO)
-//                        .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     private BigDecimal calculateFulfilledQuantity(List<Transaction> inputTransactions, Long procOrderId){
         if (inputTransactions.isEmpty()) {
             return BigDecimal.ZERO;
         }
-
-        inputTransactions.forEach(t -> {
-            System.out.println("ID: " + t.getId());
-            System.out.println("InputQ: " + t.getInputQuantity());
-            System.out.println("OutputQ: " + t.getOutputQuantity());
-        });
-
         return inputTransactions.stream()
                 .filter(t -> t.getSourceStockOrder() != null && procOrderId.equals(t.getTargetProcessingOrder().getId()))
                 .map(Transaction::getInputQuantity)

@@ -11,8 +11,11 @@ import com.abelium.inatrace.components.transaction.mappers.TransactionMapper;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
+import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
+import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
+import com.abelium.inatrace.types.ProcessingActionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -88,6 +91,15 @@ public class TransactionService extends BaseService {
             BigDecimal subtotal = targetStockOrder.getFulfilledQuantity().subtract(transaction.getOutputQuantity());
             targetStockOrder.setFulfilledQuantity(subtotal.max(BigDecimal.ZERO));
             stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(targetStockOrder, userId, language), userId, null);
+        }
+
+        // Prevent removing transaction that has used quantity
+        if (transaction.getStatus() == TransactionStatus.EXECUTED
+                && transaction.getTargetProcessingOrder() != null
+                && transaction.getTargetProcessingOrder().getProcessingAction().getType() == ProcessingActionType.SHIPMENT) {
+
+            throw new ApiException(ApiStatus.VALIDATION_ERROR, "Approved transactions that are part of " +
+                    OrderType.GENERAL_ORDER + " cannot be deleted.");
         }
 
         em.remove(transaction);
