@@ -156,7 +156,7 @@ public class StockOrderService extends BaseService {
 
         // Used for fetching open quote orders
         if (BooleanUtils.isTrue(queryRequest.isOpenOnly)) {
-            condition = condition.and(stockOrderProxy.getIsOpenOrder()).gt(true);
+            condition = condition.and(stockOrderProxy.getIsOpenOrder()).eq(true);
         }
 
         Torpedo.where(condition);
