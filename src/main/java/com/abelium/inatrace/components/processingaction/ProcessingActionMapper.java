@@ -54,8 +54,8 @@ public final class ProcessingActionMapper {
 		apiCompany.setId(entity.getCompany().getId());
 		apiCompany.setName(entity.getCompany().getName());
 
-		ApiSemiProduct apiInputSemiProduct = SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct());
-		ApiSemiProduct apiOutputSemiProduct = SemiProductMapper.toApiSemiProduct(entity.getOutputSemiProduct());
+		ApiSemiProduct apiInputSemiProduct = SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct(), language);
+		ApiSemiProduct apiOutputSemiProduct = SemiProductMapper.toApiSemiProduct(entity.getOutputSemiProduct(), language);
 		
 		List<ApiProcessingEvidenceField> apiRequiredEvidenceFields = new ArrayList<>();
 		List<ProcessingActionPEF> processingActionProcessingEvidenceFields = entity.getProcessingEvidenceFields();

@@ -4,6 +4,8 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
+
 /**
  * SemiProduct API model object.
  *
@@ -23,6 +25,8 @@ public class ApiSemiProduct extends ApiBaseEntity {
 	private Boolean isBuyable;
 
 	private Boolean isSKUEndCustomer;
+
+	private List<ApiSemiProductTranslation> translations;
 
 	public String getName() {
 		return name;
@@ -72,4 +76,11 @@ public class ApiSemiProduct extends ApiBaseEntity {
 		isSKUEndCustomer = SKUEndCustomer;
 	}
 
+	public List<ApiSemiProductTranslation> getTranslations() {
+		return translations;
+	}
+
+	public void setTranslations(List<ApiSemiProductTranslation> translations) {
+		this.translations = translations;
+	}
 }

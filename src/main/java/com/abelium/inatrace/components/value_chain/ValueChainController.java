@@ -8,6 +8,7 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChainListRequest;
 import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +43,10 @@ public class ValueChainController {
 	@GetMapping("{id}")
 	@ApiOperation("Get a single value chain with the provided ID.")
 	public ApiResponse<ApiValueChain> getValueChain(
-			@Valid @ApiParam(value = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @ApiParam(value = "Value chain ID", required = true) @PathVariable("id") Long id,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-		return new ApiResponse<>(valueChainService.getValueChain(id));
+		return new ApiResponse<>(valueChainService.getValueChain(id, language));
 	}
 
 	@PutMapping

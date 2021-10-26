@@ -44,7 +44,7 @@ public class TransactionMapper {
 
         apiTransaction.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
         apiTransaction.setTargetStockOrder(StockOrderMapper.toApiStockOrder(entity.getTargetStockOrder(), null, language));
-        apiTransaction.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct()));
+        apiTransaction.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct(), language));
         apiTransaction.setSourceFacility(FacilityMapper.toApiFacilityBase(entity.getSourceFacility(), language));
         apiTransaction.setTargetFacility(FacilityMapper.toApiFacilityBase(entity.getTargetFacility(), language));
         apiTransaction.setShipmentId(entity.getShipmentId());
