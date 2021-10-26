@@ -100,6 +100,64 @@ public class TransactionService extends BaseService {
 
         Transaction transaction = fetchEntity(id, Transaction.class);
 
+        revertQuantities(transaction, userId, language);
+
+        // Only PENDING transactions can be deleted within QUOTE order
+        if (transaction.getStatus() != TransactionStatus.PENDING
+                && transaction.getTargetProcessingOrder() != null
+                && transaction.getTargetProcessingOrder().getProcessingAction().getType() == ProcessingActionType.SHIPMENT) {
+
+            throw new ApiException(ApiStatus.VALIDATION_ERROR, "Only PENDING transactions can be deleted.");
+        }
+
+        em.remove(transaction);
+    }
+
+    @Transactional
+    public void approveTransaction(Long id, Long userId, Language language) throws ApiException {
+        Transaction transaction = fetchEntity(id, Transaction.class);
+
+        if (transaction.getStatus() != TransactionStatus.PENDING) {
+            throw new ApiException(ApiStatus.VALIDATION_ERROR, "Only PENDING transactions can be approved.");
+        }
+
+        // Update quote order (to refresh quantities)
+        if (transaction.getTargetProcessingOrder() != null && !transaction.getTargetProcessingOrder().getTargetStockOrders().isEmpty()) {
+
+            ProcessingOrder processingOrder = transaction.getTargetProcessingOrder();
+
+            StockOrder quoteStockOrder = processingOrder.getTargetStockOrders().get(0);
+            stockOrderService.createOrUpdateStockOrder(
+                    StockOrderMapper.toApiStockOrder(quoteStockOrder, userId, language),
+                    userId,
+                    processingOrder
+            );
+        }
+
+        transaction.setStatus(TransactionStatus.EXECUTED);
+    }
+
+    @Transactional
+    public void rejectTransaction(ApiTransaction apiTransaction, Long userId, Language language) throws ApiException {
+
+        Transaction transaction = fetchEntity(apiTransaction.getId(), Transaction.class);
+
+        if (transaction.getStatus() != TransactionStatus.PENDING) {
+            throw new ApiException(ApiStatus.VALIDATION_ERROR, "Only PENDING transactions can be rejected.");
+        }
+        if (apiTransaction.getRejectComment() == null || apiTransaction.getRejectComment().isEmpty()) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Reject comment cannot be null.");
+        }
+
+        transaction.setStatus(TransactionStatus.CANCELED);
+        transaction.setRejectComment(apiTransaction.getRejectComment());
+
+        // Revert quantities but do NOT delete the transaction!
+        revertQuantities(transaction, userId, language);
+    }
+
+    private void revertQuantities(Transaction transaction, Long userId, Language language) throws ApiException {
+
         StockOrder sourceStockOrder = transaction.getSourceStockOrder();
         StockOrder targetStockOrder = transaction.getTargetStockOrder();
 
@@ -107,26 +165,23 @@ public class TransactionService extends BaseService {
         if (sourceStockOrder != null) {
             BigDecimal subtotal = sourceStockOrder.getAvailableQuantity().add(transaction.getInputQuantity());
             sourceStockOrder.setAvailableQuantity(subtotal.min(transaction.getInputQuantity()));
-            stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(sourceStockOrder, userId, language), userId, null);
+            stockOrderService.createOrUpdateStockOrder(
+                    StockOrderMapper.toApiStockOrder(sourceStockOrder, userId, language),
+                    userId,
+                    null
+            );
         }
 
         // Set target StockOrder fulfilled quantity
         if (!transaction.getIsProcessing() && targetStockOrder != null) {
             BigDecimal subtotal = targetStockOrder.getFulfilledQuantity().subtract(transaction.getOutputQuantity());
             targetStockOrder.setFulfilledQuantity(subtotal.max(BigDecimal.ZERO));
-            stockOrderService.createOrUpdateStockOrder(StockOrderMapper.toApiStockOrder(targetStockOrder, userId, language), userId, null);
+            stockOrderService.createOrUpdateStockOrder(
+                    StockOrderMapper.toApiStockOrder(targetStockOrder, userId, language),
+                    userId,
+                    null
+            );
         }
-
-        // Prevent removing transaction that has used quantity
-        if (transaction.getStatus() == TransactionStatus.EXECUTED
-                && transaction.getTargetProcessingOrder() != null
-                && transaction.getTargetProcessingOrder().getProcessingAction().getType() == ProcessingActionType.SHIPMENT) {
-
-            throw new ApiException(ApiStatus.VALIDATION_ERROR, "Approved transactions that are part of " +
-                    OrderType.GENERAL_ORDER + " cannot be deleted.");
-        }
-
-        em.remove(transaction);
     }
 
     private <E> E fetchEntity(Long id, Class<E> entityClass) throws ApiException {
