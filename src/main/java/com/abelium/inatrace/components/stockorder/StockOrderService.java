@@ -561,7 +561,6 @@ public class StockOrderService extends BaseService {
             return null;
 
         return inputTransactions.stream()
-                .filter(t -> t.getSourceStockOrder() != null && stockOrderId.equals(t.getSourceStockOrder().getId()))
                 .map(Transaction::getInputQuantity)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
