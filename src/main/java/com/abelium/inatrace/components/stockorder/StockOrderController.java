@@ -4,6 +4,7 @@ import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.stockorder.api.ApiPurchaseOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
+import com.abelium.inatrace.components.stockorder.api.ApiStockOrderAggregatedHistory;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
@@ -179,6 +180,16 @@ public class StockOrderController {
                 ),
                 authUser.getUserId(),
                 language));
+    }
+
+    @GetMapping("list/aggregated-history/{id}")
+    public ApiPaginatedResponse<ApiStockOrderAggregatedHistory> getStockOrderAggregatedHistory(
+            @Valid @ApiParam(value = "StockOrder ID", required = true) @PathVariable("id") Long id,
+            @Valid ApiPaginatedRequest request,
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @RequestHeader(value = "language" ,defaultValue = "EN", required = false) Language language
+    ) throws ApiException {
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderAggregatedHistoryList(request, id, authUser.getUserId(), language));
     }
 
     @PostMapping("bulk-purchase")

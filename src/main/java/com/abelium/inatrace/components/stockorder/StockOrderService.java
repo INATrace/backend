@@ -10,8 +10,11 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.facility.FacilityService;
 import com.abelium.inatrace.components.processingevidencefield.ProcessingEvidenceFieldService;
+import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
 import com.abelium.inatrace.components.stockorder.api.*;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
+import com.abelium.inatrace.components.transaction.api.ApiTransaction;
+import com.abelium.inatrace.components.transaction.mappers.TransactionMapper;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.Document;
@@ -34,9 +37,12 @@ import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Lazy
 @Service
@@ -174,6 +180,116 @@ public class StockOrderService extends BaseService {
         }
 
         return stockOrderProxy;
+    }
+
+    public ApiPaginatedList<ApiStockOrderAggregatedHistory> getStockOrderAggregatedHistoryList(
+            ApiPaginatedRequest request, Long id, Long userId, Language language) throws ApiException {
+
+        StockOrder stockOrder = fetchEntity(id, StockOrder.class);
+
+        // read involved transactions, and set them as output transactions
+        TypedQuery<Transaction> getTransactionsBySourceStockOrderQuery = em
+                .createNamedQuery("Transaction.getTransactionsByStockOrderId", Transaction.class)
+                .setParameter("stockOrderId", stockOrder.getId());
+
+        List<Transaction> orderOutputTransactions = getTransactionsBySourceStockOrderQuery.getResultList();
+
+        List<ApiTransaction> orderOutputApiTransactions = new ArrayList<>();
+        if (orderOutputTransactions != null && !orderOutputTransactions.isEmpty()) {
+            orderOutputApiTransactions = orderOutputTransactions.stream()
+                    .map(transaction -> TransactionMapper.toApiTransaction(transaction, language))
+                    .collect(Collectors.toList());
+        }
+
+        // recursively add history, starting from depth 0
+        List<ApiStockOrderAggregatedHistory> stockAggregationHistoryList = addNextAggregationLevels(0, request,
+                stockOrder, userId, language);
+
+        if (!stockAggregationHistoryList.isEmpty()) {
+            // set output transactions only on first (root) element
+            stockAggregationHistoryList.get(0).getProcessingOrder().setOutputTransactions(orderOutputApiTransactions);
+        }
+
+        ApiPaginatedList<ApiStockOrderAggregatedHistory> apiPaginatedList = new ApiPaginatedList<>();
+        apiPaginatedList.setItems(stockAggregationHistoryList);
+
+        // paginated info is based on depth
+        apiPaginatedList.setLimit(request.getLimit());
+        apiPaginatedList.setOffset(request.getOffset());
+
+        if (!stockAggregationHistoryList.isEmpty()) {
+            // set count - depth of th last item
+            apiPaginatedList.setCount(stockAggregationHistoryList.get(stockAggregationHistoryList.size() - 1).getDepth());
+        } else {
+            apiPaginatedList.setCount(0);
+        }
+
+        return apiPaginatedList;
+    }
+
+    /***
+     * Recursively adds next stock aggregation history list.
+     *
+     * @param currentDepth - aggregated history depth level
+     * @param paginatedRequest - pagination, only levels specified are returned
+     * @param stockOrder - current stockOrder entity for searching next child nodes
+     * @param userId - caller user id
+     * @param language - language
+     *
+     * @return returns aggregated history list for next levels
+     *
+     */
+    private List<ApiStockOrderAggregatedHistory> addNextAggregationLevels(int currentDepth,
+                                                                          ApiPaginatedRequest paginatedRequest,
+                                                                          StockOrder stockOrder, Long userId, Language language) {
+
+        if (stockOrder != null && stockOrder.getProcessingOrder() != null && !stockOrder.getProcessingOrder().getInputTransactions().isEmpty()){
+
+            List<ApiStockOrderAggregatedHistory> resultHistoryList = new ArrayList<>();
+
+            ApiStockOrderAggregatedHistory nextHistory = new ApiStockOrderAggregatedHistory();
+
+            List<StockOrder> sourceOrderList = stockOrder.getProcessingOrder().getInputTransactions().stream()
+                    .map(Transaction::getSourceStockOrder).collect(Collectors.toList());
+
+            List<ApiStockOrderAggregation> nextAggregations = new ArrayList<>();
+
+            sourceOrderList.forEach(sourceOrder -> {
+
+                ApiStockOrderAggregation aggregation = new ApiStockOrderAggregation();
+                aggregation.setStockOrder(StockOrderMapper.toApiStockOrder(sourceOrder, userId, language));
+            //    aggregation.setFields(new ArrayList<>());// TODO: map fields
+            //    aggregation.setDocuments(new ArrayList<>()); // todo map documents
+
+                nextAggregations.add(aggregation);
+            });
+
+            nextHistory.setAggregations(nextAggregations);
+            nextHistory.setProcessingOrder(ProcessingOrderMapper.toApiProcessingOrder(stockOrder.getProcessingOrder(), language));
+            nextHistory.setDepth(currentDepth);
+
+            // add when paginated
+            if ((currentDepth > paginatedRequest.getOffset() - 1)
+                && (currentDepth < paginatedRequest.getOffset() + paginatedRequest.getLimit() - 1)){
+                resultHistoryList.add(nextHistory);
+            }
+
+            if (currentDepth >= paginatedRequest.getOffset() + paginatedRequest.getLimit() - 1) {
+                // break if upper limit
+                return new ArrayList<>();
+            } else {
+                // next recursion for every child element
+                sourceOrderList.forEach(sourceOrder -> {
+                    resultHistoryList.addAll(
+                            addNextAggregationLevels(currentDepth + 1, paginatedRequest, sourceOrder, userId, language));
+                });
+
+                return resultHistoryList;
+            }
+
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     @Transactional

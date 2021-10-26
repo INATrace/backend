@@ -28,6 +28,11 @@ public class ApiProcessingOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Input transactions")
     public List<ApiTransaction> inputTransactions;
 
+    // output transactions are not stored in DB,
+    // is only mapped when needed, for ex. in order history
+    @ApiModelProperty(value = "Output transactions")
+    public List<ApiTransaction> outputTransactions;
+
     @ApiModelProperty(value = "Target stock orders")
     public List<ApiStockOrder> targetStockOrders;
 
@@ -61,6 +66,14 @@ public class ApiProcessingOrder extends ApiBaseEntity {
 
     public void setInputTransactions(List<ApiTransaction> inputTransactions) {
         this.inputTransactions = inputTransactions;
+    }
+
+    public List<ApiTransaction> getOutputTransactions() {
+        return outputTransactions;
+    }
+
+    public void setOutputTransactions(List<ApiTransaction> outputTransactions) {
+        this.outputTransactions = outputTransactions;
     }
 
     public List<ApiStockOrder> getTargetStockOrders() {
