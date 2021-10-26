@@ -71,18 +71,9 @@ public class ProcessingActionService extends BaseService {
 				.collect(Collectors.toList()), count);
 	}
 
-
 	public ApiProcessingAction getProcessingAction(Long id, Language language) throws ApiException {
 		
 		ProcessingAction processingAction = fetchProcessingAction(id);
-		ProcessingActionTranslation translation = processingAction.getProcessingActionTranslations()
-					.stream()
-					.filter(l -> language.equals(l.getLanguage()))
-					.findAny()
-					.orElse(null);
-		processingAction.getProcessingActionTranslations().clear();
-		if(translation != null)
-			processingAction.getProcessingActionTranslations().add(translation);
 		return ProcessingActionMapper.toApiProcessingAction(processingAction, language);
 	}
 
@@ -147,6 +138,7 @@ public class ProcessingActionService extends BaseService {
 				}
 		);
 
+		entity.setSortOrder(apiProcessingAction.getSortOrder());
 		entity.setPrefix(apiProcessingAction.getPrefix());
 		entity.setRepackedOutputs(apiProcessingAction.getRepackedOutputs());
 		entity.setMaxOutputWeight(apiProcessingAction.getMaxOutputWeight());

@@ -192,6 +192,10 @@ public class ApiTransaction extends ApiBaseEntity {
         this.outputQuantity = outputQuantity;
     }
 
+    public BigDecimal getPricePerUnit() {
+        return pricePerUnit;
+    }
+
     public void setPricePerUnit(BigDecimal pricePerUnit) {
         this.pricePerUnit = pricePerUnit;
     }

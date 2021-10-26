@@ -13,29 +13,46 @@ import com.abelium.inatrace.types.Language;
 
 public class TransactionMapper {
 
-    public static ApiTransaction toApiTransaction(Transaction entity, Language language) {
-        if(entity == null) return null;
+    public static ApiTransaction toApiTransactionBase(Transaction entity) {
+
+        if (entity == null) {
+            return null;
+        }
+
         ApiTransaction apiTransaction = new ApiTransaction();
         apiTransaction.setId(entity.getId());
-        apiTransaction.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
         apiTransaction.setInitiationUserId(entity.getInitiationUserId());
-        apiTransaction.setSourceStockOrder(StockOrderMapper.toApiStockOrder(entity.getSourceStockOrder(), null, language));
+        apiTransaction.setIsProcessing(entity.getIsProcessing());
+        apiTransaction.setActionType(ActionTypeMapper.toApiActionType(entity.getActionType()));
+        apiTransaction.setInputQuantity(entity.getInputQuantity());
+        apiTransaction.setOutputQuantity(entity.getOutputQuantity());
+        apiTransaction.setStatus(entity.getStatus());
+        apiTransaction.setRejectComment(entity.getRejectComment());
+        apiTransaction.setSourceStockOrder(StockOrderMapper.toApiStockOrderBase(entity.getSourceStockOrder()));
+        apiTransaction.setInputMeasureUnitType(MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(entity.getInputMeasureUnitType()));
+
+        return apiTransaction;
+    }
+
+    public static ApiTransaction toApiTransaction(Transaction entity, Language language) {
+
+        ApiTransaction apiTransaction = toApiTransactionBase(entity);
+
+        if (apiTransaction == null) {
+            return null;
+        }
+
+        apiTransaction.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
         apiTransaction.setTargetStockOrder(StockOrderMapper.toApiStockOrder(entity.getTargetStockOrder(), null, language));
         apiTransaction.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct(), language));
         apiTransaction.setSourceFacility(FacilityMapper.toApiFacilityBase(entity.getSourceFacility(), language));
         apiTransaction.setTargetFacility(FacilityMapper.toApiFacilityBase(entity.getTargetFacility(), language));
-        apiTransaction.setIsProcessing(entity.getIsProcessing());
-        apiTransaction.setActionType(ActionTypeMapper.toApiActionType(entity.getActionType()));
-        apiTransaction.setStatus(entity.getStatus());
         apiTransaction.setShipmentId(entity.getShipmentId());
-        apiTransaction.setInputMeasureUnitType(MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getInputMeasureUnitType()));
         apiTransaction.setOutputMeasureUnitType(MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getOutputMeasureUnitType()));
-        apiTransaction.setInputQuantity(entity.getInputQuantity());
-        apiTransaction.setOutputQuantity(entity.getOutputQuantity());
         apiTransaction.setPricePerUnit(entity.getPricePerUnit());
         apiTransaction.setCurrency(entity.getCurrency());
         apiTransaction.setGradeAbbreviation(GradeAbbreviationMapper.toApiGradeAbbreviation(entity.getGradeAbbreviation()));
-        apiTransaction.setRejectComment(entity.getRejectComment());
+
         return apiTransaction;
     }
 

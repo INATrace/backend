@@ -637,12 +637,12 @@ public class StockOrder extends TimestampEntity {
 		this.sacNumber = sacNumber;
 	}
 
-	public Boolean getOpenOrder() {
+	public Boolean getIsOpenOrder() {
 		return isOpenOrder;
 	}
 
-	public void setOpenOrder(Boolean openOrder) {
-		isOpenOrder = openOrder;
+	public void setIsOpenOrder(Boolean isOpenOrder) {
+		this.isOpenOrder = isOpenOrder;
 	}
 
 	public Facility getQuoteFacility() {

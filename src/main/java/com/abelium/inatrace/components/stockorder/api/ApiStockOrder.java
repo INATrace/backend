@@ -8,6 +8,7 @@ import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.company.api.ApiUserCustomer;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
+import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.productorder.api.ApiProductOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
@@ -118,6 +119,9 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     @ApiModelProperty(value = "The produrct order that triggered creation of this stock order")
     private ApiProductOrder productOrder;
+
+    @ApiModelProperty(value = "The processing order that created this stock order")
+    private ApiProcessingOrder processingOrder;
 
     @ApiModelProperty(value = "Price per unit", position = 21)
     private BigDecimal pricePerUnit;
@@ -448,6 +452,14 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setProductOrder(ApiProductOrder productOrder) {
         this.productOrder = productOrder;
+    }
+
+    public ApiProcessingOrder getProcessingOrder() {
+        return processingOrder;
+    }
+
+    public void setProcessingOrder(ApiProcessingOrder processingOrder) {
+        this.processingOrder = processingOrder;
     }
 
     public BigDecimal getPricePerUnit() {
