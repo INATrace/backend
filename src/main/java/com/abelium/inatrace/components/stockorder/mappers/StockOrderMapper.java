@@ -29,6 +29,7 @@ public class StockOrderMapper {
         ApiStockOrder apiStockOrder = new ApiStockOrder();
         apiStockOrder.setId(entity.getId());
         apiStockOrder.setIdentifier(entity.getIdentifier());
+        apiStockOrder.setInternalLotNumber(entity.getInternalLotNumber());
         apiStockOrder.setCurrency(entity.getCurrency());
         apiStockOrder.setPreferredWayOfPayment(entity.getPreferredWayOfPayment());
         apiStockOrder.setFulfilledQuantity(entity.getFulfilledQuantity());
