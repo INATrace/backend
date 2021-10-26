@@ -1,6 +1,7 @@
 package com.abelium.inatrace.components.transaction;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
+import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
@@ -9,6 +10,7 @@ import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.components.transaction.api.ApiTransaction;
 import com.abelium.inatrace.components.transaction.mappers.TransactionMapper;
 import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
 import com.abelium.inatrace.tools.Queries;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.stream.Collectors;
 
 @Lazy
 @Service
@@ -29,6 +32,27 @@ public class TransactionService extends BaseService {
 
     public ApiTransaction getApiTransaction(Long id, Language language) throws ApiException {
         return TransactionMapper.toApiTransaction(fetchEntity(id, Transaction.class), language);
+    }
+
+    /**
+     * Return a ist of input transactions for provided stock order ID. Used in Quote orders.
+     * @param stockOrderId Stock order ID.
+     * @return List of transacitons.
+     */
+    public ApiPaginatedList<ApiTransaction> getStockOrderInputTransactions(Long stockOrderId) throws ApiException {
+
+        // Fetch the stock order
+        StockOrder stockOrder = stockOrderService.fetchEntity(stockOrderId, StockOrder.class);
+
+        // Validate that stock order has processing order (if not proccessing order, there are no transactions)
+        ProcessingOrder processingOrder = stockOrder.getProcessingOrder();
+        if (processingOrder == null) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "The Stock order with the provided ID has no Processing order");
+        }
+
+        return new ApiPaginatedList<>(
+                processingOrder.getInputTransactions().stream().map(TransactionMapper::toApiTransactionBase)
+                        .collect(Collectors.toList()), processingOrder.getInputTransactions().size());
     }
 
     /**

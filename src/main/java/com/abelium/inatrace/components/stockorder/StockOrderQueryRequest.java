@@ -9,6 +9,7 @@ public class StockOrderQueryRequest {
 
     public Long companyId;
     public Long facilityId;
+    public Long quoteCompanyId;
     public Long quoteFacilityId;
     public Long farmerId;
     public Long semiProductId;
@@ -26,13 +27,18 @@ public class StockOrderQueryRequest {
 
     public StockOrderQueryRequest() {}
 
-    public StockOrderQueryRequest(Long facilityId, Long quoteFacilityId, Long semiProductId, Long companyCustomerId,
+    // Used for fetchgin Quote order (input and output)
+    public StockOrderQueryRequest(Long companyId, Long facilityId, Long quoteCompanyId, Long quoteFacilityId, Long semiProductId, Long companyCustomerId,
                                   Boolean isOpenOnly) {
+
+        this.companyId = companyId;
         this.facilityId = facilityId;
+        this.quoteCompanyId = quoteCompanyId;
         this.quoteFacilityId = quoteFacilityId;
         this.semiProductId = semiProductId;
         this.companyCustomerId = companyCustomerId;
         this.isOpenOnly = isOpenOnly;
+        this.orderType = OrderType.GENERAL_ORDER;
     }
 
     public StockOrderQueryRequest(Long facilityId,

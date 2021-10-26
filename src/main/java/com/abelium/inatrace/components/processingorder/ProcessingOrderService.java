@@ -313,7 +313,7 @@ public class ProcessingOrderService extends BaseService {
             entity.getInputTransactions().add(insertedTransaction);
 
             // Update source StockOrder
-//            stockOrderService.createOrUpdateStockOrder(apiTransaction.getSourceStockOrder(), userId, entity);
+            stockOrderService.createOrUpdateStockOrder(apiTransaction.getSourceStockOrder(), userId, entity);
         }
 
         ApiStockOrder apiTargetStockOrder = apiProcessingOrder.getTargetStockOrders().get(0);

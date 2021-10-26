@@ -116,31 +116,49 @@ public class StockOrderController {
                 language));
     }
 
-    @GetMapping("list/facility/{facilityId}/orders-for-customers")
+    @GetMapping("list/company/{companyId}/orders-for-customers")
     @ApiOperation("Get a paginated list of stock orders by facility ID for customers.")
     public ApiPaginatedResponse<ApiStockOrder> getStockOrdersInFacilityForCustomer(
             @Valid ApiPaginatedRequest request,
-            @Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("facilityId") Long facilityId,
+            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @ApiParam(value = "Facility ID") @RequestParam(value = "facilityId", required = false) Long facilityId,
             @Valid @ApiParam(value = "Company customer ID") @RequestParam(value = "companyCustomerId", required = false) Long companyCustomerId,
             @Valid @ApiParam(value = "Return only open stock orders") @RequestParam(value = "openOnly", required = false) Boolean openOnly,
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
 
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request,
-                new StockOrderQueryRequest(facilityId, null, null, companyCustomerId, openOnly), authUser.getUserId(), language));
+                new StockOrderQueryRequest(
+                        companyId,
+                        facilityId,
+                        null,
+                        null,
+                        null,
+                        companyCustomerId,
+                        openOnly
+                ), authUser.getUserId(), language));
     }
 
-    @GetMapping("list/facility/{facilityId}/quote-orders")
+    @GetMapping("list/company/{companyId}/quote-orders")
     public ApiPaginatedResponse<ApiStockOrder> getQuoteOrdersInFacility(
             @Valid ApiPaginatedRequest request,
-            @Valid @ApiParam(value = "Quote facility ID", required = true) @PathVariable("facilityId") Long facilityId,
+            @Valid @ApiParam(value = "Quote company ID", required = true) @PathVariable("companyId") Long quoteCompanyId,
+            @Valid @ApiParam(value = "Quote facility ID") @RequestParam(value = "facilityId", required = false) Long quoteFacilityId,
             @Valid @ApiParam(value = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
             @Valid @ApiParam(value = "Return only open stock orders") @RequestParam(value = "openOnly", required = false) Boolean openOnly,
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
 
         return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request,
-                new StockOrderQueryRequest(null, facilityId, semiProductId, null, openOnly), authUser.getUserId(), language));
+                new StockOrderQueryRequest(
+                        null,
+                        null,
+                        quoteCompanyId,
+                        quoteFacilityId,
+                        semiProductId,
+                        null,
+                        openOnly
+                ), authUser.getUserId(), language));
     }
 
     @GetMapping("list/company/{companyId}")
