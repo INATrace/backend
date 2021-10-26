@@ -32,6 +32,7 @@ public class ProcessingOrderMapper {
             return null;
         }
 
+        apiProcessingOrder.setCreationTimestamp(entity.getCreationTimestamp());
         apiProcessingOrder.setProcessingDate(entity.getProcessingDate());
         apiProcessingOrder.setProcessingAction(ProcessingActionMapper.toApiProcessingAction(entity.getProcessingAction()));
         apiProcessingOrder.setInputTransactions(entity.getInputTransactions().stream().map(transaction -> TransactionMapper.toApiTransaction(transaction, language)).collect(Collectors.toList()));

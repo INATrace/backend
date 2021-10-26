@@ -17,6 +17,9 @@ public class ApiProcessingOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Initiator user ID")
     public Long initiatorUserId;
 
+    @ApiModelProperty(value = "Timestamp indicates when processing order have been created")
+    private Instant creationTimestamp;
+
     @ApiModelProperty(value = "Processing action")
     public ApiProcessingAction processingAction;
 
@@ -42,6 +45,14 @@ public class ApiProcessingOrder extends ApiBaseEntity {
 
     public void setInitiatorUserId(Long initiatorUserId) {
         this.initiatorUserId = initiatorUserId;
+    }
+
+    public Instant getCreationTimestamp() {
+        return creationTimestamp;
+    }
+
+    public void setCreationTimestamp(Instant creationTimestamp) {
+        this.creationTimestamp = creationTimestamp;
     }
 
     public ApiProcessingAction getProcessingAction() {
