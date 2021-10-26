@@ -119,7 +119,7 @@ public class PaymentController {
 		@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
 		@Valid ApiPaginatedRequest request) {
 
-		return new ApiPaginatedResponse<>(paymentService.listBulkPaymentsByCompany(companyId, request));
+		return new ApiPaginatedResponse<>(paymentService.listBulkPayments(request, new PaymentQueryRequest(companyId)));
 	}
 
 	@PutMapping

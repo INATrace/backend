@@ -1,11 +1,12 @@
 package com.abelium.inatrace.components.payment;
 
-import com.abelium.inatrace.components.company.api.ApiCompanyBase;
+import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.payment.api.ApiBulkPayment;
+import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
+import com.abelium.inatrace.components.user.mappers.UserMapper;
 import com.abelium.inatrace.db.entities.payment.BulkPayment;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Mapper for BulkPayment entity.
@@ -19,11 +20,11 @@ public final class BulkPaymentMapper {
 	}
 
 	public static ApiBulkPayment toApiBulkPayment(BulkPayment entity) {
+		if(entity == null) return null;
 
-		// Simplest apiBulkPayment object
 		ApiBulkPayment apiBulkPayment = new ApiBulkPayment();
 		apiBulkPayment.setId(entity.getId());
-		apiBulkPayment.setCreatedBy(entity.getCreatedBy().getId());
+		apiBulkPayment.setCreatedBy(UserMapper.toSimpleApiUser(entity.getCreatedBy()));
 		apiBulkPayment.setCurrency(entity.getCurrency());
 		apiBulkPayment.setPaymentDescription(entity.getPaymentDescription());
 		apiBulkPayment.setPaymentPurposeType(entity.getPaymentPurposeType());
@@ -31,15 +32,8 @@ public final class BulkPaymentMapper {
 		apiBulkPayment.setTotalAmount(entity.getTotalAmount());
 		apiBulkPayment.setAdditionalCost(entity.getAdditionalCost());
 		apiBulkPayment.setAdditionalCostDescription(entity.getAdditionalCostDescription());
-		List<Long> stockOrders = new ArrayList<>();
-		entity.getStockOrders().forEach((so) -> stockOrders.add(so.getId()));
-		apiBulkPayment.setStockOrders(stockOrders);
-		
-		ApiCompanyBase apiPayingCompany = new ApiCompanyBase();
-		apiPayingCompany.setId(entity.getPayingCompany().getId());
-		apiPayingCompany.setName(entity.getPayingCompany().getName());
-		apiBulkPayment.setPayingCompany(apiPayingCompany);
-
+		apiBulkPayment.setStockOrders(entity.getStockOrders().stream().map(StockOrderMapper::toApiStockOrderBase).collect(Collectors.toList()));
+		apiBulkPayment.setPayingCompany(CompanyMapper.toApiCompanyBase(entity.getPayingCompany()));
 		return apiBulkPayment;
 	}
 }

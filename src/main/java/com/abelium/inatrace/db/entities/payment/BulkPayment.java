@@ -26,16 +26,6 @@ import javax.persistence.Version;
 
 @Entity
 @Table
-@NamedQueries({
-	@NamedQuery(name = "BulkPayment.listBulkPaymentsByCompanyId", 
-				query = "SELECT bp FROM BulkPayment bp "
-						+ "INNER JOIN bp.payingCompany pc "
-						+ "WHERE pc.id = :companyId"),
-	@NamedQuery(name = "BulkPayment.countBulkPaymentsByCompanyId",
-    			query = "SELECT COUNT(bp) FROM BulkPayment bp "
-						+ "INNER JOIN bp.payingCompany pc "
-						+ "WHERE pc.id = :companyId")
-})
 public class BulkPayment extends BaseEntity {
 
 	@Version
@@ -61,7 +51,7 @@ public class BulkPayment extends BaseEntity {
 	private PaymentPurposeType paymentPurposeType;
 	
 	@Column
-	private Long receiptNumber;
+	private String receiptNumber;
 	
 	@Column
 	private BigDecimal totalAmount;
@@ -74,6 +64,8 @@ public class BulkPayment extends BaseEntity {
 	
 	@OneToMany(mappedBy = "bulkPayment", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<StockOrder> stockOrders = new ArrayList<>();
+
+	// List of payments
 	
 	public User getCreatedBy() {
 		return createdBy;
@@ -123,11 +115,11 @@ public class BulkPayment extends BaseEntity {
 		this.paymentPurposeType = paymentPurposeType;
 	}
 
-	public Long getReceiptNumber() {
+	public String getReceiptNumber() {
 		return receiptNumber;
 	}
 
-	public void setReceiptNumber(Long receiptNumber) {
+	public void setReceiptNumber(String receiptNumber) {
 		this.receiptNumber = receiptNumber;
 	}
 
