@@ -121,6 +121,8 @@ public class TransactionService extends BaseService {
             throw new ApiException(ApiStatus.VALIDATION_ERROR, "Only PENDING transactions can be approved.");
         }
 
+        transaction.setStatus(TransactionStatus.EXECUTED);
+
         // Update quote order (to refresh quantities)
         if (transaction.getTargetProcessingOrder() != null && !transaction.getTargetProcessingOrder().getTargetStockOrders().isEmpty()) {
 
@@ -133,8 +135,6 @@ public class TransactionService extends BaseService {
                     processingOrder
             );
         }
-
-        transaction.setStatus(TransactionStatus.EXECUTED);
     }
 
     @Transactional

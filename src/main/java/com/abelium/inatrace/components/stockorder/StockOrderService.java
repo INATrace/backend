@@ -319,7 +319,7 @@ public class StockOrderService extends BaseService {
             List<Transaction> inputTxs = processingOrder.getInputTransactions();
 
             if (apiStockOrder.getOrderType() == OrderType.GENERAL_ORDER) {
-                entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs, processingOrder.getId()));
+                entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs));
                 // TODO: Used quantity needs to be reduced!
                 entity.setAvailableQuantity(calculateAvailableQuantity(inputTxs));
             } else {
@@ -467,44 +467,6 @@ public class StockOrderService extends BaseService {
         return new ApiBaseEntity(entity);
     }
 
-    // Should be called only from ProcessingOrderService
-    @Transactional
-    public StockOrder createOrUpdateQuoteStockOrder(ApiStockOrder apiQuoteStockOrder, Long userId, ProcessingOrder processingOrder) throws ApiException {
-
-        StockOrder entity;
-        boolean inserted = false;
-
-        if (apiQuoteStockOrder.getId() != null) {
-            entity = fetchEntity(apiQuoteStockOrder.getId(), StockOrder.class);
-
-        } else {
-            if (apiQuoteStockOrder.getFulfilledQuantity() != null && apiQuoteStockOrder.getFulfilledQuantity().compareTo(BigDecimal.ZERO) != 0) {
-                throw new ApiException(ApiStatus.INVALID_REQUEST, "Fulfilled quantity must be 0");
-            }
-
-            Long insertedStockOrderId = createOrUpdateStockOrder(apiQuoteStockOrder, userId, processingOrder).getId();
-            entity = fetchEntity(insertedStockOrderId, StockOrder.class);
-            inserted = true;
-        }
-
-        if (apiQuoteStockOrder.getOrderType() != OrderType.GENERAL_ORDER) {
-            throw new ApiException(ApiStatus.INVALID_REQUEST, "Order must be of orderType " +  OrderType.GENERAL_ORDER
-                    + " to allow input transactions");
-        }
-
-        if (!inserted) {
-
-            // Do not mess with quantities - transactions will take care of it.
-            apiQuoteStockOrder.setAvailableQuantity(entity.getAvailableQuantity());
-            apiQuoteStockOrder.setFulfilledQuantity(entity.getFulfilledQuantity());
-
-            createOrUpdateStockOrder(apiQuoteStockOrder, userId, processingOrder);
-            return fetchEntity(apiQuoteStockOrder.getId(), StockOrder.class);
-        }
-
-        return entity;
-    }
-
     @Transactional
     public void deleteStockOrder(Long id) throws ApiException{
         StockOrder stockOrder = fetchEntity(id, StockOrder.class);
@@ -548,12 +510,12 @@ public class StockOrderService extends BaseService {
         return balance;
     }
 
-    private BigDecimal calculateFulfilledQuantity(List<Transaction> inputTransactions, Long procOrderId){
+    private BigDecimal calculateFulfilledQuantity(List<Transaction> inputTransactions){
         if (inputTransactions.isEmpty()) {
             return BigDecimal.ZERO;
         }
         return inputTransactions.stream()
-                .filter(t -> t.getSourceStockOrder() != null && procOrderId.equals(t.getTargetProcessingOrder().getId()))
+                .filter(t -> !t.getStatus().equals(TransactionStatus.CANCELED))
                 .map(Transaction::getInputQuantity)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }

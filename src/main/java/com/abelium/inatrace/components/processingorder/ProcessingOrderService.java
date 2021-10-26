@@ -16,6 +16,7 @@ import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
+import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -324,8 +325,22 @@ public class ProcessingOrderService extends BaseService {
 
         }
 
-        ApiStockOrder apiTargetStockOrder = apiProcessingOrder.getTargetStockOrders().get(0);
-        StockOrder quoteStockOrder = stockOrderService.createOrUpdateQuoteStockOrder(apiTargetStockOrder, userId, entity);
+        ApiStockOrder apiQuoteStockOrder = apiProcessingOrder.getTargetStockOrders().get(0);
+
+        if (apiQuoteStockOrder.getOrderType() != OrderType.GENERAL_ORDER) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Order must be of orderType " +  OrderType.GENERAL_ORDER
+                    + " to allow input transactions");
+        }
+
+        if (apiQuoteStockOrder.getId() == null) {
+            if (apiQuoteStockOrder.getFulfilledQuantity() != null && apiQuoteStockOrder.getFulfilledQuantity().compareTo(BigDecimal.ZERO) != 0) {
+                throw new ApiException(ApiStatus.INVALID_REQUEST, "Fulfilled quantity must be 0");
+            }
+        }
+
+        Long insertedStockOrderId = stockOrderService.createOrUpdateStockOrder(apiQuoteStockOrder, userId, entity).getId();
+        StockOrder quoteStockOrder = fetchEntity(insertedStockOrderId, StockOrder.class);
+
         quoteStockOrder.setProcessingOrder(entity);
         entity.setTargetStockOrders(List.of(quoteStockOrder));
 
