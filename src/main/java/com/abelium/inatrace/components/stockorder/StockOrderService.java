@@ -535,7 +535,9 @@ public class StockOrderService extends BaseService {
             return BigDecimal.ZERO;
 
         return inputTransactions.stream()
-                .filter(t -> t.getSourceStockOrder() != null && stockOrderId.equals(t.getSourceStockOrder().getId()))
+                .filter(t -> t.getSourceStockOrder() != null
+                        && stockOrderId.equals(t.getSourceStockOrder().getId())
+                        && !t.getStatus().equals(TransactionStatus.CANCELED))
                 .map(Transaction::getOutputQuantity)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
