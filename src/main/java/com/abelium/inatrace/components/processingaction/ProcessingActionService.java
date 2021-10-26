@@ -138,6 +138,7 @@ public class ProcessingActionService extends BaseService {
 				}
 		);
 
+		entity.setSortOrder(apiProcessingAction.getSortOrder());
 		entity.setPrefix(apiProcessingAction.getPrefix());
 		entity.setRepackedOutputs(apiProcessingAction.getRepackedOutputs());
 		entity.setMaxOutputWeight(apiProcessingAction.getMaxOutputWeight());
