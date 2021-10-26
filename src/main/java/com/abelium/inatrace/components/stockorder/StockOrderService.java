@@ -10,6 +10,7 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.facility.FacilityService;
 import com.abelium.inatrace.components.processingevidencefield.ProcessingEvidenceFieldService;
+import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
 import com.abelium.inatrace.components.stockorder.api.*;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
@@ -41,6 +42,7 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -209,11 +211,16 @@ public class StockOrderService extends BaseService {
 
         if (!stockAggregationHistoryList.isEmpty()) {
             // set output transactions only on first (root) element
+            if (stockAggregationHistoryList.get(0).getProcessingOrder() == null){
+                stockAggregationHistoryList.get(0).setProcessingOrder(new ApiProcessingOrder());
+            }
             stockAggregationHistoryList.get(0).getProcessingOrder().setOutputTransactions(orderOutputApiTransactions);
+
         }
 
         ApiPaginatedList<ApiStockOrderAggregatedHistory> apiPaginatedList = new ApiPaginatedList<>();
-        apiPaginatedList.setItems(stockAggregationHistoryList);
+        apiPaginatedList.setItems(stockAggregationHistoryList.stream().sorted(Comparator.comparingInt(ApiStockOrderAggregatedHistory::getDepth)).collect(
+                Collectors.toList()));
 
         // paginated info is based on depth
         apiPaginatedList.setLimit(request.getLimit());
@@ -222,6 +229,7 @@ public class StockOrderService extends BaseService {
         if (!stockAggregationHistoryList.isEmpty()) {
             // set count - depth of th last item
             apiPaginatedList.setCount(stockAggregationHistoryList.get(stockAggregationHistoryList.size() - 1).getDepth());
+
         } else {
             apiPaginatedList.setCount(0);
         }
@@ -245,49 +253,62 @@ public class StockOrderService extends BaseService {
                                                                           ApiPaginatedRequest paginatedRequest,
                                                                           StockOrder stockOrder, Long userId, Language language) {
 
-        if (stockOrder != null && stockOrder.getProcessingOrder() != null && !stockOrder.getProcessingOrder().getInputTransactions().isEmpty()){
+        if (stockOrder != null) {
 
             List<ApiStockOrderAggregatedHistory> resultHistoryList = new ArrayList<>();
 
             ApiStockOrderAggregatedHistory nextHistory = new ApiStockOrderAggregatedHistory();
 
-            List<StockOrder> sourceOrderList = stockOrder.getProcessingOrder().getInputTransactions().stream()
-                    .map(Transaction::getSourceStockOrder).collect(Collectors.toList());
-
             List<ApiStockOrderAggregation> nextAggregations = new ArrayList<>();
 
-            sourceOrderList.forEach(sourceOrder -> {
+            if (stockOrder.getProcessingOrder() != null && !stockOrder.getProcessingOrder().getInputTransactions().isEmpty()) {
 
+                List<StockOrder> sourceOrderList = stockOrder.getProcessingOrder().getInputTransactions().stream().map(Transaction::getSourceStockOrder).collect(Collectors.toList());
+
+                sourceOrderList.forEach(sourceOrder -> {
+                    ApiStockOrderAggregation aggregation = new ApiStockOrderAggregation();
+                    aggregation.setStockOrder(StockOrderMapper.toApiStockOrder(sourceOrder, userId, language));
+                    //    aggregation.setFields(new ArrayList<>());// TODO: map fields
+                    //    aggregation.setDocuments(new ArrayList<>()); // todo map documents
+                    nextAggregations.add(aggregation);
+                });
+
+                nextHistory.setAggregations(nextAggregations);
+                nextHistory.setProcessingOrder(
+                        ProcessingOrderMapper.toApiProcessingOrder(stockOrder.getProcessingOrder(), language));
+                nextHistory.setDepth(currentDepth);
+
+                if (currentDepth >= paginatedRequest.getOffset() + paginatedRequest.getLimit() - 1) {
+                    // break if upper limit
+                    return new ArrayList<>();
+                } else {
+                    // next recursion for every child element
+                    sourceOrderList.forEach(sourceOrder -> {
+                        resultHistoryList
+                                .addAll(addNextAggregationLevels(currentDepth + 1, paginatedRequest, sourceOrder, userId, language));
+                    });
+                }
+            } else {
+                // map last element, that does not contain processing order
                 ApiStockOrderAggregation aggregation = new ApiStockOrderAggregation();
-                aggregation.setStockOrder(StockOrderMapper.toApiStockOrder(sourceOrder, userId, language));
-            //    aggregation.setFields(new ArrayList<>());// TODO: map fields
-            //    aggregation.setDocuments(new ArrayList<>()); // todo map documents
-
+                aggregation.setStockOrder(StockOrderMapper.toApiStockOrder(stockOrder, userId, language));
+                //    aggregation.setFields(new ArrayList<>());// TODO: map fields
+                //    aggregation.setDocuments(new ArrayList<>()); // todo map documents
                 nextAggregations.add(aggregation);
-            });
 
-            nextHistory.setAggregations(nextAggregations);
-            nextHistory.setProcessingOrder(ProcessingOrderMapper.toApiProcessingOrder(stockOrder.getProcessingOrder(), language));
-            nextHistory.setDepth(currentDepth);
+                nextHistory.setAggregations(nextAggregations);
+                nextHistory.setProcessingOrder(
+                        ProcessingOrderMapper.toApiProcessingOrder(stockOrder.getProcessingOrder(), language));
+                nextHistory.setDepth(currentDepth);
+            }
 
             // add when paginated
-            if ((currentDepth > paginatedRequest.getOffset() - 1)
-                && (currentDepth < paginatedRequest.getOffset() + paginatedRequest.getLimit() - 1)){
+            if ((currentDepth > paginatedRequest.getOffset() - 1) &&
+                    (currentDepth < paginatedRequest.getOffset() + paginatedRequest.getLimit() - 1)) {
                 resultHistoryList.add(nextHistory);
             }
 
-            if (currentDepth >= paginatedRequest.getOffset() + paginatedRequest.getLimit() - 1) {
-                // break if upper limit
-                return new ArrayList<>();
-            } else {
-                // next recursion for every child element
-                sourceOrderList.forEach(sourceOrder -> {
-                    resultHistoryList.addAll(
-                            addNextAggregationLevels(currentDepth + 1, paginatedRequest, sourceOrder, userId, language));
-                });
-
-                return resultHistoryList;
-            }
+            return resultHistoryList;
 
         } else {
             return new ArrayList<>();
