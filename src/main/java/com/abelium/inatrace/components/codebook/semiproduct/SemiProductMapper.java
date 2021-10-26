@@ -21,36 +21,28 @@ public final class SemiProductMapper {
 	}
 
 	/**
-	 * Mapping ID and name to API entity
-	 *
-	 * @param entity DB entity
-	 * @return API model entity with ID and name
-	 */
-	public static ApiSemiProduct toApiSemiProductIdName(SemiProduct entity) {
-
-		ApiSemiProduct apiSemiProduct = new ApiSemiProduct();
-		apiSemiProduct.setId(entity.getId());
-		apiSemiProduct.setName(entity.getName());
-		apiSemiProduct.setBuyable(entity.getBuyable());
-
-		return apiSemiProduct;
-	}
-
-	/**
 	 * Mapping the base entity attributes - no associations are included.
 	 *
 	 * @param entity DB entity.
 	 * @return API model entity.
 	 */
 	public static ApiSemiProduct toApiSemiProductBase(SemiProduct entity, Language language) {
-		if(entity == null) return null;
 
-		SemiProductTranslation translation = entity.getSemiProductTranslations().stream().filter(semiProductTranslation -> semiProductTranslation.getLanguage().equals(language)).findFirst().orElse(new SemiProductTranslation());
+		if(entity == null) {
+			return null;
+		}
+
+		SemiProductTranslation translation = entity.getSemiProductTranslations()
+				.stream()
+				.filter(semiProductTranslation -> semiProductTranslation.getLanguage().equals(language))
+				.findFirst()
+				.orElse(new SemiProductTranslation());
 
 		ApiSemiProduct apiSemiProduct = new ApiSemiProduct();
 		apiSemiProduct.setId(entity.getId());
 		apiSemiProduct.setName(translation.getName());
 		apiSemiProduct.setDescription(translation.getDescription());
+		apiSemiProduct.setBuyable(entity.getBuyable());
 
 		return apiSemiProduct;
 	}
@@ -62,7 +54,10 @@ public final class SemiProductMapper {
 	 * @return API model entity.
 	 */
 	public static ApiSemiProduct toApiSemiProduct(SemiProduct entity, Language language) {
-		if(entity == null) return null;
+
+		if(entity == null) {
+			return null;
+		}
 
 		ApiSemiProduct apiSemiProduct = SemiProductMapper.toApiSemiProductBase(entity, language);
 
@@ -79,6 +74,7 @@ public final class SemiProductMapper {
 	}
 
 	public static ApiSemiProduct toApiSemiProductDetail(SemiProduct entity, Language language) {
+
 		if (entity == null) {
 			return null;
 		}
