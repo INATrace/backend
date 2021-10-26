@@ -29,6 +29,7 @@ public class StockOrderMapper {
         ApiStockOrder apiStockOrder = new ApiStockOrder();
         apiStockOrder.setId(entity.getId());
         apiStockOrder.setIdentifier(entity.getIdentifier());
+        apiStockOrder.setInternalLotNumber(entity.getInternalLotNumber());
         apiStockOrder.setCurrency(entity.getCurrency());
         apiStockOrder.setPreferredWayOfPayment(entity.getPreferredWayOfPayment());
         apiStockOrder.setFulfilledQuantity(entity.getFulfilledQuantity());
@@ -128,7 +129,7 @@ public class StockOrderMapper {
         apiStockOrder.setAvailableQuantity(entity.getAvailableQuantity());
         apiStockOrder.setTare(entity.getTare());
         apiStockOrder.setAvailable(entity.getAvailable());
-        apiStockOrder.setOpenOrder(entity.getOpenOrder());
+        apiStockOrder.setOpenOrder(entity.getIsOpenOrder());
 
         // Set dates
         apiStockOrder.setProductionDate(entity.getProductionDate());
