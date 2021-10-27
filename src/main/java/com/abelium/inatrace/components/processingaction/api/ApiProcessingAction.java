@@ -5,16 +5,17 @@ import com.abelium.inatrace.components.codebook.processing_evidence_type.api.Api
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.processingactiontranslation.api.ApiProcessingActionTranslation;
-import com.abelium.inatrace.components.processingevidencefield.api.ApiProcessingEvidenceField;
+import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
+import com.abelium.inatrace.components.product.api.ApiFinalProduct;
+import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Processing action API model.
@@ -58,12 +59,24 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Processing action input semi product")
 	private ApiSemiProduct outputSemiProduct;
+
+	@ApiModelProperty(value = "The input Final product")
+	private ApiFinalProduct inputFinalProduct;
+
+	@ApiModelProperty(value = "The output final product")
+	private ApiFinalProduct outputFinalProduct;
 	
 	@ApiModelProperty(value = "Processing action type")
 	private ProcessingActionType type;
 
 	@ApiModelProperty(value = "Processing action public timeline icon type")
 	private PublicTimelineIconType publicTimelineIconType;
+
+	@ApiModelProperty(value = "Denoting if this processing action is Transfer or Quote of a Final product")
+	private Boolean finalProductAction;
+
+	@ApiModelProperty(value = "The value chain that this Processing action supports")
+	private ApiValueChain valueChain;
 	
 	@ApiModelProperty(value = "Processing action required document types")
 	private List<ApiProcessingEvidenceType> requiredDocumentTypes = new ArrayList<>();
@@ -73,6 +86,10 @@ public class ApiProcessingAction extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "Processing action translations")
 	private List<ApiProcessingActionTranslation> translations = new ArrayList<>();
+
+	public ApiProcessingAction() {
+		super();
+	}
 
 	public String getName() {
 		return name;
@@ -170,6 +187,22 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		this.outputSemiProduct = outputSemiProduct;
 	}
 
+	public ApiFinalProduct getInputFinalProduct() {
+		return inputFinalProduct;
+	}
+
+	public void setInputFinalProduct(ApiFinalProduct inputFinalProduct) {
+		this.inputFinalProduct = inputFinalProduct;
+	}
+
+	public ApiFinalProduct getOutputFinalProduct() {
+		return outputFinalProduct;
+	}
+
+	public void setOutputFinalProduct(ApiFinalProduct outputFinalProduct) {
+		this.outputFinalProduct = outputFinalProduct;
+	}
+
 	public ProcessingActionType getType() {
 		return type;
 	}
@@ -185,7 +218,23 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	public void setPublicTimelineIconType(PublicTimelineIconType publicTimelineIconType) {
 		this.publicTimelineIconType = publicTimelineIconType;
 	}
-	
+
+	public Boolean getFinalProductAction() {
+		return finalProductAction;
+	}
+
+	public void setFinalProductAction(Boolean finalProductAction) {
+		this.finalProductAction = finalProductAction;
+	}
+
+	public ApiValueChain getValueChain() {
+		return valueChain;
+	}
+
+	public void setValueChain(ApiValueChain valueChain) {
+		this.valueChain = valueChain;
+	}
+
 	public List<ApiProcessingEvidenceType> getRequiredDocumentTypes() {
 		return requiredDocumentTypes;
 	}
@@ -208,35 +257,6 @@ public class ApiProcessingAction extends ApiBaseEntity {
 
 	public void setTranslations(List<ApiProcessingActionTranslation> translations) {
 		this.translations = translations;
-	}
-
-	public ApiProcessingAction() {
-		super();
-	}
-
-	public ApiProcessingAction(String name, String description, Language language, Long sortOrder, String prefix,
-			Boolean repackedOutputs, BigDecimal maxOutputWeight, String publicTimelineLabel,
-			String publicTimelineLocation, ApiCompanyBase company, ApiSemiProduct inputSemiProduct,
-			ApiSemiProduct outputSemiProduct, ProcessingActionType type, PublicTimelineIconType publicTimelineIconType,
-			List<ApiProcessingEvidenceType> requiredDocumentTypes,
-			List<ApiProcessingEvidenceField> requiredEvidenceFields) {
-		super();
-		this.name = name;
-		this.description = description;
-		this.language = language;
-		this.sortOrder = sortOrder;
-		this.prefix = prefix;
-		this.repackedOutputs = repackedOutputs;
-		this.maxOutputWeight = maxOutputWeight;
-		this.publicTimelineLabel = publicTimelineLabel;
-		this.publicTimelineLocation = publicTimelineLocation;
-		this.company = company;
-		this.inputSemiProduct = inputSemiProduct;
-		this.outputSemiProduct = outputSemiProduct;
-		this.type = type;
-		this.publicTimelineIconType = publicTimelineIconType;
-		this.requiredDocumentTypes = requiredDocumentTypes;
-		this.requiredEvidenceFields = requiredEvidenceFields;
 	}
 
 }

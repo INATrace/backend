@@ -1,4 +1,4 @@
-package com.abelium.inatrace.components.processingevidencefield;
+package com.abelium.inatrace.components.codebook.processingevidencefield;
 
 import javax.validation.Valid;
 
@@ -17,7 +17,7 @@ import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiPaginatedResponse;
 import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.processingevidencefield.api.ApiProcessingEvidenceField;
+import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

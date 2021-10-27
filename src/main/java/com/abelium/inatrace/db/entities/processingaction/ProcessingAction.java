@@ -4,6 +4,8 @@ import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.product.FinalProduct;
+import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
 
@@ -56,12 +58,30 @@ public class ProcessingAction extends TimestampEntity {
 	
 	@ManyToOne
 	private Company company;
-	
+
+	/**
+	 * Used when we have action types: PROCESSING, QUOTE, TRANSFER, FINAL_PROCESSING
+	 */
 	@ManyToOne
 	private SemiProduct inputSemiProduct;
-	
+
+	/**
+	 * Used when we have action types: PROCESSING, QUOTE, TRANSFER
+	 */
 	@ManyToOne
 	private SemiProduct outputSemiProduct;
+
+	/**
+	 * Used when we have action types QUOTE or TRANSFER and finalProductAction value to true
+	 */
+	@ManyToOne
+	private FinalProduct inputFinalProduct;
+
+	/**
+	 * Used when we have action type FINAL_PROCESSING or action types QUOTE and TRANSFER with finalProductAction value to true
+	 */
+	@ManyToOne
+	private FinalProduct outputFinalProduct;
 	
 	@Column
 	private String publicTimelineLabel;
@@ -76,6 +96,18 @@ public class ProcessingAction extends TimestampEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
 	private PublicTimelineIconType publicTimelineIconType;
+
+	/**
+	 * Used to set if we are working with transfer or quote action for final products (fron final product to final product)
+	 */
+	@Column
+	private Boolean finalProductAction;
+
+	/**
+	 * The value chain that this Processing action supports - used to source semi-products, proc. evidence types and proc. evidence fields
+	 */
+	@ManyToOne
+	private ValueChain valueChain;
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionPET> requiredDocumentTypes = new ArrayList<>();
@@ -85,6 +117,10 @@ public class ProcessingAction extends TimestampEntity {
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionTranslation> processingActionTranslations = new ArrayList<>();
+
+	public ProcessingAction() {
+		super();
+	}
 
 	public Long getSortOrder() {
 		return sortOrder;
@@ -142,6 +178,22 @@ public class ProcessingAction extends TimestampEntity {
 		this.outputSemiProduct = outputSemiProduct;
 	}
 
+	public FinalProduct getInputFinalProduct() {
+		return inputFinalProduct;
+	}
+
+	public void setInputFinalProduct(FinalProduct inputFinalProduct) {
+		this.inputFinalProduct = inputFinalProduct;
+	}
+
+	public FinalProduct getOutputFinalProduct() {
+		return outputFinalProduct;
+	}
+
+	public void setOutputFinalProduct(FinalProduct outputFinalProduct) {
+		this.outputFinalProduct = outputFinalProduct;
+	}
+
 	public String getPublicTimelineLabel() {
 		return publicTimelineLabel;
 	}
@@ -174,6 +226,22 @@ public class ProcessingAction extends TimestampEntity {
 		this.publicTimelineIconType = publicTimelineIconType;
 	}
 
+	public Boolean getFinalProductAction() {
+		return finalProductAction;
+	}
+
+	public void setFinalProductAction(Boolean finalProductAction) {
+		this.finalProductAction = finalProductAction;
+	}
+
+	public ValueChain getValueChain() {
+		return valueChain;
+	}
+
+	public void setValueChain(ValueChain valueChain) {
+		this.valueChain = valueChain;
+	}
+
 	public List<ProcessingActionPET> getRequiredDocumentTypes() {
 		return requiredDocumentTypes;
 	}
@@ -196,32 +264,6 @@ public class ProcessingAction extends TimestampEntity {
 
 	public void setProcessingActionTranslations(List<ProcessingActionTranslation> processingActionTranslations) {
 		this.processingActionTranslations = processingActionTranslations;
-	}
-
-	public ProcessingAction(Long sortOrder, String prefix, Boolean repackedOutputs, BigDecimal maxOutputWeight,
-			Company company, SemiProduct inputSemiProduct, SemiProduct outputSemiProduct, String publicTimelineLabel,
-			String publicTimelineLocation, ProcessingActionType type, PublicTimelineIconType publicTimelineIconType,
-			List<ProcessingActionPET> requiredDocumentTypes, List<ProcessingActionPEF> processingEvidenceFields,
-			List<ProcessingActionTranslation> processingActionTranslations) {
-		super();
-		this.sortOrder = sortOrder;
-		this.prefix = prefix;
-		this.repackedOutputs = repackedOutputs;
-		this.maxOutputWeight = maxOutputWeight;
-		this.company = company;
-		this.inputSemiProduct = inputSemiProduct;
-		this.outputSemiProduct = outputSemiProduct;
-		this.publicTimelineLabel = publicTimelineLabel;
-		this.publicTimelineLocation = publicTimelineLocation;
-		this.type = type;
-		this.publicTimelineIconType = publicTimelineIconType;
-		this.requiredDocumentTypes = requiredDocumentTypes;
-		this.processingEvidenceFields = processingEvidenceFields;
-		this.processingActionTranslations = processingActionTranslations;
-	}
-
-	public ProcessingAction() {
-		super();
 	}
 	
 }

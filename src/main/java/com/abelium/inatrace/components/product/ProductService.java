@@ -586,7 +586,7 @@ public class ProductService extends BaseService {
     	OnGoingLogicalCondition condition = Torpedo.condition();
 
     	if (queryRequest.productId != null) {
-    		condition.and(finalProductProxy.getProduct()).isNotNull()
+    		condition = condition.and(finalProductProxy.getProduct()).isNotNull()
 					.and(finalProductProxy.getProduct().getId()).eq(queryRequest.productId);
 		}
 

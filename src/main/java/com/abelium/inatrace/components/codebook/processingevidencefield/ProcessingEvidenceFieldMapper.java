@@ -1,6 +1,6 @@
-package com.abelium.inatrace.components.processingevidencefield;
+package com.abelium.inatrace.components.codebook.processingevidencefield;
 
-import com.abelium.inatrace.components.processingevidencefield.api.ApiProcessingEvidenceField;
+import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceField;
 
 /**

@@ -39,7 +39,7 @@ public class ProcessingActionController {
 	@GetMapping("list/company/{id}")
 	@ApiOperation("Get a list of processing actions by company ID.")
 	public ApiPaginatedResponse<ApiProcessingAction> listProcessingActionsByCompany(
-		@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long companyId,
+		@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
 		@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 		@Valid ApiPaginatedRequest request) {
 

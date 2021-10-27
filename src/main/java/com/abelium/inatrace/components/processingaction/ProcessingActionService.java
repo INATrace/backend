@@ -10,7 +10,7 @@ import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
-import com.abelium.inatrace.components.processingevidencefield.ProcessingEvidenceFieldService;
+import com.abelium.inatrace.components.codebook.processingevidencefield.ProcessingEvidenceFieldService;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;

@@ -9,6 +9,7 @@ import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.facility.api.ApiFacilityLocation;
 import com.abelium.inatrace.components.facility.api.ApiFacilityTranslation;
+import com.abelium.inatrace.components.product.ProductApiTools;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.facility.FacilitySemiProduct;
 import com.abelium.inatrace.db.entities.facility.FacilityTranslation;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * Mapper for Facility entity.
  *
- * @author Rene Flores, Sunesis d.o.o.
+ * @author Rene Flores, Pece Adjievski, Sunesis d.o.o.
  */
 public final class FacilityMapper {
 
@@ -35,7 +36,11 @@ public final class FacilityMapper {
 			return null;
 		}
 
-		FacilityTranslation translation = entity.getFacilityTranslations().stream().filter(facilityTranslation -> facilityTranslation.getLanguage().equals(language)).findFirst().orElse(new FacilityTranslation());
+		FacilityTranslation translation = entity.getFacilityTranslations()
+				.stream()
+				.filter(facilityTranslation -> facilityTranslation.getLanguage().equals(language))
+				.findFirst()
+				.orElse(new FacilityTranslation());
 
 		ApiFacility apiFacility = new ApiFacility();
 
@@ -64,6 +69,7 @@ public final class FacilityMapper {
 		apiFacility.setDisplayTare(entity.getDisplayTare());
 		apiFacility.setDisplayWomenOnly(entity.getDisplayWomenOnly());
 
+		// Map facility location data
 		ApiFacilityLocation apiFacilityLocation = new ApiFacilityLocation();
 		ApiAddress apiAddress = new ApiAddress();
 		ApiCountry apiCountry = new ApiCountry();
@@ -89,18 +95,23 @@ public final class FacilityMapper {
 		apiFacilityLocation.setPubliclyVisible(entity.getFacilityLocation().getPubliclyVisible());
 		apiFacility.setFacilityLocation(apiFacilityLocation);
 
+		// Map facility type
 		ApiFacilityType apiFacilityType = new ApiFacilityType();
 		apiFacilityType.setId(entity.getFacilityType().getId());
 		apiFacilityType.setCode(entity.getFacilityType().getCode());
 		apiFacilityType.setLabel(entity.getFacilityType().getLabel());
 		apiFacility.setFacilityType(apiFacilityType);
 
+		// Map facility semi-products
 		List<ApiSemiProduct> apiSemiProductList = new ArrayList<>();
 		for (FacilitySemiProduct facilitySemiProduct : entity.getFacilitySemiProducts()) {
 			apiSemiProductList.add(SemiProductMapper.toApiSemiProductBase(facilitySemiProduct.getSemiProduct(), language));
 		}
-
 		apiFacility.setFacilitySemiProductList(apiSemiProductList);
+
+		// Map the facility final products
+		apiFacility.setFacilityFinalProducts(entity.getFacilityFinalProducts().stream()
+				.map(ffp -> ProductApiTools.toApiFinalProduct(ffp.getFinalProduct())).collect(Collectors.toList()));
 
 		return apiFacility;
 	}
@@ -113,15 +124,21 @@ public final class FacilityMapper {
 			return null;
 		}
 
-		apiFacility.setTranslations(facility.getFacilityTranslations().stream().map(FacilityMapper::toApiFacilityTranslation).collect(Collectors.toList()));
+		apiFacility.setTranslations(facility
+				.getFacilityTranslations()
+				.stream()
+				.map(FacilityMapper::toApiFacilityTranslation)
+				.collect(Collectors.toList()));
 
 		return apiFacility;
 	}
 
 	public static ApiFacilityTranslation toApiFacilityTranslation(FacilityTranslation facilityTranslation) {
+
 		ApiFacilityTranslation apiFacilityTranslation = new ApiFacilityTranslation();
 		apiFacilityTranslation.setName(facilityTranslation.getName());
 		apiFacilityTranslation.setLanguage(facilityTranslation.getLanguage());
+
 		return apiFacilityTranslation;
 	}
 }
