@@ -13,6 +13,8 @@ public class ApiStockOrderAggregatedHistory extends ApiBaseEntity {
 	@ApiModelProperty(value = "Processing order for this aggregation history")
 	private ApiProcessingOrder processingOrder;
 
+	@ApiModelProperty(value = "Stock order for this aggregation history")
+	private ApiStockOrder stockOrder;
 
 	@ApiModelProperty(value = "List of fields for this aggregation history")
 	private List<ApiStockOrderAggregation> aggregations;
@@ -26,6 +28,14 @@ public class ApiStockOrderAggregatedHistory extends ApiBaseEntity {
 
 	public void setProcessingOrder(ApiProcessingOrder processingOrder) {
 		this.processingOrder = processingOrder;
+	}
+
+	public ApiStockOrder getStockOrder() {
+		return stockOrder;
+	}
+
+	public void setStockOrder(ApiStockOrder stockOrder) {
+		this.stockOrder = stockOrder;
 	}
 
 	public List<ApiStockOrderAggregation> getAggregations() {
