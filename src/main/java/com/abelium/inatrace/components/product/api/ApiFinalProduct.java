@@ -12,6 +12,9 @@ public class ApiFinalProduct extends ApiBaseEntity {
     @ApiModelProperty(value = "Description of final product")
     private String description;
 
+    @ApiModelProperty(value = "The Product that this final product belongs")
+    private ApiProductBase product;
+
     @ApiModelProperty(value = "Measurement unit type of final product")
     private ApiMeasureUnitType measurementUnitType;
 
@@ -29,6 +32,14 @@ public class ApiFinalProduct extends ApiBaseEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public ApiProductBase getProduct() {
+        return product;
+    }
+
+    public void setProduct(ApiProductBase product) {
+        this.product = product;
     }
 
     public ApiMeasureUnitType getMeasurementUnitType() {
