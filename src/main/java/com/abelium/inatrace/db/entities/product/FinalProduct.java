@@ -3,11 +3,13 @@ package com.abelium.inatrace.db.entities.product;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "FinalProduct.getFinalProductsForProductsIds", query = "SELECT fp From FinalProduct fp WHERE fp.product.id IN :productsIds"),
+        @NamedQuery(name = "FinalProduct.countFinalProductsForProductsIds", query = "SELECT COUNT(fp) From FinalProduct fp WHERE fp.product.id IN :productsIds")
+})
 public class FinalProduct extends TimestampEntity {
 
     @Column(nullable = false)
