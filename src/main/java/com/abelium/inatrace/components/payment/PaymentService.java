@@ -6,10 +6,11 @@ import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
+import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.payment.api.ApiBulkPayment;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
-import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.user.UserService;
+import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.company.Company;
@@ -48,8 +49,8 @@ public class PaymentService extends BaseService {
 		return PaymentMapper.toApiPayment(fetchEntity(id, Payment.class), userId);
 	}
 
-	public ApiBulkPayment getBulkPayment(Long id) throws ApiException {
-		return BulkPaymentMapper.toApiBulkPayment(fetchEntity(id, BulkPayment.class));
+	public ApiBulkPayment getBulkPayment(Long id, Long userId) throws ApiException {
+		return BulkPaymentMapper.toApiBulkPayment(fetchEntity(id, BulkPayment.class), userId);
 	}
 
 	public ApiPaginatedList<ApiPayment> getPaymentList(ApiPaginatedRequest request, PaymentQueryRequest queryRequest, Long userId) {
@@ -102,10 +103,11 @@ public class PaymentService extends BaseService {
 	}
 
 	public ApiPaginatedList<ApiBulkPayment> listBulkPayments(ApiPaginatedRequest request,
-															 PaymentQueryRequest queryRequest) {
+															 PaymentQueryRequest queryRequest,
+															 Long userId) {
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> bulkPaymentQueryObject(
-				request, queryRequest), BulkPaymentMapper::toApiBulkPayment);
+				request, queryRequest), bulkPayment -> BulkPaymentMapper.toApiBulkPayment(bulkPayment, userId));
 	}
 
 	private BulkPayment bulkPaymentQueryObject(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
@@ -120,6 +122,9 @@ public class PaymentService extends BaseService {
 		Torpedo.where(condition);
 
 		switch (request.sortBy) {
+			case "receiptNumber": QueryTools.orderBy(request.sort, bulkPaymentProxy.getReceiptNumber()); break;
+			case "totalAmount": QueryTools.orderBy(request.sort, bulkPaymentProxy.getTotalAmount()); break;
+			case "paymentPurposeType": QueryTools.orderBy(request.sort, bulkPaymentProxy.getPaymentPurposeType()); break;
 			default: QueryTools.orderBy(request.sort, bulkPaymentProxy.getId());
 		}
 
@@ -127,7 +132,9 @@ public class PaymentService extends BaseService {
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdatePayment(ApiPayment apiPayment, Long userId) throws ApiException {
+	public ApiBaseEntity createOrUpdatePayment(ApiPayment apiPayment,
+											   Long userId,
+											   boolean isPartOfBulkPayment) throws ApiException {
 
 		Payment entity = fetchEntityOrElse(apiPayment.getId(), Payment.class, new Payment());
 		User currentUser = userService.fetchUserById(userId);
@@ -164,7 +171,7 @@ public class PaymentService extends BaseService {
 			}
 
 			// Verify document is provided, if payment purpose is FIRST_INSTALLMENT
-			if (apiPayment.getPaymentPurposeType() == PaymentPurposeType.FIRST_INSTALLMENT && apiPayment.getReceiptDocument() == null)
+			if (!isPartOfBulkPayment && apiPayment.getPaymentPurposeType() == PaymentPurposeType.FIRST_INSTALLMENT && apiPayment.getReceiptDocument() == null)
 				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Receipt document has to be provided!");
 
 			// Verify totalPaid (amount paid to the farmer) is not negative
@@ -233,6 +240,18 @@ public class PaymentService extends BaseService {
 		if(apiBulkPayment.getPayingCompany() == null || apiBulkPayment.getPayingCompany().getId() == null) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Paying company ID has to be provided!");
 		}
+		if(apiBulkPayment.getPayments() == null || apiBulkPayment.getPayments().isEmpty()) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "At least one payment needs to be provided.");
+		}
+		if(apiBulkPayment.getPaymentDescription() == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Payment description needs to be provided.");
+		}
+		if(apiBulkPayment.getAdditionalCost() != null && apiBulkPayment.getAdditionalCostDescription() == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Additional cost description needs to be provided.");
+		}
+		if(apiBulkPayment.getReceiptNumber() == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Recipient number is required.");
+		}
 
 		BulkPayment entity = new BulkPayment();
 
@@ -246,32 +265,33 @@ public class PaymentService extends BaseService {
 		entity.setAdditionalCost(apiBulkPayment.getAdditionalCost());
 		entity.setAdditionalCostDescription(apiBulkPayment.getAdditionalCostDescription());
 		entity.setCurrency(apiBulkPayment.getCurrency());
-		entity.setFormalCreationTime(Instant.now());
+		entity.setFormalCreationTime(apiBulkPayment.getFormalCreationTime() != null
+				? apiBulkPayment.getFormalCreationTime()
+				: Instant.now());
 
-		for (ApiStockOrder apiPurchaseOrder: apiBulkPayment.getStockOrders()) {
+		// Create activity proofs
+		for (ApiActivityProof apiActivityProof : apiBulkPayment.getAdditionalProofs()) {
 
-			StockOrder purchaseOrder = fetchEntity(apiPurchaseOrder.getId(), StockOrder.class);
+			Document activityProofDoc = fetchEntity(apiActivityProof.getDocument().getId(), Document.class);
+
+			ActivityProof activityProof = new ActivityProof();
+			activityProof.setDocument(activityProofDoc);
+			activityProof.setType(apiActivityProof.getType());
+			activityProof.setFormalCreationDate(activityProof.getFormalCreationDate());
+			activityProof.setValidUntil(activityProof.getValidUntil());
+
+			entity.getAdditionalProofs().add(activityProof);
+		}
+
+		// Create payments
+		for (ApiPayment apiPayment: apiBulkPayment.getPayments()) {
+
+			Long insertedPaymentId = createOrUpdatePayment(apiPayment, userId, true).getId();
+			Payment payment = fetchEntity(insertedPaymentId, Payment.class);
 
 			// Bi-directional mapping
-			purchaseOrder.setBulkPayment(entity);
-			entity.getStockOrders().add(purchaseOrder);
-
-			// Activity proof
-//			for (ApiActivityProof apiAP : apiBulkPayment.getAdditionalProofs()) {
-//
-//				Document activityProofDoc = fetchEntity(apiAP.getDocument().getId(), Document.class);
-//
-//				StockOrderActivityProof stockOrderActivityProof = new StockOrderActivityProof();
-//				stockOrderActivityProof.setStockOrder(purchaseOrder);
-//				stockOrderActivityProof.setActivityProof(new ActivityProof());
-//				stockOrderActivityProof.getActivityProof().setDocument(activityProofDoc);
-//				stockOrderActivityProof.getActivityProof().setFormalCreationDate(apiAP.getFormalCreationDate());
-//				stockOrderActivityProof.getActivityProof().setType(apiAP.getType());
-//				stockOrderActivityProof.getActivityProof().setValidUntil(apiAP.getValidUntil());
-//
-//				purchaseOrder.getActivityProofs().add(stockOrderActivityProof);
-//			}
-
+			payment.setBulkPayment(entity);
+			entity.getPayments().add(payment);
 		}
 
 		if (entity.getId() == null) {

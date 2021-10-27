@@ -60,13 +60,4 @@ public final class PaymentMapper {
 
 		return apiPayment;
 	}
-
-	public static ApiBulkPayment toApiBulkPayment(BulkPayment entity){
-		if(entity == null) return null;
-
-		ApiBulkPayment apiBulkPayment = new ApiBulkPayment();
-		apiBulkPayment.setId(entity.getId());
-		apiBulkPayment.setCurrency(entity.getCurrency());
-		return apiBulkPayment;
-	}
 }

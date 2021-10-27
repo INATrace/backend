@@ -9,7 +9,6 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.facility.Facility;
-import com.abelium.inatrace.db.entities.payment.BulkPayment;
 import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.productorder.ProductOrder;
@@ -68,9 +67,6 @@ public class StockOrder extends TimestampEntity {
 	
 	@ManyToOne
 	private Facility facility;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	private BulkPayment bulkPayment;
 
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Certification> certifications;
@@ -603,14 +599,6 @@ public class StockOrder extends TimestampEntity {
 
 	public void setClient(Company client) {
 		this.client = client;
-	}
-
-	public BulkPayment getBulkPayment() {
-		return bulkPayment;
-	}
-
-	public void setBulkPayment(BulkPayment bulkPayment) {
-		this.bulkPayment = bulkPayment;
 	}
 
 	public ProcessingOrder getProcessingOrder() {

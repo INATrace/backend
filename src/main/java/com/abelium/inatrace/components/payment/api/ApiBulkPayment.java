@@ -3,12 +3,15 @@ package com.abelium.inatrace.components.payment.api;
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.company.api.ApiCompany;
-import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
+import com.abelium.inatrace.tools.converters.SimpleDateConverter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,9 +19,18 @@ public class ApiBulkPayment extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Bulk payment created by")
 	private ApiUser createdBy;
-	
+
+	@ApiModelProperty(value = "Creation timestamp")
+	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
+	private Instant creationTimestamp;
+
 	@ApiModelProperty(value = "Bulk payment currency")
 	private String currency;
+
+	@ApiModelProperty(value = "Formal creation date")
+	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
+	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
+	private Instant formalCreationTime;
 	
 	@ApiModelProperty(value = "Company that pays for the bulk payment")
 	private ApiCompany payingCompany;
@@ -41,8 +53,8 @@ public class ApiBulkPayment extends ApiBaseEntity {
 	@ApiModelProperty(value = "Bulk payment additional cost description")
 	private String additionalCostDescription;
 	
-	@ApiModelProperty(value = "Bulk payment stock orders")
-	private List<ApiStockOrder> stockOrders = new ArrayList<>();
+	@ApiModelProperty(value = "Bulk payment payments")
+	private List<ApiPayment> payments = new ArrayList<>();
 	
 	@ApiModelProperty(value = "Bulk payment additional proofs")
 	private List<ApiActivityProof> additionalProofs = new ArrayList<>();
@@ -55,12 +67,28 @@ public class ApiBulkPayment extends ApiBaseEntity {
 		this.createdBy = createdBy;
 	}
 
+	public Instant getCreationTimestamp() {
+		return creationTimestamp;
+	}
+
+	public void setCreationTimestamp(Instant creationTimestamp) {
+		this.creationTimestamp = creationTimestamp;
+	}
+
 	public String getCurrency() {
 		return currency;
 	}
 
 	public void setCurrency(String currency) {
 		this.currency = currency;
+	}
+
+	public Instant getFormalCreationTime() {
+		return formalCreationTime;
+	}
+
+	public void setFormalCreationTime(Instant formalCreationTime) {
+		this.formalCreationTime = formalCreationTime;
 	}
 
 	public ApiCompany getPayingCompany() {
@@ -119,12 +147,12 @@ public class ApiBulkPayment extends ApiBaseEntity {
 		this.additionalCostDescription = additionalCostDescription;
 	}
 
-	public List<ApiStockOrder> getStockOrders() {
-		return stockOrders;
+	public List<ApiPayment> getPayments() {
+		return payments;
 	}
 
-	public void setStockOrders(List<ApiStockOrder> stockOrders) {
-		this.stockOrders = stockOrders;
+	public void setPayments(List<ApiPayment> payments) {
+		this.payments = payments;
 	}
 
 	public List<ApiActivityProof> getAdditionalProofs() {

@@ -1,6 +1,5 @@
 package com.abelium.inatrace.components.product.api;
 
-import com.abelium.inatrace.components.common.api.ApiCountry;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
