@@ -7,6 +7,7 @@ import com.abelium.inatrace.components.codebook.processing_evidence_type.Process
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
+import com.abelium.inatrace.types.Language;
 
 import java.util.stream.Collectors;
 
@@ -42,7 +43,7 @@ public final class ValueChainMapper {
 	 * @param entity DB entity.
 	 * @return API model entity.
 	 */
-	public static ApiValueChain toApiValueChain(ValueChain entity) {
+	public static ApiValueChain toApiValueChain(ValueChain entity, Language language) {
 
 		ApiValueChain apiValueChain = ValueChainMapper.toApiValueChainBase(entity);
 
@@ -77,7 +78,7 @@ public final class ValueChainMapper {
 		// Map semi-products
 		if (!entity.getSemiProducts().isEmpty()) {
 			apiValueChain.setSemiProducts(entity.getSemiProducts().stream()
-					.map(vcSemiProduct -> SemiProductMapper.toApiSemiProductBase(vcSemiProduct.getSemiProduct()))
+					.map(vcSemiProduct -> SemiProductMapper.toApiSemiProductBase(vcSemiProduct.getSemiProduct(), language))
 					.collect(Collectors.toList()));
 		}
 

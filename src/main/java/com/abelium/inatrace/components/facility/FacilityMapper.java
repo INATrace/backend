@@ -97,8 +97,9 @@ public final class FacilityMapper {
 
 		List<ApiSemiProduct> apiSemiProductList = new ArrayList<>();
 		for (FacilitySemiProduct facilitySemiProduct : entity.getFacilitySemiProducts()) {
-			apiSemiProductList.add(SemiProductMapper.toApiSemiProductIdName(facilitySemiProduct.getSemiProduct()));
+			apiSemiProductList.add(SemiProductMapper.toApiSemiProductBase(facilitySemiProduct.getSemiProduct(), language));
 		}
+
 		apiFacility.setFacilitySemiProductList(apiSemiProductList);
 
 		return apiFacility;

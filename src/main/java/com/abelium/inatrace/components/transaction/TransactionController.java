@@ -1,15 +1,16 @@
 package com.abelium.inatrace.components.transaction;
 
-import com.abelium.inatrace.api.ApiPaginatedResponse;
+import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.transaction.api.ApiTransaction;
+import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -35,6 +36,33 @@ public class TransactionController {
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("stockOrderId") Long stockOrderId) throws ApiException {
 
 		return new ApiPaginatedResponse<>(transactionService.getStockOrderInputTransactions(stockOrderId));
+	}
+
+	@PutMapping("/{id}/approve")
+	@ApiOperation("Approves transaction with provided ID.")
+	public ApiDefaultResponse approveTransaction(
+			@Valid @ApiParam(value = "Transaction ID", required = true) @PathVariable("id") Long id,
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
+
+		transactionService.approveTransaction(id, authUser.getUserId(), language);
+		return new ApiDefaultResponse();
+	}
+
+	@PutMapping("/{id}/reject")
+	@ApiOperation("Rejects transaction with provided ID and reverts it's quantities.")
+	public ApiDefaultResponse rejectTransaction(
+			@Valid @ApiParam(value = "Transaction ID", required = true) @PathVariable("id") Long id,
+			@Valid @RequestBody ApiTransaction apiTransaction,
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
+
+		if (apiTransaction == null || !id.equals(apiTransaction.getId())) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Data integrity violation!");
+		}
+
+		transactionService.rejectTransaction(apiTransaction, authUser.getUserId(), language);
+		return new ApiDefaultResponse();
 	}
 
 }
