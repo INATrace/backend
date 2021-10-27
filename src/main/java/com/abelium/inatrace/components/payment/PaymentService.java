@@ -14,10 +14,7 @@ import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.db.entities.payment.BulkPayment;
-import com.abelium.inatrace.db.entities.payment.Payment;
-import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
-import com.abelium.inatrace.db.entities.payment.PaymentStatus;
+import com.abelium.inatrace.db.entities.payment.*;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -279,13 +276,15 @@ public class PaymentService extends BaseService {
 
 			Document activityProofDoc = fetchEntity(apiActivityProof.getDocument().getId(), Document.class);
 
-			ActivityProof activityProof = new ActivityProof();
-			activityProof.setDocument(activityProofDoc);
-			activityProof.setType(apiActivityProof.getType());
-			activityProof.setFormalCreationDate(activityProof.getFormalCreationDate());
-			activityProof.setValidUntil(activityProof.getValidUntil());
+			BulkPaymentActivityProof bulkPaymentActivityProof = new BulkPaymentActivityProof();
+			bulkPaymentActivityProof.setBulkPayment(entity);
+			bulkPaymentActivityProof.setActivityProof(new ActivityProof());
+			bulkPaymentActivityProof.getActivityProof().setDocument(activityProofDoc);
+			bulkPaymentActivityProof.getActivityProof().setType(apiActivityProof.getType());
+			bulkPaymentActivityProof.getActivityProof().setFormalCreationDate(apiActivityProof.getFormalCreationDate());
+			bulkPaymentActivityProof.getActivityProof().setValidUntil(apiActivityProof.getValidUntil());
 
-			entity.getAdditionalProofs().add(activityProof);
+			entity.getAdditionalProofs().add(bulkPaymentActivityProof);
 		}
 
 		if (entity.getId() == null) {

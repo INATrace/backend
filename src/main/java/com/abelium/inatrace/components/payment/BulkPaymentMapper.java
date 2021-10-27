@@ -54,7 +54,7 @@ public final class BulkPaymentMapper {
 
 		if (!entity.getAdditionalProofs().isEmpty()) {
 			apiBulkPayment.setAdditionalProofs(entity.getAdditionalProofs().stream()
-					.map(ap -> ActivityProofMapper.toApiActivityProof(ap, userId))
+					.map(ap -> ActivityProofMapper.toApiActivityProof(ap.getActivityProof(), userId))
 					.collect(Collectors.toList()));
 		}
 

@@ -53,8 +53,8 @@ public class BulkPayment extends TimestampEntity {
 	@OneToMany(mappedBy = "bulkPayment")
 	private List<Payment> payments = new ArrayList<>();
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ActivityProof> additionalProofs;
+	@OneToMany(mappedBy = "bulkPayment", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<BulkPaymentActivityProof> additionalProofs;
 
 	public User getCreatedBy() {
 		return createdBy;
@@ -146,13 +146,13 @@ public class BulkPayment extends TimestampEntity {
 		this.payments = payments;
 	}
 
-	public List<ActivityProof> getAdditionalProofs() {
+	public List<BulkPaymentActivityProof> getAdditionalProofs() {
 		if (additionalProofs == null)
 			additionalProofs = new ArrayList<>();
 		return additionalProofs;
 	}
 
-	public void setAdditionalProofs(List<ActivityProof> additionalProofs) {
+	public void setAdditionalProofs(List<BulkPaymentActivityProof> additionalProofs) {
 		this.additionalProofs = additionalProofs;
 	}
 }
