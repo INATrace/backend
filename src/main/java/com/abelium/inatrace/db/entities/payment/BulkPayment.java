@@ -53,7 +53,7 @@ public class BulkPayment extends TimestampEntity {
 	@OneToMany(mappedBy = "bulkPayment")
 	private List<Payment> payments = new ArrayList<>();
 
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ActivityProof> additionalProofs;
 
 	public User getCreatedBy() {

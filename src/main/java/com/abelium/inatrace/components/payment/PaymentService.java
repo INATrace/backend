@@ -19,6 +19,7 @@ import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
 import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -28,7 +29,6 @@ import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
-import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -157,17 +157,11 @@ public class PaymentService extends BaseService {
 			entity.setUpdatedBy(currentUser);
 
 		} else {
-
 			// If method is POST, let's create a payment from scratch
-			// Important to consider that a purchase order must exist, since we will extract information from it
-			// Get purchase order to which you will generate a payment
-			StockOrder stockOrder;
-			try {
-				stockOrder = (StockOrder) em.createNamedQuery("StockOrder.getPurchaseOrderByIdAndType")
-						.setParameter("stockOrderId", apiPayment.getStockOrder().getId())
-						.getSingleResult();
-			} catch (NoResultException e) {
-				throw new ApiException(ApiStatus.INVALID_REQUEST, "A purchase order (StockOrder) is required in order to create a payment.");
+
+			StockOrder stockOrder = fetchEntity(apiPayment.getStockOrder().getId(), StockOrder.class);;
+			if (stockOrder.getOrderType() != OrderType.PURCHASE_ORDER) {
+				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Not a purchase order");
 			}
 
 			// Verify document is provided, if payment purpose is FIRST_INSTALLMENT
@@ -269,7 +263,18 @@ public class PaymentService extends BaseService {
 				? apiBulkPayment.getFormalCreationTime()
 				: Instant.now());
 
-		// Create activity proofs
+		// Create payments
+		for (ApiPayment apiPayment: apiBulkPayment.getPayments()) {
+
+			Long insertedPaymentId = createOrUpdatePayment(apiPayment, userId, true).getId();
+			Payment payment = fetchEntity(insertedPaymentId, Payment.class);
+
+			// Bi-directional mapping
+			payment.setBulkPayment(entity);
+			entity.getPayments().add(payment);
+		}
+
+		// Add activity proofs
 		for (ApiActivityProof apiActivityProof : apiBulkPayment.getAdditionalProofs()) {
 
 			Document activityProofDoc = fetchEntity(apiActivityProof.getDocument().getId(), Document.class);
@@ -281,17 +286,6 @@ public class PaymentService extends BaseService {
 			activityProof.setValidUntil(activityProof.getValidUntil());
 
 			entity.getAdditionalProofs().add(activityProof);
-		}
-
-		// Create payments
-		for (ApiPayment apiPayment: apiBulkPayment.getPayments()) {
-
-			Long insertedPaymentId = createOrUpdatePayment(apiPayment, userId, true).getId();
-			Payment payment = fetchEntity(insertedPaymentId, Payment.class);
-
-			// Bi-directional mapping
-			payment.setBulkPayment(entity);
-			entity.getPayments().add(payment);
 		}
 
 		if (entity.getId() == null) {

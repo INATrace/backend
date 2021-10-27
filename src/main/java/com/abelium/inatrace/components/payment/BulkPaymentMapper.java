@@ -1,5 +1,6 @@
 package com.abelium.inatrace.components.payment;
 
+import com.abelium.inatrace.components.common.mappers.ActivityProofMapper;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.payment.api.ApiBulkPayment;
 import com.abelium.inatrace.components.user.mappers.UserMapper;
@@ -50,6 +51,13 @@ public final class BulkPaymentMapper {
 		apiBulkPayment.setAdditionalCostDescription(entity.getAdditionalCostDescription());
 		apiBulkPayment.setPayments(entity.getPayments().stream().map(p -> PaymentMapper.toApiPayment(p, userId)).collect(Collectors.toList()));
 		apiBulkPayment.setPayingCompany(CompanyMapper.toApiCompanyBase(entity.getPayingCompany()));
+
+		if (!entity.getAdditionalProofs().isEmpty()) {
+			apiBulkPayment.setAdditionalProofs(entity.getAdditionalProofs().stream()
+					.map(ap -> ActivityProofMapper.toApiActivityProof(ap, userId))
+					.collect(Collectors.toList()));
+		}
+
 		return apiBulkPayment;
 	}
 }
