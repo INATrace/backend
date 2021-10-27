@@ -107,7 +107,7 @@ public class PaymentService extends BaseService {
 															 Long userId) {
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> bulkPaymentQueryObject(
-				request, queryRequest), bulkPayment -> BulkPaymentMapper.toApiBulkPayment(bulkPayment, userId));
+				request, queryRequest), bulkPayment -> BulkPaymentMapper.toApiBulkPaymentBase(bulkPayment, userId));
 	}
 
 	private BulkPayment bulkPaymentQueryObject(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {

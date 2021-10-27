@@ -18,6 +18,19 @@ public final class BulkPaymentMapper {
 		throw new IllegalStateException("Utility class");
 	}
 
+	public static ApiBulkPayment toApiBulkPaymentBase(BulkPayment entity, Long userId) {
+		if(entity == null) {
+			return null;
+		}
+
+		ApiBulkPayment apiBulkPayment = new ApiBulkPayment();
+		apiBulkPayment.setId(entity.getId());
+		apiBulkPayment.setPaymentPurposeType(entity.getPaymentPurposeType());
+		apiBulkPayment.setReceiptNumber(entity.getReceiptNumber());
+		apiBulkPayment.setTotalAmount(entity.getTotalAmount());
+		return apiBulkPayment;
+	}
+
 	public static ApiBulkPayment toApiBulkPayment(BulkPayment entity, Long userId) {
 		if(entity == null) {
 			return null;
