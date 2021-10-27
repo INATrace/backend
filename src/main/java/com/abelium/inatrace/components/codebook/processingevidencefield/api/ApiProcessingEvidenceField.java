@@ -1,4 +1,4 @@
-package com.abelium.inatrace.components.processingevidencefield.api;
+package com.abelium.inatrace.components.codebook.processingevidencefield.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.types.ProcessingEvidenceFieldType;
