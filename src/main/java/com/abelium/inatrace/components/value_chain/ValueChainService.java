@@ -25,6 +25,7 @@ import com.abelium.inatrace.db.entities.value_chain.enums.ValueChainStatus;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+import com.abelium.inatrace.types.Language;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -102,11 +103,11 @@ public class ValueChainService extends BaseService {
 		return valueChainProxy;
 	}
 
-	public ApiValueChain getValueChain(Long id) throws ApiException {
+	public ApiValueChain getValueChain(Long id, Language language) throws ApiException {
 
 		ValueChain valueChain = fetchValueChain(id);
 
-		return ValueChainMapper.toApiValueChain(valueChain);
+		return ValueChainMapper.toApiValueChain(valueChain, language);
 	}
 
 	@Transactional

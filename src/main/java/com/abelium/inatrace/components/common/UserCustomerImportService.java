@@ -1,5 +1,6 @@
 package com.abelium.inatrace.components.common;
 
+import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.company.CompanyService;
 import com.abelium.inatrace.components.company.api.ApiAddress;
@@ -45,8 +46,7 @@ public class UserCustomerImportService extends BaseService {
             inputStream = new ByteArrayInputStream(documentData.file);
             mainWorkbook = new XSSFWorkbook(inputStream);
         } catch (IOException e) {
-            System.out.println("Could not read file");
-            return;
+            throw new ApiException(ApiStatus.ERROR, "Could not read file");
         }
 
         XSSFSheet mainSheet = mainWorkbook.getSheetAt(0);
@@ -63,22 +63,23 @@ public class UserCustomerImportService extends BaseService {
 
                 // Bank info
                 apiUserCustomer.setBank(new ApiBankInformation());
-                apiUserCustomer.getBank().setAccountHolderName(getStringOrNumeric(row.getCell(28)));
-                apiUserCustomer.getBank().setAccountNumber(getStringOrNumeric(row.getCell(27)));
-                apiUserCustomer.getBank().setAdditionalInformation(getStringOrNumeric(row.getCell(30)));
-                apiUserCustomer.getBank().setBankName(getStringOrNumeric(row.getCell(29)));
+                apiUserCustomer.getBank().setAccountHolderName(getStringOrNumeric(row.getCell(29)));
+                apiUserCustomer.getBank().setAccountNumber(getStringOrNumeric(row.getCell(28)));
+                apiUserCustomer.getBank().setAdditionalInformation(getStringOrNumeric(row.getCell(31)));
+                apiUserCustomer.getBank().setBankName(getStringOrNumeric(row.getCell(30)));
 
                 apiUserCustomer.setCompanyId(companyId);
                 apiUserCustomer.setEmail(getString(row.getCell(17)));
 
                 // Farm info
                 apiUserCustomer.setFarm(new ApiFarmInformation());
-                apiUserCustomer.getFarm().setAreaOrganicCertified(getNumericBigDecimal(row.getCell(25)));
-                apiUserCustomer.getFarm().setCoffeeCultivatedArea(getNumericBigDecimal(row.getCell(22)));
-                apiUserCustomer.getFarm().setNumberOfTrees(getNumericInteger(row.getCell(23)));
-                apiUserCustomer.getFarm().setOrganic(getBoolean(row.getCell(24)));
-                apiUserCustomer.getFarm().setStartTransitionToOrganic(getDate(row.getCell(26)));
-                apiUserCustomer.getFarm().setTotalCultivatedArea(getNumericBigDecimal(row.getCell(21)));
+                apiUserCustomer.getFarm().setAreaOrganicCertified(getNumericBigDecimal(row.getCell(26)));
+                apiUserCustomer.getFarm().setAreaUnit(getString(row.getCell(21)));
+                apiUserCustomer.getFarm().setCoffeeCultivatedArea(getNumericBigDecimal(row.getCell(23)));
+                apiUserCustomer.getFarm().setNumberOfTrees(getNumericInteger(row.getCell(24)));
+                apiUserCustomer.getFarm().setOrganic(getBoolean(row.getCell(25)));
+                apiUserCustomer.getFarm().setStartTransitionToOrganic(getDate(row.getCell(27)));
+                apiUserCustomer.getFarm().setTotalCultivatedArea(getNumericBigDecimal(row.getCell(22)));
 
                 apiUserCustomer.setFarmerCompanyInternalId(getStringOrNumeric(row.getCell(0)));
                 apiUserCustomer.setGender(getGender(row.getCell(15)));
@@ -151,16 +152,17 @@ public class UserCustomerImportService extends BaseService {
                 validCell(row.getCell(18), CellType.STRING) &&
                 validCell(row.getCell(19), List.of()) &&
                 validCell(row.getCell(20), List.of()) &&
-                validCell(row.getCell(21), CellType.NUMERIC) &&
+                validCell(row.getCell(21), CellType.STRING) &&
                 validCell(row.getCell(22), CellType.NUMERIC) &&
                 validCell(row.getCell(23), CellType.NUMERIC) &&
-                validCell(row.getCell(24), CellType.STRING) &&
-                validCell(row.getCell(25), CellType.NUMERIC) &&
+                validCell(row.getCell(24), CellType.NUMERIC) &&
+                validCell(row.getCell(25), CellType.STRING) &&
                 validCell(row.getCell(26), CellType.NUMERIC) &&
-                validCell(row.getCell(27), List.of(CellType.STRING, CellType.NUMERIC)) &&
+                validCell(row.getCell(27), CellType.NUMERIC) &&
                 validCell(row.getCell(28), List.of(CellType.STRING, CellType.NUMERIC)) &&
                 validCell(row.getCell(29), List.of(CellType.STRING, CellType.NUMERIC)) &&
-                validCell(row.getCell(30), List.of(CellType.STRING, CellType.NUMERIC));
+                validCell(row.getCell(30), List.of(CellType.STRING, CellType.NUMERIC)) &&
+                validCell(row.getCell(31), List.of(CellType.STRING, CellType.NUMERIC));
     }
 
     private boolean validCell(Cell cell, List<CellType> cellTypeList) {

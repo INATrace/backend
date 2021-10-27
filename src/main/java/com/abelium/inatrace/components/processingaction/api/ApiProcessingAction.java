@@ -31,7 +31,10 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Processing action language")
 	private Language language;
-	
+
+	@ApiModelProperty(value = "Sort order number. Lower number means first")
+	private Long sortOrder;
+
 	@ApiModelProperty(value = "Processing action prefix")
 	private String prefix;
 
@@ -93,6 +96,14 @@ public class ApiProcessingAction extends ApiBaseEntity {
 
 	public void setLanguage(Language language) {
 		this.language = language;
+	}
+
+	public Long getSortOrder() {
+		return sortOrder;
+	}
+
+	public void setSortOrder(Long sortOrder) {
+		this.sortOrder = sortOrder;
 	}
 
 	public String getPrefix() {
@@ -203,7 +214,7 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		super();
 	}
 
-	public ApiProcessingAction(String name, String description, Language language, String prefix,
+	public ApiProcessingAction(String name, String description, Language language, Long sortOrder, String prefix,
 			Boolean repackedOutputs, BigDecimal maxOutputWeight, String publicTimelineLabel,
 			String publicTimelineLocation, ApiCompanyBase company, ApiSemiProduct inputSemiProduct,
 			ApiSemiProduct outputSemiProduct, ProcessingActionType type, PublicTimelineIconType publicTimelineIconType,
@@ -213,6 +224,7 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		this.name = name;
 		this.description = description;
 		this.language = language;
+		this.sortOrder = sortOrder;
 		this.prefix = prefix;
 		this.repackedOutputs = repackedOutputs;
 		this.maxOutputWeight = maxOutputWeight;

@@ -99,7 +99,7 @@ public class StockOrderMapper {
 
         // Map the semi-product that is represented by this stock order
         if (entity.getSemiProduct() != null) {
-            apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct()));
+            apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct(), language));
         }
 
         // Set the facility and company of the stock order
