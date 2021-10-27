@@ -8,6 +8,7 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.common.UserCustomerImportService;
+import com.abelium.inatrace.components.common.api.ApiUserCustomerImportResponse;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.company.types.CompanyAction;
@@ -46,7 +47,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
@@ -239,6 +239,15 @@ public class CompanyService extends BaseService {
 
 	public ApiUserCustomer getUserCustomer(Long id) {
 		return companyApiTools.toApiUserCustomer(em.find(UserCustomer.class, id));
+	}
+
+	public boolean existsUserCustomer(ApiUserCustomer apiUserCustomer) {
+		List<UserCustomer> userCustomerList = em.createNamedQuery("UserCustomer.getUserCustomerByNameSurnameAndVillage", UserCustomer.class)
+				.setParameter("name", apiUserCustomer.getName())
+				.setParameter("surname", apiUserCustomer.getSurname())
+				.setParameter("village", apiUserCustomer.getLocation().getAddress().getVillage())
+				.getResultList();
+		return !userCustomerList.isEmpty();
 	}
 
 	public ApiPaginatedList<ApiUserCustomer> getUserCustomersForCompanyAndType(Long companyId, UserCustomerType type, ApiListFarmersRequest request) {
@@ -634,8 +643,8 @@ public class CompanyService extends BaseService {
 		return !companyUserList.isEmpty();
 	}
 
-	public void importFarmersSpreadsheet(Long companyId, Long documentId) throws ApiException {
-		userCustomerImportService.importFarmersSpreadsheet(companyId, documentId);
+	public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId) throws ApiException {
+		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId);
 	}
 
 }

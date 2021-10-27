@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.common;
 
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.common.api.ApiUserCustomerImportResponse;
 import com.abelium.inatrace.components.company.CompanyService;
 import com.abelium.inatrace.components.company.api.ApiAddress;
 import com.abelium.inatrace.components.company.api.ApiUserCustomer;
@@ -24,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -37,7 +39,7 @@ public class UserCustomerImportService extends BaseService {
     @Autowired
     private StorageService storageService;
 
-    public void importFarmersSpreadsheet(Long companyId, Long documentId) throws ApiException {
+    public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId) throws ApiException {
         DocumentData documentData = storageService.downloadDocument(em.find(Document.class, documentId).getStorageKey());
         InputStream inputStream;
         XSSFWorkbook mainWorkbook;
@@ -52,6 +54,8 @@ public class UserCustomerImportService extends BaseService {
         XSSFSheet mainSheet = mainWorkbook.getSheetAt(0);
 
         int rowIndex = 5;
+        int successful = 0;
+        List<ApiUserCustomer> duplicates = new ArrayList<>();
 
         while (true) {
             Row row = mainSheet.getRow(rowIndex);
@@ -107,11 +111,22 @@ public class UserCustomerImportService extends BaseService {
                 apiUserCustomer.setSurname(getString(row.getCell(1)));
                 apiUserCustomer.setType(UserCustomerType.FARMER);
 
-                companyService.addUserCustomer(companyId, apiUserCustomer);
+                if (companyService.existsUserCustomer(apiUserCustomer)) {
+                    duplicates.add(apiUserCustomer);
+                } else {
+                    companyService.addUserCustomer(companyId, apiUserCustomer);
+                    successful++;
+                }
             }
 
             rowIndex++;
         }
+
+        ApiUserCustomerImportResponse response = new ApiUserCustomerImportResponse();
+        response.setSuccessful(successful);
+        response.setDuplicates(duplicates);
+
+        return response;
     }
 
     private boolean emptyRow(Row row) {

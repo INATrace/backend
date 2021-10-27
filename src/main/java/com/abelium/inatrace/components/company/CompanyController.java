@@ -7,6 +7,7 @@ import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.common.api.ApiUserCustomerImportResponse;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
@@ -17,11 +18,9 @@ import com.abelium.inatrace.types.UserCustomerType;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -190,11 +189,10 @@ public class CompanyController {
     @PostMapping(value = "/userCustomers/import/farmers/{companyId}/{documentId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ApiOperation(value = "Upload .xls or .xlsx spreadsheet of farmers to import into DB")
-    public ApiDefaultResponse importFarmersSpreadsheet(
+    public ApiUserCustomerImportResponse importFarmersSpreadsheet(
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
             @Valid @ApiParam(value = "Document ID", required = true) @PathVariable("documentId") Long documentId) throws ApiException {
-        companyService.importFarmersSpreadsheet(companyId, documentId);
-        return new ApiDefaultResponse();
+        return companyService.importFarmersSpreadsheet(companyId, documentId);
     }
 
 }
