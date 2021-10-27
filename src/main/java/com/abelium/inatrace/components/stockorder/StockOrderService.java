@@ -209,18 +209,17 @@ public class StockOrderService extends BaseService {
         List<ApiStockOrderAggregatedHistory> stockAggregationHistoryList = addNextAggregationLevels(0, request,
                 stockOrder, userId, language);
 
+        ApiPaginatedList<ApiStockOrderAggregatedHistory> apiPaginatedList = new ApiPaginatedList<>();
+        apiPaginatedList.setItems(stockAggregationHistoryList.stream().sorted(Comparator.comparingInt(ApiStockOrderAggregatedHistory::getDepth)).collect(
+                Collectors.toList()));
+
         if (!stockAggregationHistoryList.isEmpty()) {
             // set output transactions only on first (root) element
             if (stockAggregationHistoryList.get(0).getProcessingOrder() == null){
                 stockAggregationHistoryList.get(0).setProcessingOrder(new ApiProcessingOrder());
             }
             stockAggregationHistoryList.get(0).getProcessingOrder().setOutputTransactions(orderOutputApiTransactions);
-
         }
-
-        ApiPaginatedList<ApiStockOrderAggregatedHistory> apiPaginatedList = new ApiPaginatedList<>();
-        apiPaginatedList.setItems(stockAggregationHistoryList.stream().sorted(Comparator.comparingInt(ApiStockOrderAggregatedHistory::getDepth)).collect(
-                Collectors.toList()));
 
         // paginated info is based on depth
         apiPaginatedList.setLimit(request.getLimit());
