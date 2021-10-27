@@ -31,8 +31,9 @@ public class ApiProcessingOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Input transactions")
     public List<ApiTransaction> inputTransactions;
 
-    // output transactions are not stored in DB,
-    // is only mapped when needed, for ex. in order history
+    // Output transactions are not stored in DB,
+    // is only mapped when needed, for ex. in aggregations - order history.
+    // also outputTransactions[0].targetStockOrder is set, enabling link to next order
     @ApiModelProperty(value = "Output transactions")
     public List<ApiTransaction> outputTransactions;
 

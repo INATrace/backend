@@ -199,21 +199,38 @@ public class StockOrderService extends BaseService {
         ApiPaginatedList<ApiStockOrderAggregatedHistory> apiPaginatedList = new ApiPaginatedList<>();
         apiPaginatedList.setItems(stockAggregationHistoryList);
 
+        // additional code for setting data for the first history element (depth=0)
+        // code sets output transactions, and connected stock orders
         if (!stockAggregationHistoryList.isEmpty()) {
 
             List<Transaction> outputTransactions = findOutputTransactions(stockOrder);
 
-            // set output transactions only on first (root) element
-            if (stockAggregationHistoryList.get(0).getProcessingOrder() == null) {
+            if (outputTransactions != null && !outputTransactions.isEmpty()) {
 
-                if (outputTransactions != null && !outputTransactions.isEmpty()) {
+                // set output transactions only on first (root) element
+                if (stockAggregationHistoryList.get(0).getProcessingOrder() == null) {
 
                     stockAggregationHistoryList.get(0).setProcessingOrder(ProcessingOrderMapper
                             .toApiProcessingOrder(outputTransactions.get(0).getTargetProcessingOrder(), language));
-                    stockAggregationHistoryList.get(0).getProcessingOrder().setOutputTransactions(
-                            outputTransactions.stream()
-                                    .map(transaction -> TransactionMapper.toApiTransaction(transaction, language))
-                                    .collect(Collectors.toList()));
+                }
+
+                stockAggregationHistoryList.get(0).getProcessingOrder().setOutputTransactions(
+                        outputTransactions.stream()
+                                .map(transaction -> TransactionMapper.toApiTransaction(transaction, language))
+                                .collect(Collectors.toList()));
+
+                // find and set targetSourceOrder for first outputTransaction.
+                // search with query, because targetStockOrder is only set properly for TRANSFER types
+                TypedQuery<StockOrder> outputStockOrdersQuery = em
+                        .createNamedQuery("StockOrder.getStockOrdersByProcessingOrderId", StockOrder.class)
+                        .setParameter("processingOrderId",
+                                outputTransactions.get(0).getTargetProcessingOrder().getId());
+                List<StockOrder> outputStockOrders = outputStockOrdersQuery.getResultList();
+
+                if (outputStockOrders != null && !outputStockOrders.isEmpty()) {
+                    stockAggregationHistoryList.get(0).getProcessingOrder().getOutputTransactions().get(0)
+                            .setTargetStockOrder(
+                                    StockOrderMapper.toApiStockOrder(outputStockOrders.get(0), userId, language));
                 }
             }
         }
@@ -305,10 +322,8 @@ public class StockOrderService extends BaseService {
                           sourceOrderList.forEach(sourceOrder -> {
                               resultHistoryList
                                       .addAll(addNextAggregationLevels(currentDepth + 1, paginatedRequest, sourceOrder, userId, language));
-
                           });
                     }
-
                 }
             } else {
                 // map last element, that does not contain processing order

@@ -18,10 +18,7 @@ import java.math.BigDecimal;
 @NamedQueries({
 @NamedQuery(
 		name = "Transaction.getOutputTransactionsByStockOrderId",
-		query = "SELECT t FROM Transaction t WHERE t.sourceStockOrder.id = :stockOrderId"),
-@NamedQuery(
-		name = "Transaction.getInputTransactionsByStockOrderId",
-		query = "SELECT t FROM Transaction t WHERE t.targetStockOrder.id = :stockOrderId"),
+		query = "SELECT t FROM Transaction t WHERE t.sourceStockOrder.id = :stockOrderId")
 })
 @Entity
 public class Transaction extends TimestampEntity {
