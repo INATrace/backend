@@ -58,13 +58,16 @@ public class Facility extends TimestampEntity {
 	private FacilityType facilityType;
 
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<FacilitySemiProduct> facilitySemiProducts = new ArrayList<>();
-	
-	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL)
-	private List<StockOrder> stockOrders = new ArrayList<>();
+	private List<FacilitySemiProduct> facilitySemiProducts;
 
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<FacilityTranslation> facilityTranslations = new ArrayList<>();
+	private List<FacilityFinalProduct> facilityFinalProducts;
+	
+	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL)
+	private List<StockOrder> stockOrders;
+
+	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<FacilityTranslation> facilityTranslations;
 
 	public String getName() {
 		return name;
@@ -155,13 +158,19 @@ public class Facility extends TimestampEntity {
 	}
 
 	public List<FacilitySemiProduct> getFacilitySemiProducts() {
+		if (facilitySemiProducts == null) {
+			facilitySemiProducts = new ArrayList<>();
+		}
 		return facilitySemiProducts;
 	}
 
-	public void setFacilitySemiProducts(List<FacilitySemiProduct> facilitySemiProducts) {
-		this.facilitySemiProducts = facilitySemiProducts;
+	public List<FacilityFinalProduct> getFacilityFinalProducts() {
+		if (facilityFinalProducts == null) {
+			facilityFinalProducts = new ArrayList<>();
+		}
+		return facilityFinalProducts;
 	}
-	
+
 	public List<StockOrder> getStockOrders() {
 		return stockOrders;
 	}
@@ -171,11 +180,10 @@ public class Facility extends TimestampEntity {
 	}
 
 	public List<FacilityTranslation> getFacilityTranslations() {
+		if (facilityTranslations == null) {
+			facilityTranslations = new ArrayList<>();
+		}
 		return facilityTranslations;
-	}
-
-	public void setFacilityTranslations(List<FacilityTranslation> facilityTranslations) {
-		this.facilityTranslations = facilityTranslations;
 	}
 
 	public Facility() {

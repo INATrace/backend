@@ -2,6 +2,8 @@ package com.abelium.inatrace.components.product;
 
 import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
+import com.abelium.inatrace.api.ApiStatus;
+import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.product.api.ApiFinalProduct;
 import com.abelium.inatrace.db.base.BaseEntity;
@@ -56,4 +58,18 @@ public class FinalProductService extends BaseService {
 
 		return new ApiPaginatedList<>(finalProducts, count);
 	}
+
+	/**
+	 * Fetch Final product with the provided ID.
+	 */
+	public FinalProduct fetchFinalProduct(Long id) throws ApiException {
+
+		FinalProduct finalProduct = em.find(FinalProduct.class, id);
+		if (finalProduct == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid Final product ID");
+		}
+
+		return finalProduct;
+	}
+
 }

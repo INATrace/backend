@@ -10,15 +10,15 @@ import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
+import com.abelium.inatrace.components.product.FinalProductService;
+import com.abelium.inatrace.components.product.api.ApiFinalProduct;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.Address;
 import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.db.entities.facility.Facility;
-import com.abelium.inatrace.db.entities.facility.FacilityLocation;
-import com.abelium.inatrace.db.entities.facility.FacilitySemiProduct;
-import com.abelium.inatrace.db.entities.facility.FacilityTranslation;
+import com.abelium.inatrace.db.entities.facility.*;
+import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
@@ -52,10 +52,13 @@ public class FacilityService extends BaseService {
 
 	private final CompanyQueries companyQueries;
 
+	private final FinalProductService finalProductService;
+
 	@Autowired
-	public FacilityService(SemiProductService semiProductService, CompanyQueries companyQueries) {
+	public FacilityService(SemiProductService semiProductService, CompanyQueries companyQueries, FinalProductService finalProductService) {
 		this.semiProductService = semiProductService;
 		this.companyQueries = companyQueries;
+		this.finalProductService = finalProductService;
 	}
 
 	public ApiPaginatedList<ApiFacility> getFacilityList(ApiPaginatedRequest request, Language language) {
@@ -146,20 +149,21 @@ public class FacilityService extends BaseService {
 			em.persist(entity);
 		}
 
-		entity.getFacilitySemiProducts().clear();
+		// Update the Facility semi-products
+		updateFacilitySemiProducts(apiFacility, entity);
 
-		for (ApiSemiProduct apiSemiProduct : apiFacility.getFacilitySemiProductList()) {
-			FacilitySemiProduct facilitySemiProduct = new FacilitySemiProduct();
-			SemiProduct semiProduct = semiProductService.fetchSemiProduct(apiSemiProduct.getId());
-			facilitySemiProduct.setFacility(entity);
-			facilitySemiProduct.setSemiProduct(semiProduct);
-			entity.getFacilitySemiProducts().add(facilitySemiProduct);
-		}
+		// Update the Facility final products
+		updateFacilityFinalProducts(apiFacility, entity);
 
-		// remove translations not in request
-		entity.getFacilityTranslations().removeIf(facilityTranslation -> apiFacility.getTranslations().stream().noneMatch(apiFacilityTranslation -> facilityTranslation.getLanguage().equals(apiFacilityTranslation.getLanguage())));
+		// Remove translations not in request
+		entity.getFacilityTranslations().removeIf(facilityTranslation -> apiFacility
+				.getTranslations()
+				.stream()
+				.noneMatch(apiFacilityTranslation -> facilityTranslation
+						.getLanguage()
+						.equals(apiFacilityTranslation.getLanguage())));
 
-		// add or update existing
+		// Add or update existing
 		apiFacility.getTranslations().forEach(apiFacilityTranslation -> {
 			FacilityTranslation translation = entity.getFacilityTranslations().stream().filter(facilityTranslation -> facilityTranslation.getLanguage().equals(apiFacilityTranslation.getLanguage())).findFirst().orElse(new FacilityTranslation());
 			translation.setName(apiFacilityTranslation.getName());
@@ -309,6 +313,32 @@ public class FacilityService extends BaseService {
 		Torpedo.where(condition);
 
 		return facilityProxy;
+	}
+
+	private void updateFacilitySemiProducts(ApiFacility apiFacility, Facility entity) throws ApiException {
+
+		entity.getFacilitySemiProducts().clear();
+
+		for (ApiSemiProduct apiSemiProduct : apiFacility.getFacilitySemiProductList()) {
+			FacilitySemiProduct facilitySemiProduct = new FacilitySemiProduct();
+			SemiProduct semiProduct = semiProductService.fetchSemiProduct(apiSemiProduct.getId());
+			facilitySemiProduct.setFacility(entity);
+			facilitySemiProduct.setSemiProduct(semiProduct);
+			entity.getFacilitySemiProducts().add(facilitySemiProduct);
+		}
+	}
+
+	private void updateFacilityFinalProducts(ApiFacility apiFacility, Facility entity) throws ApiException {
+
+		entity.getFacilityFinalProducts().clear();
+
+		for (ApiFinalProduct apiFinalProduct : apiFacility.getFacilityFinalProducts()) {
+			FacilityFinalProduct facilityFinalProduct = new FacilityFinalProduct();
+			FinalProduct finalProduct = finalProductService.fetchFinalProduct(apiFinalProduct.getId());
+			facilityFinalProduct.setFacility(entity);
+			facilityFinalProduct.setFinalProduct(finalProduct);
+			entity.getFacilityFinalProducts().add(facilityFinalProduct);
+		}
 	}
 
 }

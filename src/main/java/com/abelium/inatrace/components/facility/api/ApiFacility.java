@@ -5,6 +5,7 @@ import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityTyp
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 
+import com.abelium.inatrace.components.product.api.ApiFinalProduct;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
@@ -46,6 +47,9 @@ public class ApiFacility extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "List of semi product ID's for this facility")
 	private List<ApiSemiProduct> facilitySemiProductList;
+
+	@ApiModelProperty(value = "List of final product ID's for this facility")
+	private List<ApiFinalProduct> facilityFinalProducts;
 
 	@ApiModelProperty(value = "List of facility translations")
 	private List<ApiFacilityTranslation> translations;
@@ -144,6 +148,14 @@ public class ApiFacility extends ApiBaseEntity {
 
 	public void setFacilitySemiProductList(List<ApiSemiProduct> facilitySemiProductList) {
 		this.facilitySemiProductList = facilitySemiProductList;
+	}
+
+	public List<ApiFinalProduct> getFacilityFinalProducts() {
+		return facilityFinalProducts;
+	}
+
+	public void setFacilityFinalProducts(List<ApiFinalProduct> facilityFinalProducts) {
+		this.facilityFinalProducts = facilityFinalProducts;
 	}
 
 	public List<ApiFacilityTranslation> getTranslations() {
