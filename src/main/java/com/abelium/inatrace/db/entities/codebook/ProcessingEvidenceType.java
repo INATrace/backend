@@ -4,10 +4,7 @@ import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.enums.EvidenceType;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 
 /**
  * Codebook entity for processing evidences.
@@ -15,6 +12,12 @@ import javax.persistence.Enumerated;
  * @author Pece Adjievski, Sunesis d.o.o.
  */
 @Entity
+@NamedQueries({
+		@NamedQuery(name = "ProcessingEvidenceType.listProcessingEvidenceTypesByValueChain",
+		            query = "SELECT vcpet.processingEvidenceType FROM ValueChainProcEvidenceType vcpet WHERE vcpet.valueChain.id = :valueChainId"),
+		@NamedQuery(name = "ProcessingEvidenceType.countProcessingEvidenceTypesByValueChain",
+		            query = "SELECT COUNT(vcpet.processingEvidenceType) FROM ValueChainProcEvidenceType vcpet WHERE vcpet.valueChain.id = :valueChainId")
+})
 public class ProcessingEvidenceType extends TimestampEntity {
 
 	/**

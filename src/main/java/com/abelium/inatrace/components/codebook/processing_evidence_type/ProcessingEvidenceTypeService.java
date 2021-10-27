@@ -15,7 +15,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
 
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service for processing evidence type entity.
@@ -96,6 +99,28 @@ public class ProcessingEvidenceTypeService extends BaseService {
 		}
 
 		return processingEvidenceType;
+	}
+
+	public ApiPaginatedList<ApiProcessingEvidenceType> listProcessingEvidenceTypesByValueChain(Long valueChainId,
+	                                                                                           ApiPaginatedRequest request) {
+
+		TypedQuery<ProcessingEvidenceType> processingEvidenceTypesQuery =
+				em.createNamedQuery("ProcessingEvidenceType.listProcessingEvidenceTypesByValueChain", ProcessingEvidenceType.class)
+				.setParameter("valueChainId", valueChainId)
+				.setFirstResult(request.getOffset())
+				.setMaxResults(request.getLimit());
+
+		List<ProcessingEvidenceType> processingEvidenceTypes = processingEvidenceTypesQuery.getResultList();
+
+		Long count = em.createNamedQuery("ProcessingEvidenceType.countProcessingEvidenceTypesByValueChain", Long.class)
+				.setParameter("valueChainId", valueChainId)
+				.getSingleResult();
+
+		return new ApiPaginatedList<>(
+				processingEvidenceTypes
+						.stream()
+						.map(ProcessingEvidenceTypeMapper::toApiProcessingEvidenceTypeBase)
+						.collect(Collectors.toList()), count);
 	}
 
 }

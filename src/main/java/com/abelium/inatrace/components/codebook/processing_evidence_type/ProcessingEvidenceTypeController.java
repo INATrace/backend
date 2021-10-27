@@ -33,6 +33,15 @@ public class ProcessingEvidenceTypeController {
 		return new ApiPaginatedResponse<>(processingEvidenceTypeService.getProcEvidenceTypeList(request));
 	}
 
+	@GetMapping("list/value-chain/{id}")
+	@ApiOperation("Get a list of processing evidence types by value chain ID.")
+	public ApiPaginatedResponse<ApiProcessingEvidenceType> listProcessingEvidenceTypesByValueChain(
+			@Valid @ApiParam(value = "Value chain ID", required = true) @PathVariable("id") Long valueChainId,
+			@Valid ApiPaginatedRequest request) {
+
+		return new ApiPaginatedResponse<>(processingEvidenceTypeService.listProcessingEvidenceTypesByValueChain(valueChainId, request));
+	}
+
 	@GetMapping("{id}")
 	@ApiOperation("Get a single processing evidence type with the provided ID.")
 	public ApiResponse<ApiProcessingEvidenceType> getProcessingEvidenceType(
