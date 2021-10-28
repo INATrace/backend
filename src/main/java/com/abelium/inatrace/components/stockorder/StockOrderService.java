@@ -353,8 +353,8 @@ public class StockOrderService extends BaseService {
                             + ") cannot be bigger then fulfilled quantity (" + entity.getFulfilledQuantity() + ").");
                 }
                 if (entity.getFulfilledQuantity().compareTo(entity.getTotalQuantity()) > 0) {
-                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Total quantity (" + entity.getTotalQuantity()
-                            + ") cannot be bigger then fulfilled quantity (" + entity.getFulfilledQuantity() + ").");
+                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Fulfilled quantity (" + entity.getFulfilledQuantity()
+                            + ") cannot be bigger then total quantity (" + entity.getTotalQuantity() + ").");
                 }
             }
         }
