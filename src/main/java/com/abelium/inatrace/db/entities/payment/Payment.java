@@ -110,8 +110,8 @@ public class Payment extends TimestampEntity {
 	@Column(length = Lengths.ENUM)
 	private ReceiptDocumentType receiptDocumentType; // purchase sheet, receipt
 	
-//	@ManyToOne
-//	private BulkPayment bankTransfer;
+	@ManyToOne(fetch = FetchType.LAZY)
+	private BulkPayment bulkPayment;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
@@ -316,13 +316,21 @@ public class Payment extends TimestampEntity {
 		this.receiptDocumentType = receiptDocumentType;
 	}
 
-//	public BulkPayment getBankTransfer() {
-//		return bankTransfer;
-//	}
-//
-//	public void setBankTransfer(BulkPayment bankTransfer) {
-//		this.bankTransfer = bankTransfer;
-//	}
+	public Long getEntityVersion() {
+		return entityVersion;
+	}
+
+	public void setEntityVersion(Long entityVersion) {
+		this.entityVersion = entityVersion;
+	}
+
+	public BulkPayment getBulkPayment() {
+		return bulkPayment;
+	}
+
+	public void setBulkPayment(BulkPayment bulkPayment) {
+		this.bulkPayment = bulkPayment;
+	}
 
 	public PaymentPurposeType getPaymentPurposeType() {
 		return paymentPurposeType;

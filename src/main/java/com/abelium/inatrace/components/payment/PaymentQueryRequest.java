@@ -9,14 +9,18 @@ public class PaymentQueryRequest {
 
     public PaymentQueryRequest() { }
 
+    public PaymentQueryRequest(Long companyId) {
+        this.companyId = companyId;
+    }
+
     public PaymentQueryRequest(Long companyId,
-                        Long purchaseId,
-                        PreferredWayOfPayment preferredWayOfPayment,
-                        PaymentStatus paymentStatus,
-                        Instant productionDateStart,
-                        Instant productionDateEnd,
-                        String farmerName,
-                        Long farmerId) {
+                               Long purchaseId,
+                               PreferredWayOfPayment preferredWayOfPayment,
+                               PaymentStatus paymentStatus,
+                               Instant productionDateStart,
+                               Instant productionDateEnd,
+                               String farmerName,
+                               Long farmerId) {
         this.companyId = companyId;
         this.purchaseId = purchaseId;
         this.preferredWayOfPayment = preferredWayOfPayment;

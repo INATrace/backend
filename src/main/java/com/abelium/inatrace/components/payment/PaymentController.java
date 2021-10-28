@@ -44,9 +44,11 @@ public class PaymentController {
 	
 	@GetMapping("bulk-payment/{id}")
 	@ApiOperation("Get a single bulk payment with the provided ID.")
-	public ApiResponse<ApiBulkPayment> getBulkPayment(@Valid @ApiParam(value = "Bulk payment ID", required = true) @PathVariable("id") Long id) throws ApiException {
+	public ApiResponse<ApiBulkPayment> getBulkPayment(
+			@Valid @ApiParam(value = "Bulk payment ID", required = true) @PathVariable("id") Long id,
+			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		return new ApiResponse<>(paymentService.getBulkPayment(id));
+		return new ApiResponse<>(paymentService.getBulkPayment(id, authUser.getUserId()));
 	}
 
 	@GetMapping("list")
@@ -117,9 +119,14 @@ public class PaymentController {
 	@ApiOperation("Get a list of bulk payments by company ID.")
 	public ApiPaginatedResponse<ApiBulkPayment> listBulkPaymentsByCompany(
 		@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+		@AuthenticationPrincipal CustomUserDetails authUser,
 		@Valid ApiPaginatedRequest request) {
 
-		return new ApiPaginatedResponse<>(paymentService.listBulkPaymentsByCompany(companyId, request));
+		return new ApiPaginatedResponse<>(paymentService.listBulkPayments(
+				request,
+				new PaymentQueryRequest(companyId),
+				authUser.getUserId())
+		);
 	}
 
 	@PutMapping
@@ -128,7 +135,7 @@ public class PaymentController {
 			@Valid @RequestBody ApiPayment apiPayment,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		return new ApiResponse<>(paymentService.createOrUpdatePayment(apiPayment, authUser.getUserId()));
+		return new ApiResponse<>(paymentService.createOrUpdatePayment(apiPayment, authUser.getUserId(), false));
 	}
 	
 	@PostMapping("bulk-payment")

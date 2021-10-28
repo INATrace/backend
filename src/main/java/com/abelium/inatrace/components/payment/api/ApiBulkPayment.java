@@ -2,25 +2,38 @@ package com.abelium.inatrace.components.payment.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
-import com.abelium.inatrace.components.company.api.ApiCompanyBase;
+import com.abelium.inatrace.components.company.api.ApiCompany;
+import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
+import com.abelium.inatrace.tools.converters.SimpleDateConverter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.swagger.annotations.ApiModelProperty;
 
 public class ApiBulkPayment extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Bulk payment created by")
-	private Long createdBy;
-	
+	private ApiUser createdBy;
+
+	@ApiModelProperty(value = "Creation timestamp")
+	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
+	private Instant creationTimestamp;
+
 	@ApiModelProperty(value = "Bulk payment currency")
 	private String currency;
+
+	@ApiModelProperty(value = "Formal creation date")
+	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
+	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
+	private Instant formalCreationTime;
 	
 	@ApiModelProperty(value = "Company that pays for the bulk payment")
-	private ApiCompanyBase payingCompany;
+	private ApiCompany payingCompany;
 	
 	@ApiModelProperty(value = "Bulk payment drescription")
 	private String paymentDescription;
@@ -28,8 +41,8 @@ public class ApiBulkPayment extends ApiBaseEntity {
 	@ApiModelProperty(value = "Bulk payment purpose type")
 	private PaymentPurposeType paymentPurposeType;
 	
-	@ApiModelProperty(value = "Bulk payment receipt numbet")
-	private Long receiptNumber;
+	@ApiModelProperty(value = "Bulk payment receipt number")
+	private String receiptNumber;
 	
 	@ApiModelProperty(value = "Bulk payment total amount")
 	private BigDecimal totalAmount;
@@ -40,18 +53,26 @@ public class ApiBulkPayment extends ApiBaseEntity {
 	@ApiModelProperty(value = "Bulk payment additional cost description")
 	private String additionalCostDescription;
 	
-	@ApiModelProperty(value = "Bulk payment stock orders")
-	private List<Long> stockOrders = new ArrayList<>();
+	@ApiModelProperty(value = "Bulk payment payments")
+	private List<ApiPayment> payments = new ArrayList<>();
 	
 	@ApiModelProperty(value = "Bulk payment additional proofs")
 	private List<ApiActivityProof> additionalProofs = new ArrayList<>();
 
-	public Long getCreatedBy() {
+	public ApiUser getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreatedBy(Long createdBy) {
+	public void setCreatedBy(ApiUser createdBy) {
 		this.createdBy = createdBy;
+	}
+
+	public Instant getCreationTimestamp() {
+		return creationTimestamp;
+	}
+
+	public void setCreationTimestamp(Instant creationTimestamp) {
+		this.creationTimestamp = creationTimestamp;
 	}
 
 	public String getCurrency() {
@@ -62,11 +83,19 @@ public class ApiBulkPayment extends ApiBaseEntity {
 		this.currency = currency;
 	}
 
-	public ApiCompanyBase getPayingCompany() {
+	public Instant getFormalCreationTime() {
+		return formalCreationTime;
+	}
+
+	public void setFormalCreationTime(Instant formalCreationTime) {
+		this.formalCreationTime = formalCreationTime;
+	}
+
+	public ApiCompany getPayingCompany() {
 		return payingCompany;
 	}
 
-	public void setPayingCompany(ApiCompanyBase payingCompany) {
+	public void setPayingCompany(ApiCompany payingCompany) {
 		this.payingCompany = payingCompany;
 	}
 
@@ -86,11 +115,11 @@ public class ApiBulkPayment extends ApiBaseEntity {
 		this.paymentPurposeType = paymentPurposeType;
 	}
 
-	public Long getReceiptNumber() {
+	public String getReceiptNumber() {
 		return receiptNumber;
 	}
 
-	public void setReceiptNumber(Long receiptNumber) {
+	public void setReceiptNumber(String receiptNumber) {
 		this.receiptNumber = receiptNumber;
 	}
 
@@ -118,12 +147,12 @@ public class ApiBulkPayment extends ApiBaseEntity {
 		this.additionalCostDescription = additionalCostDescription;
 	}
 
-	public List<Long> getStockOrders() {
-		return stockOrders;
+	public List<ApiPayment> getPayments() {
+		return payments;
 	}
 
-	public void setStockOrders(List<Long> stockOrders) {
-		this.stockOrders = stockOrders;
+	public void setPayments(List<ApiPayment> payments) {
+		this.payments = payments;
 	}
 
 	public List<ApiActivityProof> getAdditionalProofs() {
@@ -133,5 +162,4 @@ public class ApiBulkPayment extends ApiBaseEntity {
 	public void setAdditionalProofs(List<ApiActivityProof> additionalProofs) {
 		this.additionalProofs = additionalProofs;
 	}
-	
 }

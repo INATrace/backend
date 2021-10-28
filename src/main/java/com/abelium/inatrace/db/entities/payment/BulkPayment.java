@@ -1,42 +1,20 @@
 package com.abelium.inatrace.db.entities.payment;
 
 import com.abelium.inatrace.api.types.Lengths;
-import com.abelium.inatrace.db.base.BaseEntity;
+import com.abelium.inatrace.db.base.TimestampEntity;
+import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Version;
-
 @Entity
 @Table
-@NamedQueries({
-	@NamedQuery(name = "BulkPayment.listBulkPaymentsByCompanyId", 
-				query = "SELECT bp FROM BulkPayment bp "
-						+ "INNER JOIN bp.payingCompany pc "
-						+ "WHERE pc.id = :companyId"),
-	@NamedQuery(name = "BulkPayment.countBulkPaymentsByCompanyId",
-    			query = "SELECT COUNT(bp) FROM BulkPayment bp "
-						+ "INNER JOIN bp.payingCompany pc "
-						+ "WHERE pc.id = :companyId")
-})
-public class BulkPayment extends BaseEntity {
+public class BulkPayment extends TimestampEntity {
 
 	@Version
 	private Long entityVersion;
@@ -61,7 +39,7 @@ public class BulkPayment extends BaseEntity {
 	private PaymentPurposeType paymentPurposeType;
 	
 	@Column
-	private Long receiptNumber;
+	private String receiptNumber;
 	
 	@Column
 	private BigDecimal totalAmount;
@@ -72,9 +50,12 @@ public class BulkPayment extends BaseEntity {
 	@Column
 	private String additionalCostDescription;
 	
+	@OneToMany(mappedBy = "bulkPayment")
+	private List<Payment> payments = new ArrayList<>();
+
 	@OneToMany(mappedBy = "bulkPayment", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<StockOrder> stockOrders = new ArrayList<>();
-	
+	private List<BulkPaymentActivityProof> additionalProofs;
+
 	public User getCreatedBy() {
 		return createdBy;
 	}
@@ -123,11 +104,11 @@ public class BulkPayment extends BaseEntity {
 		this.paymentPurposeType = paymentPurposeType;
 	}
 
-	public Long getReceiptNumber() {
+	public String getReceiptNumber() {
 		return receiptNumber;
 	}
 
-	public void setReceiptNumber(Long receiptNumber) {
+	public void setReceiptNumber(String receiptNumber) {
 		this.receiptNumber = receiptNumber;
 	}
 
@@ -155,12 +136,23 @@ public class BulkPayment extends BaseEntity {
 		this.additionalCostDescription = additionalCostDescription;
 	}
 
-	public List<StockOrder> getStockOrders() {
-		return stockOrders;
+	public List<Payment> getPayments() {
+		if (payments == null)
+			payments = new ArrayList<>();
+		return payments;
 	}
 
-	public void setStockOrders(List<StockOrder> stockOrders) {
-		this.stockOrders = stockOrders;
+	public void setPayments(List<Payment> payments) {
+		this.payments = payments;
 	}
 
+	public List<BulkPaymentActivityProof> getAdditionalProofs() {
+		if (additionalProofs == null)
+			additionalProofs = new ArrayList<>();
+		return additionalProofs;
+	}
+
+	public void setAdditionalProofs(List<BulkPaymentActivityProof> additionalProofs) {
+		this.additionalProofs = additionalProofs;
+	}
 }
