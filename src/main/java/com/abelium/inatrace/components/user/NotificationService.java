@@ -33,7 +33,7 @@ public class NotificationService extends BaseService {
         context.setVariable("signature", "Best Regards,");
         context.setVariable("INATraceTeam", "Team INATrace");
         context.setVariable("link", link);
-        context.setVariable("linkText", "START NOW");
+        context.setVariable("linkText", "CONFIRM EMAIL");
         return templateEngine.process("inline/basic-ar.html", context);	
     }
 
