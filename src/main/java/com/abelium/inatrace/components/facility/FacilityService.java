@@ -73,7 +73,10 @@ public class FacilityService extends BaseService {
 
 		FacilityTranslation ft = Torpedo.innerJoin(facilityProxy.getFacilityTranslations());
 
-		Torpedo.where(ft.getLanguage()).eq(language);
+		OnGoingLogicalCondition condition = Torpedo.condition();
+		condition = condition.and(ft.getLanguage()).eq(language);
+		condition = condition.and(facilityProxy.getDeactivated()).neq(Boolean.TRUE);
+		Torpedo.where(condition);
 
 		if ("name".equals(request.sortBy)) {
 			QueryTools.orderBy(request.sort, facilityProxy.getName());
@@ -347,6 +350,7 @@ public class FacilityService extends BaseService {
 		condition = condition.and(ft.getLanguage()).eq(language);
 		condition = condition.and(facilityProxy.getCompany()).in(companiesIds);
 		condition = condition.and(facilityProxy.getIsPublic()).eq(true);
+		condition = condition.and(facilityProxy.getDeactivated()).neq(Boolean.TRUE);
 
 		if (semiProductId != null) {
 			FacilitySemiProduct fsp = Torpedo.leftJoin(facilityProxy.getFacilitySemiProducts());
