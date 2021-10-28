@@ -28,19 +28,10 @@ public class NotificationService extends BaseService {
         context.setVariable("greeting", "Dear " + name + " " + surname);
         context.setVariable("message", 
         	"<p>We received your details and will get back to you as soon as possible.</p>" + 
-        	"<p>We make sure that everyone who registers is who they say they are, and for that we will step in contact with you to perform our standard verification due diligence. " +
-        	"Please prepare the following documents in advance for your verification process to be as quick and efficient as possible: <p>" + 
-        	"<ul>" +
-        	"<li> Incorporation documentation" + 
-        	"<li> 1 recent utility bill with clearly stated company name and address from the last 3 months*" + 
-        	"</ul>" +
-        	"<p>*In some cases, we will need some other documents to complete the verification process</p>" + 
-        	"<p>You can login into your INATrace dashboard using the email and password you used to register and get a head start in preparing your profile!</p>" + 
-        	"<p>If you have any further questions regarding INATrace, do not hesitate to contact us at <a href=\"mailto:" + infoMail + "\">" + infoMail + "</a> or use the support chat in your INATrace " +
-        	"dashboard (green button in bottom right corner of the screen).</p>");
-        context.setVariable("signatureMessage", "We look forward to chatting soon!");
+        	"<p>As soon as we verified and activated your profile, you can login into your INATrace dashborard using the email and password you used to register.<p>");
+        context.setVariable("signatureMessage", "");
         context.setVariable("signature", "Best Regards,");
-        context.setVariable("INATraceTeam", "Team INATrace!");
+        context.setVariable("INATraceTeam", "Team INATrace");
         context.setVariable("link", link);
         context.setVariable("linkText", "START NOW");
         return templateEngine.process("inline/basic-ar.html", context);	
