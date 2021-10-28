@@ -322,11 +322,16 @@ public class StockOrderService extends BaseService {
                 List<Transaction> inputTxs = processingOrder.getInputTransactions();
 
                 if (apiStockOrder.getOrderType() == OrderType.GENERAL_ORDER) {
-                    entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs));
 
-                    // If quote order acts as source stock order, then reduce it's available quantity
                     if (!processingOrder.getTargetStockOrders().contains(entity)) {
+
+                        // Quote order is part of another StockOrder (as source)
                         entity.setAvailableQuantity(entity.getAvailableQuantity().subtract(calculateUsedQuantity(inputTxs, entity.getId())));
+                        entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs, entity.getId()));
+
+                    } else {
+                        // When updating quote order itself
+                        entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs, null));
                     }
 
                 } else {
@@ -517,12 +522,13 @@ public class StockOrderService extends BaseService {
         return balance;
     }
 
-    private BigDecimal calculateFulfilledQuantity(List<Transaction> inputTransactions){
+    private BigDecimal calculateFulfilledQuantity(List<Transaction> inputTransactions, Long stockOrderId){
         if (inputTransactions.isEmpty()) {
             return BigDecimal.ZERO;
         }
         return inputTransactions.stream()
                 .filter(t -> !t.getStatus().equals(TransactionStatus.CANCELED))
+                .filter(t -> stockOrderId == null || stockOrderId.equals(t.getSourceStockOrder().getId()))
                 .map(Transaction::getInputQuantity)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
