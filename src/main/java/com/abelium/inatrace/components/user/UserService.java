@@ -96,7 +96,7 @@ public class UserService extends BaseService {
 		if (user == null) {
 			throw new ApiException(ApiStatus.AUTH_ERROR, "Invalid credentials");
 		}
-		if (user.getStatus() == UserStatus.DEACTIVATED || user.getStatus() == UserStatus.UNCONFIRMED) {
+		if (user.getStatus() == UserStatus.DEACTIVATED || user.getStatus() == UserStatus.UNCONFIRMED || user.getStatus() == UserStatus.CONFIRMED_EMAIL) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "Not confirmed or disabled");
 		}
 		if (!new BCryptPasswordEncoder().matches(loginRequest.password, user.getPassword())) {
