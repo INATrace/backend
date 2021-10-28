@@ -17,6 +17,9 @@ public class ApiProcessingOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Initiator user ID")
     public Long initiatorUserId;
 
+    @ApiModelProperty(value = "Timestamp indicates when processing order have been created")
+    private Instant creationTimestamp;
+
     @ApiModelProperty(value = "Processing action")
     public ApiProcessingAction processingAction;
 
@@ -28,6 +31,12 @@ public class ApiProcessingOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Input transactions")
     public List<ApiTransaction> inputTransactions;
 
+    // Output transactions are not stored in DB,
+    // is only mapped when needed, for ex. in aggregations - order history.
+    // also outputTransactions[0].targetStockOrder is set, enabling link to next order
+    @ApiModelProperty(value = "Output transactions")
+    public List<ApiTransaction> outputTransactions;
+
     @ApiModelProperty(value = "Target stock orders")
     public List<ApiStockOrder> targetStockOrders;
 
@@ -37,6 +46,14 @@ public class ApiProcessingOrder extends ApiBaseEntity {
 
     public void setInitiatorUserId(Long initiatorUserId) {
         this.initiatorUserId = initiatorUserId;
+    }
+
+    public Instant getCreationTimestamp() {
+        return creationTimestamp;
+    }
+
+    public void setCreationTimestamp(Instant creationTimestamp) {
+        this.creationTimestamp = creationTimestamp;
     }
 
     public ApiProcessingAction getProcessingAction() {
@@ -61,6 +78,14 @@ public class ApiProcessingOrder extends ApiBaseEntity {
 
     public void setInputTransactions(List<ApiTransaction> inputTransactions) {
         this.inputTransactions = inputTransactions;
+    }
+
+    public List<ApiTransaction> getOutputTransactions() {
+        return outputTransactions;
+    }
+
+    public void setOutputTransactions(List<ApiTransaction> outputTransactions) {
+        this.outputTransactions = outputTransactions;
     }
 
     public List<ApiStockOrder> getTargetStockOrders() {

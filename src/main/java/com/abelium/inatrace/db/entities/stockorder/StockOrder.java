@@ -27,7 +27,10 @@ import java.util.List;
 	@NamedQuery(name = "StockOrder.getPurchaseOrderByIdAndType",
 				query = "SELECT so FROM StockOrder so "
 						+ "WHERE so.id = :stockOrderId "
-						+ "AND so.orderType = 'PURCHASE_ORDER'")
+						+ "AND so.orderType = 'PURCHASE_ORDER'"),
+	@NamedQuery(name = "StockOrder.getStockOrdersByProcessingOrderId",
+	            query = "SELECT so FROM StockOrder so "
+			            + "WHERE so.processingOrder.id = :processingOrderId")
 })
 public class StockOrder extends TimestampEntity {
 

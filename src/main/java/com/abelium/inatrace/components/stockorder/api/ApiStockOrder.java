@@ -30,6 +30,9 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Stock order identifier", position = 1)
     private String identifier;
 
+    @ApiModelProperty(value = "Timestamp indicates when stock order have been created")
+    private Instant creationTimestamp;
+
     @ApiModelProperty(value = "Timestamp indicates when stock order have been updated", position = 2)
     private Instant updateTimestamp;
 
@@ -256,6 +259,14 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public Instant getCreationTimestamp() {
+        return creationTimestamp;
+    }
+
+    public void setCreationTimestamp(Instant creationTimestamp) {
+        this.creationTimestamp = creationTimestamp;
     }
 
     public Instant getUpdateTimestamp() {
