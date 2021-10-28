@@ -354,7 +354,7 @@ public class ProcessingOrderService extends BaseService {
     @Transactional
     public void deleteProcessingOrder(Long id) throws ApiException {
 
-        // TODO: Should entities be deleted instead of detached?
+        // Transactions should not be deleted -> May result in inappropriate quantities
 
         ProcessingOrder entity = fetchEntity(id, ProcessingOrder.class);
 

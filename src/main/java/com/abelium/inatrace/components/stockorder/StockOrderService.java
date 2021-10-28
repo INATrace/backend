@@ -304,7 +304,8 @@ public class StockOrderService extends BaseService {
                 }
 
                 break;
-            default:
+
+            case GENERAL_ORDER:
 
                 // Applies only for new Quote StockOrders
                 if (entity.getId() == null) {
@@ -313,24 +314,31 @@ public class StockOrderService extends BaseService {
                 }
         }
 
-        if (processingOrder != null && entity.getId() != null) {
+        if (entity.getId() != null) {
 
-            // Calculate quantities based on input transactions
-            List<Transaction> inputTxs = processingOrder.getInputTransactions();
+            if (processingOrder != null) {
 
-            if (apiStockOrder.getOrderType() == OrderType.GENERAL_ORDER) {
-                entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs));
-                // TODO: Used quantity needs to be reduced!
-                entity.setAvailableQuantity(calculateAvailableQuantity(inputTxs));
-            } else {
-                if (lastUsedQuantity == null) {
-                    lastUsedQuantity = BigDecimal.ZERO;
+                // Calculate quantities based on input transactions
+                List<Transaction> inputTxs = processingOrder.getInputTransactions();
+
+                if (apiStockOrder.getOrderType() == OrderType.GENERAL_ORDER) {
+                    entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs));
+
+                    // If quote order acts as source stock order, then reduce it's available quantity
+                    if (!processingOrder.getTargetStockOrders().contains(entity)) {
+                        // TODO: Should be reduced, not set to zero!
+                        entity.setAvailableQuantity(BigDecimal.ZERO);
+                    }
+
+                } else {
+                    entity.setAvailableQuantity(entity.getFulfilledQuantity()
+                            .subtract(lastUsedQuantity != null ? lastUsedQuantity : BigDecimal.ZERO)
+                            .subtract(calculateUsedQuantity(inputTxs, entity.getId())));
                 }
-                entity.setAvailableQuantity(entity.getFulfilledQuantity().subtract(lastUsedQuantity).subtract(calculateUsedQuantity(inputTxs, entity.getId())));
-            }
 
-        } else if (entity.getTotalQuantity() != null && lastUsedQuantity != null && entity.getAvailableQuantity() != null){
-            entity.setAvailableQuantity(apiStockOrder.getFulfilledQuantity().subtract(lastUsedQuantity));
+            } else if (lastUsedQuantity != null) {
+                entity.setAvailableQuantity(apiStockOrder.getFulfilledQuantity().subtract(lastUsedQuantity));
+            }
         }
 
         // Validate quantities
@@ -516,16 +524,6 @@ public class StockOrderService extends BaseService {
         }
         return inputTransactions.stream()
                 .filter(t -> !t.getStatus().equals(TransactionStatus.CANCELED))
-                .map(Transaction::getInputQuantity)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    private BigDecimal calculateAvailableQuantity(List<Transaction> inputTransactions){
-        if (inputTransactions.isEmpty()) {
-            return BigDecimal.ZERO;
-        }
-        return inputTransactions.stream()
-                .filter(t -> t.getStatus().equals(TransactionStatus.EXECUTED))
                 .map(Transaction::getInputQuantity)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }

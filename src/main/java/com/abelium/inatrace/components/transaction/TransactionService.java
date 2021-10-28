@@ -127,8 +127,8 @@ public class TransactionService extends BaseService {
         if (transaction.getTargetProcessingOrder() != null && !transaction.getTargetProcessingOrder().getTargetStockOrders().isEmpty()) {
 
             ProcessingOrder processingOrder = transaction.getTargetProcessingOrder();
-
             StockOrder quoteStockOrder = processingOrder.getTargetStockOrders().get(0);
+            quoteStockOrder.setAvailableQuantity(quoteStockOrder.getAvailableQuantity().add(transaction.getInputQuantity()));
             stockOrderService.createOrUpdateStockOrder(
                     StockOrderMapper.toApiStockOrder(quoteStockOrder, userId, language),
                     userId,
@@ -154,6 +154,17 @@ public class TransactionService extends BaseService {
 
         // Revert quantities but do NOT delete the transaction!
         revertQuantities(transaction, userId, language);
+
+        // Balance fulfilled quantity in quote stock order
+        if (transaction.getTargetProcessingOrder() != null && !transaction.getTargetProcessingOrder().getTargetStockOrders().isEmpty()) {
+            ProcessingOrder processingOrder = transaction.getTargetProcessingOrder();
+            StockOrder quoteStockOrder = processingOrder.getTargetStockOrders().get(0);
+            stockOrderService.createOrUpdateStockOrder(
+                    StockOrderMapper.toApiStockOrder(quoteStockOrder, userId, language),
+                    userId,
+                    processingOrder
+            );
+        }
     }
 
     private void revertQuantities(Transaction transaction, Long userId, Language language) throws ApiException {
@@ -163,8 +174,7 @@ public class TransactionService extends BaseService {
 
         // Set source StockOrder available quantity
         if (sourceStockOrder != null) {
-            BigDecimal subtotal = sourceStockOrder.getAvailableQuantity().add(transaction.getInputQuantity());
-            sourceStockOrder.setAvailableQuantity(subtotal.min(transaction.getInputQuantity()));
+            sourceStockOrder.setAvailableQuantity(sourceStockOrder.getAvailableQuantity().add(transaction.getInputQuantity()));
             stockOrderService.createOrUpdateStockOrder(
                     StockOrderMapper.toApiStockOrder(sourceStockOrder, userId, language),
                     userId,
@@ -174,8 +184,7 @@ public class TransactionService extends BaseService {
 
         // Set target StockOrder fulfilled quantity
         if (!transaction.getIsProcessing() && targetStockOrder != null) {
-            BigDecimal subtotal = targetStockOrder.getFulfilledQuantity().subtract(transaction.getOutputQuantity());
-            targetStockOrder.setFulfilledQuantity(subtotal.max(BigDecimal.ZERO));
+            targetStockOrder.setFulfilledQuantity(targetStockOrder.getFulfilledQuantity().subtract(transaction.getOutputQuantity()));
             stockOrderService.createOrUpdateStockOrder(
                     StockOrderMapper.toApiStockOrder(targetStockOrder, userId, language),
                     userId,
