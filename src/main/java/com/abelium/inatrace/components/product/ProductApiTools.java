@@ -765,7 +765,10 @@ public class ProductApiTools {
 	}
 
 	public static ApiFinalProduct toApiFinalProduct(FinalProduct entity) {
-		if (entity == null) return null;
+
+		if (entity == null) {
+			return null;
+		}
 
 		ApiFinalProduct apiFinalProduct = new ApiFinalProduct();
 		apiFinalProduct.setId(entity.getId());

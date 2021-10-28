@@ -1,12 +1,13 @@
 package com.abelium.inatrace.components.processingaction;
 
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
+import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
-import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.components.processingactiontranslation.ProcessingActionTranslationMapper;
-import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
+import com.abelium.inatrace.components.product.ProductApiTools;
+import com.abelium.inatrace.components.value_chain.ValueChainMapper;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
@@ -29,9 +30,11 @@ public final class ProcessingActionMapper {
 	
 	public static ApiProcessingAction toApiProcessingAction(ProcessingAction entity, Language language) {
 
-		// Simplest apiProcessingAction object
 		ApiProcessingAction apiProcessingAction = new ApiProcessingAction();
 		apiProcessingAction.setId(entity.getId());
+
+		// Map the value chain
+		apiProcessingAction.setValueChain(ValueChainMapper.toApiValueChainBase(entity.getValueChain()));
 
 		// Set the translated name and description
 		entity.getProcessingActionTranslations().stream()
@@ -49,14 +52,22 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setPublicTimelineLocation(entity.getPublicTimelineLocation());
 		apiProcessingAction.setPublicTimelineIconType(entity.getPublicTimelineIconType());
 		apiProcessingAction.setType(entity.getType());
+		apiProcessingAction.setFinalProductAction(entity.getFinalProductAction());
 		
 		ApiCompanyBase apiCompany = new ApiCompanyBase();
 		apiCompany.setId(entity.getCompany().getId());
 		apiCompany.setName(entity.getCompany().getName());
+		apiProcessingAction.setCompany(apiCompany);
 
-		ApiSemiProduct apiInputSemiProduct = SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct(), language);
-		ApiSemiProduct apiOutputSemiProduct = SemiProductMapper.toApiSemiProduct(entity.getOutputSemiProduct(), language);
-		
+		// Map the input and output semi-products
+		apiProcessingAction.setInputSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct(), language));
+		apiProcessingAction.setOutputSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getOutputSemiProduct(), language));
+
+		// Map the input and output final products
+		apiProcessingAction.setInputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getInputFinalProduct()));
+		apiProcessingAction.setOutputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getOutputFinalProduct()));
+
+		// Processing evidence fields
 		List<ApiProcessingEvidenceField> apiRequiredEvidenceFields = new ArrayList<>();
 		List<ProcessingActionPEF> processingActionProcessingEvidenceFields = entity.getProcessingEvidenceFields();
 		processingActionProcessingEvidenceFields.forEach(
@@ -72,10 +83,11 @@ public final class ProcessingActionMapper {
 				apiRequiredEvidenceFields.add(apiProcessingEvidenceField);
 			}
 		);
+		apiProcessingAction.setRequiredEvidenceFields(apiRequiredEvidenceFields);
 		
 		List<ApiProcessingEvidenceType> apiRequiredDocumentTypes = new ArrayList<>();
 		
-		// Get list of association entities
+		// Processing evidence types
 		List<ProcessingActionPET> processingActionProcessingEvidenceTypes = entity.getRequiredDocumentTypes();
 		processingActionProcessingEvidenceTypes.forEach(
 			processingActionProcessingEvidenceType -> {
@@ -90,13 +102,7 @@ public final class ProcessingActionMapper {
 				apiRequiredDocumentTypes.add(apiRequiredDocumentType);
 			}
 		);
-		
-		// Fill out objects
-		apiProcessingAction.setCompany(apiCompany);
-		apiProcessingAction.setInputSemiProduct(apiInputSemiProduct);
-		apiProcessingAction.setOutputSemiProduct(apiOutputSemiProduct);
 		apiProcessingAction.setRequiredDocumentTypes(apiRequiredDocumentTypes);
-		apiProcessingAction.setRequiredEvidenceFields(apiRequiredEvidenceFields);
 
 		return apiProcessingAction;
 	}

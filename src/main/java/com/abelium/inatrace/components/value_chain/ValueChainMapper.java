@@ -29,6 +29,10 @@ public final class ValueChainMapper {
 	 */
 	public static ApiValueChain toApiValueChainBase(ValueChain entity) {
 
+		if (entity == null) {
+			return null;
+		}
+
 		ApiValueChain apiValueChain = new ApiValueChain();
 		apiValueChain.setId(entity.getId());
 		apiValueChain.setName(entity.getName());
@@ -46,6 +50,10 @@ public final class ValueChainMapper {
 	public static ApiValueChain toApiValueChain(ValueChain entity, Language language) {
 
 		ApiValueChain apiValueChain = ValueChainMapper.toApiValueChainBase(entity);
+
+		if (apiValueChain == null) {
+			return null;
+		}
 
 		// Map facility types
 		if (!entity.getFacilityTypes().isEmpty()) {

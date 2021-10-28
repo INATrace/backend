@@ -181,7 +181,7 @@ public class ValueChainService extends BaseService {
 		em.remove(valueChain);
 	}
 
-	private ValueChain fetchValueChain(Long id) throws ApiException {
+	public ValueChain fetchValueChain(Long id) throws ApiException {
 
 		ValueChain valueChain = Queries.get(em, ValueChain.class, id);
 		if (valueChain == null) {
