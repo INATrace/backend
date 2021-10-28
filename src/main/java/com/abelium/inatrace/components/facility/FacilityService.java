@@ -119,6 +119,7 @@ public class FacilityService extends BaseService {
 		entity.setDisplayPriceDeductionDamage(apiFacility.getDisplayPriceDeductionDamage() != null ? apiFacility.getDisplayPriceDeductionDamage() : Boolean.FALSE);
 		entity.setDisplayTare(apiFacility.getDisplayTare() != null ? apiFacility.getDisplayTare() : Boolean.FALSE);
 		entity.setDisplayWomenOnly(apiFacility.getDisplayWomenOnly() != null ? apiFacility.getDisplayWomenOnly() : Boolean.FALSE);
+		entity.setDeactivated(apiFacility.getDeactivated());
 
 		facilityLocation.setLatitude(apiFacility.getFacilityLocation().getLatitude());
 		facilityLocation.setLongitude(apiFacility.getFacilityLocation().getLongitude());
@@ -176,6 +177,12 @@ public class FacilityService extends BaseService {
 	}
 
 	@Transactional
+	public void deactivateFacility(Long id, Boolean deactivated) {
+		Facility facility = em.find(Facility.class, id);
+		facility.setDeactivated(deactivated);
+	}
+
+	@Transactional
 	public void deleteFacility(Long id) throws ApiException {
 
 		Facility facility = fetchFacility(id);
@@ -221,6 +228,42 @@ public class FacilityService extends BaseService {
 					.setMaxResults(request.getLimit());
 
 			count = em.createNamedQuery("Facility.countFacilitiesByCompany", Long.class)
+					.setParameter("companyId", companyId).getSingleResult();
+		}
+
+		List<Facility> facilities = facilitiesQuery.getResultList();
+
+		return new ApiPaginatedList<>(
+				facilities.stream().map(facility -> FacilityMapper.toApiFacility(facility, language)).collect(Collectors.toList()), count);
+	}
+
+	public ApiPaginatedList<ApiFacility> listActivatedFacilitiesByCompany(Long companyId, Long semiProductId, ApiPaginatedRequest request, Language language) {
+
+		TypedQuery<Facility> facilitiesQuery;
+		Long count;
+
+		if (semiProductId != null) {
+
+			facilitiesQuery = em.createNamedQuery("Facility.listActivatedFacilitiesByCompanyAndSemiProduct", Facility.class)
+					.setParameter("companyId", companyId)
+					.setParameter("semiProductId", semiProductId)
+					.setParameter("language", language)
+					.setFirstResult(request.getOffset())
+					.setMaxResults(request.getLimit());
+
+			count = em.createNamedQuery("Facility.countActivatedFacilitiesByCompanyAndSemiProduct", Long.class)
+					.setParameter("companyId", companyId)
+					.setParameter("semiProductId", semiProductId)
+					.getSingleResult();
+		} else {
+
+			facilitiesQuery = em.createNamedQuery("Facility.listActivatedFacilitiesByCompany", Facility.class)
+					.setParameter("companyId", companyId)
+					.setParameter("language", language)
+					.setFirstResult(request.getOffset())
+					.setMaxResults(request.getLimit());
+
+			count = em.createNamedQuery("Facility.countActivatedFacilitiesByCompany", Long.class)
 					.setParameter("companyId", companyId).getSingleResult();
 		}
 

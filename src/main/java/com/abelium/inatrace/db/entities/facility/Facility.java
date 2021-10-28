@@ -18,6 +18,9 @@ import java.util.List;
 	@NamedQuery(name = "Facility.listCollectingFacilitiesByCompany",
 				query = "SELECT f FROM Facility f INNER JOIN FETCH f.facilityTranslations t INNER JOIN f.company c WHERE c.id = :companyId AND f.isCollectionFacility = true AND t.language = :language"),
 	@NamedQuery(name = "Facility.countCollectingFacilitiesByCompany", query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId AND f.isCollectionFacility = true"),
+
+	@NamedQuery(name = "Facility.listActivatedFacilitiesByCompany", query = "SELECT f FROM Facility f INNER JOIN FETCH f.facilityTranslations t INNER JOIN f.company c WHERE c.id = :companyId AND t.language = :language AND (f.isDeactivated IS NULL OR f.isDeactivated = false)"),
+	@NamedQuery(name = "Facility.countActivatedFacilitiesByCompany", query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId AND (f.isDeactivated IS NULL OR f.isDeactivated = false)"),
 })
 public class Facility extends TimestampEntity {
 
@@ -47,6 +50,9 @@ public class Facility extends TimestampEntity {
 
 	@Column
 	private Boolean displayWomenOnly;
+
+	@Column
+	private Boolean isDeactivated;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	private FacilityLocation facilityLocation;
@@ -133,6 +139,14 @@ public class Facility extends TimestampEntity {
 		this.displayWomenOnly = displayWomenOnly;
 	}
 
+	public Boolean getDeactivated() {
+		return isDeactivated;
+	}
+
+	public void setDeactivated(Boolean deactivated) {
+		isDeactivated = deactivated;
+	}
+
 	public FacilityLocation getFacilityLocation() {
 		return facilityLocation;
 	}
@@ -190,13 +204,14 @@ public class Facility extends TimestampEntity {
 		super();
 	}
 
-	public Facility(String name, Boolean isCollectionFacility, Boolean isPublic,
+	public Facility(String name, Boolean isCollectionFacility, Boolean isPublic, Boolean isDeactivated,
 			FacilityLocation facilityLocation, Company company, FacilityType facilityType,
 			List<FacilitySemiProduct> facilitySemiProducts, List<StockOrder> stockOrders, List<FacilityTranslation> facilityTranslations) {
 		super();
 		this.name = name;
 		this.isCollectionFacility = isCollectionFacility;
 		this.isPublic = isPublic;
+		this.isDeactivated = isDeactivated;
 		this.facilityLocation = facilityLocation;
 		this.company = company;
 		this.facilityType = facilityType;
