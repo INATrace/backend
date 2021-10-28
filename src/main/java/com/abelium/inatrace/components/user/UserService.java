@@ -325,7 +325,7 @@ public class UserService extends BaseService {
 		}
 		confirmationToken.getUser().setStatus(UserStatus.CONFIRMED_EMAIL);
 		confirmationToken.setStatus(Status.DISABLED);
-		return loginUser(confirmationToken.getUser());
+		return ResponseEntity.ok().body(new ApiDefaultResponse());
 	}
     
     @Transactional
