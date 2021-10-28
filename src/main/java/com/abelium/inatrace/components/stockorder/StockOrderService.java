@@ -326,8 +326,7 @@ public class StockOrderService extends BaseService {
 
                     // If quote order acts as source stock order, then reduce it's available quantity
                     if (!processingOrder.getTargetStockOrders().contains(entity)) {
-                        // TODO: Should be reduced, not set to zero!
-                        entity.setAvailableQuantity(BigDecimal.ZERO);
+                        entity.setAvailableQuantity(entity.getAvailableQuantity().subtract(calculateUsedQuantity(inputTxs, entity.getId())));
                     }
 
                 } else {
