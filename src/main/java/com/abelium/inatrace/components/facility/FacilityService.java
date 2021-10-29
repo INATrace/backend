@@ -194,40 +194,38 @@ public class FacilityService extends BaseService {
 
 	}
 	
-	public ApiPaginatedList<ApiFacility> listFacilitiesByCompany(Long companyId, Long semiProductId, ApiPaginatedRequest request, Language language) {
+	public ApiPaginatedList<ApiFacility> listFacilitiesByCompany(Long companyId,
+	                                                             Long semiProductId,
+	                                                             Long finalProductId,
+	                                                             ApiPaginatedRequest request,
+	                                                             Language language) {
 
-		TypedQuery<Facility> facilitiesQuery;
-		Long count;
+		return PaginationTools.createPaginatedResponse(em, request, () ->
+						listFacilitiesByCompanyQuery(companyId, semiProductId, finalProductId, language),
+				facility -> FacilityMapper.toApiFacility(facility, language));
+	}
+
+	private Facility listFacilitiesByCompanyQuery(Long companyId, Long semiProductId, Long finalProductId, Language language) {
+
+		Facility facilityProxy = Torpedo.from(Facility.class);
+		FacilityTranslation ft = Torpedo.innerJoin(facilityProxy.getFacilityTranslations());
+
+		OnGoingLogicalCondition condition = Torpedo.condition();
+
+		condition = condition.and(ft.getLanguage()).eq(language);
+		condition = condition.and(facilityProxy.getCompany().getId()).eq(companyId);
 
 		if (semiProductId != null) {
-
-			facilitiesQuery = em.createNamedQuery("Facility.listFacilitiesByCompanyAndSemiProduct", Facility.class)
-					.setParameter("companyId", companyId)
-					.setParameter("semiProductId", semiProductId)
-					.setParameter("language", language)
-					.setFirstResult(request.getOffset())
-					.setMaxResults(request.getLimit());
-
-			count = em.createNamedQuery("Facility.countFacilitiesByCompanyAndSemiProduct", Long.class)
-					.setParameter("companyId", companyId)
-					.setParameter("semiProductId", semiProductId)
-					.getSingleResult();
-		} else {
-
-			facilitiesQuery = em.createNamedQuery("Facility.listFacilitiesByCompany", Facility.class)
-					.setParameter("companyId", companyId)
-					.setParameter("language", language)
-					.setFirstResult(request.getOffset())
-					.setMaxResults(request.getLimit());
-
-			count = em.createNamedQuery("Facility.countFacilitiesByCompany", Long.class)
-					.setParameter("companyId", companyId).getSingleResult();
+			FacilitySemiProduct fsp = Torpedo.leftJoin(facilityProxy.getFacilitySemiProducts());
+			condition = condition.and(fsp.getSemiProduct().getId()).eq(semiProductId);
+		} else if (finalProductId != null) {
+			FacilityFinalProduct ffp = Torpedo.leftJoin(facilityProxy.getFacilityFinalProducts());
+			condition = condition.and(ffp.getFinalProduct().getId()).eq(finalProductId);
 		}
 
-		List<Facility> facilities = facilitiesQuery.getResultList();
+		Torpedo.where(condition);
 
-		return new ApiPaginatedList<>(
-				facilities.stream().map(facility -> FacilityMapper.toApiFacility(facility, language)).collect(Collectors.toList()), count);
+		return facilityProxy;
 	}
 	
 	public ApiPaginatedList<ApiFacility> listCollectingFacilitiesByCompany(Long companyId, ApiPaginatedRequest request, Language language) {
@@ -250,7 +248,11 @@ public class FacilityService extends BaseService {
 
 	// Get the list of selling (public) facilities that the company with the provided ID can see.
 	// The candidates of companies' facilities are retrieved through the connected products (value chains).
-	public ApiPaginatedList<ApiFacility> listAvailableSellingFacilitiesForCompany(Long companyId, Long semiProductId, ApiPaginatedRequest request, Language language) {
+	public ApiPaginatedList<ApiFacility> listAvailableSellingFacilitiesForCompany(Long companyId,
+	                                                                              Long semiProductId,
+	                                                                              Long finalProductId,
+	                                                                              ApiPaginatedRequest request,
+	                                                                              Language language) {
 
 		// First get all the products where the company is participating in role BUYER OR EXPORTER
 		TypedQuery<ProductCompany> productsAssociationsQuery = em.createNamedQuery(
@@ -291,10 +293,11 @@ public class FacilityService extends BaseService {
 		}
 
 		return PaginationTools.createPaginatedResponse(em, request, () ->
-				availableSellingFacilitiesQuery(candidateCompaniesIds, semiProductId, language), facility -> FacilityMapper.toApiFacility(facility, language));
+				availableSellingFacilitiesQuery(candidateCompaniesIds, semiProductId, finalProductId, language),
+				facility -> FacilityMapper.toApiFacility(facility, language));
 	}
 
-	private Facility availableSellingFacilitiesQuery(Set<Company> companiesIds, Long semiProductId, Language language) {
+	private Facility availableSellingFacilitiesQuery(Set<Company> companiesIds, Long semiProductId, Long finalProductId, Language language) {
 
 		Facility facilityProxy = Torpedo.from(Facility.class);
 		FacilityTranslation ft = Torpedo.innerJoin(facilityProxy.getFacilityTranslations());
@@ -308,6 +311,9 @@ public class FacilityService extends BaseService {
 		if (semiProductId != null) {
 			FacilitySemiProduct fsp = Torpedo.leftJoin(facilityProxy.getFacilitySemiProducts());
 			condition = condition.and(fsp.getSemiProduct().getId()).eq(semiProductId);
+		} else if (finalProductId != null) {
+			FacilityFinalProduct ffp = Torpedo.leftJoin(facilityProxy.getFacilityFinalProducts());
+			condition = condition.and(ffp.getFinalProduct().getId()).eq(finalProductId);
 		}
 
 		Torpedo.where(condition);

@@ -40,10 +40,11 @@ public class FacilityController {
 	public ApiPaginatedResponse<ApiFacility> listFacilitiesByCompany(
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
 			@Valid @ApiParam(value = "Semi product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+			@Valid @ApiParam(value = "Final product ID") @RequestParam(value = "finalProductId", required = false) Long finalProductId,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 			@Valid ApiPaginatedRequest request) {
 
-		return new ApiPaginatedResponse<>(facilityService.listFacilitiesByCompany(companyId, semiProductId, request, language));
+		return new ApiPaginatedResponse<>(facilityService.listFacilitiesByCompany(companyId, semiProductId, finalProductId, request, language));
 	}
 
 	@GetMapping("list/company/{id}/available-selling")
@@ -52,9 +53,10 @@ public class FacilityController {
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
 			@Valid @ApiParam(value = "Semi product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+			@Valid @ApiParam(value = "Final product ID") @RequestParam(value = "finalProductId", required = false) Long finalProductId,
 			@Valid ApiPaginatedRequest request) {
 
-		return new ApiPaginatedResponse<>(facilityService.listAvailableSellingFacilitiesForCompany(companyId, semiProductId, request, language));
+		return new ApiPaginatedResponse<>(facilityService.listAvailableSellingFacilitiesForCompany(companyId, semiProductId, finalProductId, request, language));
 	}
 	
 	@GetMapping("list/collecting/company/{id}")

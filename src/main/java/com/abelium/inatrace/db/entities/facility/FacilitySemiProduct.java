@@ -8,10 +8,6 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @NamedQueries({
-	@NamedQuery(name = "Facility.listFacilitiesByCompanyAndSemiProduct",
-	            query = "SELECT fsp.facility FROM FacilitySemiProduct fsp INNER JOIN FETCH fsp.facility.facilityTranslations t WHERE fsp.facility.company.id = :companyId AND fsp.semiProduct.id = :semiProductId AND t.language = :language"),
-	@NamedQuery(name = "Facility.countFacilitiesByCompanyAndSemiProduct",
-	            query = "SELECT COUNT(fsp.facility) FROM FacilitySemiProduct fsp WHERE fsp.facility.company.id = :companyId AND fsp.semiProduct.id = :semiProductId"),
 
 	@NamedQuery(name = "Facility.listSellingFacilitiesByCompanyAndSemiProduct",
 	            query = "SELECT fsp.facility FROM FacilitySemiProduct fsp INNER JOIN FETCH fsp.facility.facilityTranslations t WHERE fsp.facility.company.id = :companyId AND fsp.facility.isPublic = true AND fsp.semiProduct.id = :semiProductId AND t.language = :language"),
