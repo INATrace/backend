@@ -75,7 +75,7 @@ public class FacilityService extends BaseService {
 
 		OnGoingLogicalCondition condition = Torpedo.condition();
 		condition = condition.and(ft.getLanguage()).eq(language);
-		condition = condition.and(facilityProxy.getDeactivated()).neq(Boolean.TRUE);
+		condition = condition.and(facilityProxy.getIsDeactivated()).neq(Boolean.TRUE);
 		Torpedo.where(condition);
 
 		if ("name".equals(request.sortBy)) {
@@ -122,7 +122,7 @@ public class FacilityService extends BaseService {
 		entity.setDisplayPriceDeductionDamage(apiFacility.getDisplayPriceDeductionDamage() != null ? apiFacility.getDisplayPriceDeductionDamage() : Boolean.FALSE);
 		entity.setDisplayTare(apiFacility.getDisplayTare() != null ? apiFacility.getDisplayTare() : Boolean.FALSE);
 		entity.setDisplayWomenOnly(apiFacility.getDisplayWomenOnly() != null ? apiFacility.getDisplayWomenOnly() : Boolean.FALSE);
-		entity.setDeactivated(apiFacility.getDeactivated());
+		entity.setIsDeactivated(apiFacility.getDeactivated());
 
 		facilityLocation.setLatitude(apiFacility.getFacilityLocation().getLatitude());
 		facilityLocation.setLongitude(apiFacility.getFacilityLocation().getLongitude());
@@ -182,7 +182,7 @@ public class FacilityService extends BaseService {
 	@Transactional
 	public void deactivateFacility(Long id, Boolean deactivated) {
 		Facility facility = em.find(Facility.class, id);
-		facility.setDeactivated(deactivated);
+		facility.setIsDeactivated(deactivated);
 	}
 
 	@Transactional
@@ -350,7 +350,7 @@ public class FacilityService extends BaseService {
 		condition = condition.and(ft.getLanguage()).eq(language);
 		condition = condition.and(facilityProxy.getCompany()).in(companiesIds);
 		condition = condition.and(facilityProxy.getIsPublic()).eq(true);
-		condition = condition.and(facilityProxy.getDeactivated()).neq(Boolean.TRUE);
+		condition = condition.and(facilityProxy.getIsDeactivated()).neq(Boolean.TRUE);
 
 		if (semiProductId != null) {
 			FacilitySemiProduct fsp = Torpedo.leftJoin(facilityProxy.getFacilitySemiProducts());

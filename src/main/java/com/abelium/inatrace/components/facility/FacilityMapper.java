@@ -48,7 +48,7 @@ public final class FacilityMapper {
 		apiFacility.setName(translation.getName());
 		apiFacility.setIsCollectionFacility(entity.getIsCollectionFacility());
 		apiFacility.setIsPublic(entity.getIsPublic());
-		apiFacility.setDeactivated(entity.getDeactivated());
+		apiFacility.setDeactivated(entity.getIsDeactivated());
 
 		apiFacility.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
 

@@ -139,11 +139,11 @@ public class Facility extends TimestampEntity {
 		this.displayWomenOnly = displayWomenOnly;
 	}
 
-	public Boolean getDeactivated() {
+	public Boolean getIsDeactivated() {
 		return isDeactivated;
 	}
 
-	public void setDeactivated(Boolean deactivated) {
+	public void setIsDeactivated(Boolean deactivated) {
 		isDeactivated = deactivated;
 	}
 
