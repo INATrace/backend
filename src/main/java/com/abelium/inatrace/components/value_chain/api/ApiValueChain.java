@@ -5,6 +5,7 @@ import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityTyp
 import com.abelium.inatrace.components.codebook.grade_abbreviation.api.ApiGradeAbbreviation;
 import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
+import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.db.entities.value_chain.enums.ValueChainStatus;
 import io.swagger.annotations.ApiModelProperty;
@@ -41,7 +42,10 @@ public class ApiValueChain extends ApiBaseEntity {
 	@ApiModelProperty(value = "list of supported processing evidence types", position = 8)
 	private List<ApiProcessingEvidenceType> processingEvidenceTypes;
 
-	@ApiModelProperty(value = "list of supported semi-products", position = 9)
+	@ApiModelProperty(value = "list of supported processing evidence fields", position = 9)
+	private List<ApiProcessingEvidenceField> processingEvidenceFields;
+
+	@ApiModelProperty(value = "list of supported semi-products", position = 10)
 	private List<ApiSemiProduct> semiProducts;
 
 	public String getName() {
@@ -98,6 +102,14 @@ public class ApiValueChain extends ApiBaseEntity {
 
 	public void setProcessingEvidenceTypes(List<ApiProcessingEvidenceType> processingEvidenceTypes) {
 		this.processingEvidenceTypes = processingEvidenceTypes;
+	}
+
+	public List<ApiProcessingEvidenceField> getProcessingEvidenceFields() {
+		return processingEvidenceFields;
+	}
+
+	public void setProcessingEvidenceFields(List<ApiProcessingEvidenceField> processingEvidenceFields) {
+		this.processingEvidenceFields = processingEvidenceFields;
 	}
 
 	public List<ApiSemiProduct> getSemiProducts() {

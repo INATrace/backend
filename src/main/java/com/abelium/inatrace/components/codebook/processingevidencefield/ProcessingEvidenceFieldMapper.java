@@ -16,6 +16,10 @@ public final class ProcessingEvidenceFieldMapper {
 
 	public static ApiProcessingEvidenceField toApiProcessingEvidenceField(ProcessingEvidenceField entity) {
 
+		if (entity == null) {
+			return null;
+		}
+
 		// ApiProcessingEvidenceField object
 		ApiProcessingEvidenceField apiProcessingEvidenceField = new ApiProcessingEvidenceField();
 		apiProcessingEvidenceField.setId(entity.getId());

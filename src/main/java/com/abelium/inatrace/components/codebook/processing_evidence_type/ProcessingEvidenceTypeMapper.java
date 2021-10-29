@@ -22,6 +22,10 @@ public final class ProcessingEvidenceTypeMapper {
 	 */
 	public static ApiProcessingEvidenceType toApiProcessingEvidenceTypeBase(ProcessingEvidenceType entity) {
 
+		if (entity == null) {
+			return null;
+		}
+
 		ApiProcessingEvidenceType apiProcessingEvidenceType = new ApiProcessingEvidenceType();
 		apiProcessingEvidenceType.setId(entity.getId());
 		apiProcessingEvidenceType.setCode(entity.getCode());
@@ -41,6 +45,10 @@ public final class ProcessingEvidenceTypeMapper {
 
 		ApiProcessingEvidenceType apiProcessingEvidenceType = ProcessingEvidenceTypeMapper.toApiProcessingEvidenceTypeBase(
 				entity);
+
+		if (apiProcessingEvidenceType == null) {
+			return null;
+		}
 
 		apiProcessingEvidenceType.setProvenance(entity.getProvenance());
 		apiProcessingEvidenceType.setFairness(entity.getFairness());

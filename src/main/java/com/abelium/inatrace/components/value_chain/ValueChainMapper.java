@@ -4,6 +4,7 @@ import com.abelium.inatrace.components.codebook.facility_type.FacilityTypeMapper
 import com.abelium.inatrace.components.codebook.grade_abbreviation.GradeAbbreviationMapper;
 import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeMapper;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.ProcessingEvidenceTypeMapper;
+import com.abelium.inatrace.components.codebook.processingevidencefield.ProcessingEvidenceFieldMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
@@ -81,6 +82,13 @@ public final class ValueChainMapper {
 			apiValueChain.setProcessingEvidenceTypes(entity.getProcEvidenceTypes().stream()
 					.map(vcProcEvidenceType -> ProcessingEvidenceTypeMapper.toApiProcessingEvidenceTypeBase(
 							vcProcEvidenceType.getProcessingEvidenceType())).collect(Collectors.toList()));
+		}
+
+		// Map processing evidence fields
+		if (!entity.getProcessingEvidenceFields().isEmpty()) {
+			apiValueChain.setProcessingEvidenceFields(entity.getProcessingEvidenceFields().stream()
+					.map(vcProcEvidenceField -> ProcessingEvidenceFieldMapper.toApiProcessingEvidenceField(
+							vcProcEvidenceField.getProcessingEvidenceField())).collect(Collectors.toList()));
 		}
 
 		// Map semi-products

@@ -12,6 +12,8 @@ import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTyp
 import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.ProcessingEvidenceTypeService;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
+import com.abelium.inatrace.components.codebook.processingevidencefield.ProcessingEvidenceFieldService;
+import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.BaseService;
@@ -51,6 +53,7 @@ public class ValueChainService extends BaseService {
 	private final MeasureUnitTypeService measureUnitTypeService;
 	private final GradeAbbreviationService gradeAbbreviationService;
 	private final ProcessingEvidenceTypeService procEvidenceTypeService;
+	private final ProcessingEvidenceFieldService procEvidenceFieldService;
 	private final SemiProductService semiProductService;
 
 	@Autowired
@@ -59,12 +62,14 @@ public class ValueChainService extends BaseService {
 	                         MeasureUnitTypeService measureUnitTypeService,
 	                         GradeAbbreviationService gradeAbbreviationService,
 	                         ProcessingEvidenceTypeService procEvidenceTypeService,
+	                         ProcessingEvidenceFieldService procEvidenceFieldService,
 	                         SemiProductService semiProductService) {
 		this.userService = userService;
 		this.facilityTypeService = facilityTypeService;
 		this.measureUnitTypeService = measureUnitTypeService;
 		this.gradeAbbreviationService = gradeAbbreviationService;
 		this.procEvidenceTypeService = procEvidenceTypeService;
+		this.procEvidenceFieldService = procEvidenceFieldService;
 		this.semiProductService = semiProductService;
 	}
 
@@ -145,6 +150,9 @@ public class ValueChainService extends BaseService {
 
 		// Update processing evidence types
 		updateVCProcEvidenceTypes(entity, apiValueChain);
+
+		// Update processing evidence fields
+		updateVCProcEvidenceFields(entity, apiValueChain);
 
 		// Update semi-products
 		updateVCSemiProducts(entity, apiValueChain);
@@ -256,6 +264,23 @@ public class ValueChainService extends BaseService {
 			}
 		}
 		currentVCProcEvidenceTypes.values().forEach(vcPET -> entity.getProcEvidenceTypes().remove(vcPET));
+	}
+
+	private void updateVCProcEvidenceFields(ValueChain entity, ApiValueChain apiValueChain) throws ApiException {
+
+		Map<Long, ValueChainProcessingEvidenceField> currentVCProcEvidenceFields = entity.getProcessingEvidenceFields().stream()
+				.collect(Collectors.toMap(vcPEF -> vcPEF.getProcessingEvidenceField().getId(), vcPEF -> vcPEF));
+		for (ApiProcessingEvidenceField apiProcessingEvidenceField : apiValueChain.getProcessingEvidenceFields()) {
+			ValueChainProcessingEvidenceField vcPEF = currentVCProcEvidenceFields.get(apiProcessingEvidenceField.getId());
+			if (vcPEF == null) {
+				ProcessingEvidenceField processingEvidenceField = procEvidenceFieldService.fetchProcessingEvidenceField(
+						apiProcessingEvidenceField.getId());
+				entity.getProcessingEvidenceFields().add(new ValueChainProcessingEvidenceField(entity, processingEvidenceField));
+			} else {
+				currentVCProcEvidenceFields.remove(apiProcessingEvidenceField.getId());
+			}
+		}
+		currentVCProcEvidenceFields.values().forEach(vcPEF -> entity.getProcessingEvidenceFields().remove(vcPEF));
 	}
 
 	private void updateVCSemiProducts(ValueChain entity, ApiValueChain apiValueChain) throws ApiException {
