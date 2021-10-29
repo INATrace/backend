@@ -18,7 +18,7 @@ public class ApiSemiProduct extends ApiBaseEntity {
 
 	private String description;
 
-	private ApiMeasureUnitType apiMeasureUnitType;
+	private ApiMeasureUnitType measurementUnitType;
 
 	private Boolean isSKU;
 
@@ -44,12 +44,12 @@ public class ApiSemiProduct extends ApiBaseEntity {
 		this.description = description;
 	}
 
-	public ApiMeasureUnitType getApiMeasureUnitType() {
-		return apiMeasureUnitType;
+	public ApiMeasureUnitType getMeasurementUnitType() {
+		return measurementUnitType;
 	}
 
-	public void setApiMeasureUnitType(ApiMeasureUnitType apiMeasureUnitType) {
-		this.apiMeasureUnitType = apiMeasureUnitType;
+	public void setMeasurementUnitType(ApiMeasureUnitType measurementUnitType) {
+		this.measurementUnitType = measurementUnitType;
 	}
 
 	public Boolean getSKU() {

@@ -66,7 +66,7 @@ public final class SemiProductMapper {
 		apiSemiProduct.setBuyable(entity.getBuyable());
 
 		if (entity.getMeasurementUnitType() != null) {
-			apiSemiProduct.setApiMeasureUnitType(
+			apiSemiProduct.setMeasurementUnitType(
 					MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getMeasurementUnitType()));
 		}
 

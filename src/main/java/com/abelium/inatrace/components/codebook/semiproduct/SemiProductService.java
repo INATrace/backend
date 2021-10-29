@@ -93,15 +93,15 @@ public class SemiProductService extends BaseService {
 		semiProduct.setBuyable(apiSemiProduct.getBuyable());
 		semiProduct.setSKUEndCustomer(apiSemiProduct.getSKUEndCustomer());
 
-		if (apiSemiProduct.getApiMeasureUnitType() != null &&
-				apiSemiProduct.getApiMeasureUnitType().getId() != null &&
+		if (apiSemiProduct.getMeasurementUnitType() != null &&
+				apiSemiProduct.getMeasurementUnitType().getId() != null &&
 				(semiProduct.getMeasurementUnitType() == null ||
 						!Objects.equals(semiProduct.getMeasurementUnitType().getId(),
-								apiSemiProduct.getApiMeasureUnitType().getId()))) {
+								apiSemiProduct.getMeasurementUnitType().getId()))) {
 			MeasureUnitType measureUnitType = measureUnitTypeService.fetchMeasureUnitType(
-					apiSemiProduct.getApiMeasureUnitType().getId());
+					apiSemiProduct.getMeasurementUnitType().getId());
 			semiProduct.setMeasurementUnitType(measureUnitType);
-		} else if (apiSemiProduct.getApiMeasureUnitType() == null || apiSemiProduct.getApiMeasureUnitType().getId() == null) {
+		} else if (apiSemiProduct.getMeasurementUnitType() == null || apiSemiProduct.getMeasurementUnitType().getId() == null) {
 			semiProduct.setMeasurementUnitType(null);
 		}
 
