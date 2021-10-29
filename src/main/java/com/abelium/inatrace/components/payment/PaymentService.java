@@ -82,7 +82,9 @@ public class PaymentService extends BaseService {
 		}
 		if(queryRequest.farmerName != null) { // Search by farmers name (query)
 			condition = condition.and(paymentProxy.getRecipientUserCustomer()).isNotNull();
-			condition = condition.and(paymentProxy.getRecipientUserCustomer().getName()).like().startsWith(queryRequest.farmerName);
+			OnGoingLogicalCondition likeName = Torpedo.condition(paymentProxy.getRecipientUserCustomer().getName()).like().any(queryRequest.farmerName);
+			OnGoingLogicalCondition likeSurname = Torpedo.condition(paymentProxy.getRecipientUserCustomer().getSurname()).like().any(queryRequest.farmerName);
+			condition = condition.and(Torpedo.condition(likeName.or(likeSurname)));
 		}
 		if (queryRequest.farmerId != null) {
 			condition = condition.and(paymentProxy.getRecipientUserCustomer()).isNotNull();
