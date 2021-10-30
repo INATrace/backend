@@ -71,6 +71,7 @@ public class CommonCsvController {
 					productionDateStart != null ? productionDateStart.toInstant() : null,
 					productionDateEnd != null ? productionDateEnd.toInstant() : null,
 					farmerName,
+					null,
 					null
 				), 
 				authUser.getUserId()
@@ -101,6 +102,7 @@ public class CommonCsvController {
 				request,
 				new StockOrderQueryRequest(
 					companyId,
+					null,
 					null,
 					null,
 					null,

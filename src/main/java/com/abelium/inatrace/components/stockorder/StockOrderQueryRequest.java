@@ -12,6 +12,7 @@ public class StockOrderQueryRequest {
     public Long quoteCompanyId;
     public Long quoteFacilityId;
     public Long farmerId;
+    public Long representativeOfProducerUserCustomerId;
     public Long semiProductId;
     public Long companyCustomerId;
     public OrderType orderType;
@@ -58,6 +59,7 @@ public class StockOrderQueryRequest {
     public StockOrderQueryRequest(Long companyId,
                                   Long facilityId,
                                   Long farmerId,
+                                  Long representativeOfProducerUserCustomerId,
                                   Boolean isOpenBalanceOnly,
                                   Boolean isPurchaseOrderOnly,
                                   Boolean isAvailable,
@@ -71,6 +73,7 @@ public class StockOrderQueryRequest {
         this.companyId = companyId;
         this.facilityId = facilityId;
         this.farmerId = farmerId;
+        this.representativeOfProducerUserCustomerId = representativeOfProducerUserCustomerId;
         this.isOpenBalanceOnly = isOpenBalanceOnly;
         this.isPurchaseOrderOnly = isPurchaseOrderOnly;
         this.isAvailable = isAvailable;

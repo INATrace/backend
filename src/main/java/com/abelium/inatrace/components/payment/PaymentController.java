@@ -81,6 +81,7 @@ public class PaymentController {
 						productionDateStart != null ? productionDateStart.toInstant() : null,
 						productionDateEnd != null ? productionDateEnd.toInstant() : null,
 						farmerName,
+						null,
 						null
 				),
 				authUser.getUserId()
@@ -98,7 +99,8 @@ public class PaymentController {
 			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
 			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
 			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName,
-			@Valid @ApiParam(value = "Search by farmer id") @RequestParam(value = "farmerId", required = false) Long farmerId) {
+			@Valid @ApiParam(value = "Search by farmer id") @RequestParam(value = "farmerId", required = false) Long farmerId,
+			@Valid @ApiParam(value = "Search by representative of farmer id") @RequestParam(value = "representativeOfRecepientUserCustomerId", required = false) Long representativeOfRecepientUserCustomerId) {
 
 		return new ApiPaginatedResponse<>(paymentService.getPaymentList(
 				request,
@@ -110,7 +112,8 @@ public class PaymentController {
 						productionDateStart != null ? productionDateStart.toInstant() : null,
 						productionDateEnd != null ? productionDateEnd.toInstant() : null,
 						farmerName,
-						farmerId
+						farmerId,
+						representativeOfRecepientUserCustomerId
 				), authUser.getUserId()
 		));
 	}

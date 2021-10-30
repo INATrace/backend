@@ -115,6 +115,12 @@ public class StockOrderService extends BaseService {
             condition = condition.and(stockOrderProxy.getProducerUserCustomer().getId()).eq(queryRequest.farmerId);
         }
 
+        if (queryRequest.representativeOfProducerUserCustomerId != null) {
+            condition = condition.and(stockOrderProxy.getRepresentativeOfProducerUserCustomer()).isNotNull();
+            condition = condition.and(stockOrderProxy.getRepresentativeOfProducerUserCustomer().getId())
+                    .eq(queryRequest.representativeOfProducerUserCustomerId);
+        }
+
         if(queryRequest.semiProductId != null) {
             condition = condition.and(stockOrderProxy.getSemiProduct()).isNotNull();
             condition = condition.and(stockOrderProxy.getSemiProduct().getId()).eq(queryRequest.semiProductId);
