@@ -9,6 +9,7 @@ import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.company.api.ApiUserCustomer;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
+import com.abelium.inatrace.components.product.api.ApiFinalProduct;
 import com.abelium.inatrace.components.productorder.api.ApiProductOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
@@ -75,6 +76,9 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     @ApiModelProperty(value = "Semi product", position = 7)
     private ApiSemiProduct semiProduct;
+
+    @ApiModelProperty(value = "Final product")
+    private ApiFinalProduct finalProduct;
 
     @ApiModelProperty(value = "Facility", position = 8)
     private ApiFacility facility;
@@ -375,6 +379,14 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setSemiProduct(ApiSemiProduct semiProduct) {
         this.semiProduct = semiProduct;
+    }
+
+    public ApiFinalProduct getFinalProduct() {
+        return finalProduct;
+    }
+
+    public void setFinalProduct(ApiFinalProduct finalProduct) {
+        this.finalProduct = finalProduct;
     }
 
     public ApiFacility getFacility() {

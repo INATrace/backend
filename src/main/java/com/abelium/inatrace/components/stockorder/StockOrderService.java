@@ -6,15 +6,16 @@ import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.ProcessingEvidenceTypeService;
+import com.abelium.inatrace.components.codebook.processingevidencefield.ProcessingEvidenceFieldService;
+import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.facility.FacilityService;
-import com.abelium.inatrace.components.codebook.processingevidencefield.ProcessingEvidenceFieldService;
 import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
+import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.stockorder.api.*;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.components.transaction.mappers.TransactionMapper;
-import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
@@ -55,13 +56,21 @@ public class StockOrderService extends BaseService {
 
     private final ProcessingEvidenceTypeService procEvidenceTypeService;
 
+    private final SemiProductService semiProductService;
+
+    private final FinalProductService finalProductService;
+
     @Autowired
     public StockOrderService(FacilityService facilityService,
                              ProcessingEvidenceFieldService procEvidenceFieldService,
-                             ProcessingEvidenceTypeService procEvidenceTypeService) {
+                             ProcessingEvidenceTypeService procEvidenceTypeService,
+                             SemiProductService semiProductService,
+                             FinalProductService finalProductService) {
         this.facilityService = facilityService;
         this.procEvidenceFieldService = procEvidenceFieldService;
         this.procEvidenceTypeService = procEvidenceTypeService;
+        this.semiProductService = semiProductService;
+        this.finalProductService = finalProductService;
     }
 
     public ApiStockOrder getStockOrder(long id, Long userId, Language language, Boolean withProcessingOrder) throws ApiException {
@@ -110,17 +119,24 @@ public class StockOrderService extends BaseService {
         }
 
         // Query parameter filters
-        if(queryRequest.farmerId != null) {
+        if (queryRequest.farmerId != null) {
             condition = condition.and(stockOrderProxy.getProducerUserCustomer()).isNotNull();
             condition = condition.and(stockOrderProxy.getProducerUserCustomer().getId()).eq(queryRequest.farmerId);
         }
 
-        if(queryRequest.semiProductId != null) {
+        // Used for filtering stock orders by semi-product
+        if (queryRequest.semiProductId != null) {
             condition = condition.and(stockOrderProxy.getSemiProduct()).isNotNull();
             condition = condition.and(stockOrderProxy.getSemiProduct().getId()).eq(queryRequest.semiProductId);
         }
 
-        if(queryRequest.isOpenBalanceOnly != null && queryRequest.isOpenBalanceOnly) {
+        // Used for filtering stock orders by final product
+        if (queryRequest.finalProductId != null) {
+            condition = condition.and(stockOrderProxy.getFinalProduct()).isNotNull();
+            condition = condition.and(stockOrderProxy.getFinalProduct().getId()).eq(queryRequest.finalProductId);
+        }
+
+        if (queryRequest.isOpenBalanceOnly != null && queryRequest.isOpenBalanceOnly) {
             condition = condition.and(stockOrderProxy.getBalance()).isNotNull();
             condition = condition.and(stockOrderProxy.getBalance()).gt(BigDecimal.ZERO);
         }
@@ -414,7 +430,6 @@ public class StockOrderService extends BaseService {
             apiStockOrder.setFulfilledQuantity(farmer.getFulfilledQuantity());
             apiStockOrder.setTotalQuantity(farmer.getTotalQuantity());
             apiStockOrder.setTotalGrossQuantity(farmer.getTotalGrossQuantity());
-
         }
 
         return apiStockOrder;
@@ -452,7 +467,17 @@ public class StockOrderService extends BaseService {
         entity.setProductionDate(apiStockOrder.getProductionDate());
         entity.setInternalLotNumber(apiStockOrder.getInternalLotNumber());
         entity.setDeliveryTime(apiStockOrder.getDeliveryTime());
-        entity.setSemiProduct(fetchEntity(apiStockOrder.getSemiProduct().getId(), SemiProduct.class));
+
+        // Set semi-product (usen in processing)
+        if (apiStockOrder.getSemiProduct() != null) {
+            entity.setSemiProduct(semiProductService.fetchSemiProduct(apiStockOrder.getSemiProduct().getId()));
+        }
+
+        // Set final product (used in final prodcut processing)
+        if (apiStockOrder.getFinalProduct() != null) {
+            entity.setFinalProduct(finalProductService.fetchFinalProduct(apiStockOrder.getFinalProduct().getId()));
+        }
+
         entity.setOrganic(apiStockOrder.getOrganic());
         entity.setTare(apiStockOrder.getTare());
         entity.setWomenShare(apiStockOrder.getWomenShare());

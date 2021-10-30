@@ -8,6 +8,7 @@ import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.company.mappers.UserCustomerMapper;
 import com.abelium.inatrace.components.facility.FacilityMapper;
 import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
+import com.abelium.inatrace.components.product.ProductApiTools;
 import com.abelium.inatrace.components.productorder.mappers.ProductOrderMapper;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrderEvidenceTypeValue;
@@ -106,9 +107,10 @@ public class StockOrderMapper {
         });
 
         // Map the semi-product that is represented by this stock order
-        if (entity.getSemiProduct() != null) {
-            apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct(), language));
-        }
+        apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct(), language));
+
+        // Map the final product that is represented by this stock order
+        apiStockOrder.setFinalProduct(ProductApiTools.toApiFinalProduct(entity.getFinalProduct()));
 
         // Set the facility and company of the stock order
         apiStockOrder.setFacility(FacilityMapper.toApiFacility(entity.getFacility(), language));

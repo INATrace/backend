@@ -11,6 +11,7 @@ import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
+import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.productorder.ProductOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
@@ -64,9 +65,14 @@ public class StockOrder extends TimestampEntity {
 	// The comopany customer for which the stock order was placed
 	@OneToOne
 	private CompanyCustomer consumerCompanyCustomer;
-	
+
+	// Set when this stock order represent a unit of quantity for a semi-product (used in processing)
 	@ManyToOne
 	private SemiProduct semiProduct;
+
+	// Set when this stock order represnts a uint of quantity for a final product (used in final processing)
+	@ManyToOne
+	private FinalProduct finalProduct;
 	
 	@ManyToOne
 	private Facility facility;
@@ -349,6 +355,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setSemiProduct(SemiProduct semiProduct) {
 		this.semiProduct = semiProduct;
+	}
+
+	public FinalProduct getFinalProduct() {
+		return finalProduct;
+	}
+
+	public void setFinalProduct(FinalProduct finalProduct) {
+		this.finalProduct = finalProduct;
 	}
 
 	public Facility getFacility() {

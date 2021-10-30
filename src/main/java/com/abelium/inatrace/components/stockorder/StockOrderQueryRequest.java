@@ -13,6 +13,7 @@ public class StockOrderQueryRequest {
     public Long quoteFacilityId;
     public Long farmerId;
     public Long semiProductId;
+    public Long finalProductId;
     public Long companyCustomerId;
     public OrderType orderType;
     public Boolean isOpenBalanceOnly;
@@ -43,12 +44,14 @@ public class StockOrderQueryRequest {
 
     public StockOrderQueryRequest(Long facilityId,
                                   Long semiProductId,
+                                  Long finalProductId,
                                   Boolean isAvailable,
                                   Boolean isWomenShare,
                                   Instant productionDateStart,
                                   Instant productionDateEnd) {
         this.facilityId = facilityId;
         this.semiProductId = semiProductId;
+        this.finalProductId = finalProductId;
         this.isAvailable = isAvailable;
         this.isWomenShare = isWomenShare;
         this.productionDateStart = productionDateStart;
