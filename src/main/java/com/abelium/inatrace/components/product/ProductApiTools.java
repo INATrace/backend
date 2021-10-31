@@ -774,7 +774,7 @@ public class ProductApiTools {
 		apiFinalProduct.setId(entity.getId());
 		apiFinalProduct.setName(entity.getName());
 		apiFinalProduct.setDescription(entity.getDescription());
-		apiFinalProduct.setMeasurementUnitType(MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(entity.getMeasurementUnitType()));
+		apiFinalProduct.setMeasurementUnitType(MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getMeasurementUnitType()));
 
 		// Map the basic info of the owner product
 		apiFinalProduct.setProduct(new ApiProductBase());
