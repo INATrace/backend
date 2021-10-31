@@ -20,7 +20,8 @@ public class PaymentQueryRequest {
                                Instant productionDateStart,
                                Instant productionDateEnd,
                                String farmerName,
-                               Long farmerId) {
+                               Long farmerId,
+                               Long representativeOfRecepientUserCustomerId) {
         this.companyId = companyId;
         this.purchaseId = purchaseId;
         this.preferredWayOfPayment = preferredWayOfPayment;
@@ -29,6 +30,7 @@ public class PaymentQueryRequest {
         this.productionDateEnd = productionDateEnd;
         this.farmerName = farmerName;
         this.farmerId = farmerId;
+        this.representativeOfRecepientUserCustomerId = representativeOfRecepientUserCustomerId;
     }
 
     public Long companyId;
@@ -39,6 +41,7 @@ public class PaymentQueryRequest {
     public Instant productionDateEnd;
     public String farmerName; // RepresentativeOfRecipientUserCustomer.name
     public Long farmerId;
+    public Long representativeOfRecepientUserCustomerId;
 
     @Override
     public String toString() {
@@ -51,6 +54,7 @@ public class PaymentQueryRequest {
                 ", productionDateEnd=" + productionDateEnd +
                 ", farmerName='" + farmerName + '\'' +
                 ", farmerId='" + farmerId + '\'' +
+                ", representativeOfRecepientUserCustomerId='" + representativeOfRecepientUserCustomerId + '\'' +
                 '}';
     }
 }

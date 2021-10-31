@@ -124,6 +124,13 @@ public class StockOrderService extends BaseService {
             condition = condition.and(stockOrderProxy.getProducerUserCustomer().getId()).eq(queryRequest.farmerId);
         }
 
+        // Filer by collector (used in purchase orders)
+        if (queryRequest.representativeOfProducerUserCustomerId != null) {
+            condition = condition.and(stockOrderProxy.getRepresentativeOfProducerUserCustomer()).isNotNull();
+            condition = condition.and(stockOrderProxy.getRepresentativeOfProducerUserCustomer().getId())
+                    .eq(queryRequest.representativeOfProducerUserCustomerId);
+        }
+
         // Used for filtering stock orders by semi-product
         if (queryRequest.semiProductId != null) {
             condition = condition.and(stockOrderProxy.getSemiProduct()).isNotNull();
