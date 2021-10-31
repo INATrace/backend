@@ -120,10 +120,10 @@ public class ProductService extends BaseService {
 	}
 
     @Transactional
-	public ApiBaseEntity createProduct(Long userId, ApiProduct request) throws ApiException {
+	public ApiBaseEntity createProduct(CustomUserDetails authUser, ApiProduct request) throws ApiException {
 		Product product = new Product();
 		
-		productApiTools.updateProduct(userId, product, request);
+		productApiTools.updateProduct(authUser, product, request);
 
 		if (product.getAssociatedCompanies().stream().noneMatch(productCompany -> productCompany.getType() == ProductCompanyType.OWNER)) {
 			if (request.getCompany() == null || request.getCompany().getId() == null) {
@@ -167,7 +167,7 @@ public class ProductService extends BaseService {
 			p.setComparisonOfPrice(new ComparisonOfPrice());
 			em.persist(p.getComparisonOfPrice());
 		}
-		productApiTools.updateProduct(authUser.getUserId(), p, ap);
+		productApiTools.updateProduct(authUser, p, ap);
 	}
 
     @Transactional

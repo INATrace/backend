@@ -6,15 +6,16 @@ import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.ProcessingEvidenceTypeService;
+import com.abelium.inatrace.components.codebook.processingevidencefield.ProcessingEvidenceFieldService;
+import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.facility.FacilityService;
-import com.abelium.inatrace.components.codebook.processingevidencefield.ProcessingEvidenceFieldService;
 import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
+import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.stockorder.api.*;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.components.transaction.mappers.TransactionMapper;
-import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
@@ -55,13 +56,21 @@ public class StockOrderService extends BaseService {
 
     private final ProcessingEvidenceTypeService procEvidenceTypeService;
 
+    private final SemiProductService semiProductService;
+
+    private final FinalProductService finalProductService;
+
     @Autowired
     public StockOrderService(FacilityService facilityService,
                              ProcessingEvidenceFieldService procEvidenceFieldService,
-                             ProcessingEvidenceTypeService procEvidenceTypeService) {
+                             ProcessingEvidenceTypeService procEvidenceTypeService,
+                             SemiProductService semiProductService,
+                             FinalProductService finalProductService) {
         this.facilityService = facilityService;
         this.procEvidenceFieldService = procEvidenceFieldService;
         this.procEvidenceTypeService = procEvidenceTypeService;
+        this.semiProductService = semiProductService;
+        this.finalProductService = finalProductService;
     }
 
     public ApiStockOrder getStockOrder(long id, Long userId, Language language, Boolean withProcessingOrder) throws ApiException {
@@ -110,23 +119,31 @@ public class StockOrderService extends BaseService {
         }
 
         // Query parameter filters
-        if(queryRequest.farmerId != null) {
+        if (queryRequest.farmerId != null) {
             condition = condition.and(stockOrderProxy.getProducerUserCustomer()).isNotNull();
             condition = condition.and(stockOrderProxy.getProducerUserCustomer().getId()).eq(queryRequest.farmerId);
         }
 
+        // Filer by collector (used in purchase orders)
         if (queryRequest.representativeOfProducerUserCustomerId != null) {
             condition = condition.and(stockOrderProxy.getRepresentativeOfProducerUserCustomer()).isNotNull();
             condition = condition.and(stockOrderProxy.getRepresentativeOfProducerUserCustomer().getId())
                     .eq(queryRequest.representativeOfProducerUserCustomerId);
         }
 
-        if(queryRequest.semiProductId != null) {
+        // Used for filtering stock orders by semi-product
+        if (queryRequest.semiProductId != null) {
             condition = condition.and(stockOrderProxy.getSemiProduct()).isNotNull();
             condition = condition.and(stockOrderProxy.getSemiProduct().getId()).eq(queryRequest.semiProductId);
         }
 
-        if(queryRequest.isOpenBalanceOnly != null && queryRequest.isOpenBalanceOnly) {
+        // Used for filtering stock orders by final product
+        if (queryRequest.finalProductId != null) {
+            condition = condition.and(stockOrderProxy.getFinalProduct()).isNotNull();
+            condition = condition.and(stockOrderProxy.getFinalProduct().getId()).eq(queryRequest.finalProductId);
+        }
+
+        if (queryRequest.isOpenBalanceOnly != null && queryRequest.isOpenBalanceOnly) {
             condition = condition.and(stockOrderProxy.getBalance()).isNotNull();
             condition = condition.and(stockOrderProxy.getBalance()).gt(BigDecimal.ZERO);
         }
@@ -157,8 +174,10 @@ public class StockOrderService extends BaseService {
 
         // Search by farmers name (query)
         if (queryRequest.producerUserCustomerName != null) {
-            condition = condition.and(stockOrderProxy.getProducerUserCustomer().getName()).like()
-                    .startsWith(queryRequest.producerUserCustomerName);
+            condition = condition.and(stockOrderProxy.getProducerUserCustomer()).isNotNull();
+            OnGoingLogicalCondition likeName = Torpedo.condition(stockOrderProxy.getProducerUserCustomer().getName()).like().any(queryRequest.producerUserCustomerName);
+            OnGoingLogicalCondition likeSurname = Torpedo.condition(stockOrderProxy.getProducerUserCustomer().getSurname()).like().any(queryRequest.producerUserCustomerName);
+            condition = condition.and(Torpedo.condition(likeName.or(likeSurname)));
         }
 
         // Get only stock orders that have available quantity
@@ -325,10 +344,8 @@ public class StockOrderService extends BaseService {
                                 .addAll(addNextAggregationLevels(currentDepth + 1, paginatedRequest, sourceOrderList.get(0), userId, language));
                     } else {
                         // proceed recursion with all leafs
-                          sourceOrderList.forEach(sourceOrder -> {
-                              resultHistoryList
-                                      .addAll(addNextAggregationLevels(currentDepth + 1, paginatedRequest, sourceOrder, userId, language));
-                          });
+                          sourceOrderList.forEach(sourceOrder -> resultHistoryList
+                                  .addAll(addNextAggregationLevels(currentDepth + 1, paginatedRequest, sourceOrder, userId, language)));
                     }
                 }
             } else {
@@ -420,7 +437,6 @@ public class StockOrderService extends BaseService {
             apiStockOrder.setFulfilledQuantity(farmer.getFulfilledQuantity());
             apiStockOrder.setTotalQuantity(farmer.getTotalQuantity());
             apiStockOrder.setTotalGrossQuantity(farmer.getTotalGrossQuantity());
-
         }
 
         return apiStockOrder;
@@ -442,12 +458,17 @@ public class StockOrderService extends BaseService {
         }
 
         // Validation of required fields
-        if (apiStockOrder.getOrderType() == null)
+        if (apiStockOrder.getOrderType() == null) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "OrderType needs to be provided!");
-        if (apiStockOrder.getFacility() == null)
+        }
+        if (apiStockOrder.getFacility() == null) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Facility needs to be provided!");
-        if (apiStockOrder.getSemiProduct() == null)
-            throw new ApiException(ApiStatus.INVALID_REQUEST, "SemiProduct needs to be provided!");
+        }
+
+        // Semi-product or Final product needs to be provided
+        if (apiStockOrder.getSemiProduct() == null && apiStockOrder.getFinalProduct() == null) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Semi-product or Final product needs to be provided!");
+        }
 
         entity.setOrderType(apiStockOrder.getOrderType());
         entity.setFacility(facilityService.fetchFacility(apiStockOrder.getFacility().getId()));
@@ -458,7 +479,17 @@ public class StockOrderService extends BaseService {
         entity.setProductionDate(apiStockOrder.getProductionDate());
         entity.setInternalLotNumber(apiStockOrder.getInternalLotNumber());
         entity.setDeliveryTime(apiStockOrder.getDeliveryTime());
-        entity.setSemiProduct(fetchEntity(apiStockOrder.getSemiProduct().getId(), SemiProduct.class));
+
+        // Set semi-product (usen in processing)
+        if (apiStockOrder.getSemiProduct() != null) {
+            entity.setSemiProduct(semiProductService.fetchSemiProduct(apiStockOrder.getSemiProduct().getId()));
+        }
+
+        // Set final product (used in final prodcut processing)
+        if (apiStockOrder.getFinalProduct() != null) {
+            entity.setFinalProduct(finalProductService.fetchFinalProduct(apiStockOrder.getFinalProduct().getId()));
+        }
+
         entity.setOrganic(apiStockOrder.getOrganic());
         entity.setTare(apiStockOrder.getTare());
         entity.setWomenShare(apiStockOrder.getWomenShare());
@@ -550,8 +581,14 @@ public class StockOrderService extends BaseService {
 
         // END: Calculate quantities
 
+        // Set the measure unit from the contained semi-product
         if (entity.getSemiProduct() != null) {
             entity.setMeasurementUnitType(entity.getSemiProduct().getMeasurementUnitType());
+        }
+
+        // Set the measure unit from the contained final product
+        if (entity.getFinalProduct() != null) {
+            entity.setMeasurementUnitType(entity.getFinalProduct().getMeasurementUnitType());
         }
 
         // Production location
@@ -574,7 +611,7 @@ public class StockOrderService extends BaseService {
         switch (apiStockOrder.getOrderType()) {
             case PURCHASE_ORDER:
 
-                // on purchase order, Total quantity is calculated by total gross quantity and tare
+                // On purchase order, Total quantity is calculated by total gross quantity and tare
                 if (apiStockOrder.getTare() != null) {
                     apiStockOrder.setTotalQuantity(apiStockOrder.getTotalGrossQuantity().subtract(apiStockOrder.getTare()));
                 } else {

@@ -52,12 +52,13 @@ public class StockOrderController {
                 request, new StockOrderQueryRequest(), authUser.getUserId(), language));
     }
 
-    @GetMapping("/list/facility/{facilityId}/semi-product/{semiProductId}/available")
-    @ApiOperation("Get a paginated list of stock orders for provided semi product ID and facility ID.")
-    public ApiPaginatedResponse<ApiStockOrder> getAvailableStockForSemiProductInFacility(
+    @GetMapping("/list/facility/{facilityId}/available")
+    @ApiOperation("Get a paginated list of stock orders for provided facility ID and semi-product or final product ID.")
+    public ApiPaginatedResponse<ApiStockOrder> getAvailableStockForStockUnitInFacility(
             @Valid ApiPaginatedRequest request,
             @Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("facilityId") Long facilityId,
-            @Valid @ApiParam(value = "SemiProduct ID", required = true) @PathVariable("semiProductId") Long semiProductId,
+            @Valid @ApiParam(value = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+            @Valid @ApiParam(value = "Final product ID") @RequestParam(value = "finalProductId", required = false) Long finalProductId,
             @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
@@ -69,6 +70,7 @@ public class StockOrderController {
                 new StockOrderQueryRequest(
                         facilityId,
                         semiProductId,
+                        finalProductId,
                         true,
                         isWomenShare,
                         productionDateStart != null ? productionDateStart.toInstant() : null,

@@ -33,7 +33,7 @@ public class ProductController {
     @ApiOperation(value = "Create a new product")
     public ApiResponse<ApiBaseEntity> createProduct(@AuthenticationPrincipal CustomUserDetails authUser, 
     		@Valid @RequestBody ApiProduct request) throws ApiException {
-		return new ApiResponse<>(productService.createProduct(authUser.getUserId(), request));
+		return new ApiResponse<>(productService.createProduct(authUser, request));
     }
     
     @GetMapping(value = "/list")

@@ -2,13 +2,13 @@ package com.abelium.inatrace.db.entities.stockorder;
 
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
-import com.abelium.inatrace.db.entities.codebook.ActionType;
 import com.abelium.inatrace.db.entities.codebook.GradeAbbreviationType;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
+import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
 
 import javax.persistence.*;
@@ -42,8 +42,13 @@ public class Transaction extends TimestampEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private ProcessingOrder targetProcessingOrder;
 
+	// Used for orders with action type 'PROCESSING'
 	@ManyToOne
 	private SemiProduct semiProduct;
+
+	// Used for orders with action type 'FINAL_PROCESSING'
+	@ManyToOne
+	private FinalProduct finalProduct;
 	
 	@ManyToOne
 	private Facility sourceFacility;
@@ -53,9 +58,6 @@ public class Transaction extends TimestampEntity {
 
 	@Column
 	private Boolean isProcessing;
-	
-	@OneToOne
-	private ActionType actionType;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
@@ -136,6 +138,14 @@ public class Transaction extends TimestampEntity {
 		this.semiProduct = semiProduct;
 	}
 
+	public FinalProduct getFinalProduct() {
+		return finalProduct;
+	}
+
+	public void setFinalProduct(FinalProduct finalProduct) {
+		this.finalProduct = finalProduct;
+	}
+
 	public Facility getSourceFacility() {
 		return sourceFacility;
 	}
@@ -158,14 +168,6 @@ public class Transaction extends TimestampEntity {
 
 	public void setIsProcessing(Boolean isProcessing) {
 		this.isProcessing = isProcessing;
-	}
-
-	public ActionType getActionType() {
-		return actionType;
-	}
-
-	public void setActionType(ActionType actionType) {
-		this.actionType = actionType;
 	}
 
 	public TransactionStatus getStatus() {

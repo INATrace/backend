@@ -17,18 +17,6 @@ import java.util.List;
 @Entity
 @Table
 @NamedQueries({
-	@NamedQuery(name = "ProcessingAction.listProcessingActionsByCompany", 
-			query = "SELECT pa FROM ProcessingAction pa "
-					+ "INNER JOIN FETCH pa.processingActionTranslations t "
-					+ "INNER JOIN pa.company c "
-					+ "WHERE c.id = :companyId "
-					+ "AND t.language = :language "
-					+ "ORDER BY pa.sortOrder ASC, pa.id ASC"),
-	@NamedQuery(name = "ProcessingAction.countProcessingActionsByCompany",
-			query = "SELECT COUNT(pa) FROM ProcessingAction pa "
-					+ "INNER JOIN pa.processingActionTranslations t "
-					+ "WHERE pa.company.id = :companyId "
-					+ "AND t.language = :language"),
 	@NamedQuery(name = "ProcessingAction.listProcessingActions", 
 			query = "SELECT pa FROM ProcessingAction pa "
 					+ "INNER JOIN FETCH pa.processingActionTranslations t "
