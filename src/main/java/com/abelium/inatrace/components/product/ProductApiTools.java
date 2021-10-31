@@ -24,8 +24,10 @@ import com.abelium.inatrace.db.entities.process.Process;
 import com.abelium.inatrace.db.entities.process.ProcessDocument;
 import com.abelium.inatrace.db.entities.process.ProcessStandard;
 import com.abelium.inatrace.db.entities.product.*;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.FieldTools;
 import com.abelium.inatrace.tools.ListTools;
+import com.abelium.inatrace.types.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -334,14 +336,16 @@ public class ProductApiTools {
 	}
 
 	
-	public void updateProduct(Long userId, Product p, ApiProduct pu) throws ApiException {
-		updateProductContent(userId, p, pu);
+	public void updateProduct(CustomUserDetails authUser, Product p, ApiProduct pu) throws ApiException {
+		updateProductContent(authUser.getUserId(), p, pu);
 		if (pu.origin != null) {
 			if (pu.origin.locations != null) updateOriginLocations(p, p.getOriginLocations(), pu.origin.locations);
 		}
 		if (pu.company != null) p.setCompany(companyQueries.fetchCompany(pu.company.id));
 		if (pu.valueChain != null) p.setValueChain(valueChainQueries.fetchValueChain(pu.valueChain.getId()));
-		if (pu.associatedCompanies != null) updateProductCompanies(p, p.getAssociatedCompanies(), pu.associatedCompanies);
+		if (pu.associatedCompanies != null && authUser.getUserRole() == UserRole.ADMIN) {
+			updateProductCompanies(p, p.getAssociatedCompanies(), pu.associatedCompanies);
+		}
 	}
 
 	public void updateProductContent(Long userId, ProductContent p, ApiProductContent pu) throws ApiException {
