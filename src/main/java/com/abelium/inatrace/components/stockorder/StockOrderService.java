@@ -335,10 +335,8 @@ public class StockOrderService extends BaseService {
                                 .addAll(addNextAggregationLevels(currentDepth + 1, paginatedRequest, sourceOrderList.get(0), userId, language));
                     } else {
                         // proceed recursion with all leafs
-                          sourceOrderList.forEach(sourceOrder -> {
-                              resultHistoryList
-                                      .addAll(addNextAggregationLevels(currentDepth + 1, paginatedRequest, sourceOrder, userId, language));
-                          });
+                          sourceOrderList.forEach(sourceOrder -> resultHistoryList
+                                  .addAll(addNextAggregationLevels(currentDepth + 1, paginatedRequest, sourceOrder, userId, language)));
                     }
                 }
             } else {
@@ -451,12 +449,17 @@ public class StockOrderService extends BaseService {
         }
 
         // Validation of required fields
-        if (apiStockOrder.getOrderType() == null)
+        if (apiStockOrder.getOrderType() == null) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "OrderType needs to be provided!");
-        if (apiStockOrder.getFacility() == null)
+        }
+        if (apiStockOrder.getFacility() == null) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Facility needs to be provided!");
-        if (apiStockOrder.getSemiProduct() == null)
-            throw new ApiException(ApiStatus.INVALID_REQUEST, "SemiProduct needs to be provided!");
+        }
+
+        // Semi-product or Final product needs to be provided
+        if (apiStockOrder.getSemiProduct() == null && apiStockOrder.getFinalProduct() == null) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Semi-product or Final product needs to be provided!");
+        }
 
         entity.setOrderType(apiStockOrder.getOrderType());
         entity.setFacility(facilityService.fetchFacility(apiStockOrder.getFacility().getId()));
@@ -569,8 +572,14 @@ public class StockOrderService extends BaseService {
 
         // END: Calculate quantities
 
+        // Set the measure unit from the contained semi-product
         if (entity.getSemiProduct() != null) {
             entity.setMeasurementUnitType(entity.getSemiProduct().getMeasurementUnitType());
+        }
+
+        // Set the measure unit from the contained final product
+        if (entity.getFinalProduct() != null) {
+            entity.setMeasurementUnitType(entity.getFinalProduct().getMeasurementUnitType());
         }
 
         // Production location
@@ -593,7 +602,7 @@ public class StockOrderService extends BaseService {
         switch (apiStockOrder.getOrderType()) {
             case PURCHASE_ORDER:
 
-                // on purchase order, Total quantity is calculated by total gross quantity and tare
+                // On purchase order, Total quantity is calculated by total gross quantity and tare
                 if (apiStockOrder.getTare() != null) {
                     apiStockOrder.setTotalQuantity(apiStockOrder.getTotalGrossQuantity().subtract(apiStockOrder.getTare()));
                 } else {

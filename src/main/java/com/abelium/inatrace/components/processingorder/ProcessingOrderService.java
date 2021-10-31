@@ -102,6 +102,7 @@ public class ProcessingOrderService extends BaseService {
                 return createOrUpdateQuoteOrder(entity, apiProcessingOrder, userId, language);
 
             case PROCESSING:
+            case FINAL_PROCESSING:
 
                 if (apiProcessingOrder.getInputTransactions() == null || apiProcessingOrder.getInputTransactions().isEmpty()) {
                     throw new ApiException(ApiStatus.INVALID_REQUEST, "At least one input Transaction has to be provided!");
@@ -177,7 +178,7 @@ public class ProcessingOrderService extends BaseService {
 
         // Delete target StockOrder and input Transactions that are not present in the request
         // (applies only for existing ProcessingOrders)
-        if(entity.getId() != null) {
+        if (entity.getId() != null) {
 
             // Remove transactions that are not present in request
             List<Transaction> transactionsToBeDeleted = entity.getInputTransactions()
@@ -234,7 +235,8 @@ public class ProcessingOrderService extends BaseService {
         for (int i = 0; i < apiProcessingOrder.getInputTransactions().size(); i++) {
 
             ApiTransaction apiTransaction = apiProcessingOrder.getInputTransactions().get(i);
-            Boolean isProcessing = processingAction.getType() == ProcessingActionType.PROCESSING;
+            Boolean isProcessing = processingAction.getType() == ProcessingActionType.PROCESSING ||
+                    processingAction.getType() == ProcessingActionType.FINAL_PROCESSING;
 
             ApiBaseEntity insertedApiTransaction = transactionService.createOrUpdateTransaction(apiTransaction, isProcessing);
             Transaction insertedTransaction = fetchEntity(insertedApiTransaction.getId(), Transaction.class);
@@ -302,14 +304,14 @@ public class ProcessingOrderService extends BaseService {
             for (Transaction t: transactionsToBeDeleted) {
                 transactionService.deleteTransaction(t.getId(), userId, language);
             }
-
         }
 
         // Create new or update existing input Transactions
         for (int i = 0; i < apiProcessingOrder.getInputTransactions().size(); i++) {
 
             ApiTransaction apiTransaction = apiProcessingOrder.getInputTransactions().get(i);
-            Boolean isProcessing = entity.getProcessingAction().getType() == ProcessingActionType.PROCESSING;
+            Boolean isProcessing = entity.getProcessingAction().getType() == ProcessingActionType.PROCESSING ||
+                    entity.getProcessingAction().getType() == ProcessingActionType.FINAL_PROCESSING;
 
             Long insertedTransactionId = transactionService.createOrUpdateTransaction(apiTransaction, isProcessing).getId();
             Transaction insertedTransaction = fetchEntity(insertedTransactionId, Transaction.class);

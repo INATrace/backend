@@ -1,12 +1,12 @@
 package com.abelium.inatrace.components.transaction.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.components.codebook.action_type.api.ApiActionType;
 import com.abelium.inatrace.components.codebook.grade_abbreviation.api.ApiGradeAbbreviation;
 import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
+import com.abelium.inatrace.components.product.api.ApiFinalProduct;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
 import io.swagger.annotations.ApiModelProperty;
@@ -30,6 +30,9 @@ public class ApiTransaction extends ApiBaseEntity {
     @ApiModelProperty(value = "Semi product", position = 5)
     private ApiSemiProduct semiProduct;
 
+    @ApiModelProperty(value = "Final product")
+    private ApiFinalProduct finalProduct;
+
     @ApiModelProperty(value = "Source facility", position = 6)
     private ApiFacility sourceFacility;
 
@@ -38,9 +41,6 @@ public class ApiTransaction extends ApiBaseEntity {
 
     @ApiModelProperty(value = "Is order of type processing", position = 8)
     private Boolean isProcessing;
-
-    @ApiModelProperty(value = "Action type", position = 9)
-    private ApiActionType actionType;
 
     @ApiModelProperty(value = "Transaction status", position = 10)
     private TransactionStatus status;
@@ -112,6 +112,14 @@ public class ApiTransaction extends ApiBaseEntity {
         this.semiProduct = semiProduct;
     }
 
+    public ApiFinalProduct getFinalProduct() {
+        return finalProduct;
+    }
+
+    public void setFinalProduct(ApiFinalProduct finalProduct) {
+        this.finalProduct = finalProduct;
+    }
+
     public ApiFacility getSourceFacility() {
         return sourceFacility;
     }
@@ -134,14 +142,6 @@ public class ApiTransaction extends ApiBaseEntity {
 
     public void setIsProcessing(Boolean processing) {
         isProcessing = processing;
-    }
-
-    public ApiActionType getActionType() {
-        return actionType;
-    }
-
-    public void setActionType(ApiActionType actionType) {
-        this.actionType = actionType;
     }
 
     public TransactionStatus getStatus() {
