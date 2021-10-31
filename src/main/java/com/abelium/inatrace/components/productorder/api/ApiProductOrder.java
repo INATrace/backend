@@ -1,7 +1,6 @@
 package com.abelium.inatrace.components.productorder.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.components.codebook.grade_abbreviation.api.ApiGradeAbbreviation;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
@@ -37,9 +36,6 @@ public class ApiProductOrder extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "Require organic coffee")
 	private Boolean requiredOrganic;
-
-	@ApiModelProperty(value = "The grade required")
-	private ApiGradeAbbreviation requiredGrade;
 
 	@ApiModelProperty(value = "The ordered items(final products) of this order")
 	private List<ApiStockOrder> items;
@@ -90,14 +86,6 @@ public class ApiProductOrder extends ApiBaseEntity {
 
 	public void setRequiredOrganic(Boolean requiredOrganic) {
 		this.requiredOrganic = requiredOrganic;
-	}
-
-	public ApiGradeAbbreviation getRequiredGrade() {
-		return requiredGrade;
-	}
-
-	public void setRequiredGrade(ApiGradeAbbreviation requiredGrade) {
-		this.requiredGrade = requiredGrade;
 	}
 
 	public List<ApiStockOrder> getItems() {

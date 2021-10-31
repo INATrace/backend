@@ -1,6 +1,5 @@
 package com.abelium.inatrace.components.productorder.mappers;
 
-import com.abelium.inatrace.components.codebook.grade_abbreviation.GradeAbbreviationMapper;
 import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.facility.FacilityMapper;
 import com.abelium.inatrace.components.productorder.api.ApiProductOrder;
@@ -35,7 +34,6 @@ public final class ProductOrderMapper {
 		apiProductOrder.setRequiredOrganic(entity.getRequiredOrganic());
 		apiProductOrder.setFacility(FacilityMapper.toApiFacilityBase(entity.getFacility(), language));
 		apiProductOrder.setCustomer(CompanyCustomerMapper.toApiCompanyCustomerBase(entity.getCustomer()));
-		apiProductOrder.setRequiredGrade(GradeAbbreviationMapper.toApiGradeAbbreviation(entity.getRequiredGrade()));
 
 		// Map the ordered items contained in this order
 		apiProductOrder.setItems(

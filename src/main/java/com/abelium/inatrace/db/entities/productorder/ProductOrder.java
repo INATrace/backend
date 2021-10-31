@@ -1,7 +1,6 @@
 package com.abelium.inatrace.db.entities.productorder;
 
 import com.abelium.inatrace.db.base.TimestampEntity;
-import com.abelium.inatrace.db.entities.codebook.GradeAbbreviationType;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
@@ -31,9 +30,6 @@ public class ProductOrder extends TimestampEntity {
 
 	@Column
 	private Boolean requiredOrganic;
-
-	@ManyToOne
-	private GradeAbbreviationType requiredGrade;
 
 	@OneToMany(mappedBy = "productOrder")
 	private List<StockOrder> items;
@@ -76,14 +72,6 @@ public class ProductOrder extends TimestampEntity {
 
 	public void setRequiredOrganic(Boolean requiredOrganic) {
 		this.requiredOrganic = requiredOrganic;
-	}
-
-	public GradeAbbreviationType getRequiredGrade() {
-		return requiredGrade;
-	}
-
-	public void setRequiredGrade(GradeAbbreviationType requiredGrade) {
-		this.requiredGrade = requiredGrade;
 	}
 
 	public List<StockOrder> getItems() {
