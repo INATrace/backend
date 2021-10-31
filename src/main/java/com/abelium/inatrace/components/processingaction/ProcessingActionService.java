@@ -20,6 +20,7 @@ import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionTranslation;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
+import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
@@ -27,6 +28,8 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.torpedoquery.jpa.OnGoingLogicalCondition;
+import org.torpedoquery.jpa.Torpedo;
 
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
@@ -172,27 +175,41 @@ public class ProcessingActionService extends BaseService {
 		return processingAction;
 	}
 	
-	public ApiPaginatedList<ApiProcessingAction> listProcessingActionsByCompany(Long companyId, Language language, ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiProcessingAction> listProcessingActionsByCompany(Long companyId, Language language,
+	                                                                            ApiPaginatedRequest request,
+	                                                                            ProcessingActionType actionType,
+	                                                                            Boolean onlyFinalProducts) {
 
-		TypedQuery<ProcessingAction> processingActionsQuery = 
-			em.createNamedQuery("ProcessingAction.listProcessingActionsByCompany", ProcessingAction.class)
-				.setParameter("companyId", companyId)
-				.setParameter("language", language)
-				.setFirstResult(request.getOffset())
-				.setMaxResults(request.getLimit());
+		return PaginationTools.createPaginatedResponse(em, request, () ->
+						listProcessingActionsByCompanyQuery(companyId, language, actionType, onlyFinalProducts),
+				processingAction -> ProcessingActionMapper.toApiProcessingAction(processingAction, language));
+	}
 
-		List<ProcessingAction> processingActions = processingActionsQuery.getResultList();
+	private ProcessingAction listProcessingActionsByCompanyQuery(Long companyId, Language language,
+	                                                             ProcessingActionType actionType,
+	                                                             Boolean onlyFinalProducts) {
 
-		Long count = em.createNamedQuery("ProcessingAction.countProcessingActionsByCompany", Long.class)
-			.setParameter("companyId", companyId)
-			.setParameter("language", language)
-			.getSingleResult();
+		ProcessingAction processingActionProxy = Torpedo.from(ProcessingAction.class);
+		ProcessingActionTranslation procActionTranslation = Torpedo.innerJoin(
+				processingActionProxy.getProcessingActionTranslations());
 
-		return new ApiPaginatedList<>(
-			processingActions
-				.stream()
-				.map(processingAction -> ProcessingActionMapper.toApiProcessingAction(processingAction, language))
-				.collect(Collectors.toList()), count);
+		OnGoingLogicalCondition condition = Torpedo.condition();
+
+		condition = condition.and(procActionTranslation.getLanguage()).eq(language);
+		condition = condition.and(processingActionProxy.getCompany().getId()).eq(companyId);
+
+		if (actionType != null) {
+			condition = condition.and(processingActionProxy.getType()).eq(actionType);
+		}
+
+		if (BooleanUtils.isTrue(onlyFinalProducts)) {
+			condition = condition.and(processingActionProxy.getInputFinalProduct()).isNotNull();
+			condition = condition.and(processingActionProxy.getOutputFinalProduct()).isNotNull();
+		}
+
+		Torpedo.where(condition);
+
+		return processingActionProxy;
 	}
 
 	private void validateProcessingAction(ApiProcessingAction apiProcessingAction) throws ApiException {

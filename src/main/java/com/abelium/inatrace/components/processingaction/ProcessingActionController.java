@@ -4,6 +4,7 @@ import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.types.Language;
+import com.abelium.inatrace.types.ProcessingActionType;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,10 +41,13 @@ public class ProcessingActionController {
 	@ApiOperation("Get a list of processing actions by company ID.")
 	public ApiPaginatedResponse<ApiProcessingAction> listProcessingActionsByCompany(
 		@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+		@Valid @ApiParam(value = "Processing action type") @RequestParam(value = "actionType", required = false)
+				ProcessingActionType actionType,
+		@Valid @ApiParam(value = "Only final product actions") @RequestParam(value = "onlyFinalProducts", required = false) Boolean onlyFinalProducts,
 		@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 		@Valid ApiPaginatedRequest request) {
 
-		return new ApiPaginatedResponse<>(processingActionService.listProcessingActionsByCompany(companyId, language, request));
+		return new ApiPaginatedResponse<>(processingActionService.listProcessingActionsByCompany(companyId, language, request, actionType, onlyFinalProducts));
 	}
 	
 	@GetMapping("{id}")
