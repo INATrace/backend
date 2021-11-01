@@ -31,6 +31,7 @@ import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
+import com.abelium.inatrace.types.ProcessingActionType;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -44,6 +45,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Lazy
@@ -527,8 +529,8 @@ public class StockOrderService extends BaseService {
                 }
         }
 
+        // If existing entity and processing order is provided edit the quantities
         if (entity.getId() != null) {
-
             if (processingOrder != null) {
 
                 // Calculate quantities based on input transactions
@@ -591,6 +593,9 @@ public class StockOrderService extends BaseService {
         if (entity.getFinalProduct() != null) {
             entity.setMeasurementUnitType(entity.getFinalProduct().getMeasurementUnitType());
         }
+
+        // If entity is new and processing order is provided with processing action type 'GENERATE_QR_CODE', generate a new QR code tag for this stock order
+        generateStockOrderQRCodeTag(entity, processingOrder);
 
         // Production location
         ApiStockOrderLocation apiProdLocation = apiStockOrder.getProductionLocation();
@@ -797,6 +802,13 @@ public class StockOrderService extends BaseService {
             stockOrderPETypeValue.setOtherEvidence(otherEvidence);
 
             entity.getDocumentRequirements().add(stockOrderPETypeValue);
+        }
+    }
+
+    private void generateStockOrderQRCodeTag(StockOrder entity, ProcessingOrder processingOrder) {
+
+        if (entity.getId() == null && processingOrder != null && processingOrder.getProcessingAction().getType() == ProcessingActionType.GENERATE_QR_CODE) {
+            entity.setQrCodeTag(UUID.randomUUID().toString());
         }
     }
 

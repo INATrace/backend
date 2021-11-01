@@ -103,6 +103,7 @@ public class ProcessingOrderService extends BaseService {
 
             case PROCESSING:
             case FINAL_PROCESSING:
+            case GENERATE_QR_CODE:
 
                 if (apiProcessingOrder.getInputTransactions() == null || apiProcessingOrder.getInputTransactions().isEmpty()) {
                     throw new ApiException(ApiStatus.INVALID_REQUEST, "At least one input Transaction has to be provided!");
@@ -122,6 +123,15 @@ public class ProcessingOrderService extends BaseService {
                                     + "' cannot be used, because it has been already used in this processing step");
                     }
                 }
+
+                // In case we have 'GENERATE_QR_CODE', only one target stock order is permited
+                if (processingAction.getType() == ProcessingActionType.GENERATE_QR_CODE) {
+                    if (apiProcessingOrder.getTargetStockOrders().size() > 1) {
+                        throw new ApiException(ApiStatus.VALIDATION_ERROR,
+                                "Only one target Stock order is permited when ProcessingActionType is 'Generate QR code'");
+                    }
+                }
+
                 break;
 
             case TRANSFER:
@@ -236,7 +246,8 @@ public class ProcessingOrderService extends BaseService {
 
             ApiTransaction apiTransaction = apiProcessingOrder.getInputTransactions().get(i);
             Boolean isProcessing = processingAction.getType() == ProcessingActionType.PROCESSING ||
-                    processingAction.getType() == ProcessingActionType.FINAL_PROCESSING;
+                    processingAction.getType() == ProcessingActionType.FINAL_PROCESSING ||
+                    processingAction.getType() == ProcessingActionType.GENERATE_QR_CODE;
 
             ApiBaseEntity insertedApiTransaction = transactionService.createOrUpdateTransaction(apiTransaction, isProcessing);
             Transaction insertedTransaction = fetchEntity(insertedApiTransaction.getId(), Transaction.class);
