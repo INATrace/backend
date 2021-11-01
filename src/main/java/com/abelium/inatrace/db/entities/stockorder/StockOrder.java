@@ -209,6 +209,10 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private String currencyForEndCustomer;
 
+	// Generated UUID tag to be used in the QR code for this stock order (all new stock orders created from this should inherit this tag)
+	@Column
+	private String qrCodeTag;
+
 	public User getCreatedBy() {
 		return createdBy;
 	}
@@ -558,6 +562,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setCurrencyForEndCustomer(String currencyForEndCustomer) {
 		this.currencyForEndCustomer = currencyForEndCustomer;
+	}
+
+	public String getQrCodeTag() {
+		return qrCodeTag;
+	}
+
+	public void setQrCodeTag(String qrCodeTag) {
+		this.qrCodeTag = qrCodeTag;
 	}
 
 	public StockOrderLocation getProductionLocation() {

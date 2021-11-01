@@ -168,6 +168,9 @@ public class StockOrderMapper {
         apiStockOrder.setPricePerUnitForEndCustomer(entity.getPricePerUnitForEndCustomer());
         apiStockOrder.setCurrencyForEndCustomer(entity.getCurrencyForEndCustomer());
 
+        // Map the stock order QR code tag
+        apiStockOrder.setQrCodeTag(entity.getQrCodeTag());
+
 //        apiStockOrder.setRequiredWomensCoffee(entity.getRequiredWomensCoffee());
 
         // If requested mapping with Processing order, map the Processing order that created this stock order
