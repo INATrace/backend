@@ -28,6 +28,7 @@ public final class ProductOrderMapper {
 
 		ApiProductOrder apiProductOrder = new ApiProductOrder();
 		apiProductOrder.setId(entity.getId());
+		apiProductOrder.setOrderId(entity.getOrderId());
 		apiProductOrder.setUpdateTimestamp(entity.getUpdateTimestamp());
 		apiProductOrder.setDeliveryDeadline(entity.getDeliveryDeadline());
 		apiProductOrder.setRequiredWomensOnly(entity.getRequiredWomensOnly());

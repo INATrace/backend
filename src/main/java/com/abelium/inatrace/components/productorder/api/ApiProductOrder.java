@@ -17,8 +17,11 @@ import java.util.List;
 @Validated
 public class ApiProductOrder extends ApiBaseEntity {
 
+	@ApiModelProperty(value = "The order ID entered by the user")
+	private String orderId;
+
 	@ApiModelProperty(value = "Timestamp indicates when product order have been updated")
-	public Instant updateTimestamp;
+	private Instant updateTimestamp;
 
 	@ApiModelProperty(value = "Facility to which this order is order is ordered")
 	private ApiFacility facility;
@@ -39,6 +42,14 @@ public class ApiProductOrder extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "The ordered items(final products) of this order")
 	private List<ApiStockOrder> items;
+
+	public String getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
+	}
 
 	public Instant getUpdateTimestamp() {
 		return updateTimestamp;

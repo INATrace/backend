@@ -16,6 +16,9 @@ import java.util.List;
 @Entity
 public class ProductOrder extends TimestampEntity {
 
+	@Column
+	private String orderId;
+
 	@ManyToOne(optional = false)
 	private Facility facility;
 
@@ -33,6 +36,14 @@ public class ProductOrder extends TimestampEntity {
 
 	@OneToMany(mappedBy = "productOrder")
 	private List<StockOrder> items;
+
+	public String getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
+	}
 
 	public Facility getFacility() {
 		return facility;
