@@ -165,33 +165,10 @@ public class StockOrderMapper {
         apiStockOrder.setWomenShare(entity.getWomenShare());
         apiStockOrder.setOrganic(entity.getOrganic());
 
-//        apiStockOrder.setExpiryDate(entity.getExpiryDate());
-//        apiStockOrder.setEstimatedDeliveryDate(entity.getEstimatedDeliveryDate());
-//        apiStockOrder.setOrderId(entity.getOrderId());
-//        apiStockOrder.setGlobalOrderId(entity.getGlobalOrderId());
-//        apiStockOrder.setSalesPricePerUnit(entity.getSalesPricePerUnit());
-//        apiStockOrder.setSalesCurrency(entity.getSalesCurrency());
-//        apiStockOrder.setClient(CompanyMapper.toApiCompany(entity.getClient()));
-//        apiStockOrder.setProcessingAction(ProcessingActionMapper.toApiProcessingAction(entity.getProcessingAction()));
+        apiStockOrder.setPricePerUnitForEndCustomer(entity.getPricePerUnitForEndCustomer());
+        apiStockOrder.setCurrencyForEndCustomer(entity.getCurrencyForEndCustomer());
 
-//        apiStockOrder.setPricePerUnitForOwner(entity.getPricePerUnitForOwner());
-//        apiStockOrder.setPricePerUnitForBuyer(entity.getPricePerUnitForBuyer());
-//        apiStockOrder.setExchangeRateAtBuyer(entity.getExchangeRateAtBuyer());
-//        apiStockOrder.setPricePerUnitForEndCustomer(entity.getPricePerUnitForEndCustomer());
-//        apiStockOrder.setExchangeRateAtEndCustomer(entity.getExchangeRateAtEndCustomer());
-//        apiStockOrder.setCuppingResult(entity.getCuppingResult());
-//        apiStockOrder.setCuppingGrade(entity.getCuppingGrade());
-//        apiStockOrder.setCuppingFlavour(entity.getCuppingFlavour());
-//        apiStockOrder.setRoastingDate(entity.getRoastingDate());
-//        apiStockOrder.setRoastingProfile(entity.getRoastingProfile());
-//        apiStockOrder.setShipperDetails(entity.getShipperDetails());
-//        apiStockOrder.setCarrierDetails(entity.getCarrierDetails());
-//        apiStockOrder.setPortOfLoading(entity.getPortOfLoading());
-//        apiStockOrder.setPortOfDischarge(entity.getPortOfDischarge());
-//        apiStockOrder.setDateOfEndDelivery(entity.getDateOfEndDelivery());
 //        apiStockOrder.setRequiredWomensCoffee(entity.getRequiredWomensCoffee());
-//        apiStockOrder.setShippedAtDateFromOriginPort(entity.getShippedAtDateFromOriginPort());
-//        apiStockOrder.setArrivedAtDateToDestinationPort(entity.getArrivedAtDateToDestinationPort());
 
         // If requested mapping with Processing order, map the Processing order that created this stock order
         if (BooleanUtils.isTrue(withProcessingOrder)) {

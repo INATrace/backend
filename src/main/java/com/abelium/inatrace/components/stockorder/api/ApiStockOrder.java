@@ -109,20 +109,8 @@ public class ApiStockOrder extends ApiBaseEntity {
     @JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
     private Instant productionDate;
 
-//    @ApiModelProperty(value = "Expiry date", position = 16)
-//    public Instant expiryDate;
-
-//    @ApiModelProperty(value = "Estimated delivery date", position = 17)
-//    public Instant estimatedDeliveryDate;
-
     @ApiModelProperty(value = "Delivery time", position = 18)
     private Instant deliveryTime;
-
-//    @ApiModelProperty(value = "Order ID", position = 19)
-//    public Long orderId;
-
-//    @ApiModelProperty(value = "Global order ID", position = 20)
-//    public Long globalOrderId;
 
     @ApiModelProperty(value = "The produrct order that triggered creation of this stock order")
     private ApiProductOrder productOrder;
@@ -133,14 +121,8 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Price per unit", position = 21)
     private BigDecimal pricePerUnit;
 
-//    @ApiModelProperty(value = "Sales price per unit", position = 22)
-//    public Float salesPricePerUnit;
-
     @ApiModelProperty(value = "Currency", position = 23)
     private String currency;
-
-//    @ApiModelProperty(value = "Sales currency", position = 24)
-//    public String salesCurrency;
 
     @ApiModelProperty(value = "Is order of type PURCHASE_ORDER", position = 25)
     private Boolean isPurchaseOrder;
@@ -166,16 +148,6 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Balance", position = 36)
     private BigDecimal balance;
 
-    // Relevant only for order type: STOCK_ORDER
-//    @ApiModelProperty(value = "Input transactions for stock order. Read only.")
-//    public List<ApiTransaction> inputTransactions;
-
-//    @ApiModelProperty(value = "Client company", position = 38)
-//    public ApiCompany client;
-
-//    @ApiModelProperty(value = "Processing action", position = 40)
-//    public ApiProcessingAction processingAction;
-
     @ApiModelProperty(value = "Preferred way of payment", position = 41)
     private PreferredWayOfPayment preferredWayOfPayment;
 
@@ -194,59 +166,14 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "The company customer for whom the stock order is created")
     private ApiCompanyCustomer consumerCompanyCustomer;
 
-//    @ApiModelProperty(value = "Price per unit for owner", position = 46)
-//    private BigDecimal pricePerUnitForOwner;
+    @ApiModelProperty(value = "Price per unit for end customer", position = 49)
+    private BigDecimal pricePerUnitForEndCustomer;
 
-//    @ApiModelProperty(value = "Price per unit for buyer", position = 47)
-//    private BigDecimal pricePerUnitForBuyer;
-
-//    @ApiModelProperty(value = "Exchange rate at buyer", position = 48)
-//    private BigDecimal exchangeRateAtBuyer;
-
-//    @ApiModelProperty(value = "Price per unit for end customer", position = 49)
-//    private BigDecimal pricePerUnitForEndCustomer;
-
-//    @ApiModelProperty(value = "Exchange rate at end customer", position = 50)
-//    private BigDecimal exchangeRateAtEndCustomer;
-
-//    @ApiModelProperty(value = "Cupping result", position = 51)
-//    private String cuppingResult;
-
-//    @ApiModelProperty(value = "Cupping grade", position = 52)
-//    private String cuppingGrade;
-
-//    @ApiModelProperty(value = "Cupping flavour", position = 53)
-//    private String cuppingFlavour;
-
-//    @ApiModelProperty(value = "Roasting date", position = 54)
-//    private Instant roastingDate;
-
-//    @ApiModelProperty(value = "Roasting profile", position = 55)
-//    private String roastingProfile;
-
-//    @ApiModelProperty(value = "Shipper details", position = 56)
-//    private String shipperDetails;
-
-//    @ApiModelProperty(value = "Carrier details", position = 57)
-//    private String carrierDetails;
-
-//    @ApiModelProperty(value = "Part of loading", position = 58)
-//    private String portOfLoading;
-
-//    @ApiModelProperty(value = "Port od discharge", position = 59)
-//    private String portOfDischarge;
-
-//    @ApiModelProperty(value = "Date of end delivery", position = 60)
-//    private Instant dateOfEndDelivery;
+    @ApiModelProperty(value = "Currency for price per unit for end customer")
+    private String currencyForEndCustomer;
 
 //    @ApiModelProperty(value = "Required women's coffee", position = 61)
 //    private Boolean requiredWomensCoffee;
-
-//    @ApiModelProperty(value = "Shipper at date from origin port", position = 62)
-//    private Instant shippedAtDateFromOriginPort;
-
-//    @ApiModelProperty(value = "Arrived at date to destination port", position = 63)
-//    private Instant arrivedAtDateToDestinationPort;
 
     @ApiModelProperty(value = "Organic")
     private Boolean organic;
@@ -611,6 +538,22 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setConsumerCompanyCustomer(ApiCompanyCustomer consumerCompanyCustomer) {
         this.consumerCompanyCustomer = consumerCompanyCustomer;
+    }
+
+    public BigDecimal getPricePerUnitForEndCustomer() {
+        return pricePerUnitForEndCustomer;
+    }
+
+    public void setPricePerUnitForEndCustomer(BigDecimal pricePerUnitForEndCustomer) {
+        this.pricePerUnitForEndCustomer = pricePerUnitForEndCustomer;
+    }
+
+    public String getCurrencyForEndCustomer() {
+        return currencyForEndCustomer;
+    }
+
+    public void setCurrencyForEndCustomer(String currencyForEndCustomer) {
+        this.currencyForEndCustomer = currencyForEndCustomer;
     }
 
     public Boolean getOrganic() {

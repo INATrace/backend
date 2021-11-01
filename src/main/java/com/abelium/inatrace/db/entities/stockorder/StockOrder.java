@@ -51,13 +51,13 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private Long creatorId;
 
-	// Farmer representative - collector
-	@ManyToOne
-	private UserCustomer representativeOfProducerUserCustomer;
-
 	// Farmer
 	@ManyToOne
 	private UserCustomer producerUserCustomer;
+
+	// Farmer representative - collector
+	@ManyToOne
+	private UserCustomer representativeOfProducerUserCustomer;
 	
 	@OneToOne(cascade = CascadeType.ALL)
 	private StockOrderLocation productionLocation;
@@ -76,6 +76,14 @@ public class StockOrder extends TimestampEntity {
 	
 	@ManyToOne
 	private Facility facility;
+
+	// The facility that is quoted for total quantity of the provided semi-product
+	@ManyToOne
+	private Facility quoteFacility;
+
+	// The company of the quoted facility (this should be set automatically from the facility company)
+	@ManyToOne
+	private Company quoteCompany;
 
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Certification> certifications;
@@ -123,37 +131,16 @@ public class StockOrder extends TimestampEntity {
 	private BigDecimal availableQuantity;
 	
 	@Column
-	private Boolean isAvailable;
-	
-	@Column
 	private Instant productionDate;
-	
-	@Column
-	private Instant expiryDate;
-	
-	@Column
-	private Instant estimatedDeliveryDate;
 	
 	@Column
 	private Instant deliveryTime;
 	
 	@Column
-	private Long orderId;
-	
-	@Column
-	private Long globalOrderId;
-	
-	@Column
 	private BigDecimal pricePerUnit;
 	
 	@Column
-	private BigDecimal salesPricePerUnit;
-	
-	@Column
 	private String currency;
-	
-	@Column
-	private String salesCurrency;
 	
 	@Column
 	private Boolean isPurchaseOrder;
@@ -170,8 +157,12 @@ public class StockOrder extends TimestampEntity {
 	
 	@Column
 	private Boolean womenShare;
-	
-	// CALCULATED section
+
+	@Column
+	private Boolean requiredWomensCoffee;
+
+	@Column
+	private Boolean organic;
 
 	@Column
 	private BigDecimal cost;
@@ -181,6 +172,12 @@ public class StockOrder extends TimestampEntity {
 
 	@Column
 	private BigDecimal balance;
+
+	@Column
+	private BigDecimal tare;
+
+	@Column
+	private BigDecimal damagedPriceDeduction;
 
 	@ManyToOne
 	private Company client;
@@ -194,94 +191,23 @@ public class StockOrder extends TimestampEntity {
 	
 	@Column
 	private Integer sacNumber;
-	
-//	TODO: one to many self referencing?
-//	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-//	private List<StockOrder> triggerOrders = new ArrayList<>();
-	
-//	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-//	private List<StockOrder> triggeredOrders = new ArrayList<>();
-	
-//	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-//	private List<StockOrder> inputOrders = new ArrayList<>();
 
 	// Used in case where we have Quote order - the quote order is open when total quantity > fulfilled quantity
 	@Column
 	private Boolean isOpenOrder;
 
-	// The facility that is quoted for total quantity of the provided semi-product
-	@ManyToOne
-	private Facility quoteFacility;
+	// Used in processing order with action PROCESSING, FINAL_PROCESSING AND TRANSFER to denote that
+	// the stock unit represented by this stock order is available in the facility
+	@Column
+	private Boolean isAvailable;
 
-	// The company of the quoted facility (this should be set automatically from the facility company)
-	@ManyToOne
-	private Company quoteCompany;
-	
-	@Column
-    private BigDecimal pricePerUnitForOwner;
-	
-	@Column
-    private BigDecimal pricePerUnitForBuyer;
-	
-	@Column
-    private BigDecimal exchangeRateAtBuyer;
-	
+	// The price per unit specified in the final product order (global order)
 	@Column
     private BigDecimal pricePerUnitForEndCustomer;
-	
-	@Column
-    private BigDecimal exchangeRateAtEndCustomer;
-	
-	@Column
-    private String cuppingResult;
-	
-	@Column
-    private String cuppingGrade;
-	
-	@Column
-    private String cuppingFlavour;
-	
-	@Column
-    private Instant roastingDate;
-	
-	@Column
-    private String roastingProfile;
-	
-	@Column
-    private String shipperDetails;
-	
-	@Column
-    private String carrierDetails;
-	
-	@Column
-    private String portOfLoading;
-	
-	@Column
-    private String portOfDischarge;
-	
-	@OneToOne
-    private StockOrderLocation locationOfEndDelivery;
-	
-	@Column
-    private Instant dateOfEndDelivery;
-	
-	@Column
-    private Boolean requiredWomensCoffee;
 
+	// The currency for the price per unit in the final product order (global order)
 	@Column
-    private Instant shippedAtDateFromOriginPort;
-	
-	@Column
-    private Instant arrivedAtDateToDestinationPort;
-
-	@Column
-	private Boolean organic;
-
-	@Column
-	private BigDecimal tare;
-
-	@Column
-	private BigDecimal damagedPriceDeduction;
+	private String currencyForEndCustomer;
 
 	public User getCreatedBy() {
 		return createdBy;
@@ -445,44 +371,12 @@ public class StockOrder extends TimestampEntity {
 		this.productionDate = productionDate;
 	}
 
-	public Instant getExpiryDate() {
-		return expiryDate;
-	}
-
-	public void setExpiryDate(Instant expiryDate) {
-		this.expiryDate = expiryDate;
-	}
-
-	public Instant getEstimatedDeliveryDate() {
-		return estimatedDeliveryDate;
-	}
-
-	public void setEstimatedDeliveryDate(Instant estimatedDeliveryDate) {
-		this.estimatedDeliveryDate = estimatedDeliveryDate;
-	}
-
 	public Instant getDeliveryTime() {
 		return deliveryTime;
 	}
 
 	public void setDeliveryTime(Instant deliveryTime) {
 		this.deliveryTime = deliveryTime;
-	}
-
-	public Long getOrderId() {
-		return orderId;
-	}
-
-	public void setOrderId(Long orderId) {
-		this.orderId = orderId;
-	}
-
-	public Long getGlobalOrderId() {
-		return globalOrderId;
-	}
-
-	public void setGlobalOrderId(Long globalOrderId) {
-		this.globalOrderId = globalOrderId;
 	}
 
 	public List<StockOrderPEFieldValue> getProcessingEFValues() {
@@ -514,14 +408,6 @@ public class StockOrder extends TimestampEntity {
 		this.pricePerUnit = pricePerUnit;
 	}
 
-	public BigDecimal getSalesPricePerUnit() {
-		return salesPricePerUnit;
-	}
-
-	public void setSalesPricePerUnit(BigDecimal salesPricePerUnit) {
-		this.salesPricePerUnit = salesPricePerUnit;
-	}
-
 	public List<Payment> getPayments() {
 		return payments;
 	}
@@ -536,14 +422,6 @@ public class StockOrder extends TimestampEntity {
 
 	public void setCurrency(String currency) {
 		this.currency = currency;
-	}
-
-	public String getSalesCurrency() {
-		return salesCurrency;
-	}
-
-	public void setSalesCurrency(String salesCurrency) {
-		this.salesCurrency = salesCurrency;
 	}
 
 	public Boolean getPurchaseOrder() {
@@ -666,30 +544,6 @@ public class StockOrder extends TimestampEntity {
 		this.quoteCompany = quoteCompany;
 	}
 
-	public BigDecimal getPricePerUnitForOwner() {
-		return pricePerUnitForOwner;
-	}
-
-	public void setPricePerUnitForOwner(BigDecimal pricePerUnitForOwner) {
-		this.pricePerUnitForOwner = pricePerUnitForOwner;
-	}
-
-	public BigDecimal getPricePerUnitForBuyer() {
-		return pricePerUnitForBuyer;
-	}
-
-	public void setPricePerUnitForBuyer(BigDecimal pricePerUnitForBuyer) {
-		this.pricePerUnitForBuyer = pricePerUnitForBuyer;
-	}
-
-	public BigDecimal getExchangeRateAtBuyer() {
-		return exchangeRateAtBuyer;
-	}
-
-	public void setExchangeRateAtBuyer(BigDecimal exchangeRateAtBuyer) {
-		this.exchangeRateAtBuyer = exchangeRateAtBuyer;
-	}
-
 	public BigDecimal getPricePerUnitForEndCustomer() {
 		return pricePerUnitForEndCustomer;
 	}
@@ -698,84 +552,12 @@ public class StockOrder extends TimestampEntity {
 		this.pricePerUnitForEndCustomer = pricePerUnitForEndCustomer;
 	}
 
-	public BigDecimal getExchangeRateAtEndCustomer() {
-		return exchangeRateAtEndCustomer;
+	public String getCurrencyForEndCustomer() {
+		return currencyForEndCustomer;
 	}
 
-	public void setExchangeRateAtEndCustomer(BigDecimal exchangeRateAtEndCustomer) {
-		this.exchangeRateAtEndCustomer = exchangeRateAtEndCustomer;
-	}
-
-	public String getCuppingResult() {
-		return cuppingResult;
-	}
-
-	public void setCuppingResult(String cuppingResult) {
-		this.cuppingResult = cuppingResult;
-	}
-
-	public String getCuppingGrade() {
-		return cuppingGrade;
-	}
-
-	public void setCuppingGrade(String cuppingGrade) {
-		this.cuppingGrade = cuppingGrade;
-	}
-
-	public String getCuppingFlavour() {
-		return cuppingFlavour;
-	}
-
-	public void setCuppingFlavour(String cuppingFlavour) {
-		this.cuppingFlavour = cuppingFlavour;
-	}
-
-	public Instant getRoastingDate() {
-		return roastingDate;
-	}
-
-	public void setRoastingDate(Instant roastingDate) {
-		this.roastingDate = roastingDate;
-	}
-
-	public String getRoastingProfile() {
-		return roastingProfile;
-	}
-
-	public void setRoastingProfile(String roastingProfile) {
-		this.roastingProfile = roastingProfile;
-	}
-
-	public String getShipperDetails() {
-		return shipperDetails;
-	}
-
-	public void setShipperDetails(String shipperDetails) {
-		this.shipperDetails = shipperDetails;
-	}
-
-	public String getCarrierDetails() {
-		return carrierDetails;
-	}
-
-	public void setCarrierDetails(String carrierDetails) {
-		this.carrierDetails = carrierDetails;
-	}
-
-	public String getPortOfLoading() {
-		return portOfLoading;
-	}
-
-	public void setPortOfLoading(String portOfLoading) {
-		this.portOfLoading = portOfLoading;
-	}
-
-	public String getPortOfDischarge() {
-		return portOfDischarge;
-	}
-
-	public void setPortOfDischarge(String portOfDischarge) {
-		this.portOfDischarge = portOfDischarge;
+	public void setCurrencyForEndCustomer(String currencyForEndCustomer) {
+		this.currencyForEndCustomer = currencyForEndCustomer;
 	}
 
 	public StockOrderLocation getProductionLocation() {
@@ -786,44 +568,12 @@ public class StockOrder extends TimestampEntity {
 		this.productionLocation = productionLocation;
 	}
 
-	public StockOrderLocation getLocationOfEndDelivery() {
-		return locationOfEndDelivery;
-	}
-
-	public void setLocationOfEndDelivery(StockOrderLocation locationOfEndDelivery) {
-		this.locationOfEndDelivery = locationOfEndDelivery;
-	}
-
-	public Instant getDateOfEndDelivery() {
-		return dateOfEndDelivery;
-	}
-
-	public void setDateOfEndDelivery(Instant dateOfEndDelivery) {
-		this.dateOfEndDelivery = dateOfEndDelivery;
-	}
-
 	public Boolean getRequiredWomensCoffee() {
 		return requiredWomensCoffee;
 	}
 
 	public void setRequiredWomensCoffee(Boolean requiredWomensCoffee) {
 		this.requiredWomensCoffee = requiredWomensCoffee;
-	}
-
-	public Instant getShippedAtDateFromOriginPort() {
-		return shippedAtDateFromOriginPort;
-	}
-
-	public void setShippedAtDateFromOriginPort(Instant shippedAtDateFromOriginPort) {
-		this.shippedAtDateFromOriginPort = shippedAtDateFromOriginPort;
-	}
-
-	public Instant getArrivedAtDateToDestinationPort() {
-		return arrivedAtDateToDestinationPort;
-	}
-
-	public void setArrivedAtDateToDestinationPort(Instant arrivedAtDateToDestinationPort) {
-		this.arrivedAtDateToDestinationPort = arrivedAtDateToDestinationPort;
 	}
 
 	public Boolean getOrganic() {
