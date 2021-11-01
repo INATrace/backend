@@ -13,10 +13,14 @@ package com.abelium.inatrace.types;
  *
  * TRANSFER - Transfer a semi-product from one facility into onther. This is inside one company. Can be also used for transfer
  * final products between facilities. In this case, there is a field in ProcessingAction entity which specifeis that action is for final product.
+ *
+ * GENERATE_QR_CODE - Special processing action which is used for generating QR code tag that's used to tag a stock order representing some quantity of selected semi-product.
+ * The input and output semi-product is the same in this case.
  */
 public enum ProcessingActionType {
     PROCESSING,
     FINAL_PROCESSING,
     SHIPMENT,
-    TRANSFER
+    TRANSFER,
+    GENERATE_QR_CODE
 }

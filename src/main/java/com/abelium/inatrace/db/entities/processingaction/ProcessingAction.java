@@ -48,13 +48,13 @@ public class ProcessingAction extends TimestampEntity {
 	private Company company;
 
 	/**
-	 * Used when we have action types: PROCESSING, QUOTE, TRANSFER, FINAL_PROCESSING
+	 * Used when we have action types: PROCESSING, QUOTE, TRANSFER, FINAL_PROCESSING, GENERATE_QR_CODE
 	 */
 	@ManyToOne
 	private SemiProduct inputSemiProduct;
 
 	/**
-	 * Used when we have action types: PROCESSING, QUOTE, TRANSFER
+	 * Used when we have action types: PROCESSING, QUOTE, TRANSFER, GENERATE_QR_CODE
 	 */
 	@ManyToOne
 	private SemiProduct outputSemiProduct;

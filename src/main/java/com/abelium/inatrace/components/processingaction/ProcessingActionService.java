@@ -268,6 +268,13 @@ public class ProcessingActionService extends BaseService {
 						throw new ApiException(ApiStatus.INVALID_REQUEST, "Input semi-product is required");
 					}
 				}
+				break;
+			case GENERATE_QR_CODE:
+
+				// Validate input semi-product
+				if (apiProcessingAction.getInputSemiProduct() == null || apiProcessingAction.getInputSemiProduct().getId() == null) {
+					throw new ApiException(ApiStatus.INVALID_REQUEST, "Input semi-product is required");
+				}
 		}
 
 		// Make sure English translation is present
@@ -329,6 +336,14 @@ public class ProcessingActionService extends BaseService {
 					entity.setInputSemiProduct(inputSemiProduct);
 					entity.setOutputSemiProduct(inputSemiProduct);
 				}
+				break;
+
+			case GENERATE_QR_CODE:
+
+				// Set the input and output semi-product (the output is the same with the input)
+				inputSemiProduct = semiProductService.fetchSemiProduct(apiProcessingAction.getInputSemiProduct().getId());
+				entity.setInputSemiProduct(inputSemiProduct);
+				entity.setOutputSemiProduct(inputSemiProduct);
 		}
 	}
 
