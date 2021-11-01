@@ -479,6 +479,7 @@ public class StockOrderService extends BaseService {
         entity.setProductionDate(apiStockOrder.getProductionDate());
         entity.setInternalLotNumber(apiStockOrder.getInternalLotNumber());
         entity.setDeliveryTime(apiStockOrder.getDeliveryTime());
+        entity.setComments(apiStockOrder.getComments());
 
         // Set semi-product (usen in processing)
         if (apiStockOrder.getSemiProduct() != null) {
