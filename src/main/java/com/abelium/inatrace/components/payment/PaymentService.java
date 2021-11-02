@@ -39,8 +39,12 @@ import java.time.Instant;
 @Service
 public class PaymentService extends BaseService {
 
+	private final UserService userService;
+
 	@Autowired
-	private UserService userService;
+	public PaymentService(UserService userService) {
+		this.userService = userService;
+	}
 
 	public ApiPayment getPayment(Long id, Long userId) throws ApiException {
 		return PaymentMapper.toApiPayment(fetchEntity(id, Payment.class), userId);
@@ -98,9 +102,10 @@ public class PaymentService extends BaseService {
 
 		Torpedo.where(condition);
 
-		switch (request.sortBy) {
-			case "productionDate": QueryTools.orderBy(request.sort, paymentProxy.getProductionDate()); break;
-			default: QueryTools.orderBy(request.sort, paymentProxy.getId());
+		if ("productionDate".equals(request.sortBy)) {
+			QueryTools.orderBy(request.sort, paymentProxy.getProductionDate());
+		} else {
+			QueryTools.orderBy(request.sort, paymentProxy.getId());
 		}
 
 		return paymentProxy;
@@ -145,8 +150,7 @@ public class PaymentService extends BaseService {
 
 		if (entity.getId() != null) {
 
-			// If method is PUT, let's keep it simple and just allow to update the payment status to CONFIRMED
-			// Coffee Matheo doesn't allow us to update fields other than the payment status
+			// Do not allow update of fields other than the payment status
 			// Also it is not allowed to set back the value to UNCONFIRMED
 			if (apiPayment.getPaymentStatus() == PaymentStatus.CONFIRMED) {
 				if (entity.getPaymentStatus() == PaymentStatus.UNCONFIRMED) {
@@ -154,42 +158,57 @@ public class PaymentService extends BaseService {
 				}
 			}
 
-			// TODO: Should the "paymentConfirmedByCompany" be the same as "payingCompany"?
 			entity.setPaymentConfirmedAtTime(Instant.now());
 			entity.setPaymentConfirmedByCompany(entity.getPayingCompany());
 			entity.setPaymentConfirmedByUser(currentUser);
 			entity.setUpdatedBy(currentUser);
 
 		} else {
-			// If method is POST, let's create a payment from scratch
 
-			StockOrder stockOrder = fetchEntity(apiPayment.getStockOrder().getId(), StockOrder.class);;
-			if (stockOrder.getOrderType() != OrderType.PURCHASE_ORDER) {
-				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Not a purchase order");
+			if (apiPayment.getRecipientType() == null) {
+				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Recipient type is required");
+			}
+
+			StockOrder stockOrder = fetchEntity(apiPayment.getStockOrder().getId(), StockOrder.class);
+
+			if (stockOrder.getOrderType() != OrderType.PURCHASE_ORDER && stockOrder.getOrderType() != OrderType.GENERAL_ORDER) {
+				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Not a Purchase or Quote order");
 			}
 
 			// Verify document is provided, if payment purpose is FIRST_INSTALLMENT
-			if (!isPartOfBulkPayment && apiPayment.getPaymentPurposeType() == PaymentPurposeType.FIRST_INSTALLMENT && apiPayment.getReceiptDocument() == null)
-				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Receipt document has to be provided!");
+			if (!isPartOfBulkPayment && apiPayment.getPaymentPurposeType() == PaymentPurposeType.FIRST_INSTALLMENT && apiPayment.getReceiptDocument() == null) {
+				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Receipt document has to be provided");
+			}
 
 			// Verify totalPaid (amount paid to the farmer) is not negative
-			if (apiPayment.getAmountPaidToTheFarmer().compareTo(BigDecimal.ZERO) < 0)
+			if (apiPayment.getAmountPaidToTheFarmer().compareTo(BigDecimal.ZERO) < 0) {
 				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Total amount paid cannot be negative");
+			}
+
+			// Check if recipient type is COMPANY that a recipient Company is provided
+			if (apiPayment.getRecipientType() == RecipientType.COMPANY && apiPayment.getRecipientCompany() == null) {
+				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Recipient company is required when type is COMPANY");
+			}
+
+			// Check if recipient type is USER_CUSTOMER that a recipient user customer is provided
+			if (apiPayment.getRecipientType() == RecipientType.USER_CUSTOMER && apiPayment.getRecipientUserCustomer() == null) {
+				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Recipient user customer is required when type is USER_CUSTOMER");
+			}
 
 			// Receipt document (note: Storage key needs to be unique)
-			if(apiPayment.getReceiptDocument() != null) {
+			if (apiPayment.getReceiptDocument() != null) {
 				entity.setReceiptDocument(fetchEntity(apiPayment.getReceiptDocument().getId(), Document.class));
 			}
 
 			// Values from StockOrder
 			entity.setStockOrder(stockOrder);
 			entity.setOrderReference(stockOrder.getIdentifier());
-			entity.setProductionDate(stockOrder.getProductionDate()); // TODO: Is productionDate same as StockOrder prod. date?
-			entity.setPayingCompany(stockOrder.getCompany()); // same company which has created purchase order
+			entity.setProductionDate(stockOrder.getProductionDate());
+			entity.setPayingCompany(stockOrder.getCompany()); // The company that is paying
 			entity.setPurchased(stockOrder.getTotalQuantity());
 			entity.setPreferredWayOfPayment(stockOrder.getPreferredWayOfPayment());
-			entity.setRecipientUserCustomer(stockOrder.getProducerUserCustomer()); // farmer
-			entity.setRepresentativeOfRecipientUserCustomer(stockOrder.getRepresentativeOfProducerUserCustomer()); // collector
+			entity.setRecipientUserCustomer(stockOrder.getProducerUserCustomer()); // Farmer
+			entity.setRepresentativeOfRecipientUserCustomer(stockOrder.getRepresentativeOfProducerUserCustomer()); // Collector
 
 			// Values from request
 			entity.setReceiptDocumentType(apiPayment.getReceiptDocumentType());
@@ -201,21 +220,18 @@ public class PaymentService extends BaseService {
 			entity.setReceiptNumber(apiPayment.getReceiptNumber());
 			entity.setCurrency(apiPayment.getCurrency());
 
-			entity.setTotalPaid(apiPayment.getAmountPaidToTheFarmer()); // ?
+			entity.setTotalPaid(apiPayment.getAmountPaidToTheFarmer());
 			entity.setAmountPaidToTheFarmer(apiPayment.getAmountPaidToTheFarmer());
-			entity.setAmountPaidToTheCollector(BigDecimal.ZERO); // ?
+			entity.setAmountPaidToTheCollector(BigDecimal.ZERO);
 
-			// TODO: Optional ? -> Or should be error thrown?
-			if (apiPayment.getRecipientCompany() != null)
+			// If this payment is for Quote order between two companies in the value chain
+			if (apiPayment.getRecipientCompany() != null) {
 				entity.setRecipientCompany(fetchEntityOrElse(apiPayment.getRecipientCompany().getId(), Company.class, null));
-			if (apiPayment.getRepresentativeOfRecipientCompany() != null)
-				entity.setRecipientCompany(fetchEntityOrElse(apiPayment.getRepresentativeOfRecipientCompany().getId(), Company.class, null));
-
-			entity.setCreatedBy(currentUser);
-			entity.setUpdatedBy(currentUser);
+			}
 
 			stockOrder.setBalance(stockOrder.getBalance().subtract(entity.getTotalPaid()));
-			stockOrder.setUpdatedBy(currentUser);
+
+			entity.setCreatedBy(currentUser);
 		}
 		
 		if (entity.getId() == null) {
@@ -235,19 +251,23 @@ public class PaymentService extends BaseService {
 		}
 
 		// Required fields
-		if(apiBulkPayment.getPayingCompany() == null || apiBulkPayment.getPayingCompany().getId() == null) {
+		if (apiBulkPayment.getPayingCompany() == null || apiBulkPayment.getPayingCompany().getId() == null) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Paying company ID has to be provided!");
 		}
-		if(apiBulkPayment.getPayments() == null || apiBulkPayment.getPayments().isEmpty()) {
+
+		if (apiBulkPayment.getPayments() == null || apiBulkPayment.getPayments().isEmpty()) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "At least one payment needs to be provided.");
 		}
-		if(apiBulkPayment.getPaymentDescription() == null) {
+
+		if (apiBulkPayment.getPaymentDescription() == null) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Payment description needs to be provided.");
 		}
-		if(apiBulkPayment.getAdditionalCost() != null && apiBulkPayment.getAdditionalCostDescription() == null) {
+
+		if (apiBulkPayment.getAdditionalCost() != null && apiBulkPayment.getAdditionalCostDescription() == null) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Additional cost description needs to be provided.");
 		}
-		if(apiBulkPayment.getReceiptNumber() == null) {
+
+		if (apiBulkPayment.getReceiptNumber() == null) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Recipient number is required.");
 		}
 
@@ -304,11 +324,6 @@ public class PaymentService extends BaseService {
 	@Transactional
 	public void deletePayment(Long id) throws ApiException {
 		em.remove(fetchEntity(id, Payment.class));
-	}
-
-	@Transactional
-	public void deleteBulkPayment(Long id) throws ApiException {
-		em.remove(fetchEntity(id, BulkPayment.class));
 	}
 
 	private <E> E fetchEntity(Long id, Class<E> entityClass) throws ApiException {

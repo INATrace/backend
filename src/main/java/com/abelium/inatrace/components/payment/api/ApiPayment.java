@@ -4,7 +4,6 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
-import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.company.api.ApiUserCustomer;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
@@ -52,9 +51,6 @@ public class ApiPayment extends ApiBaseEntity {
 	@ApiModelProperty(value = "Stock order related to the payment")
 	private ApiStockOrder stockOrder;
 	
-//	@ApiModelProperty(value = "")
-//	private List<Transaction> inputTransactions = new ArrayList<>();
-	
 	@ApiModelProperty(value = "Recipient type")
 	private RecipientType recipientType;
 	
@@ -66,9 +62,6 @@ public class ApiPayment extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Receipt document type")
 	private ReceiptDocumentType receiptDocumentType;
-	
-//	@ApiModelProperty(value = "")
-//	private BulkPayment bankTransfer;
 	
 	@ApiModelProperty(value = "Payment purpose type")
 	private PaymentPurposeType paymentPurposeType;
@@ -100,22 +93,16 @@ public class ApiPayment extends ApiBaseEntity {
 	@ApiModelProperty(value = "Paying company")
 	private ApiCompany payingCompany;
 	
-	// The next properties can be extracted from the purchase (stock order) on the way back
+	// The properties can be extracted from the purchase (stock order) on the way back
 	
 	@ApiModelProperty(value = "Company that receives the payment")
-	private ApiCompanyBase recipientCompany; // TODO: is this a company receiving a payment?
-	
-	@ApiModelProperty(value = "Representative of the company that receives the payment")
-	private ApiCompanyBase representativeOfRecipientCompany;
+	private ApiCompanyBase recipientCompany;
 
 	@ApiModelProperty(value = "User customer that receives the payment (farmer)")
 	private ApiUserCustomer recipientUserCustomer;
 
 	@ApiModelProperty(value = "Representative of the user customer that receives the payment (collector)")
 	private ApiUserCustomer representativeOfRecipientUserCustomer;
-	
-	@ApiModelProperty(value = "Company customer that receives the payment")
-	private ApiCompanyCustomer recipientCompanyCustomer;
 
 	public Instant getUpdatedTimestamp() {
 		return updatedTimestamp;
@@ -301,14 +288,6 @@ public class ApiPayment extends ApiBaseEntity {
 		this.recipientCompany = recipientCompany;
 	}
 
-	public ApiCompanyBase getRepresentativeOfRecipientCompany() {
-		return representativeOfRecipientCompany;
-	}
-
-	public void setRepresentativeOfRecipientCompany(ApiCompanyBase representativeOfRecipientCompany) {
-		this.representativeOfRecipientCompany = representativeOfRecipientCompany;
-	}
-
 	public ApiUserCustomer getRecipientUserCustomer() {
 		return recipientUserCustomer;
 	}
@@ -323,14 +302,6 @@ public class ApiPayment extends ApiBaseEntity {
 
 	public void setRepresentativeOfRecipientUserCustomer(ApiUserCustomer representativeOfRecipientUserCustomer) {
 		this.representativeOfRecipientUserCustomer = representativeOfRecipientUserCustomer;
-	}
-
-	public ApiCompanyCustomer getRecipientCompanyCustomer() {
-		return recipientCompanyCustomer;
-	}
-
-	public void setRecipientCompanyCustomer(ApiCompanyCustomer recipientCompanyCustomer) {
-		this.recipientCompanyCustomer = recipientCompanyCustomer;
 	}
 
 }
