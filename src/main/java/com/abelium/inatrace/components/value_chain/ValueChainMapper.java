@@ -88,7 +88,7 @@ public final class ValueChainMapper {
 		if (!entity.getProcessingEvidenceFields().isEmpty()) {
 			apiValueChain.setProcessingEvidenceFields(entity.getProcessingEvidenceFields().stream()
 					.map(vcProcEvidenceField -> ProcessingEvidenceFieldMapper.toApiProcessingEvidenceField(
-							vcProcEvidenceField.getProcessingEvidenceField())).collect(Collectors.toList()));
+							vcProcEvidenceField.getProcessingEvidenceField(), language)).collect(Collectors.toList()));
 		}
 
 		// Map semi-products
