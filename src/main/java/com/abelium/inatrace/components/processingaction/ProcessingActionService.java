@@ -209,6 +209,9 @@ public class ProcessingActionService extends BaseService {
 
 		Torpedo.where(condition);
 
+		Torpedo.orderBy(processingActionProxy.getId());
+		Torpedo.orderBy(processingActionProxy.getSortOrder());
+
 		return processingActionProxy;
 	}
 
