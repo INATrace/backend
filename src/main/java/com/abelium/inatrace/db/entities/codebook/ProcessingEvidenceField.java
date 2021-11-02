@@ -6,6 +6,7 @@ import com.abelium.inatrace.db.entities.value_chain.ValueChainProcessingEvidence
 import com.abelium.inatrace.types.ProcessingEvidenceFieldType;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,6 +41,9 @@ public class ProcessingEvidenceField extends TimestampEntity {
 	@OneToMany(mappedBy = "processingEvidenceField", orphanRemoval = true, cascade = CascadeType.ALL)
 	private List<ValueChainProcessingEvidenceField> valueChains;
 
+	@OneToMany(mappedBy = "processingEvidenceField", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProcessingEvidenceFieldTranslation> processingEvidenceFieldTranslations = new ArrayList<>();
+
 	public String getFieldName() {
 		return fieldName;
 	}
@@ -72,4 +76,10 @@ public class ProcessingEvidenceField extends TimestampEntity {
 		this.valueChains = valueChains;
 	}
 
+	public List<ProcessingEvidenceFieldTranslation> getProcessingEvidenceFieldTranslations() {
+		if (processingEvidenceFieldTranslations == null) {
+			processingEvidenceFieldTranslations = new ArrayList<>();
+		}
+		return processingEvidenceFieldTranslations;
+	}
 }

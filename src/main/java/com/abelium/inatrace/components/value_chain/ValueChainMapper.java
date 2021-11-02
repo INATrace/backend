@@ -81,14 +81,14 @@ public final class ValueChainMapper {
 		if (!entity.getProcEvidenceTypes().isEmpty()) {
 			apiValueChain.setProcessingEvidenceTypes(entity.getProcEvidenceTypes().stream()
 					.map(vcProcEvidenceType -> ProcessingEvidenceTypeMapper.toApiProcessingEvidenceTypeBase(
-							vcProcEvidenceType.getProcessingEvidenceType())).collect(Collectors.toList()));
+							vcProcEvidenceType.getProcessingEvidenceType(), language)).collect(Collectors.toList()));
 		}
 
 		// Map processing evidence fields
 		if (!entity.getProcessingEvidenceFields().isEmpty()) {
 			apiValueChain.setProcessingEvidenceFields(entity.getProcessingEvidenceFields().stream()
 					.map(vcProcEvidenceField -> ProcessingEvidenceFieldMapper.toApiProcessingEvidenceField(
-							vcProcEvidenceField.getProcessingEvidenceField())).collect(Collectors.toList()));
+							vcProcEvidenceField.getProcessingEvidenceField(), language)).collect(Collectors.toList()));
 		}
 
 		// Map semi-products
