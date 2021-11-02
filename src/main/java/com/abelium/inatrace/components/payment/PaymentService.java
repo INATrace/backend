@@ -231,9 +231,11 @@ public class PaymentService extends BaseService {
 
 			if (stockOrder.getOrderType() == OrderType.PURCHASE_ORDER) {
 				stockOrder.setBalance(stockOrder.getBalance().subtract(entity.getTotalPaid()));
+				stockOrder.setUpdatedBy(currentUser);
 			}
 
 			entity.setCreatedBy(currentUser);
+			entity.setUpdatedBy(currentUser);
 		}
 		
 		if (entity.getId() == null) {
