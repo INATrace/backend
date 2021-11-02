@@ -5,6 +5,7 @@ import com.abelium.inatrace.types.ProcessingEvidenceFieldType;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -73,6 +74,9 @@ public class ApiProcessingEvidenceField extends ApiBaseEntity {
 	}
 
 	public List<ApiProcessingEvidenceFieldTranslation> getTranslations() {
+		if (translations == null) {
+			translations = new ArrayList<>();
+		}
 		return translations;
 	}
 

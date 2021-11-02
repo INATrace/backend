@@ -77,6 +77,9 @@ public class ProcessingEvidenceField extends TimestampEntity {
 	}
 
 	public List<ProcessingEvidenceFieldTranslation> getProcessingEvidenceFieldTranslations() {
+		if (processingEvidenceFieldTranslations == null) {
+			processingEvidenceFieldTranslations = new ArrayList<>();
+		}
 		return processingEvidenceFieldTranslations;
 	}
 
