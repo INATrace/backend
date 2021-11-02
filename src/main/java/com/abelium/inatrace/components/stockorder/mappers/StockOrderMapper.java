@@ -33,8 +33,10 @@ public class StockOrderMapper {
         apiStockOrder.setInternalLotNumber(entity.getInternalLotNumber());
         apiStockOrder.setCurrency(entity.getCurrency());
         apiStockOrder.setPreferredWayOfPayment(entity.getPreferredWayOfPayment());
+        apiStockOrder.setTotalQuantity(entity.getTotalQuantity());
         apiStockOrder.setFulfilledQuantity(entity.getFulfilledQuantity());
         apiStockOrder.setBalance(entity.getBalance());
+        apiStockOrder.setOrderType(entity.getOrderType());
         apiStockOrder.setMeasureUnitType(
                 MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(entity.getMeasurementUnitType()));
 

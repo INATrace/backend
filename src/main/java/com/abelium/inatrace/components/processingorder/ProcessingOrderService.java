@@ -255,7 +255,13 @@ public class ProcessingOrderService extends BaseService {
             entity.getInputTransactions().add(insertedTransaction);
 
             // Update source StockOrder
-            stockOrderService.createOrUpdateStockOrder(apiTransaction.getSourceStockOrder(), userId, entity);
+            if (apiTransaction.getId() == null) {
+                stockOrderService.calculateQuantities(
+                        apiTransaction.getSourceStockOrder(),
+                        fetchEntity(apiTransaction.getSourceStockOrder().getId(), StockOrder.class),
+                        entity
+                );
+            }
 
             // Set targetStockOrders for TRANSFER
             if (processingAction.getType() == ProcessingActionType.TRANSFER) {
@@ -333,7 +339,11 @@ public class ProcessingOrderService extends BaseService {
 
             // Update source StockOrder
             if (apiTransaction.getId() == null) {
-                stockOrderService.createOrUpdateStockOrder(apiTransaction.getSourceStockOrder(), userId, entity);
+                stockOrderService.calculateQuantities(
+                        apiTransaction.getSourceStockOrder(),
+                        fetchEntity(apiTransaction.getSourceStockOrder().getId(), StockOrder.class),
+                        entity
+                );
             }
 
         }
