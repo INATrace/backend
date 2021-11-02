@@ -82,8 +82,4 @@ public class ProcessingEvidenceField extends TimestampEntity {
 		}
 		return processingEvidenceFieldTranslations;
 	}
-
-	public void setProcessingEvidenceFieldTranslations(List<ProcessingEvidenceFieldTranslation> processingEvidenceFieldTranslations) {
-		this.processingEvidenceFieldTranslations = processingEvidenceFieldTranslations;
-	}
 }

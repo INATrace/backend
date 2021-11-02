@@ -116,8 +116,4 @@ public class ProcessingEvidenceType extends TimestampEntity {
 		}
 		return translations;
 	}
-
-	public void setTranslations(List<ProcessingEvidenceTypeTranslation> translations) {
-		this.translations = translations;
-	}
 }

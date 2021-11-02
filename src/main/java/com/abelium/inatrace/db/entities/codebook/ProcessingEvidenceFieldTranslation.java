@@ -6,7 +6,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table
 public class ProcessingEvidenceFieldTranslation extends TranslatedEntity {
 
     @Version
