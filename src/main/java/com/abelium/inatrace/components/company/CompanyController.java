@@ -181,9 +181,16 @@ public class CompanyController {
     @ApiOperation(value = "Get list of associations for the selected company with given ID")
     public ApiPaginatedResponse<ApiCompanyListResponse> getAssociations(
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long id,
-            @Valid ApiPaginatedRequest request
-    ) {
+            @Valid ApiPaginatedRequest request) {
         return new ApiPaginatedResponse<>(companyService.getAssociations(id, request));
+    }
+
+    @GetMapping(value = "/{id}/connected-companies")
+    @ApiOperation(value = "Get list of conneccted companies for the company with the given ID")
+    public ApiPaginatedResponse<ApiCompanyListResponse> getConnectedCompanies(
+            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long id,
+            @Valid ApiPaginatedRequest request) {
+        return new ApiPaginatedResponse<>(companyService.getConnectedCompanies(id, request));
     }
 
     @PostMapping(value = "/userCustomers/import/farmers/{companyId}/{documentId}")
