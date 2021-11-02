@@ -25,14 +25,14 @@ public final class ProcessingEvidenceFieldMapper {
 			return null;
 		}
 
-		ProcessingEvidenceFieldTranslation translation = entity.getProcessingEvidenceFieldTranslations()
+		ProcessingEvidenceFieldTranslation translation = entity.getTranslations()
 				.stream()
 				.filter(processingEvidenceFieldTranslation -> processingEvidenceFieldTranslation.getLanguage().equals(language))
 				.findFirst()
 				.orElse(new ProcessingEvidenceFieldTranslation());
 
 		if (translation.getLabel() == null || translation.getLabel().equals("")) {
-			translation = entity.getProcessingEvidenceFieldTranslations()
+			translation = entity.getTranslations()
 					.stream()
 					.filter(processingEvidenceFieldTranslation -> processingEvidenceFieldTranslation.getLanguage().equals(Language.EN))
 					.findFirst()
@@ -56,7 +56,7 @@ public final class ProcessingEvidenceFieldMapper {
 
 		ApiProcessingEvidenceField apiProcessingEvidenceField = toApiProcessingEvidenceField(entity, language);
 		apiProcessingEvidenceField.setTranslations(entity
-				.getProcessingEvidenceFieldTranslations()
+				.getTranslations()
 				.stream()
 				.map(ProcessingEvidenceFieldMapper::toApiProcessingEvidenceFieldTranslation)
 				.collect(Collectors.toList()));

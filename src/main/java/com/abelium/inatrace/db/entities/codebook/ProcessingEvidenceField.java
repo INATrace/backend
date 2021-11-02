@@ -41,8 +41,8 @@ public class ProcessingEvidenceField extends TimestampEntity {
 	@OneToMany(mappedBy = "processingEvidenceField", orphanRemoval = true, cascade = CascadeType.ALL)
 	private List<ValueChainProcessingEvidenceField> valueChains;
 
-	@OneToMany(mappedBy = "processingEvidenceField", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProcessingEvidenceFieldTranslation> processingEvidenceFieldTranslations = new ArrayList<>();
+	@OneToMany(mappedBy = "processingEvidenceField", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	private List<ProcessingEvidenceFieldTranslation> translations = new ArrayList<>();
 
 	public String getFieldName() {
 		return fieldName;
@@ -76,10 +76,10 @@ public class ProcessingEvidenceField extends TimestampEntity {
 		this.valueChains = valueChains;
 	}
 
-	public List<ProcessingEvidenceFieldTranslation> getProcessingEvidenceFieldTranslations() {
-		if (processingEvidenceFieldTranslations == null) {
-			processingEvidenceFieldTranslations = new ArrayList<>();
+	public List<ProcessingEvidenceFieldTranslation> getTranslations() {
+		if (translations == null) {
+			translations = new ArrayList<>();
 		}
-		return processingEvidenceFieldTranslations;
+		return translations;
 	}
 }

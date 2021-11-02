@@ -69,7 +69,7 @@ public class ProcessingEvidenceFieldService extends BaseService {
 		entity.setType(apiProcessingEvidenceField.getType());
 
 		// Remove translation not in request
-		entity.getProcessingEvidenceFieldTranslations().removeIf(processingEvidenceFieldTranslation -> apiProcessingEvidenceField
+		entity.getTranslations().removeIf(processingEvidenceFieldTranslation -> apiProcessingEvidenceField
 				.getTranslations()
 				.stream()
 				.noneMatch(apiProcessingEvidenceFieldTranslation -> processingEvidenceFieldTranslation
@@ -80,7 +80,7 @@ public class ProcessingEvidenceFieldService extends BaseService {
 
 		// Add or update existing
 		apiProcessingEvidenceField.getTranslations().forEach(apiProcessingEvidenceFieldTranslation -> {
-			ProcessingEvidenceFieldTranslation translation = entity.getProcessingEvidenceFieldTranslations().stream().filter(processingEvidenceFieldTranslation -> processingEvidenceFieldTranslation
+			ProcessingEvidenceFieldTranslation translation = entity.getTranslations().stream().filter(processingEvidenceFieldTranslation -> processingEvidenceFieldTranslation
 					.getLanguage()
 					.equals(apiProcessingEvidenceFieldTranslation.getLanguage()))
 					.findFirst()
@@ -88,7 +88,7 @@ public class ProcessingEvidenceFieldService extends BaseService {
 			translation.setLabel(apiProcessingEvidenceFieldTranslation.getLabel());
 			translation.setLanguage(apiProcessingEvidenceFieldTranslation.getLanguage());
 			translation.setProcessingEvidenceField(entity);
-			entity.getProcessingEvidenceFieldTranslations().add(translation);
+			entity.getTranslations().add(translation);
 		});
 		
 		if (entity.getId() == null) {

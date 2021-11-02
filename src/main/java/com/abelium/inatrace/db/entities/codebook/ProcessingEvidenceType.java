@@ -59,7 +59,7 @@ public class ProcessingEvidenceType extends TimestampEntity {
 	@Column
 	private Boolean quality;
 
-	@OneToMany(mappedBy = "processingEvidenceType", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "processingEvidenceType", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<ProcessingEvidenceTypeTranslation> translations;
 
 	public String getCode() {
