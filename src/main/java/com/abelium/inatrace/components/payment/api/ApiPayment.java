@@ -39,8 +39,8 @@ public class ApiPayment extends ApiBaseEntity {
 	@ApiModelProperty(value = "Quantity purchased to be paid")
 	private Integer purchased;
 
-	@ApiModelProperty(value = "Payment amount paid to the farmer")
-	private BigDecimal amountPaidToTheFarmer;
+	@ApiModelProperty(value = "Payment amount paid (to a farmer or recipient company)")
+	private BigDecimal amount;
 	
 	@ApiModelProperty(value = "Payment amount paid to the collector")
 	private BigDecimal amountPaidToTheCollector;
@@ -152,12 +152,12 @@ public class ApiPayment extends ApiBaseEntity {
 		this.purchased = purchased;
 	}
 
-	public BigDecimal getAmountPaidToTheFarmer() {
-		return amountPaidToTheFarmer;
+	public BigDecimal getAmount() {
+		return amount;
 	}
 
-	public void setAmountPaidToTheFarmer(BigDecimal amountPaidToTheFarmer) {
-		this.amountPaidToTheFarmer = amountPaidToTheFarmer;
+	public void setAmount(BigDecimal amount) {
+		this.amount = amount;
 	}
 
 	public BigDecimal getAmountPaidToTheCollector() {

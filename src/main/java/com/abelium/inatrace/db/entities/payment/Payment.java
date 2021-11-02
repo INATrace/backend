@@ -59,8 +59,9 @@ public class Payment extends TimestampEntity {
 	@Column
 	private BigDecimal purchased; // stock order quantity
 
+	// The amount paid in the specified currency (paid to farmer of paid to a recipient company for Quote order)
 	@Column
-	private BigDecimal amountPaidToTheFarmer; // same as stock order balance
+	private BigDecimal amount;
 	
 	@Column
 	private BigDecimal amountPaidToTheCollector; // set to 0 by default
@@ -167,12 +168,12 @@ public class Payment extends TimestampEntity {
 		this.currency = currency;
 	}
 
-	public BigDecimal getAmountPaidToTheFarmer() {
-		return amountPaidToTheFarmer;
+	public BigDecimal getAmount() {
+		return amount;
 	}
 
-	public void setAmountPaidToTheFarmer(BigDecimal amount) {
-		this.amountPaidToTheFarmer = amount;
+	public void setAmount(BigDecimal amount) {
+		this.amount = amount;
 	}
 
 	public BigDecimal getAmountPaidToTheCollector() {

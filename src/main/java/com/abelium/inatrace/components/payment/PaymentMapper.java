@@ -3,11 +3,9 @@ package com.abelium.inatrace.components.payment;
 import com.abelium.inatrace.components.common.CommonApiTools;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.company.mappers.UserCustomerMapper;
-import com.abelium.inatrace.components.payment.api.ApiBulkPayment;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.components.user.mappers.UserMapper;
-import com.abelium.inatrace.db.entities.payment.BulkPayment;
 import com.abelium.inatrace.db.entities.payment.Payment;
 
 /**
@@ -31,7 +29,7 @@ public final class PaymentMapper {
 		apiPayment.setUpdatedBy(UserMapper.toSimpleApiUser(entity.getUpdatedBy()));
 		apiPayment.setPaymentType(entity.getPaymentType());
 		apiPayment.setCurrency(entity.getCurrency());
-		apiPayment.setAmountPaidToTheFarmer(entity.getAmountPaidToTheFarmer());
+		apiPayment.setAmount(entity.getAmount());
 		apiPayment.setAmountPaidToTheCollector(entity.getAmountPaidToTheCollector());
 		apiPayment.setRecipientType(entity.getRecipientType());
 		apiPayment.setReceiptNumber(entity.getReceiptNumber());
@@ -48,11 +46,6 @@ public final class PaymentMapper {
 		apiPayment.setPayingCompany(CompanyMapper.toApiCompanyBase(entity.getPayingCompany()));
 		apiPayment.setPaymentConfirmedByUser(UserMapper.toSimpleApiUser(entity.getPaymentConfirmedByUser()));
 		apiPayment.setStockOrder(StockOrderMapper.toApiStockOrderBase(entity.getStockOrder()));
-
-//		ApiCompanyCustomer apiRecipientCompanyCustomer = new ApiCompanyCustomer();
-//		apiRecipientCompanyCustomer.setId(entity.getRecipientCompanyCustomer().getId());
-//		apiRecipientCompanyCustomer.setName(entity.getRecipientCompanyCustomer().getName());
-//		apiPayment.setRecipientCompanyCustomer(apiRecipientCompanyCustomer);
 
 		if (entity.getReceiptDocument() != null) {
 			apiPayment.setReceiptDocument(CommonApiTools.toApiDocument(entity.getReceiptDocument(), userId));

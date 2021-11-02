@@ -181,7 +181,7 @@ public class PaymentService extends BaseService {
 			}
 
 			// Verify totalPaid (amount paid to the farmer) is not negative
-			if (apiPayment.getAmountPaidToTheFarmer().compareTo(BigDecimal.ZERO) < 0) {
+			if (apiPayment.getAmount().compareTo(BigDecimal.ZERO) < 0) {
 				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Total amount paid cannot be negative");
 			}
 
@@ -220,8 +220,8 @@ public class PaymentService extends BaseService {
 			entity.setReceiptNumber(apiPayment.getReceiptNumber());
 			entity.setCurrency(apiPayment.getCurrency());
 
-			entity.setTotalPaid(apiPayment.getAmountPaidToTheFarmer());
-			entity.setAmountPaidToTheFarmer(apiPayment.getAmountPaidToTheFarmer());
+			entity.setTotalPaid(apiPayment.getAmount());
+			entity.setAmount(apiPayment.getAmount());
 			entity.setAmountPaidToTheCollector(BigDecimal.ZERO);
 
 			// If this payment is for Quote order between two companies in the value chain

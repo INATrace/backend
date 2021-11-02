@@ -736,7 +736,7 @@ public class StockOrderService extends BaseService {
         for (Payment payment : paymentList) {
 
             if (payment.getPaymentPurposeType() == PaymentPurposeType.FIRST_INSTALLMENT) {
-                balance = balance.subtract(payment.getAmountPaidToTheFarmer());
+                balance = balance.subtract(payment.getAmount());
 
                 if (payment.getPreferredWayOfPayment() != PreferredWayOfPayment.CASH_VIA_COLLECTOR) {
                     balance = balance.subtract(payment.getAmountPaidToTheCollector());
