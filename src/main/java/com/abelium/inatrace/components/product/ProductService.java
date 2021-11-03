@@ -158,7 +158,7 @@ public class ProductService extends BaseService {
 		if (ap.getAssociatedCompanies() != null && ap.getAssociatedCompanies().stream().noneMatch(apiProductCompany -> apiProductCompany.getType() == ProductCompanyType.OWNER)) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "The product must have at least one owner.");
 		}
-		Product p = fetchProduct(authUser, ap.id);
+		Product p = fetchProductAssoc(authUser, ap.id);
 		if (p.getSettings() == null) {
 			p.setSettings(new ProductSettings());
 			em.persist(p.getSettings());
