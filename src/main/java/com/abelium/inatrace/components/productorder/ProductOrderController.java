@@ -4,10 +4,12 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.productorder.api.ApiProductOrder;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -37,12 +39,14 @@ public class ProductOrderController {
 		return new ApiResponse<>(productOrderService.getProductOrder(id, language));
 	}
 
-	@PutMapping
-	@ApiOperation("Create or update product order. If the ID is provided, then the entity with the provided ID is updated.")
-	public ApiResponse<ApiBaseEntity> createOrUpdateProductOrder(
-			@Valid @RequestBody ApiProductOrder apiProductOrder) throws ApiException {
+	@PostMapping
+	@ApiOperation("Create product order.")
+	public ApiResponse<ApiBaseEntity> createProductOrder(
+			@Valid @RequestBody ApiProductOrder apiProductOrder,
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-		return new ApiResponse<>(productOrderService.createOrUpdateProductOrder(apiProductOrder));
+		return new ApiResponse<>(productOrderService.createProductOrder(apiProductOrder, authUser.getUserId(), language));
 	}
 
 }

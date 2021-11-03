@@ -490,8 +490,17 @@ public class CompanyService extends BaseService {
 		return companyCustomer;
 	}
 
-	public ApiCompanyCustomer getCompanyCustomer(Long companyCustomerId) {
-		return CompanyCustomerMapper.toApiCompanyCustomer(em.find(CompanyCustomer.class, companyCustomerId));
+	public ApiCompanyCustomer getCompanyCustomer(Long companyCustomerId) throws ApiException {
+		return CompanyCustomerMapper.toApiCompanyCustomer(fetchCompanyCustomer(companyCustomerId));
+	}
+
+	public CompanyCustomer fetchCompanyCustomer(Long id) throws ApiException {
+		CompanyCustomer companyCustomer = em.find(CompanyCustomer.class, id);
+		if (companyCustomer == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid Company customer ID");
+		}
+
+		return companyCustomer;
 	}
 
 	@Transactional

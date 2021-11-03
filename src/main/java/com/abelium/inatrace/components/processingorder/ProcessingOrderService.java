@@ -371,14 +371,14 @@ public class ProcessingOrderService extends BaseService {
 
         ProcessingOrder entity = fetchEntity(id, ProcessingOrder.class);
 
-        // Manually detach all related transactions
+        // Remove connected transactions
         for (Transaction t: entity.getInputTransactions()) {
-            t.setTargetProcessingOrder(null);
+            em.remove(t);
         }
 
-        // Detach target stock orders
+        // Remove target stock orders
         for (StockOrder so: entity.getTargetStockOrders()) {
-            so.setProcessingOrder(null);
+            em.remove(so);
         }
 
         em.remove(entity);

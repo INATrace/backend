@@ -165,8 +165,13 @@ public class StockOrderMapper {
         apiStockOrder.setWomenShare(entity.getWomenShare());
         apiStockOrder.setOrganic(entity.getOrganic());
 
+        // Set price and currency for end customer (used in Quote orders for final products)
         apiStockOrder.setPricePerUnitForEndCustomer(entity.getPricePerUnitForEndCustomer());
         apiStockOrder.setCurrencyForEndCustomer(entity.getCurrencyForEndCustomer());
+
+        // Map the consumer company customer
+        apiStockOrder.setConsumerCompanyCustomer(
+                CompanyCustomerMapper.toApiCompanyCustomerBase(entity.getConsumerCompanyCustomer()));
 
         // Map the stock order QR code tag
         apiStockOrder.setQrCodeTag(entity.getQrCodeTag());

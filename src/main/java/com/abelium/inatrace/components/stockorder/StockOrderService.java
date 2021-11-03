@@ -20,9 +20,11 @@ import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
+import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
+import com.abelium.inatrace.db.entities.productorder.ProductOrder;
 import com.abelium.inatrace.db.entities.stockorder.*;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
@@ -487,6 +489,20 @@ public class StockOrderService extends BaseService {
         entity.setDeliveryTime(apiStockOrder.getDeliveryTime());
         entity.setComments(apiStockOrder.getComments());
 
+        // If provided set the Product order - this is provided when this Stock order was created as part of a Product order (batch Quote orders for final products)
+        if (apiStockOrder.getProductOrder() != null && apiStockOrder.getProductOrder().getId() != null) {
+            entity.setProductOrder(fetchEntity(apiStockOrder.getProductOrder().getId(), ProductOrder.class));
+        }
+
+        // Set price per unit for end customer (and currency) - this is used when plasing Quote order for final products for a end customer
+        entity.setPricePerUnitForEndCustomer(apiStockOrder.getPricePerUnitForEndCustomer());
+        entity.setCurrencyForEndCustomer(apiStockOrder.getCurrencyForEndCustomer());
+
+        // Set the consumer comapny customer (used in Quote orders for final products)
+        if (apiStockOrder.getConsumerCompanyCustomer() != null && apiStockOrder.getConsumerCompanyCustomer().getId() != null) {
+            entity.setConsumerCompanyCustomer(fetchEntity(apiStockOrder.getConsumerCompanyCustomer().getId(), CompanyCustomer.class));
+        }
+
         // Set semi-product (usen in processing)
         if (apiStockOrder.getSemiProduct() != null) {
             entity.setSemiProduct(semiProductService.fetchSemiProduct(apiStockOrder.getSemiProduct().getId()));
@@ -649,6 +665,7 @@ public class StockOrderService extends BaseService {
                     pricePerUnitReduced = entity.getPricePerUnit().subtract(entity.getDamagedPriceDeduction());
                 }
                 entity.setCost(pricePerUnitReduced.multiply(entity.getTotalQuantity()));
+
                 if (processingOrder == null) {
                     entity.setBalance(calculateBalanceForPurchaseOrder(entity));
                 } else if (entity.getId() == null){
