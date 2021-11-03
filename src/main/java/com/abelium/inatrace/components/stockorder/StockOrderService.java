@@ -344,6 +344,10 @@ public class StockOrderService extends BaseService {
                         // if sac number present, proceed with only first item leafs
                         resultHistoryList
                                 .addAll(addNextAggregationLevels(currentDepth + 1, paginatedRequest, sourceOrderList.get(0), userId, language));
+                    } else if (OrderType.TRANSFER_ORDER.equals(sourceOrderList.get(0).getOrderType())){
+                        // if transfer order, go through with first item leafs
+                        resultHistoryList
+                                .addAll(addNextAggregationLevels(currentDepth + 1, paginatedRequest, sourceOrderList.get(0), userId, language));
                     } else {
                         // proceed recursion with all leafs
                           sourceOrderList.forEach(sourceOrder -> resultHistoryList
