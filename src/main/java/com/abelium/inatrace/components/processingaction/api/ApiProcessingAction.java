@@ -65,6 +65,9 @@ public class ApiProcessingAction extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "The output final product")
 	private ApiFinalProduct outputFinalProduct;
+
+	@ApiModelProperty(value = "The Final product for which the QR code tag will be generated (used with action type GENERATE_QR_CODE)")
+	private ApiFinalProduct qrCodeForFinalProduct;
 	
 	@ApiModelProperty(value = "Processing action type")
 	private ProcessingActionType type;
@@ -201,6 +204,14 @@ public class ApiProcessingAction extends ApiBaseEntity {
 
 	public void setOutputFinalProduct(ApiFinalProduct outputFinalProduct) {
 		this.outputFinalProduct = outputFinalProduct;
+	}
+
+	public ApiFinalProduct getQrCodeForFinalProduct() {
+		return qrCodeForFinalProduct;
+	}
+
+	public void setQrCodeForFinalProduct(ApiFinalProduct qrCodeForFinalProduct) {
+		this.qrCodeForFinalProduct = qrCodeForFinalProduct;
 	}
 
 	public ProcessingActionType getType() {
