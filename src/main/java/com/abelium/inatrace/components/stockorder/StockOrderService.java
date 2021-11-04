@@ -491,21 +491,21 @@ public class StockOrderService extends BaseService {
             entity.setProductOrder(fetchEntity(apiStockOrder.getProductOrder().getId(), ProductOrder.class));
         }
 
-        // Set price per unit for end customer (and currency) - this is used when plasing Quote order for final products for a end customer
+        // Set price per unit for end customer (and currency) - this is used when placing Quote order for final products for a end customer
         entity.setPricePerUnitForEndCustomer(apiStockOrder.getPricePerUnitForEndCustomer());
         entity.setCurrencyForEndCustomer(apiStockOrder.getCurrencyForEndCustomer());
 
-        // Set the consumer comapny customer (used in Quote orders for final products)
+        // Set the consumer company customer (used in Quote orders for final products)
         if (apiStockOrder.getConsumerCompanyCustomer() != null && apiStockOrder.getConsumerCompanyCustomer().getId() != null) {
             entity.setConsumerCompanyCustomer(fetchEntity(apiStockOrder.getConsumerCompanyCustomer().getId(), CompanyCustomer.class));
         }
 
-        // Set semi-product (usen in processing)
+        // Set semi-product (used in processing)
         if (apiStockOrder.getSemiProduct() != null) {
             entity.setSemiProduct(semiProductService.fetchSemiProduct(apiStockOrder.getSemiProduct().getId()));
         }
 
-        // Set final product (used in final prodcut processing)
+        // Set final product (used in final product processing)
         if (apiStockOrder.getFinalProduct() != null) {
             entity.setFinalProduct(finalProductService.fetchFinalProduct(apiStockOrder.getFinalProduct().getId()));
         }
