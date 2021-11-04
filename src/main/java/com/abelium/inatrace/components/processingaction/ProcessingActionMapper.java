@@ -8,6 +8,10 @@ import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.components.processingactiontranslation.ProcessingActionTranslationMapper;
 import com.abelium.inatrace.components.product.ProductApiTools;
 import com.abelium.inatrace.components.value_chain.ValueChainMapper;
+import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceField;
+import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceFieldTranslation;
+import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceType;
+import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceTypeTranslation;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
@@ -67,17 +71,28 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setInputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getInputFinalProduct()));
 		apiProcessingAction.setOutputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getOutputFinalProduct()));
 
+		// Map the final prodcut for which a QR code should be generated
+		apiProcessingAction.setQrCodeForFinalProduct(ProductApiTools.toApiFinalProduct(entity.getQrCodeForFinalProduct()));
+
 		// Processing evidence fields
 		List<ApiProcessingEvidenceField> apiRequiredEvidenceFields = new ArrayList<>();
 		List<ProcessingActionPEF> processingActionProcessingEvidenceFields = entity.getProcessingEvidenceFields();
 		processingActionProcessingEvidenceFields.forEach(
 			processingActionProcessingEvidenceField -> {
 
+				// Get the translation for the request lang - if value is not present return the EN value which is required
+				ProcessingEvidenceField procEvidenceField = processingActionProcessingEvidenceField.getProcessingEvidenceField();
+				ProcessingEvidenceFieldTranslation translation = procEvidenceField.getTranslations().stream()
+						.filter(t -> t.getLanguage().equals(language)).findFirst().orElseGet(
+								() -> procEvidenceField.getTranslations().stream()
+										.filter(t -> t.getLanguage().equals(Language.EN)).findAny()
+										.orElse(new ProcessingEvidenceFieldTranslation()));
+
 				ApiProcessingEvidenceField apiProcessingEvidenceField = new ApiProcessingEvidenceField();
-				apiProcessingEvidenceField.setId(processingActionProcessingEvidenceField.getProcessingEvidenceField().getId());
-				apiProcessingEvidenceField.setFieldName(processingActionProcessingEvidenceField.getProcessingEvidenceField().getFieldName());
-				apiProcessingEvidenceField.setLabel(processingActionProcessingEvidenceField.getProcessingEvidenceField().getLabel());
-				apiProcessingEvidenceField.setType(processingActionProcessingEvidenceField.getProcessingEvidenceField().getType());
+				apiProcessingEvidenceField.setId(procEvidenceField.getId());
+				apiProcessingEvidenceField.setFieldName(procEvidenceField.getFieldName());
+				apiProcessingEvidenceField.setLabel(translation.getLabel());
+				apiProcessingEvidenceField.setType(procEvidenceField.getType());
 				apiProcessingEvidenceField.setMandatory(processingActionProcessingEvidenceField.getMandatory());
 				apiProcessingEvidenceField.setRequiredOnQuote(processingActionProcessingEvidenceField.getRequiredOnQuote());
 				apiRequiredEvidenceFields.add(apiProcessingEvidenceField);
@@ -91,11 +106,19 @@ public final class ProcessingActionMapper {
 		List<ProcessingActionPET> processingActionProcessingEvidenceTypes = entity.getRequiredDocumentTypes();
 		processingActionProcessingEvidenceTypes.forEach(
 			processingActionProcessingEvidenceType -> {
+
+				// Get the translation for the request lang - if value is not present return the EN value which is required
+				ProcessingEvidenceType procEvidenceType = processingActionProcessingEvidenceType.getProcessingEvidenceType();
+				ProcessingEvidenceTypeTranslation translation = procEvidenceType.getTranslations().stream()
+						.filter(t -> t.getLanguage().equals(language)).findFirst().orElseGet(
+								() -> procEvidenceType.getTranslations().stream()
+										.filter(t -> t.getLanguage().equals(Language.EN)).findAny()
+										.orElse(new ProcessingEvidenceTypeTranslation()));
 				
 				ApiProcessingEvidenceType apiRequiredDocumentType = new ApiProcessingEvidenceType();
-				apiRequiredDocumentType.setId(processingActionProcessingEvidenceType.getProcessingEvidenceType().getId());
-				apiRequiredDocumentType.setCode(processingActionProcessingEvidenceType.getProcessingEvidenceType().getCode());
-				apiRequiredDocumentType.setLabel(processingActionProcessingEvidenceType.getProcessingEvidenceType().getLabel());
+				apiRequiredDocumentType.setId(procEvidenceType.getId());
+				apiRequiredDocumentType.setCode(procEvidenceType.getCode());
+				apiRequiredDocumentType.setLabel(translation.getLabel());
 				apiRequiredDocumentType.setMandatory(processingActionProcessingEvidenceType.getMandatory());
 				apiRequiredDocumentType.setRequiredOnQuote(processingActionProcessingEvidenceType.getRequiredOnQuote());
 				apiRequiredDocumentType.setRequiredOneOfGroupIdForQuote(processingActionProcessingEvidenceType.getRequiredOneOfGroupIdForQuote());

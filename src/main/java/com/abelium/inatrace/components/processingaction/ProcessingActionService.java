@@ -152,6 +152,12 @@ public class ProcessingActionService extends BaseService {
 		// Create or update required processing evidence types
 		updateRequiredEvidenceTypes(apiProcessingAction, entity);
 
+		// If actino type is GENERATE_QR_CODE, set Final product for QR code
+		if (ProcessingActionType.GENERATE_QR_CODE.equals(apiProcessingAction.getType())) {
+			entity.setQrCodeForFinalProduct(
+					finalProductService.fetchFinalProduct(apiProcessingAction.getQrCodeForFinalProduct().getId()));
+		}
+
 		if (entity.getId() == null) {
 			em.persist(entity);
 		}
@@ -208,6 +214,9 @@ public class ProcessingActionService extends BaseService {
 		}
 
 		Torpedo.where(condition);
+
+		Torpedo.orderBy(processingActionProxy.getId());
+		Torpedo.orderBy(processingActionProxy.getSortOrder());
 
 		return processingActionProxy;
 	}
@@ -274,6 +283,11 @@ public class ProcessingActionService extends BaseService {
 				// Validate input semi-product
 				if (apiProcessingAction.getInputSemiProduct() == null || apiProcessingAction.getInputSemiProduct().getId() == null) {
 					throw new ApiException(ApiStatus.INVALID_REQUEST, "Input semi-product is required");
+				}
+
+				// Validate that the Final product for which the QR code should be generated is provided
+				if (apiProcessingAction.getQrCodeForFinalProduct() == null || apiProcessingAction.getQrCodeForFinalProduct().getId() == null) {
+					throw new ApiException(ApiStatus.INVALID_REQUEST, "Final product for QR code is required");
 				}
 		}
 

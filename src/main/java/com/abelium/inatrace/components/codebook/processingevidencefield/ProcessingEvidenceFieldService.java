@@ -8,9 +8,11 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceField;
+import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceFieldTranslation;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+import com.abelium.inatrace.types.Language;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
@@ -29,9 +31,9 @@ import java.util.stream.Collectors;
 @Service
 public class ProcessingEvidenceFieldService extends BaseService {
 
-	public ApiPaginatedList<ApiProcessingEvidenceField> getProcessingEvidenceFieldList(ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiProcessingEvidenceField> getProcessingEvidenceFieldList(ApiPaginatedRequest request, Language language) {
 
-		return PaginationTools.createPaginatedResponse(em, request, () -> processingEvidenceFieldQueryObject(request), ProcessingEvidenceFieldMapper::toApiProcessingEvidenceField);
+		return PaginationTools.createPaginatedResponse(em, request, () -> processingEvidenceFieldQueryObject(request), processingEvidenceField -> ProcessingEvidenceFieldMapper.toApiProcessingEvidenceFieldDetails(processingEvidenceField, language));
 	}
 
 	private ProcessingEvidenceField processingEvidenceFieldQueryObject(ApiPaginatedRequest request) {
@@ -46,8 +48,8 @@ public class ProcessingEvidenceFieldService extends BaseService {
 		return processingEvidenceFieldProxy;
 	}
 
-	public ApiProcessingEvidenceField getProcessingEvidenceField(Long id) throws ApiException {
-		return ProcessingEvidenceFieldMapper.toApiProcessingEvidenceField(fetchProcessingEvidenceField(id));
+	public ApiProcessingEvidenceField getProcessingEvidenceField(Long id, Language language) throws ApiException {
+		return ProcessingEvidenceFieldMapper.toApiProcessingEvidenceField(fetchProcessingEvidenceField(id), language);
 	}
 
 	@Transactional
@@ -65,6 +67,29 @@ public class ProcessingEvidenceFieldService extends BaseService {
 		entity.setFieldName(apiProcessingEvidenceField.getFieldName());
 		entity.setLabel(apiProcessingEvidenceField.getLabel());
 		entity.setType(apiProcessingEvidenceField.getType());
+
+		// Remove translation not in request
+		entity.getTranslations().removeIf(processingEvidenceFieldTranslation -> apiProcessingEvidenceField
+				.getTranslations()
+				.stream()
+				.noneMatch(apiProcessingEvidenceFieldTranslation -> processingEvidenceFieldTranslation
+						.getLanguage()
+						.equals(apiProcessingEvidenceFieldTranslation.getLanguage())
+			)
+		);
+
+		// Add or update existing
+		apiProcessingEvidenceField.getTranslations().forEach(apiProcessingEvidenceFieldTranslation -> {
+			ProcessingEvidenceFieldTranslation translation = entity.getTranslations().stream().filter(processingEvidenceFieldTranslation -> processingEvidenceFieldTranslation
+					.getLanguage()
+					.equals(apiProcessingEvidenceFieldTranslation.getLanguage()))
+					.findFirst()
+					.orElse(new ProcessingEvidenceFieldTranslation());
+			translation.setLabel(apiProcessingEvidenceFieldTranslation.getLabel());
+			translation.setLanguage(apiProcessingEvidenceFieldTranslation.getLanguage());
+			translation.setProcessingEvidenceField(entity);
+			entity.getTranslations().add(translation);
+		});
 		
 		if (entity.getId() == null) {
 			em.persist(entity);
@@ -89,7 +114,7 @@ public class ProcessingEvidenceFieldService extends BaseService {
 		return processingEvidenceField;
 	}
 	
-	public ApiPaginatedList<ApiProcessingEvidenceField> listProcessingEvidenceFieldsByValueChain(Long valueChainId, ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiProcessingEvidenceField> listProcessingEvidenceFieldsByValueChain(Long valueChainId, ApiPaginatedRequest request, Language language) {
 
 		TypedQuery<ProcessingEvidenceField> processingEvidenceFieldsQuery = em.createNamedQuery("ProcessingEvidenceField.listProcessingEvidenceFieldsByValueChain", ProcessingEvidenceField.class)
 			.setParameter("valueChainId", valueChainId)
@@ -105,7 +130,7 @@ public class ProcessingEvidenceFieldService extends BaseService {
 		return new ApiPaginatedList<>(
 			processingEvidenceFields
 				.stream()
-				.map(ProcessingEvidenceFieldMapper::toApiProcessingEvidenceField)
+				.map(processingEvidenceField -> ProcessingEvidenceFieldMapper.toApiProcessingEvidenceFieldDetails(processingEvidenceField, language))
 				.collect(Collectors.toList()), count);
 	}
 	

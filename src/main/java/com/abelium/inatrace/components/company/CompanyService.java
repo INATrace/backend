@@ -13,21 +13,8 @@ import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
-import com.abelium.inatrace.components.company.api.ApiUserCustomer;
-import com.abelium.inatrace.components.company.api.ApiUserCustomerAssociation;
-import com.abelium.inatrace.components.company.api.ApiUserCustomerCooperative;
 import com.abelium.inatrace.components.user.UserQueries;
-import com.abelium.inatrace.db.entities.common.Address;
-import com.abelium.inatrace.db.entities.common.BankInformation;
-import com.abelium.inatrace.db.entities.common.Country;
-import com.abelium.inatrace.db.entities.common.Document;
-import com.abelium.inatrace.db.entities.common.FarmInformation;
-import com.abelium.inatrace.db.entities.common.GeoAddress;
-import com.abelium.inatrace.db.entities.common.User;
-import com.abelium.inatrace.db.entities.common.UserCustomer;
-import com.abelium.inatrace.db.entities.common.UserCustomerLocation;
-import com.abelium.inatrace.db.entities.common.UserCustomerAssociation;
-import com.abelium.inatrace.db.entities.common.UserCustomerCooperative;
+import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
@@ -37,16 +24,12 @@ import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.tools.TorpedoProjector;
-import com.abelium.inatrace.types.CompanyStatus;
-import com.abelium.inatrace.types.CompanyUserRole;
-import com.abelium.inatrace.types.Language;
-import com.abelium.inatrace.types.UserRole;
-import com.abelium.inatrace.types.UserCustomerType;
-import com.abelium.inatrace.types.ProductCompanyType;
+import com.abelium.inatrace.types.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.torpedoquery.jpa.Function;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
@@ -439,7 +422,8 @@ public class CompanyService extends BaseService {
 		return PaginationTools.createPaginatedResponse(em, request, () -> customerListQueryObject(companyId, request), CompanyCustomerMapper::toApiCompanyCustomer);
 	}
 
-	private TorpedoProjector<ProductCompany, ApiCompanyListResponse> associationsCompanyListQueryObject(Long companyId, ApiPaginatedRequest request) {
+	private TorpedoProjector<ProductCompany, ApiCompanyListResponse> associationsCompanyListQueryObject(Long companyId) {
+
 		ProductCompany productCompanyCompany = Torpedo.from(ProductCompany.class);
 		OnGoingLogicalCondition companyCondition = Torpedo.condition(productCompanyCompany.getCompany().getId()).eq(companyId);
 		Torpedo.where(companyCondition);
@@ -458,7 +442,30 @@ public class CompanyService extends BaseService {
 	}
 
 	public ApiPaginatedList<ApiCompanyListResponse> getAssociations(Long id, ApiPaginatedRequest request) {
-		return PaginationTools.createPaginatedResponse(em, request, () -> associationsCompanyListQueryObject(id, request));
+		return PaginationTools.createPaginatedResponse(em, request, () -> associationsCompanyListQueryObject(id));
+	}
+
+	private Function<Company> connectedCompanyListQueryObject(Long companyId) {
+
+		ProductCompany productsProxy = Torpedo.from(ProductCompany.class);
+		OnGoingLogicalCondition companyCondition = Torpedo.condition(productsProxy.getCompany().getId()).eq(companyId);
+		Torpedo.where(companyCondition);
+		List<Long> associatedProductIds = Torpedo.select(productsProxy.getProduct().getId()).list(em);
+
+		ProductCompany companiesProxy = Torpedo.from(ProductCompany.class);
+		OnGoingLogicalCondition condition = Torpedo.condition();
+
+		condition = condition.and(companiesProxy.getProduct().getId()).in(associatedProductIds);
+		condition = condition.and(companiesProxy.getCompany().getId()).neq(companyId);
+
+		Torpedo.where(condition);
+
+		return Torpedo.distinct(companiesProxy.getCompany());
+	}
+
+	public ApiPaginatedList<ApiCompanyListResponse> getConnectedCompanies(Long id, ApiPaginatedRequest request) {
+		return PaginationTools.createPaginatedResponse1(em, request, () -> connectedCompanyListQueryObject(id),
+				CompanyApiTools::toApiCompanyListResponse);
 	}
 
 	private CompanyCustomer customerListQueryObject(Long companyId, ApiListCustomersRequest request) {
@@ -483,8 +490,17 @@ public class CompanyService extends BaseService {
 		return companyCustomer;
 	}
 
-	public ApiCompanyCustomer getCompanyCustomer(Long companyCustomerId) {
-		return CompanyCustomerMapper.toApiCompanyCustomer(em.find(CompanyCustomer.class, companyCustomerId));
+	public ApiCompanyCustomer getCompanyCustomer(Long companyCustomerId) throws ApiException {
+		return CompanyCustomerMapper.toApiCompanyCustomer(fetchCompanyCustomer(companyCustomerId));
+	}
+
+	public CompanyCustomer fetchCompanyCustomer(Long id) throws ApiException {
+		CompanyCustomer companyCustomer = em.find(CompanyCustomer.class, id);
+		if (companyCustomer == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid Company customer ID");
+		}
+
+		return companyCustomer;
 	}
 
 	@Transactional

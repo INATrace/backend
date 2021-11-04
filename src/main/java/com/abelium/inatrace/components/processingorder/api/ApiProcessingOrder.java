@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ApiProcessingOrder extends ApiBaseEntity {
@@ -73,6 +74,9 @@ public class ApiProcessingOrder extends ApiBaseEntity {
     }
 
     public List<ApiTransaction> getInputTransactions() {
+        if (inputTransactions == null) {
+            inputTransactions = new ArrayList<>();
+        }
         return inputTransactions;
     }
 
@@ -81,6 +85,9 @@ public class ApiProcessingOrder extends ApiBaseEntity {
     }
 
     public List<ApiTransaction> getOutputTransactions() {
+        if (outputTransactions == null) {
+            outputTransactions = new ArrayList<>();
+        }
         return outputTransactions;
     }
 
@@ -89,6 +96,9 @@ public class ApiProcessingOrder extends ApiBaseEntity {
     }
 
     public List<ApiStockOrder> getTargetStockOrders() {
+        if (targetStockOrders == null) {
+            targetStockOrders = new ArrayList<>();
+        }
         return targetStockOrders;
     }
 

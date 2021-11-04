@@ -6,7 +6,6 @@ import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
@@ -52,16 +51,17 @@ public class Payment extends TimestampEntity {
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
-	private PaymentType paymentType; // cash, bank
+	private PaymentType paymentType;
 
 	@Column
-	private String currency; // not chooseable on the frontend
+	private String currency;
 	
 	@Column
 	private BigDecimal purchased; // stock order quantity
 
+	// The amount paid in the specified currency (paid to farmer of paid to a recipient company for Quote order)
 	@Column
-	private BigDecimal amountPaidToTheFarmer; // same as stock order balance
+	private BigDecimal amount;
 	
 	@Column
 	private BigDecimal amountPaidToTheCollector; // set to 0 by default
@@ -72,20 +72,11 @@ public class Payment extends TimestampEntity {
 	@ManyToOne
 	private StockOrder stockOrder; // stock order to which the payment(s) belong to
 	
-//	@OneToOne // TODO: check relationship and how it fits here ?
-//	private StockOrder order;
-//	
-//	@OneToMany // TODO: check relationship and how it fits here ?
-//	private List<Transaction> inputTransactions = new ArrayList<>();
-	
 	@ManyToOne
 	private Company payingCompany; // company who is paying - logged-in user
 	
 	@ManyToOne
-	private Company recipientCompany; // farmer's company who is receiving payment
-	
-	@ManyToOne
-	private Company representativeOfRecipientCompany; // collector's company who is receiving payment
+	private Company recipientCompany; // the company that is receiving the payment (payment for quote orders)
 	
 	@ManyToOne
 	private UserCustomer recipientUserCustomer; // farmer
@@ -93,12 +84,9 @@ public class Payment extends TimestampEntity {
 	@ManyToOne
 	private UserCustomer representativeOfRecipientUserCustomer; // collector
 	
-	@ManyToOne
-	private CompanyCustomer recipientCompanyCustomer; // farmer geolocation, etc. ?
-	
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
-	private RecipientType recipientType; // organization, company customer or user customer (should be default)
+	private RecipientType recipientType;
 	
 	@Column
 	private String receiptNumber; // defined by user
@@ -135,10 +123,10 @@ public class Payment extends TimestampEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
-	private PreferredWayOfPayment preferredWayOfPayment; // cash cooperative, cash collector, bank transfer
+	private PreferredWayOfPayment preferredWayOfPayment;
 	
 	@Column
-    private Instant productionDate; // ?
+    private Instant productionDate;
 	
 	public String getOrderReference() {
 		return orderReference;
@@ -180,12 +168,12 @@ public class Payment extends TimestampEntity {
 		this.currency = currency;
 	}
 
-	public BigDecimal getAmountPaidToTheFarmer() {
-		return amountPaidToTheFarmer;
+	public BigDecimal getAmount() {
+		return amount;
 	}
 
-	public void setAmountPaidToTheFarmer(BigDecimal amount) {
-		this.amountPaidToTheFarmer = amount;
+	public void setAmount(BigDecimal amount) {
+		this.amount = amount;
 	}
 
 	public BigDecimal getAmountPaidToTheCollector() {
@@ -220,22 +208,6 @@ public class Payment extends TimestampEntity {
 		this.stockOrder = stockOrder;
 	}
 
-//	public StockOrder getOrder() {
-//		return order;
-//	}
-//
-//	public void setOrder(StockOrder order) {
-//		this.order = order;
-//	}
-//
-//	public List<Transaction> getInputTransactions() {
-//		return inputTransactions;
-//	}
-//
-//	public void setInputTransactions(List<Transaction> inputTransactions) {
-//		this.inputTransactions = inputTransactions;
-//	}
-
 	public Company getPayingCompany() {
 		return payingCompany;
 	}
@@ -260,28 +232,12 @@ public class Payment extends TimestampEntity {
 		this.recipientUserCustomer = recipientUserCustomer;
 	}
 
-	public Company getRepresentativeOfRecipientCompany() {
-		return representativeOfRecipientCompany;
-	}
-
-	public void setRepresentativeOfRecipientCompany(Company representativeOfRecipientCompany) {
-		this.representativeOfRecipientCompany = representativeOfRecipientCompany;
-	}
-
 	public UserCustomer getRepresentativeOfRecipientUserCustomer() {
 		return representativeOfRecipientUserCustomer;
 	}
 
 	public void setRepresentativeOfRecipientUserCustomer(UserCustomer representativeOfRecipientUserCustomer) {
 		this.representativeOfRecipientUserCustomer = representativeOfRecipientUserCustomer;
-	}
-
-	public CompanyCustomer getRecipientCompanyCustomer() {
-		return recipientCompanyCustomer;
-	}
-
-	public void setRecipientCompanyCustomer(CompanyCustomer recipientCompanyCustomer) {
-		this.recipientCompanyCustomer = recipientCompanyCustomer;
 	}
 
 	public RecipientType getRecipientType() {

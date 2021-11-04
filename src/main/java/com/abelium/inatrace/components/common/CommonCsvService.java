@@ -34,7 +34,7 @@ public class CommonCsvService extends BaseService {
 			for (ApiPayment p : apiPayments) {
 				csvPrinter.printRecord(
 					p.getPaymentPurposeType(),
-						p.getAmountPaidToTheFarmer(),
+						p.getAmount(),
 						p.getRecipientUserCustomer().getName() + " " + p.getRecipientUserCustomer().getSurname(),
 						p.getRecipientCompany() != null ? p.getRecipientCompany().getName() : "/",
 						p.getProductionDate(),

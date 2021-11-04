@@ -70,6 +70,13 @@ public class ProcessingAction extends TimestampEntity {
 	 */
 	@ManyToOne
 	private FinalProduct outputFinalProduct;
+
+	/**
+	 * Used when we have action type GENERATE_QR_CODE. It holds the reference to the Final product
+	 * that will be tagged by the generated QR code tag. This is used to to connect the QR code tag with the Final product QR labels.
+	 */
+	@ManyToOne
+	private FinalProduct qrCodeForFinalProduct;
 	
 	@Column
 	private String publicTimelineLabel;
@@ -180,6 +187,14 @@ public class ProcessingAction extends TimestampEntity {
 
 	public void setOutputFinalProduct(FinalProduct outputFinalProduct) {
 		this.outputFinalProduct = outputFinalProduct;
+	}
+
+	public FinalProduct getQrCodeForFinalProduct() {
+		return qrCodeForFinalProduct;
+	}
+
+	public void setQrCodeForFinalProduct(FinalProduct qrCodeForFinalProduct) {
+		this.qrCodeForFinalProduct = qrCodeForFinalProduct;
 	}
 
 	public String getPublicTimelineLabel() {

@@ -5,6 +5,9 @@ import com.abelium.inatrace.db.enums.EvidenceType;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Processing evidence type API model.
  *
@@ -33,6 +36,9 @@ public class ApiProcessingEvidenceType extends ApiCodebookBaseEntity {
 
 	@ApiModelProperty(value = "a group in which at least one document has to be provided")
 	private String requiredOneOfGroupIdForQuote;
+
+	@ApiModelProperty(value = "Translations for processing evidence type")
+	private List<ApiProcessingEvidenceTypeTranslation> translations;
 
 	public EvidenceType getType() {
 		return type;
@@ -90,4 +96,14 @@ public class ApiProcessingEvidenceType extends ApiCodebookBaseEntity {
 		this.requiredOneOfGroupIdForQuote = requiredOneOfGroupIdForQuote;
 	}
 
+	public List<ApiProcessingEvidenceTypeTranslation> getTranslations() {
+		if (translations == null) {
+			translations = new ArrayList<>();
+		}
+		return translations;
+	}
+
+	public void setTranslations(List<ApiProcessingEvidenceTypeTranslation> translations) {
+		this.translations = translations;
+	}
 }
