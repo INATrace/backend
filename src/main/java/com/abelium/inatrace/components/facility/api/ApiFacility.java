@@ -36,6 +36,9 @@ public class ApiFacility extends ApiBaseEntity {
 	@ApiModelProperty(value = "Enable form control 'Women only'")
 	private Boolean displayWomenOnly;
 
+	@ApiModelProperty(value = "Facility is activated")
+	private Boolean isDeactivated;
+
 	@ApiModelProperty(value = "Facility location")
 	private ApiFacilityLocation facilityLocation;
 
@@ -118,6 +121,14 @@ public class ApiFacility extends ApiBaseEntity {
 		this.displayWomenOnly = displayWomenOnly;
 	}
 
+	public Boolean getDeactivated() {
+		return isDeactivated;
+	}
+
+	public void setDeactivated(Boolean deactivated) {
+		isDeactivated = deactivated;
+	}
+
 	public ApiFacilityLocation getFacilityLocation() {
 		return facilityLocation;
 	}
@@ -170,13 +181,14 @@ public class ApiFacility extends ApiBaseEntity {
 		super();
 	}
 
-	public ApiFacility(String name, Boolean isCollectionFacility, Boolean isPublic,
+	public ApiFacility(String name, Boolean isCollectionFacility, Boolean isPublic, Boolean isDeactivated,
 			ApiFacilityLocation facilityLocation, ApiCompanyBase company, ApiFacilityType facilityType,
 			List<ApiSemiProduct> facilitySemiProductList, List<ApiFacilityTranslation> facilityTranslationList) {
 		super();
 		this.name = name;
 		this.isCollectionFacility = isCollectionFacility;
 		this.isPublic = isPublic;
+		this.isDeactivated = isDeactivated;
 		this.facilityLocation = facilityLocation;
 		this.company = company;
 		this.facilityType = facilityType;

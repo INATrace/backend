@@ -47,6 +47,16 @@ public class FacilityController {
 		return new ApiPaginatedResponse<>(facilityService.listFacilitiesByCompany(companyId, semiProductId, finalProductId, request, language));
 	}
 
+	@GetMapping("list/company/{id}/activated")
+	@ApiOperation("Get a list of activated facilities by company ID.")
+	public ApiPaginatedResponse<ApiFacility> listActivatedFacilitiesByCompany(
+			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @ApiParam(value = "Semi product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
+			@Valid ApiPaginatedRequest request) {
+		return new ApiPaginatedResponse<>(facilityService.listActivatedFacilitiesByCompany(companyId, semiProductId, request, language));
+	}
+
 	@GetMapping("list/company/{id}/available-selling")
 	@ApiOperation("Get a list of public (selling) facilities that the provided company can see")
 	public ApiPaginatedResponse<ApiFacility> listAvailableSellingFacilitiesForCompany(
@@ -93,6 +103,20 @@ public class FacilityController {
 
 		return new ApiResponse<>(facilityService.createOrUpdateFacility(apiFacility));
 
+	}
+
+	@PutMapping("{id}/activate")
+	@ApiOperation("Activate a facility")
+	public ApiDefaultResponse activateFacility(@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) {
+		facilityService.deactivateFacility(id, Boolean.FALSE);
+		return new ApiDefaultResponse();
+	}
+
+	@PutMapping("{id}/deactivate")
+	@ApiOperation("Deactivate a facility")
+	public ApiDefaultResponse deactivateFacility(@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) {
+		facilityService.deactivateFacility(id, Boolean.TRUE);
+		return new ApiDefaultResponse();
 	}
 
 	@DeleteMapping("{id}")

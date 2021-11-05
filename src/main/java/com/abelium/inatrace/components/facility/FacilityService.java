@@ -73,7 +73,10 @@ public class FacilityService extends BaseService {
 
 		FacilityTranslation ft = Torpedo.innerJoin(facilityProxy.getFacilityTranslations());
 
-		Torpedo.where(ft.getLanguage()).eq(language);
+		OnGoingLogicalCondition condition = Torpedo.condition();
+		condition = condition.and(ft.getLanguage()).eq(language);
+		condition = condition.and(facilityProxy.getIsDeactivated()).neq(Boolean.TRUE);
+		Torpedo.where(condition);
 
 		if ("name".equals(request.sortBy)) {
 			QueryTools.orderBy(request.sort, facilityProxy.getName());
@@ -119,6 +122,7 @@ public class FacilityService extends BaseService {
 		entity.setDisplayPriceDeductionDamage(apiFacility.getDisplayPriceDeductionDamage() != null ? apiFacility.getDisplayPriceDeductionDamage() : Boolean.FALSE);
 		entity.setDisplayTare(apiFacility.getDisplayTare() != null ? apiFacility.getDisplayTare() : Boolean.FALSE);
 		entity.setDisplayWomenOnly(apiFacility.getDisplayWomenOnly() != null ? apiFacility.getDisplayWomenOnly() : Boolean.FALSE);
+		entity.setIsDeactivated(apiFacility.getDeactivated());
 
 		facilityLocation.setLatitude(apiFacility.getFacilityLocation().getLatitude());
 		facilityLocation.setLongitude(apiFacility.getFacilityLocation().getLongitude());
@@ -176,6 +180,12 @@ public class FacilityService extends BaseService {
 	}
 
 	@Transactional
+	public void deactivateFacility(Long id, Boolean deactivated) {
+		Facility facility = em.find(Facility.class, id);
+		facility.setIsDeactivated(deactivated);
+	}
+
+	@Transactional
 	public void deleteFacility(Long id) throws ApiException {
 
 		Facility facility = fetchFacility(id);
@@ -226,6 +236,42 @@ public class FacilityService extends BaseService {
 		Torpedo.where(condition);
 
 		return facilityProxy;
+	}
+
+	public ApiPaginatedList<ApiFacility> listActivatedFacilitiesByCompany(Long companyId, Long semiProductId, ApiPaginatedRequest request, Language language) {
+
+		TypedQuery<Facility> facilitiesQuery;
+		Long count;
+
+		if (semiProductId != null) {
+
+			facilitiesQuery = em.createNamedQuery("Facility.listActivatedFacilitiesByCompanyAndSemiProduct", Facility.class)
+					.setParameter("companyId", companyId)
+					.setParameter("semiProductId", semiProductId)
+					.setParameter("language", language)
+					.setFirstResult(request.getOffset())
+					.setMaxResults(request.getLimit());
+
+			count = em.createNamedQuery("Facility.countActivatedFacilitiesByCompanyAndSemiProduct", Long.class)
+					.setParameter("companyId", companyId)
+					.setParameter("semiProductId", semiProductId)
+					.getSingleResult();
+		} else {
+
+			facilitiesQuery = em.createNamedQuery("Facility.listActivatedFacilitiesByCompany", Facility.class)
+					.setParameter("companyId", companyId)
+					.setParameter("language", language)
+					.setFirstResult(request.getOffset())
+					.setMaxResults(request.getLimit());
+
+			count = em.createNamedQuery("Facility.countActivatedFacilitiesByCompany", Long.class)
+					.setParameter("companyId", companyId).getSingleResult();
+		}
+
+		List<Facility> facilities = facilitiesQuery.getResultList();
+
+		return new ApiPaginatedList<>(
+				facilities.stream().map(facility -> FacilityMapper.toApiFacility(facility, language)).collect(Collectors.toList()), count);
 	}
 	
 	public ApiPaginatedList<ApiFacility> listCollectingFacilitiesByCompany(Long companyId, ApiPaginatedRequest request, Language language) {
@@ -307,6 +353,7 @@ public class FacilityService extends BaseService {
 		condition = condition.and(ft.getLanguage()).eq(language);
 		condition = condition.and(facilityProxy.getCompany()).in(companiesIds);
 		condition = condition.and(facilityProxy.getIsPublic()).eq(true);
+		condition = condition.and(facilityProxy.getIsDeactivated()).neq(Boolean.TRUE);
 
 		if (semiProductId != null) {
 			FacilitySemiProduct fsp = Torpedo.leftJoin(facilityProxy.getFacilitySemiProducts());
