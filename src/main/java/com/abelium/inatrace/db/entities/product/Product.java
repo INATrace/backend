@@ -1,7 +1,6 @@
 package com.abelium.inatrace.db.entities.product;
 
 import com.abelium.inatrace.api.types.Lengths;
-import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.types.ProductStatus;
@@ -51,18 +50,18 @@ public class Product extends ProductContent {
 	 */
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProductCompany> associatedCompanies = new ArrayList<>();
-
-	/**
-	 * a list of "collectors" 
-	 */
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product")
-	private List<UserCustomer> collectors = new ArrayList<>();
     
 	/**
 	 * labels
 	 */
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "product")
 	private List<ProductLabel> labels = new ArrayList<>();
+
+	/**
+	 * Data sharing agreements between the stakeholders on this product (value chain)
+	 */
+	@OneToMany(mappedBy = "product")
+	private List<ProductDataSharingAgreement> dataSharingAgreements;
 
 	public List<ProductLocation> getOriginLocations() {
 		return originLocations;
@@ -112,11 +111,15 @@ public class Product extends ProductContent {
 		this.labels = labels;
 	}
 
-	public List<UserCustomer> getCollectors() {
-		return collectors;
+	public List<ProductDataSharingAgreement> getDataSharingAgreements() {
+		if (dataSharingAgreements == null) {
+			dataSharingAgreements = new ArrayList<>();
+		}
+		return dataSharingAgreements;
 	}
 
-	public void setCollectors(List<UserCustomer> collectors) {
-		this.collectors = collectors;
+	public void setDataSharingAgreements(List<ProductDataSharingAgreement> dataSharingAgreements) {
+		this.dataSharingAgreements = dataSharingAgreements;
 	}
+
 }

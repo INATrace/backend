@@ -21,8 +21,11 @@ public class ApiProduct extends ApiProductContent {
 	@ApiModelProperty(value = "labels", position = 15)
 	public List<ApiProductLabelValues> labels;
 
-	@ApiModelProperty(value = "valueChain")
+	@ApiModelProperty(value = "Value chain")
 	public ApiValueChain valueChain;
+
+	@ApiModelProperty(value = "Data sharing agreements")
+	private List<ApiProductDataSharingAgreement> dataSharingAgreements;
 
 	public ApiCompany getCompany() {
 		return company;
@@ -55,4 +58,13 @@ public class ApiProduct extends ApiProductContent {
 	public void setValueChain(ApiValueChain valueChain) {
 		this.valueChain = valueChain;
 	}
+
+	public List<ApiProductDataSharingAgreement> getDataSharingAgreements() {
+		return dataSharingAgreements;
+	}
+
+	public void setDataSharingAgreements(List<ApiProductDataSharingAgreement> dataSharingAgreements) {
+		this.dataSharingAgreements = dataSharingAgreements;
+	}
+
 }
