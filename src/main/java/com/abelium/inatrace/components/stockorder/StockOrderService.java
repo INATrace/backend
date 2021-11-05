@@ -465,10 +465,7 @@ public class StockOrderService extends BaseService {
             entity.setCreatorId(apiStockOrder.getCreatorId());
         }
 
-        // Validation of required fields
-        if (apiStockOrder.getOrderType() == null) {
-            throw new ApiException(ApiStatus.INVALID_REQUEST, "OrderType needs to be provided!");
-        }
+        // Facility needs to be provided
         if (apiStockOrder.getFacility() == null) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Facility needs to be provided!");
         }
@@ -494,21 +491,21 @@ public class StockOrderService extends BaseService {
             entity.setProductOrder(fetchEntity(apiStockOrder.getProductOrder().getId(), ProductOrder.class));
         }
 
-        // Set price per unit for end customer (and currency) - this is used when plasing Quote order for final products for a end customer
+        // Set price per unit for end customer (and currency) - this is used when placing Quote order for final products for a end customer
         entity.setPricePerUnitForEndCustomer(apiStockOrder.getPricePerUnitForEndCustomer());
         entity.setCurrencyForEndCustomer(apiStockOrder.getCurrencyForEndCustomer());
 
-        // Set the consumer comapny customer (used in Quote orders for final products)
+        // Set the consumer company customer (used in Quote orders for final products)
         if (apiStockOrder.getConsumerCompanyCustomer() != null && apiStockOrder.getConsumerCompanyCustomer().getId() != null) {
             entity.setConsumerCompanyCustomer(fetchEntity(apiStockOrder.getConsumerCompanyCustomer().getId(), CompanyCustomer.class));
         }
 
-        // Set semi-product (usen in processing)
+        // Set semi-product (used in processing)
         if (apiStockOrder.getSemiProduct() != null) {
             entity.setSemiProduct(semiProductService.fetchSemiProduct(apiStockOrder.getSemiProduct().getId()));
         }
 
-        // Set final product (used in final prodcut processing)
+        // Set final product (used in final product processing)
         if (apiStockOrder.getFinalProduct() != null) {
             entity.setFinalProduct(finalProductService.fetchFinalProduct(apiStockOrder.getFinalProduct().getId()));
         }
@@ -519,90 +516,7 @@ public class StockOrderService extends BaseService {
         entity.setDamagedPriceDeduction(apiStockOrder.getDamagedPriceDeduction());
         entity.setCurrency(apiStockOrder.getCurrency());
 
-        // Calculate quantities
-        BigDecimal lastUsedQuantity = (entity.getFulfilledQuantity() != null && entity.getAvailableQuantity() != null)
-                ? entity.getFulfilledQuantity().subtract(entity.getAvailableQuantity())
-                : null;
-
-        entity.setTotalQuantity(apiStockOrder.getTotalQuantity());
-
-        switch (apiStockOrder.getOrderType()) {
-            case PURCHASE_ORDER:
-            case PROCESSING_ORDER:
-            case TRANSFER_ORDER:
-
-                entity.setFulfilledQuantity(entity.getTotalQuantity());
-
-                // For new StockOrders set available quantity to total quantity
-                if (entity.getId() == null) {
-                    entity.setAvailableQuantity(entity.getFulfilledQuantity());
-                }
-
-                break;
-
-            case GENERAL_ORDER:
-
-                // Applies only for new Quote StockOrders
-                if (entity.getId() == null) {
-                    entity.setFulfilledQuantity(apiStockOrder.getFulfilledQuantity());
-                    entity.setAvailableQuantity(apiStockOrder.getAvailableQuantity());
-                }
-        }
-
-        // If existing entity and processing order is provided edit the quantities
-        if (entity.getId() != null) {
-            if (processingOrder != null) {
-
-                // Calculate quantities based on input transactions
-                List<Transaction> inputTxs = processingOrder.getInputTransactions();
-
-                if (apiStockOrder.getOrderType() == OrderType.GENERAL_ORDER) {
-
-                    if (!processingOrder.getTargetStockOrders().contains(entity)) {
-
-                        // Quote order is part of another StockOrder (as source)
-                        entity.setAvailableQuantity(entity.getAvailableQuantity().subtract(calculateUsedQuantity(inputTxs, entity.getId())));
-                        entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs, entity.getId()));
-
-                    } else {
-                        // When updating quote order itself
-                        entity.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs, null));
-                    }
-
-                } else {
-                    entity.setAvailableQuantity(entity.getFulfilledQuantity()
-                            .subtract(lastUsedQuantity != null ? lastUsedQuantity : BigDecimal.ZERO)
-                            .subtract(calculateUsedQuantity(inputTxs, entity.getId())));
-                }
-
-            } else if (lastUsedQuantity != null) {
-                entity.setAvailableQuantity(apiStockOrder.getFulfilledQuantity().subtract(lastUsedQuantity));
-            }
-        }
-
-        // Validate quantities
-        if (entity.getAvailableQuantity() != null) {
-
-            if (entity.getAvailableQuantity().compareTo(BigDecimal.ZERO) < 0) {
-                throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity resulted in negative number.");
-            }
-
-            if (entity.getFulfilledQuantity() != null) {
-                if (entity.getFulfilledQuantity().compareTo(entity.getAvailableQuantity()) < 0) {
-                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity (" + entity.getAvailableQuantity()
-                            + ") cannot be bigger then fulfilled quantity (" + entity.getFulfilledQuantity() + ").");
-                }
-                if (entity.getFulfilledQuantity().compareTo(entity.getTotalQuantity()) > 0) {
-                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Fulfilled quantity (" + entity.getFulfilledQuantity()
-                            + ") cannot be bigger then total quantity (" + entity.getTotalQuantity() + ").");
-                }
-            }
-        }
-
-        entity.setAvailable(entity.getAvailableQuantity() != null && entity.getAvailableQuantity().compareTo(BigDecimal.ZERO) > 0);
-        entity.setIsOpenOrder(entity.getOrderType() == OrderType.GENERAL_ORDER && entity.getTotalQuantity().compareTo(entity.getFulfilledQuantity()) > 0);
-
-        // END: Calculate quantities
+        calculateQuantities(apiStockOrder, entity, processingOrder);
 
         // Set the measure unit from the contained semi-product
         if (entity.getSemiProduct() != null) {
@@ -722,6 +636,101 @@ public class StockOrderService extends BaseService {
         }
 
         return new ApiBaseEntity(entity);
+    }
+
+    public void calculateQuantities(ApiStockOrder apiStockOrder, StockOrder stockOrder, ProcessingOrder processingOrder) throws ApiException{
+
+        if (apiStockOrder.getOrderType() == null) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "OrderType needs to be provided!");
+        }
+        if (apiStockOrder.getTotalQuantity() == null) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Total quantity cannot be null!");
+        }
+        if (apiStockOrder.getFulfilledQuantity() == null) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Fulfilled quantity cannot be null!");
+        }
+
+        BigDecimal lastUsedQuantity = (stockOrder.getFulfilledQuantity() != null && stockOrder.getAvailableQuantity() != null)
+                ? stockOrder.getFulfilledQuantity().subtract(stockOrder.getAvailableQuantity())
+                : null;
+
+        stockOrder.setTotalQuantity(apiStockOrder.getTotalQuantity());
+
+        switch (apiStockOrder.getOrderType()) {
+            case PURCHASE_ORDER:
+            case PROCESSING_ORDER:
+            case TRANSFER_ORDER:
+
+                stockOrder.setFulfilledQuantity(stockOrder.getTotalQuantity());
+
+                // For new StockOrders set available quantity to total quantity
+                if (stockOrder.getId() == null) {
+                    stockOrder.setAvailableQuantity(stockOrder.getFulfilledQuantity());
+                }
+
+                break;
+
+            case GENERAL_ORDER:
+
+                // Applies only for new Quote StockOrders
+                if (stockOrder.getId() == null) {
+                    stockOrder.setFulfilledQuantity(apiStockOrder.getFulfilledQuantity());
+                    stockOrder.setAvailableQuantity(apiStockOrder.getAvailableQuantity());
+                }
+        }
+
+        // If existing entity and processing order is provided edit the quantities
+        if (stockOrder.getId() != null) {
+            if (processingOrder != null) {
+
+                // Calculate quantities based on input transactions
+                List<Transaction> inputTxs = processingOrder.getInputTransactions();
+
+                if (apiStockOrder.getOrderType() == OrderType.GENERAL_ORDER) {
+
+                    if (!processingOrder.getTargetStockOrders().contains(stockOrder)) {
+
+                        // Quote order is part of another StockOrder (as source)
+                        stockOrder.setAvailableQuantity(stockOrder.getAvailableQuantity().subtract(calculateUsedQuantity(inputTxs, stockOrder.getId())));
+                        stockOrder.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs, stockOrder.getId()));
+
+                    } else {
+                        // When updating quote order itself
+                        stockOrder.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs, null));
+                    }
+
+                } else {
+                    stockOrder.setAvailableQuantity(stockOrder.getFulfilledQuantity()
+                            .subtract(lastUsedQuantity != null ? lastUsedQuantity : BigDecimal.ZERO)
+                            .subtract(calculateUsedQuantity(inputTxs, stockOrder.getId())));
+                }
+
+            } else if (lastUsedQuantity != null) {
+                stockOrder.setAvailableQuantity(apiStockOrder.getFulfilledQuantity().subtract(lastUsedQuantity));
+            }
+        }
+
+        // Validate quantities
+        if (stockOrder.getAvailableQuantity() != null) {
+
+            if (stockOrder.getAvailableQuantity().compareTo(BigDecimal.ZERO) < 0) {
+                throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity resulted in negative number.");
+            }
+
+            if (stockOrder.getFulfilledQuantity() != null) {
+                if (stockOrder.getFulfilledQuantity().compareTo(stockOrder.getAvailableQuantity()) < 0) {
+                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Available quantity (" + stockOrder.getAvailableQuantity()
+                            + ") cannot be bigger then fulfilled quantity (" + stockOrder.getFulfilledQuantity() + ").");
+                }
+                if (stockOrder.getFulfilledQuantity().compareTo(stockOrder.getTotalQuantity()) > 0) {
+                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "Fulfilled quantity (" + stockOrder.getFulfilledQuantity()
+                            + ") cannot be bigger then total quantity (" + stockOrder.getTotalQuantity() + ").");
+                }
+            }
+        }
+
+        stockOrder.setAvailable(stockOrder.getAvailableQuantity() != null && stockOrder.getAvailableQuantity().compareTo(BigDecimal.ZERO) > 0);
+        stockOrder.setIsOpenOrder(stockOrder.getOrderType() == OrderType.GENERAL_ORDER && stockOrder.getTotalQuantity().compareTo(stockOrder.getFulfilledQuantity()) > 0);
     }
 
     @Transactional
