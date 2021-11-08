@@ -20,22 +20,6 @@ public class UserCustomerMapper {
         return apiUserCustomer;
     }
 
-    public static ApiUserCustomer toApiUserCustomerWithLocation(UserCustomer entity) {
-
-        ApiUserCustomer apiUserCustomer = toApiUserCustomerBase(entity);
-        if (apiUserCustomer == null) {
-            return null;
-        }
-
-        if (entity.getUserCustomerLocation() != null) {
-            apiUserCustomer.setLocation(new ApiUserCustomerLocation());
-            apiUserCustomer.getLocation()
-                    .setAddress(AddressMapper.toApiAddress(entity.getUserCustomerLocation().getAddress()));
-        }
-
-        return apiUserCustomer;
-    }
-
     public static ApiUserCustomer toApiUserCustomer(UserCustomer entity) {
 
         ApiUserCustomer apiUserCustomer = toApiUserCustomerBase(entity);

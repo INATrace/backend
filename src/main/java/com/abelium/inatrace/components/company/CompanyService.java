@@ -6,8 +6,10 @@ import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
+import com.abelium.inatrace.components.common.CommonService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.common.UserCustomerImportService;
+import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.common.api.ApiUserCustomerImportResponse;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
@@ -29,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.torpedoquery.jpa.Function;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
@@ -49,6 +52,9 @@ public class CompanyService extends BaseService {
 
 	@Autowired
 	private UserQueries userQueries;
+
+	@Autowired
+	private CommonService commonService;
 
 	@Autowired
 	private UserCustomerImportService userCustomerImportService;
@@ -220,8 +226,8 @@ public class CompanyService extends BaseService {
 		}
 	}
 
-	public ApiUserCustomer getUserCustomer(Long id) {
-		return companyApiTools.toApiUserCustomer(em.find(UserCustomer.class, id));
+	public ApiUserCustomer getUserCustomer(Long id, Long userId) {
+		return companyApiTools.toApiUserCustomer(em.find(UserCustomer.class, id), userId);
 	}
 
 	public boolean existsUserCustomer(ApiUserCustomer apiUserCustomer) {
@@ -233,12 +239,13 @@ public class CompanyService extends BaseService {
 		return !userCustomerList.isEmpty();
 	}
 
-	public ApiPaginatedList<ApiUserCustomer> getUserCustomersForCompanyAndType(Long companyId, UserCustomerType type, ApiListFarmersRequest request) {
-		return PaginationTools.createPaginatedResponse(em, request, () -> userCustomerListQueryObject(companyId, type, request), companyApiTools::toApiUserCustomer);
+	public ApiPaginatedList<ApiUserCustomer> getUserCustomersForCompanyAndType(Long companyId, UserCustomerType type, ApiListFarmersRequest request, Long userId) {
+		return PaginationTools.createPaginatedResponse(em, request, () -> userCustomerListQueryObject(companyId, type, request), uc -> companyApiTools.toApiUserCustomer(uc, userId));
 	}
 
 	@Transactional
-	public ApiUserCustomer addUserCustomer(Long companyId, ApiUserCustomer apiUserCustomer) {
+	public ApiUserCustomer addUserCustomer(Long companyId, ApiUserCustomer apiUserCustomer, Long userId) throws ApiException {
+
 		Company company = em.find(Company.class, companyId);
 
 		UserCustomer userCustomer = new UserCustomer();
@@ -297,6 +304,7 @@ public class CompanyService extends BaseService {
 		userCustomer.setUserCustomerLocation(userCustomerLocation);
 		em.persist(userCustomer);
 
+		// Set associations
 		userCustomer.setAssociations(new ArrayList<>());
 		if (apiUserCustomer.getAssociations() != null) {
 			for (ApiUserCustomerAssociation apiUserCustomerAssociation : apiUserCustomer.getAssociations()) {
@@ -308,6 +316,7 @@ public class CompanyService extends BaseService {
 			}
 		}
 
+		// Set cooperatives
 		userCustomer.setCooperatives(new ArrayList<>());
 		if (apiUserCustomer.getCooperatives() != null) {
 			for (ApiUserCustomerCooperative apiUserCustomerCooperative : apiUserCustomer.getCooperatives()) {
@@ -320,12 +329,28 @@ public class CompanyService extends BaseService {
 			}
 		}
 
-		return companyApiTools.toApiUserCustomer(userCustomer);
+		// Set certifications
+		if (!CollectionUtils.isEmpty(apiUserCustomer.getCertifications())) {
+			for (ApiCertification apiCertification : apiUserCustomer.getCertifications()) {
+				UserCustomerCertification certification = new UserCustomerCertification();
+				certification.setUserCustomer(userCustomer);
+				certification.setDescription(apiCertification.getDescription());
+				certification.setType(apiCertification.getType());
+				certification.setValidity(apiCertification.getValidity());
+				certification.setCertificate(commonService.fetchDocument(userId, apiCertification.getCertificate()));
+				userCustomer.getCertifications().add(certification);
+			}
+		}
+
+		return companyApiTools.toApiUserCustomer(userCustomer, userId);
 	}
 
 	@Transactional
-	public ApiUserCustomer updateUserCustomer(ApiUserCustomer apiUserCustomer) {
-		if (apiUserCustomer == null) return null;
+	public ApiUserCustomer updateUserCustomer(ApiUserCustomer apiUserCustomer, Long userId) throws ApiException {
+
+		if (apiUserCustomer == null) {
+			return null;
+		}
 
 		UserCustomer userCustomer = em.find(UserCustomer.class, apiUserCustomer.getId());
 
@@ -380,8 +405,8 @@ public class CompanyService extends BaseService {
 			userCustomer.setAssociations(new ArrayList<>());
 		}
 
+		// Update user customer associations
 		userCustomer.getAssociations().removeIf(userCustomerAssociation -> apiUserCustomer.getAssociations().stream().noneMatch(apiUserCustomerAssociation -> userCustomerAssociation.getId().equals(apiUserCustomerAssociation.getId())));
-
 		for (ApiUserCustomerAssociation apiUserCustomerAssociation : apiUserCustomer.getAssociations()) {
 			if (userCustomer.getAssociations().stream().noneMatch(userCustomerAssociation -> userCustomerAssociation.getId().equals(apiUserCustomerAssociation.getId()))) {
 				UserCustomerAssociation userCustomerAssociation = new UserCustomerAssociation();
@@ -396,8 +421,8 @@ public class CompanyService extends BaseService {
 			userCustomer.setCooperatives(new ArrayList<>());
 		}
 
+		// Update user customer cooperatives
 		userCustomer.getCooperatives().removeIf(userCustomerCooperative -> apiUserCustomer.getCooperatives().stream().noneMatch(apiUserCustomerCooperative -> userCustomerCooperative.getId().equals(apiUserCustomerCooperative.getId())));
-
 		for (ApiUserCustomerCooperative apiUserCustomerCooperative : apiUserCustomer.getCooperatives()) {
 			if (userCustomer.getCooperatives().stream().noneMatch(userCustomerCooperative -> userCustomerCooperative.getId().equals(apiUserCustomerCooperative.getId()))) {
 				UserCustomerCooperative userCustomerCooperative = new UserCustomerCooperative();
@@ -409,7 +434,27 @@ public class CompanyService extends BaseService {
 			}
 		}
 
-		return companyApiTools.toApiUserCustomer(userCustomer);
+		// Update user customer certifications
+		userCustomer.getCertifications().removeIf(ucc -> apiUserCustomer.getCertifications().stream().noneMatch(apiUCC -> ucc.getId().equals(apiUCC.getId())));
+		for (ApiCertification apiCertification : apiUserCustomer.getCertifications()) {
+
+			UserCustomerCertification certification;
+			if (apiCertification.getId() == null) {
+				certification = new UserCustomerCertification();
+				certification.setUserCustomer(userCustomer);
+				userCustomer.getCertifications().add(certification);
+			} else {
+				certification = userCustomer.getCertifications().stream()
+						.filter(ucc -> ucc.getId().equals(apiCertification.getId())).findAny().orElseThrow();
+			}
+
+			certification.setCertificate(commonService.fetchDocument(userId, apiCertification.getCertificate()));
+			certification.setType(apiCertification.getType());
+			certification.setDescription(apiCertification.getDescription());
+			certification.setValidity(apiCertification.getValidity());
+		}
+
+		return companyApiTools.toApiUserCustomer(userCustomer, userId);
 	}
 
 	@Transactional
@@ -659,8 +704,8 @@ public class CompanyService extends BaseService {
 		return !companyUserList.isEmpty();
 	}
 
-	public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId) throws ApiException {
-		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId);
+	public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, Long userId) throws ApiException {
+		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId, userId);
 	}
 
 }

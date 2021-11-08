@@ -39,7 +39,7 @@ public class UserCustomerImportService extends BaseService {
     @Autowired
     private StorageService storageService;
 
-    public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId) throws ApiException {
+    public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, Long userId) throws ApiException {
         DocumentData documentData = storageService.downloadDocument(em.find(Document.class, documentId).getStorageKey());
         InputStream inputStream;
         XSSFWorkbook mainWorkbook;
@@ -114,7 +114,7 @@ public class UserCustomerImportService extends BaseService {
                 if (companyService.existsUserCustomer(apiUserCustomer)) {
                     duplicates.add(apiUserCustomer);
                 } else {
-                    companyService.addUserCustomer(companyId, apiUserCustomer);
+                    companyService.addUserCustomer(companyId, apiUserCustomer, userId);
                     successful++;
                 }
             }

@@ -1,16 +1,15 @@
 package com.abelium.inatrace.components.common.api;
 
-import java.time.LocalDate;
-
-import javax.validation.Valid;
-
+import com.abelium.inatrace.api.ApiBaseEntity;
+import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.Valid;
+import java.time.LocalDate;
 
 @Validated
-public class ApiCertification {
+public class ApiCertification extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "certification type", position = 1)
 	public String type;
@@ -25,7 +24,6 @@ public class ApiCertification {
 	
 	@ApiModelProperty(value = "validity", position = 4)
 	public LocalDate validity;
-	
 
 	public String getDescription() {
 		return description;

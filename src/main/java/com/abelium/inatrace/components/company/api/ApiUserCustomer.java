@@ -1,17 +1,17 @@
 package com.abelium.inatrace.components.company.api;
 
+import com.abelium.inatrace.api.ApiBaseEntity;
+import com.abelium.inatrace.api.types.Lengths;
+import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.product.api.ApiBankInformation;
 import com.abelium.inatrace.components.product.api.ApiFarmInformation;
+import com.abelium.inatrace.types.Gender;
+import com.abelium.inatrace.types.UserCustomerType;
+import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.types.Lengths;
-import com.abelium.inatrace.types.Gender;
-import com.abelium.inatrace.types.UserCustomerType;
-
-import io.swagger.annotations.ApiModelProperty;
-
+import javax.validation.Valid;
 import java.util.List;
 
 @Validated
@@ -62,6 +62,10 @@ public class ApiUserCustomer extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "List of cooperatives", position = 13)
 	public List<ApiUserCustomerCooperative> cooperatives;
+
+	@ApiModelProperty(value = "User customer certifications", position = 14)
+	@Valid
+	public List<ApiCertification> certifications;
 
 	public Long getCompanyId() {
 		return companyId;
@@ -174,4 +178,13 @@ public class ApiUserCustomer extends ApiBaseEntity {
 	public void setCooperatives(List<ApiUserCustomerCooperative> cooperatives) {
 		this.cooperatives = cooperatives;
 	}
+
+	public List<ApiCertification> getCertifications() {
+		return certifications;
+	}
+
+	public void setCertifications(List<ApiCertification> certifications) {
+		this.certifications = certifications;
+	}
+
 }

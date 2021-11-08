@@ -8,6 +8,7 @@ import com.abelium.inatrace.types.Gender;
 import com.abelium.inatrace.types.UserCustomerType;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -96,6 +97,9 @@ public class UserCustomer extends BaseEntity {
 
 	@OneToMany(mappedBy = "userCustomer", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<UserCustomerCooperative> cooperatives;
+
+	@OneToMany(mappedBy = "userCustomer", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<UserCustomerCertification> certifications;
 	
 	public UserCustomerType getType() {
 		return type;
@@ -215,6 +219,17 @@ public class UserCustomer extends BaseEntity {
 
 	public void setCooperatives(List<UserCustomerCooperative> cooperatives) {
 		this.cooperatives = cooperatives;
+	}
+
+	public List<UserCustomerCertification> getCertifications() {
+		if (certifications == null) {
+			certifications = new ArrayList<>();
+		}
+		return certifications;
+	}
+
+	public void setCertifications(List<UserCustomerCertification> certifications) {
+		this.certifications = certifications;
 	}
 
 	public String getLocation() {

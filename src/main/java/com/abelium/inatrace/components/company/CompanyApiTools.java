@@ -12,7 +12,6 @@ import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.company.types.CompanyTranslatables;
 import com.abelium.inatrace.components.product.api.ApiBankInformation;
 import com.abelium.inatrace.components.product.api.ApiFarmInformation;
-import com.abelium.inatrace.components.product.api.ApiLocation;
 import com.abelium.inatrace.components.user.UserApiTools;
 import com.abelium.inatrace.components.user.UserQueries;
 import com.abelium.inatrace.db.entities.common.*;
@@ -278,8 +277,11 @@ public class CompanyApiTools {
 		return acu;
 	}
 
-	public ApiUserCustomer toApiUserCustomer(UserCustomer userCustomer) {
-		if (userCustomer == null) return null;
+	public ApiUserCustomer toApiUserCustomer(UserCustomer userCustomer, Long userId) {
+
+		if (userCustomer == null) {
+			return null;
+		}
 
 		ApiUserCustomer apiUserCustomer = new ApiUserCustomer();
 		apiUserCustomer.setId(userCustomer.getId());
@@ -291,18 +293,38 @@ public class CompanyApiTools {
 		apiUserCustomer.setEmail(userCustomer.getEmail());
 		apiUserCustomer.setGender(userCustomer.getGender());
 		apiUserCustomer.setHasSmartphone(userCustomer.getHasSmartphone());
+
 		// Company
 		apiUserCustomer.setCompanyId(userCustomer.getCompany().getId());
+
 		// Location
 		apiUserCustomer.setLocation(toApiUserCustomerLocation(userCustomer.getUserCustomerLocation()));
+
 		// Bank
 		apiUserCustomer.setBank(toApiBankInformation(userCustomer.getBank()));
+
 		// Farm
 		apiUserCustomer.setFarm(toApiFarmInformation(userCustomer.getFarm()));
+
 		// Associations
 		apiUserCustomer.setAssociations(toApiUserCustomerAssociationList(userCustomer.getAssociations()));
+
 		// Cooperatives
 		apiUserCustomer.setCooperatives(toApiUserCustomerCooperativesList(userCustomer.getCooperatives()));
+
+		// Certifications
+		apiUserCustomer.setCertifications(userCustomer.getCertifications().stream().map(ucc -> {
+
+			ApiCertification apiCertification = new ApiCertification();
+			apiCertification.setId(ucc.getId());
+			apiCertification.setCertificate(CommonApiTools.toApiDocument(ucc.getCertificate(), userId));
+			apiCertification.setType(ucc.getType());
+			apiCertification.setDescription(ucc.getDescription());
+			apiCertification.setValidity(ucc.getValidity());
+
+			return apiCertification;
+
+		}).collect(Collectors.toList()));
 
 		return apiUserCustomer;
 	}
@@ -398,14 +420,6 @@ public class CompanyApiTools {
 			return null;
 		}
 		return userCustomerCooperativeList.stream().map(this::toApiUserCustomerCooperative).collect(Collectors.toList());
-	}
-
-	public ApiLocation toApiLocation(Location location) {
-		if (location == null) return null;
-		ApiLocation apiLocation = new ApiLocation();
-		apiLocation.setAddress(toApiAddress(location.getAddress()));
-
-		return apiLocation;
 	}
 				
 }
