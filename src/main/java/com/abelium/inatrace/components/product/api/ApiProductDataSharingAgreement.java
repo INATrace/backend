@@ -1,11 +1,12 @@
 package com.abelium.inatrace.components.product.api;
 
+import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
-public class ApiProductDataSharingAgreement {
+public class ApiProductDataSharingAgreement extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "Description of this document")
 	private String description;

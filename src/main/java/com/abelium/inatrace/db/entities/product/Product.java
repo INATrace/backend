@@ -60,7 +60,7 @@ public class Product extends ProductContent {
 	/**
 	 * Data sharing agreements between the stakeholders on this product (value chain)
 	 */
-	@OneToMany(mappedBy = "product")
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProductDataSharingAgreement> dataSharingAgreements;
 
 	public List<ProductLocation> getOriginLocations() {

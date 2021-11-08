@@ -155,18 +155,23 @@ public class ProductService extends BaseService {
 
     @Transactional
 	public void updateProduct(CustomUserDetails authUser, ApiProduct ap) throws ApiException {
+
 		if (ap.getAssociatedCompanies() != null && ap.getAssociatedCompanies().stream().noneMatch(apiProductCompany -> apiProductCompany.getType() == ProductCompanyType.OWNER)) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "The product must have at least one owner.");
 		}
+
 		Product p = fetchProductAssoc(authUser, ap.id);
+
 		if (p.getSettings() == null) {
 			p.setSettings(new ProductSettings());
 			em.persist(p.getSettings());
 		}
+
 		if (p.getComparisonOfPrice() == null) {
 			p.setComparisonOfPrice(new ComparisonOfPrice());
 			em.persist(p.getComparisonOfPrice());
 		}
+
 		productApiTools.updateProduct(authUser, p, ap);
 	}
 

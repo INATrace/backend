@@ -8,17 +8,12 @@ import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.company.CompanyApiTools;
 import com.abelium.inatrace.components.company.CompanyQueries;
-import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.product.api.*;
-import com.abelium.inatrace.components.company.api.ApiUserCustomer;
-import com.abelium.inatrace.components.company.api.ApiUserCustomerAssociation;
-import com.abelium.inatrace.components.company.api.ApiUserCustomerCooperative;
-import com.abelium.inatrace.components.company.api.ApiUserCustomerLocation;
 import com.abelium.inatrace.components.value_chain.ValueChainApiTools;
 import com.abelium.inatrace.components.value_chain.ValueChainQueries;
-import com.abelium.inatrace.db.entities.common.*;
-import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.common.BankInformation;
+import com.abelium.inatrace.db.entities.common.Location;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.process.Process;
 import com.abelium.inatrace.db.entities.process.ProcessDocument;
@@ -59,7 +54,6 @@ public class ProductApiTools {
 	@Autowired
 	private ValueChainQueries valueChainQueries;
 
-
 	public static ApiProductListResponse toApiProductListResponse(long userId, Product product) {
 		if (product == null) return null;
 		
@@ -71,7 +65,10 @@ public class ProductApiTools {
 	}
 	
 	public ApiProduct toApiProduct(Long userId, Product p) {
-		if (p == null) return null;
+
+		if (p == null) {
+			return null;
+		}
 		
 		ApiProduct ap = new ApiProduct();
 		updateApiProductContent(userId, ap, p);
@@ -80,6 +77,11 @@ public class ProductApiTools {
 		ap.company = companyApiTools.toApiCompany(userId, p.getCompany(), null);
 		ap.valueChain = valueChainApiTools.toApiValueChain(p.getValueChain());
 		ap.associatedCompanies = p.getAssociatedCompanies().stream().map(ProductApiTools::toApiProductCompany).collect(Collectors.toList());
+
+		ap.setDataSharingAgreements(p.getDataSharingAgreements().stream()
+				.map(pdsa -> ProductApiTools.toApiProductDataSharingAgreement(pdsa, userId))
+				.collect(Collectors.toList()));
+
 		return ap;
 	}
 
@@ -218,44 +220,11 @@ public class ProductApiTools {
 		al.pinName = l.getPinName();
 		return al;
 	}
-
-	public static ApiUserCustomerLocation toApiUserCustomerLocation(UserCustomerLocation userCustomerLocation) {
-		if (userCustomerLocation == null) return null;
-
-		ApiUserCustomerLocation apiUserCustomerLocation = new ApiUserCustomerLocation();
-		apiUserCustomerLocation.setAddress(CommonApiTools.toApiAddress(userCustomerLocation.getAddress()));
-		apiUserCustomerLocation.setLatitude(userCustomerLocation.getLatitude());
-		apiUserCustomerLocation.setLongitude(userCustomerLocation.getLongitude());
-		apiUserCustomerLocation.setPubliclyVisible(userCustomerLocation.getPubliclyVisible());
-
-		return apiUserCustomerLocation;
-	}
 	
 	public static ApiProductCompany toApiProductCompany(ProductCompany pc) {
 		ApiProductCompany apc = new ApiProductCompany();
 		apc.company = CompanyApiTools.toApiCompanyListResponse(pc.getCompany());
 		apc.type = pc.getType();
-		return apc;
-	}
-	
-	public static ApiUserCustomer toApiUserCustomer(UserCustomer pc) {
-		if (pc == null) return null;
-		
-		ApiUserCustomer apc = new ApiUserCustomer();
-		apc.id = pc.getId();
-		apc.companyId = pc.getCompany() != null ? pc.getCompany().getId() : null;
-		apc.type = pc.getType();
-		apc.name = pc.getName();
-		apc.surname = pc.getSurname();
-		apc.location = ProductApiTools.toApiUserCustomerLocation(pc.getUserCustomerLocation());
-		apc.phone = pc.getPhone();
-		apc.email = pc.getEmail();
-		apc.gender = pc.getGender();
-		apc.hasSmartphone = pc.getHasSmartphone();
-		apc.bank = ProductApiTools.toApiBankInformation(pc.getBank());
-		apc.farm = ProductApiTools.toApiFarmInformation(pc.getFarm());
-		apc.cooperatives = pc.getCooperatives().stream().map(ProductApiTools::toApiUserCustomerCooperative).collect(Collectors.toList());
-		apc.associations = pc.getAssociations().stream().map(ProductApiTools::toApiUserCustomerAssociation).collect(Collectors.toList());
 		return apc;
 	}
 
@@ -269,55 +238,6 @@ public class ProductApiTools {
 		apiBankInformation.setAdditionalInformation(bankInformation.getAdditionalInformation());
 
 		return apiBankInformation;
-	}
-
-	public static ApiFarmInformation toApiFarmInformation(FarmInformation farmInformation) {
-		if (farmInformation == null) return null;
-
-		ApiFarmInformation apiFarmInformation = new ApiFarmInformation();
-		apiFarmInformation.setTotalCultivatedArea(farmInformation.getTotalCultivatedArea());
-		apiFarmInformation.setCoffeeCultivatedArea(farmInformation.getCoffeeCultivatedArea());
-		apiFarmInformation.setNumberOfTrees(farmInformation.getNumberOfTrees());
-		apiFarmInformation.setOrganic(farmInformation.getOrganic());
-		apiFarmInformation.setAreaOrganicCertified(farmInformation.getAreaOrganicCertified());
-		apiFarmInformation.setStartTransitionToOrganic(farmInformation.getStartTransitionToOrganic());
-
-		return apiFarmInformation;
-	}
-
-	public static ApiUserCustomerCooperative toApiUserCustomerCooperative(UserCustomerCooperative userCustomerCooperative) {
-		if (userCustomerCooperative == null) return null;
-
-		ApiUserCustomerCooperative apiUserCustomerCooperative = new ApiUserCustomerCooperative();
-		apiUserCustomerCooperative.setId(userCustomerCooperative.getId());
-		apiUserCustomerCooperative.setCompany(toApiCompany(userCustomerCooperative.getCompany()));
-		apiUserCustomerCooperative.setUserCustomer(new ApiUserCustomer());
-		apiUserCustomerCooperative.getUserCustomer().setId(userCustomerCooperative.getUserCustomer().getId());
-		apiUserCustomerCooperative.setUserCustomerType(userCustomerCooperative.getRole());
-
-		return apiUserCustomerCooperative;
-	}
-
-	public static ApiUserCustomerAssociation toApiUserCustomerAssociation(UserCustomerAssociation userCustomerAssociation) {
-		if (userCustomerAssociation == null) return null;
-
-		ApiUserCustomerAssociation apiUserCustomerAssociation = new ApiUserCustomerAssociation();
-		apiUserCustomerAssociation.setId(userCustomerAssociation.getId());
-		apiUserCustomerAssociation.setCompany(toApiCompany(userCustomerAssociation.getCompany()));
-		apiUserCustomerAssociation.setUserCustomer(new ApiUserCustomer());
-		apiUserCustomerAssociation.getUserCustomer().setId(userCustomerAssociation.getUserCustomer().getId());
-
-		return apiUserCustomerAssociation;
-	}
-
-	public static ApiCompany toApiCompany(Company company) {
-		if (company == null) return null;
-
-		ApiCompany apiCompany = new ApiCompany();
-		apiCompany.setId(company.getId());
-		apiCompany.setName(company.getName());
-
-		return apiCompany;
 	}
 	
 	public static ApiCompanyCustomer toApiCompanyCustomer(CompanyCustomer pc) {
@@ -335,16 +255,54 @@ public class ProductApiTools {
 		return apc;
 	}
 
+	public static ApiProductDataSharingAgreement toApiProductDataSharingAgreement(ProductDataSharingAgreement pdsa, Long userId) {
+
+		if (pdsa == null) {
+			return null;
+		}
+
+		ApiProductDataSharingAgreement apiProductDataSharingAgreement = new ApiProductDataSharingAgreement();
+		apiProductDataSharingAgreement.setId(pdsa.getId());
+		apiProductDataSharingAgreement.setDescription(pdsa.getDescription());
+		apiProductDataSharingAgreement.setDocument(CommonApiTools.toApiDocument(pdsa.getDocument(), userId));
+
+		return apiProductDataSharingAgreement;
+	}
 	
 	public void updateProduct(CustomUserDetails authUser, Product p, ApiProduct pu) throws ApiException {
+
 		updateProductContent(authUser.getUserId(), p, pu);
+
 		if (pu.origin != null) {
 			if (pu.origin.locations != null) updateOriginLocations(p, p.getOriginLocations(), pu.origin.locations);
 		}
-		if (pu.company != null) p.setCompany(companyQueries.fetchCompany(pu.company.id));
-		if (pu.valueChain != null) p.setValueChain(valueChainQueries.fetchValueChain(pu.valueChain.getId()));
+		if (pu.company != null) {
+			p.setCompany(companyQueries.fetchCompany(pu.company.id));
+		}
+		if (pu.valueChain != null) {
+			p.setValueChain(valueChainQueries.fetchValueChain(pu.valueChain.getId()));
+		}
 		if (pu.associatedCompanies != null && authUser.getUserRole() == UserRole.ADMIN) {
 			updateProductCompanies(p, p.getAssociatedCompanies(), pu.associatedCompanies);
+		}
+
+		// Update the data sharing agreements
+		p.getDataSharingAgreements().removeIf(pdsa -> pu.getDataSharingAgreements().stream().noneMatch(item -> pdsa.getId().equals(item.getId())));
+		for (ApiProductDataSharingAgreement apiDataSharingAgreement : pu.getDataSharingAgreements()) {
+
+			ProductDataSharingAgreement productDataSharingAgreement;
+			if (apiDataSharingAgreement.getId() == null) {
+				productDataSharingAgreement = new ProductDataSharingAgreement();
+				productDataSharingAgreement.setProduct(p);
+				p.getDataSharingAgreements().add(productDataSharingAgreement);
+			} else {
+				productDataSharingAgreement = p.getDataSharingAgreements().stream()
+						.filter(pdsa -> pdsa.getId().equals(apiDataSharingAgreement.getId())).findAny().orElseThrow();
+			}
+
+			productDataSharingAgreement.setDescription(apiDataSharingAgreement.getDescription());
+			productDataSharingAgreement.setDocument(
+					commonEngine.fetchDocument(authUser.getUserId(), apiDataSharingAgreement.getDocument()));
 		}
 	}
 
@@ -523,7 +481,7 @@ public class ProductApiTools {
 		}
 	}
 	
-	public static ApiProductLabel toApiProductLabel(ProductLabel pl) throws ApiException {
+	public static ApiProductLabel toApiProductLabel(ProductLabel pl) {
 		if (pl == null) return null;
 		
 		ApiProductLabel apl = new ApiProductLabel();
@@ -532,7 +490,7 @@ public class ProductApiTools {
 		return apl;
 	}
 
-	public static ApiProductLabelBase toApiProductLabelBase(ProductLabel pl) throws ApiException {
+	public static ApiProductLabelBase toApiProductLabelBase(ProductLabel pl) {
 		if (pl == null) return null;
 		
 		ApiProductLabel apl = new ApiProductLabel();
@@ -635,58 +593,6 @@ public class ProductApiTools {
 		bl.setBatch(plb);
 		updateLocation(bl, al);
 		return bl;
-	}
-	
-	public static void updateUserCustomer(UserCustomer pc, ApiUserCustomer apc) {
-		pc.setName(apc.name);
-		pc.setSurname(apc.surname);
-		pc.setGender(apc.gender);
-		pc.setType(apc.type);
-		pc.setPhone(apc.phone);
-		pc.setEmail(apc.email);
-		pc.setHasSmartphone(apc.getHasSmartphone());
-		// Bank
-		if (pc.getBank() == null) {
-			pc.setBank(new BankInformation());
-		}
-		pc.getBank().setBankName(apc.getBank().getBankName());
-		pc.getBank().setAdditionalInformation(apc.getBank().getAdditionalInformation());
-		pc.getBank().setAccountNumber(apc.getBank().getAccountNumber());
-		pc.getBank().setAccountHolderName(apc.getBank().getAccountHolderName());
-		// Farm
-		if (pc.getFarm() == null) {
-			pc.setFarm(new FarmInformation());
-		}
-		pc.getFarm().setAreaUnit(apc.getFarm().getAreaUnit());
-		pc.getFarm().setTotalCultivatedArea(apc.getFarm().getTotalCultivatedArea());
-		pc.getFarm().setCoffeeCultivatedArea(apc.getFarm().getCoffeeCultivatedArea());
-		pc.getFarm().setNumberOfTrees(apc.getFarm().getNumberOfTrees());
-		pc.getFarm().setOrganic(apc.getFarm().getOrganic());
-		pc.getFarm().setAreaOrganicCertified(apc.getFarm().getAreaOrganicCertified());
-		pc.getFarm().setStartTransitionToOrganic(apc.getFarm().getStartTransitionToOrganic());
-		// Location
-//		UserCustomerLocation userCustomerLocation = new UserCustomerLocation();
-//		Address address = new Address();
-//		address.setAddress(apc.getLocation().getAddress().getAddress());
-//		address.setCell(apc.getLocation().getAddress().getCell());
-//		address.setCity(apc.getLocation().getAddress().getCity());
-//		address.setHondurasDepartment(apc.getLocation().getAddress().getHondurasDepartment());
-//		address.setHondurasFarm(apc.getLocation().getAddress().getHondurasFarm());
-//		address.setHondurasMunicipality(apc.getLocation().getAddress().getHondurasMunicipality());
-//		address.setHondurasVillage(apc.getLocation().getAddress().getHondurasVillage());
-//		address.setSector(apc.getLocation().getAddress().getSector());
-//		address.setState(apc.getLocation().getAddress().getState());
-//		address.setVillage(apc.getLocation().getAddress().getVillage());
-//		address.setZip(apc.getLocation().getAddress().getZip());
-//		Country addressCountry = new Country();
-//		addressCountry.setId(apc.getLocation().getAddress().getCountry().getId());
-//		address.setCountry(addressCountry);
-//		userCustomerLocation.setLatitude(apc.getLocation().getLatitude());
-//		userCustomerLocation.setLongitude(apc.getLocation().getLongitude());
-//		userCustomerLocation.setPubliclyVisible(apc.getLocation().getPubliclyVisible());
-//		userCustomerLocation.setAddress(address);
-
-//		pc.setUserCustomerLocation(userCustomerLocation);
 	}
 
 	public void updateCompanyCustomer(CompanyCustomer pc, ApiCompanyCustomer apc) throws ApiException {
