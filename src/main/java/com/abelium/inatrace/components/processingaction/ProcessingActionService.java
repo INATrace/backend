@@ -143,6 +143,9 @@ public class ProcessingActionService extends BaseService {
 		// Set semi-prodcuts and final products (depending on the Processing action type)
 		setSemiAndFinalProducts(apiProcessingAction, entity);
 
+		// Set the estimated output quantity per unit
+		entity.setEstimatedOutputQuantityPerUnit(apiProcessingAction.getEstimatedOutputQuantityPerUnit());
+
 		// Update the translations
 		updateProcActionTranslations(apiProcessingAction, entity);
 		
@@ -231,6 +234,14 @@ public class ProcessingActionService extends BaseService {
 		// Validate action type
 		if (apiProcessingAction.getType() == null) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Action type is required");
+		}
+
+		// Validate that estimated quantity is not provided if we don't have processing action without repacking
+		if (!(apiProcessingAction.getType().equals(ProcessingActionType.PROCESSING) &&
+				BooleanUtils.isFalse(apiProcessingAction.getRepackedOutputs())) &&
+				apiProcessingAction.getEstimatedOutputQuantityPerUnit() != null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST,
+					"Estimated output quantity cannot be provided when action is not 'PROCESSING' without repacking");
 		}
 
 		switch (apiProcessingAction.getType()) {

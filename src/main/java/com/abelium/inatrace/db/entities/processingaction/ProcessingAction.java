@@ -43,6 +43,9 @@ public class ProcessingAction extends TimestampEntity {
 
 	@Column
 	private BigDecimal maxOutputWeight;
+
+	@Column
+	private BigDecimal estimatedOutputQuantityPerUnit;
 	
 	@ManyToOne
 	private Company company;
@@ -147,6 +150,14 @@ public class ProcessingAction extends TimestampEntity {
 
 	public void setMaxOutputWeight(BigDecimal maxOutputWeight) {
 		this.maxOutputWeight = maxOutputWeight;
+	}
+
+	public BigDecimal getEstimatedOutputQuantityPerUnit() {
+		return estimatedOutputQuantityPerUnit;
+	}
+
+	public void setEstimatedOutputQuantityPerUnit(BigDecimal estimatedOutputQuantityPerUnit) {
+		this.estimatedOutputQuantityPerUnit = estimatedOutputQuantityPerUnit;
 	}
 
 	public Company getCompany() {

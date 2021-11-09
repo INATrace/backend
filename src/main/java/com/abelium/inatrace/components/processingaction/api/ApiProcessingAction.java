@@ -44,6 +44,9 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Processing action maximum output weight")
 	private BigDecimal maxOutputWeight;
+
+	@ApiModelProperty(value = "The estimated output quantity per unit for this processing action")
+	private BigDecimal estimatedOutputQuantityPerUnit;
 	
 	@ApiModelProperty(value = "Processing action public timeline label")
 	private String publicTimelineLabel;
@@ -148,6 +151,14 @@ public class ApiProcessingAction extends ApiBaseEntity {
 
 	public void setMaxOutputWeight(BigDecimal maxOutputWeight) {
 		this.maxOutputWeight = maxOutputWeight;
+	}
+
+	public BigDecimal getEstimatedOutputQuantityPerUnit() {
+		return estimatedOutputQuantityPerUnit;
+	}
+
+	public void setEstimatedOutputQuantityPerUnit(BigDecimal estimatedOutputQuantityPerUnit) {
+		this.estimatedOutputQuantityPerUnit = estimatedOutputQuantityPerUnit;
 	}
 
 	public String getPublicTimelineLabel() {

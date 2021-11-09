@@ -71,6 +71,9 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setInputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getInputFinalProduct()));
 		apiProcessingAction.setOutputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getOutputFinalProduct()));
 
+		// Set the estimated output quantity per unit
+		apiProcessingAction.setEstimatedOutputQuantityPerUnit(entity.getEstimatedOutputQuantityPerUnit());
+
 		// Map the final prodcut for which a QR code should be generated
 		apiProcessingAction.setQrCodeForFinalProduct(ProductApiTools.toApiFinalProduct(entity.getQrCodeForFinalProduct()));
 
