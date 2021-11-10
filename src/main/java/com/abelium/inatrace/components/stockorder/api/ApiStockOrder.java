@@ -104,6 +104,9 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Is stock available", position = 15)
     public Boolean isAvailable;
 
+    @ApiModelProperty(value = "Total quantity of this stock order is not within the expected range")
+    public Boolean outQuantityNotInRange;
+
     @ApiModelProperty(value = "Production date", position = 16)
     @JsonSerialize(converter = SimpleDateConverter.Serialize.class)
     @JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
@@ -381,6 +384,14 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setAvailable(Boolean available) {
         isAvailable = available;
+    }
+
+    public Boolean getOutQuantityNotInRange() {
+        return outQuantityNotInRange;
+    }
+
+    public void setOutQuantityNotInRange(Boolean outQuantityNotInRange) {
+        this.outQuantityNotInRange = outQuantityNotInRange;
     }
 
     public Instant getProductionDate() {

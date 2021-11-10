@@ -128,7 +128,7 @@ public class ProcessingOrderService extends BaseService {
                 if (processingAction.getType() == ProcessingActionType.GENERATE_QR_CODE) {
                     if (apiProcessingOrder.getTargetStockOrders().size() > 1) {
                         throw new ApiException(ApiStatus.VALIDATION_ERROR,
-                                "Only one target Stock order is permited when ProcessingActionType is 'Generate QR code'");
+                                "Only one target Stock order is permitted when ProcessingActionType is 'Generate QR code'");
                     }
                 }
 
@@ -198,8 +198,9 @@ public class ProcessingOrderService extends BaseService {
                             .noneMatch(apiTransaction -> transaction.getId().equals(apiTransaction.getId())))
                     .collect(Collectors.toList());
 
-            for (Transaction t: transactionsToBeDeleted)
+            for (Transaction t : transactionsToBeDeleted) {
                 transactionService.deleteTransaction(t.getId(), userId, language);
+            }
 
             // Find target StockOrders that are not present in request
             List<StockOrder> targetStockOrdersToBeDeleted = entity.getTargetStockOrders()
@@ -252,6 +253,8 @@ public class ProcessingOrderService extends BaseService {
             ApiBaseEntity insertedApiTransaction = transactionService.createOrUpdateTransaction(apiTransaction, isProcessing);
             Transaction insertedTransaction = fetchEntity(insertedApiTransaction.getId(), Transaction.class);
             insertedTransaction.setTargetProcessingOrder(entity);
+
+            entity.getInputTransactions().remove(insertedTransaction);
             entity.getInputTransactions().add(insertedTransaction);
 
             // Update source StockOrder

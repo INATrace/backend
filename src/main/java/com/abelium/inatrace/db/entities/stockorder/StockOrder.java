@@ -201,6 +201,15 @@ public class StockOrder extends TimestampEntity {
 	@Column
 	private Boolean isAvailable;
 
+	/**
+	 * This field denotes that the total quantity (output quantity) of this stock order is not in the expected range.
+	 * This is relevant when this stock order was created from processing action type 'PROCESSING' without repacking.
+	 * If the processing action has set expected output quantity per unit, then this field gets calculated when creating
+	 * or updating the stock order.
+	 */
+	@Column
+	private Boolean outQuantityNotInRange;
+
 	// The price per unit specified in the final product order (global order)
 	@Column
     private BigDecimal pricePerUnitForEndCustomer;
@@ -365,6 +374,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setAvailable(Boolean available) {
 		isAvailable = available;
+	}
+
+	public Boolean getOutQuantityNotInRange() {
+		return outQuantityNotInRange;
+	}
+
+	public void setOutQuantityNotInRange(Boolean outQuantityNotInRange) {
+		this.outQuantityNotInRange = outQuantityNotInRange;
 	}
 
 	public Instant getProductionDate() {

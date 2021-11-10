@@ -23,6 +23,7 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
+import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.productorder.ProductOrder;
 import com.abelium.inatrace.db.entities.stockorder.*;
@@ -44,6 +45,7 @@ import org.torpedoquery.jpa.Torpedo;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -516,6 +518,7 @@ public class StockOrderService extends BaseService {
         entity.setDamagedPriceDeduction(apiStockOrder.getDamagedPriceDeduction());
         entity.setCurrency(apiStockOrder.getCurrency());
 
+        // Calculate the quantities for this stock order accommodating all different cases of stock orders
         calculateQuantities(apiStockOrder, entity, processingOrder);
 
         // Set the measure unit from the contained semi-product
@@ -707,6 +710,48 @@ public class StockOrderService extends BaseService {
 
             } else if (lastUsedQuantity != null) {
                 stockOrder.setAvailableQuantity(apiStockOrder.getFulfilledQuantity().subtract(lastUsedQuantity));
+            }
+        }
+
+        // Calculate if the total quantity of this stock order is within the expected range
+        if (processingOrder != null) {
+
+            ProcessingAction procAction = processingOrder.getProcessingAction();
+            BigDecimal expectedTotalQuantityPerUnit = procAction.getEstimatedOutputQuantityPerUnit();
+
+            if (procAction.getType().equals(ProcessingActionType.PROCESSING) &&
+                    BooleanUtils.isFalse(procAction.getRepackedOutputs()) && expectedTotalQuantityPerUnit != null) {
+
+                // Calculate the total input quantity (summed up input transactions from the processing order)
+                List<Transaction> inputTxs = processingOrder.getInputTransactions();
+                BigDecimal totalInputQuantity = inputTxs.stream()
+                        .filter(t -> !t.getStatus().equals(TransactionStatus.CANCELED))
+                        .map(Transaction::getOutputQuantity)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                BigDecimal inputUnitWeight = procAction.getInputSemiProduct().getMeasurementUnitType().getWeight();
+                BigDecimal outputUnitWeight = procAction.getOutputSemiProduct().getMeasurementUnitType().getWeight();
+
+                // Calculate the input quantity normalized in the output measuring unit (important when we have different input and output measure units)
+                BigDecimal totalInputQuantityNormalized = totalInputQuantity.divide(inputUnitWeight,
+                        RoundingMode.HALF_UP).divide(outputUnitWeight, RoundingMode.HALF_UP);
+
+                // Calculate the expected total output quantity
+                BigDecimal totalExpectedOutQuantity = totalInputQuantityNormalized.multiply(expectedTotalQuantityPerUnit);
+
+                // Calculate the expected total output quantity allowed range (+/- 20% of the total expected output quantity)
+                BigDecimal outQuantityRangeLow = totalExpectedOutQuantity
+                        .multiply(new BigDecimal("0.8"))
+                        .setScale(2, RoundingMode.HALF_UP);
+                BigDecimal outQuantityRangeHigh = totalExpectedOutQuantity
+                        .multiply(new BigDecimal("1.2"))
+                        .min(totalInputQuantityNormalized)
+                        .setScale(2, RoundingMode.HALF_UP);
+
+                // Check if the total output quantity set in the stock order is within the allowed range
+                BigDecimal totalQuantity = stockOrder.getTotalQuantity();
+                stockOrder.setOutQuantityNotInRange(!(totalQuantity.compareTo(outQuantityRangeLow) >= 0 &&
+                        totalQuantity.compareTo(outQuantityRangeHigh) <= 0));
             }
         }
 

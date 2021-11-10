@@ -142,6 +142,7 @@ public class StockOrderMapper {
         apiStockOrder.setTare(entity.getTare());
         apiStockOrder.setAvailable(entity.getAvailable());
         apiStockOrder.setOpenOrder(entity.getIsOpenOrder());
+        apiStockOrder.setOutQuantityNotInRange(entity.getOutQuantityNotInRange());
 
         // Set dates
         apiStockOrder.setProductionDate(entity.getProductionDate());
