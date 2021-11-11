@@ -133,6 +133,9 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Order type", position = 26)
     private OrderType orderType;
 
+    @ApiModelProperty(value = "The prefix for the LOT name - retrieved from the Processing action")
+    private String lotPrefix;
+
     @ApiModelProperty(value = "Internal LOT number", position = 27)
     private String internalLotNumber;
 
@@ -456,6 +459,14 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setOrderType(OrderType orderType) {
         this.orderType = orderType;
+    }
+
+    public String getLotPrefix() {
+        return lotPrefix;
+    }
+
+    public void setLotPrefix(String lotPrefix) {
+        this.lotPrefix = lotPrefix;
     }
 
     public String getInternalLotNumber() {

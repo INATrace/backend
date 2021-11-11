@@ -484,9 +484,14 @@ public class StockOrderService extends BaseService {
         entity.setPreferredWayOfPayment(apiStockOrder.getPreferredWayOfPayment());
         entity.setSacNumber(apiStockOrder.getSacNumber());
         entity.setProductionDate(apiStockOrder.getProductionDate());
-        entity.setInternalLotNumber(apiStockOrder.getInternalLotNumber());
         entity.setDeliveryTime(apiStockOrder.getDeliveryTime());
         entity.setComments(apiStockOrder.getComments());
+
+        // Set the internal LOT name and the LOT prefix if we have Processing order provided
+        entity.setInternalLotNumber(apiStockOrder.getInternalLotNumber());
+        if (processingOrder != null) {
+            entity.setLotPrefix(processingOrder.getProcessingAction().getPrefix());
+        }
 
         // If provided set the Product order - this is provided when this Stock order was created as part of a Product order (batch Quote orders for final products)
         if (apiStockOrder.getProductOrder() != null && apiStockOrder.getProductOrder().getId() != null) {

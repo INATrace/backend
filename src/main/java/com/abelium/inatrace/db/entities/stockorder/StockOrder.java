@@ -150,6 +150,9 @@ public class StockOrder extends TimestampEntity {
 	private OrderType orderType;
 
 	@Column
+	private String lotPrefix;
+
+	@Column
 	private String internalLotNumber;
 
 	@Column
@@ -459,6 +462,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setOrderType(OrderType orderType) {
 		this.orderType = orderType;
+	}
+
+	public String getLotPrefix() {
+		return lotPrefix;
+	}
+
+	public void setLotPrefix(String lotPrefix) {
+		this.lotPrefix = lotPrefix;
 	}
 
 	public String getInternalLotNumber() {

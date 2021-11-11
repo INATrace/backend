@@ -30,6 +30,7 @@ public class StockOrderMapper {
         ApiStockOrder apiStockOrder = new ApiStockOrder();
         apiStockOrder.setId(entity.getId());
         apiStockOrder.setIdentifier(entity.getIdentifier());
+        apiStockOrder.setLotPrefix(entity.getLotPrefix());
         apiStockOrder.setInternalLotNumber(entity.getInternalLotNumber());
         apiStockOrder.setCurrency(entity.getCurrency());
         apiStockOrder.setPreferredWayOfPayment(entity.getPreferredWayOfPayment());
@@ -159,6 +160,7 @@ public class StockOrderMapper {
 
         // Set identifiers and type of the stock order
         apiStockOrder.setOrderType(entity.getOrderType());
+        apiStockOrder.setLotPrefix(entity.getLotPrefix());
         apiStockOrder.setInternalLotNumber(entity.getInternalLotNumber());
         apiStockOrder.setSacNumber(entity.getSacNumber());
         apiStockOrder.setPurchaseOrder(entity.getPurchaseOrder());
