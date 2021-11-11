@@ -20,6 +20,7 @@ public class StockOrderQueryRequest {
     public Boolean isOpenBalanceOnly;
     public Boolean isPurchaseOrderOnly;
     public Boolean isWomenShare;
+    public Boolean organicOnly;
     public PreferredWayOfPayment wayOfPayment;
     public Instant productionDateStart;
     public Instant productionDateEnd;
@@ -29,7 +30,7 @@ public class StockOrderQueryRequest {
 
     public StockOrderQueryRequest() {}
 
-    // Used for fetchgin Quote order (input and output)
+    // Used for fetching Quote order (input and output)
     public StockOrderQueryRequest(Long companyId, Long facilityId, Long quoteCompanyId, Long quoteFacilityId, Long semiProductId, Long companyCustomerId,
                                   Boolean isOpenOnly) {
 
@@ -48,6 +49,7 @@ public class StockOrderQueryRequest {
                                   Long finalProductId,
                                   Boolean isAvailable,
                                   Boolean isWomenShare,
+                                  Boolean organicOnly,
                                   Instant productionDateStart,
                                   Instant productionDateEnd) {
         this.facilityId = facilityId;
@@ -55,6 +57,7 @@ public class StockOrderQueryRequest {
         this.finalProductId = finalProductId;
         this.isAvailable = isAvailable;
         this.isWomenShare = isWomenShare;
+        this.organicOnly = organicOnly;
         this.productionDateStart = productionDateStart;
         this.productionDateEnd = productionDateEnd;
     }

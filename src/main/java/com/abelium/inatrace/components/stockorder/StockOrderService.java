@@ -162,6 +162,10 @@ public class StockOrderService extends BaseService {
             condition = condition.and(stockOrderProxy.getWomenShare()).eq(queryRequest.isWomenShare);
         }
 
+        if (queryRequest.organicOnly != null) {
+            condition = condition.and(stockOrderProxy.getOrganic()).eq(queryRequest.organicOnly);
+        }
+
         if (queryRequest.wayOfPayment != null) {
             condition = condition.and(stockOrderProxy.getPreferredWayOfPayment()).eq(queryRequest.wayOfPayment);
         }
