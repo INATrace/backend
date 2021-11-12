@@ -41,6 +41,10 @@ public class StockOrderMapper {
         apiStockOrder.setMeasureUnitType(
                 MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(entity.getMeasurementUnitType()));
 
+        // Map women share and organic only
+        apiStockOrder.setWomenShare(entity.getWomenShare());
+        apiStockOrder.setOrganic(entity.getOrganic());
+
         // Farmer
         apiStockOrder.setProducerUserCustomer(
                 UserCustomerMapper.toApiUserCustomerBase(entity.getProducerUserCustomer()));
