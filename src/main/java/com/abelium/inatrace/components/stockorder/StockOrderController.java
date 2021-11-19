@@ -61,6 +61,7 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Final product ID") @RequestParam(value = "finalProductId", required = false) Long finalProductId,
             @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
             @Valid @ApiParam(value = "Organic only") @RequestParam(value = "organicOnly", required = false) Boolean organicOnly,
+            @Valid @ApiParam(value = "Internal LOT name") @RequestParam(value = "internalLotName", required = false) String internalLotName,
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
             @AuthenticationPrincipal CustomUserDetails authUser,
@@ -75,6 +76,7 @@ public class StockOrderController {
                         true,
                         isWomenShare,
                         organicOnly,
+                        internalLotName,
                         productionDateStart != null ? productionDateStart.toInstant() : null,
                         productionDateEnd != null ? productionDateEnd.toInstant() : null
                 ),

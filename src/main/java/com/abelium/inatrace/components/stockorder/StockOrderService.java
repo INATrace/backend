@@ -36,6 +36,7 @@ import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -164,6 +165,13 @@ public class StockOrderService extends BaseService {
 
         if (queryRequest.organicOnly != null) {
             condition = condition.and(stockOrderProxy.getOrganic()).eq(queryRequest.organicOnly);
+        }
+
+        // If LOT name is provided filter by LOT prefix or LOT name
+        if (StringUtils.isNotBlank(queryRequest.internalLotName)) {
+            OnGoingLogicalCondition likeInternalLotName = Torpedo.condition(stockOrderProxy.getInternalLotNumber()).like().any(queryRequest.internalLotName);
+            OnGoingLogicalCondition likeLotPrefix = Torpedo.condition(stockOrderProxy.getLotPrefix()).like().any(queryRequest.internalLotName);
+            condition = condition.and(Torpedo.condition(likeInternalLotName.or(likeLotPrefix)));
         }
 
         if (queryRequest.wayOfPayment != null) {

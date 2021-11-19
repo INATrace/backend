@@ -21,6 +21,7 @@ public class StockOrderQueryRequest {
     public Boolean isPurchaseOrderOnly;
     public Boolean isWomenShare;
     public Boolean organicOnly;
+    public String internalLotName;
     public PreferredWayOfPayment wayOfPayment;
     public Instant productionDateStart;
     public Instant productionDateEnd;
@@ -50,6 +51,7 @@ public class StockOrderQueryRequest {
                                   Boolean isAvailable,
                                   Boolean isWomenShare,
                                   Boolean organicOnly,
+                                  String internalLotName,
                                   Instant productionDateStart,
                                   Instant productionDateEnd) {
         this.facilityId = facilityId;
@@ -58,6 +60,7 @@ public class StockOrderQueryRequest {
         this.isAvailable = isAvailable;
         this.isWomenShare = isWomenShare;
         this.organicOnly = organicOnly;
+        this.internalLotName = internalLotName;
         this.productionDateStart = productionDateStart;
         this.productionDateEnd = productionDateEnd;
     }
