@@ -769,6 +769,9 @@ public class StockOrderService extends BaseService {
                 BigDecimal totalQuantity = stockOrder.getTotalQuantity();
                 stockOrder.setOutQuantityNotInRange(!(totalQuantity.compareTo(outQuantityRangeLow) >= 0 &&
                         totalQuantity.compareTo(outQuantityRangeHigh) <= 0));
+            } else {
+
+                stockOrder.setOutQuantityNotInRange(null);
             }
         }
 
