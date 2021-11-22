@@ -236,12 +236,10 @@ public class ProcessingActionService extends BaseService {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Action type is required");
 		}
 
-		// Validate that estimated quantity is not provided if we don't have processing action without repacking
-		if (!(apiProcessingAction.getType().equals(ProcessingActionType.PROCESSING) &&
-				BooleanUtils.isFalse(apiProcessingAction.getRepackedOutputs())) &&
-				apiProcessingAction.getEstimatedOutputQuantityPerUnit() != null) {
+		// Validate that estimated quantity is not provided if we don't have processing action type 'PROCESSING'
+		if (!apiProcessingAction.getType().equals(ProcessingActionType.PROCESSING)) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST,
-					"Estimated output quantity cannot be provided when action is not 'PROCESSING' without repacking");
+					"Estimated output quantity cannot be provided when action is not 'PROCESSING'");
 		}
 
 		switch (apiProcessingAction.getType()) {
