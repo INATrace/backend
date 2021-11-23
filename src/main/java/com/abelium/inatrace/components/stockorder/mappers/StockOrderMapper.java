@@ -81,11 +81,6 @@ public class StockOrderMapper {
         apiStockOrder.setProducerUserCustomer(
                 UserCustomerMapper.toApiUserCustomer(entity.getProducerUserCustomer()));
 
-//        apiStockOrder.setCertifications(entity.getCertifications()
-//                .stream()
-//                .map(CertificationMapper::toApiCertification)
-//                .collect(Collectors.toList()));
-
         // Map the activity proofs
         if (!entity.getActivityProofs().isEmpty()) {
             apiStockOrder.setActivityProofs(entity.getActivityProofs().stream()
@@ -182,8 +177,9 @@ public class StockOrderMapper {
         apiStockOrder.setConsumerCompanyCustomer(
                 CompanyCustomerMapper.toApiCompanyCustomerBase(entity.getConsumerCompanyCustomer()));
 
-        // Map the stock order QR code tag
+        // Map the stock order QR code tag and the final product for which the QR code tag is generated
         apiStockOrder.setQrCodeTag(entity.getQrCodeTag());
+        apiStockOrder.setQrCodeTagFinalProduct(ProductApiTools.toApiFinalProductBase(entity.getQrCodeTagFinalProduct()));
 
 //        apiStockOrder.setRequiredWomensCoffee(entity.getRequiredWomensCoffee());
 

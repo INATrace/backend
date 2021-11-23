@@ -181,9 +181,6 @@ public class StockOrder extends TimestampEntity {
 
 	@Column
 	private BigDecimal damagedPriceDeduction;
-
-	@ManyToOne
-	private Company client;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	private ProcessingOrder processingOrder;
@@ -224,6 +221,10 @@ public class StockOrder extends TimestampEntity {
 	// Generated UUID tag to be used in the QR code for this stock order (all new stock orders created from this should inherit this tag)
 	@Column
 	private String qrCodeTag;
+
+	// The final product for which the QR code tag is generated
+	@ManyToOne(fetch = FetchType.LAZY)
+	private FinalProduct qrCodeTagFinalProduct;
 
 	public User getCreatedBy() {
 		return createdBy;
@@ -520,14 +521,6 @@ public class StockOrder extends TimestampEntity {
 		this.balance = balance;
 	}
 
-	public Company getClient() {
-		return client;
-	}
-
-	public void setClient(Company client) {
-		this.client = client;
-	}
-
 	public ProcessingOrder getProcessingOrder() {
 		return processingOrder;
 	}
@@ -598,6 +591,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setQrCodeTag(String qrCodeTag) {
 		this.qrCodeTag = qrCodeTag;
+	}
+
+	public FinalProduct getQrCodeTagFinalProduct() {
+		return qrCodeTagFinalProduct;
+	}
+
+	public void setQrCodeTagFinalProduct(FinalProduct qrCodeTagFinalProduct) {
+		this.qrCodeTagFinalProduct = qrCodeTagFinalProduct;
 	}
 
 	public StockOrderLocation getProductionLocation() {

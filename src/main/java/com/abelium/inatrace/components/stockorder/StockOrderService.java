@@ -904,6 +904,7 @@ public class StockOrderService extends BaseService {
 
         if (entity.getId() == null && processingOrder != null && processingOrder.getProcessingAction().getType() == ProcessingActionType.GENERATE_QR_CODE) {
             entity.setQrCodeTag(UUID.randomUUID().toString());
+            entity.setQrCodeTagFinalProduct(processingOrder.getProcessingAction().getQrCodeForFinalProduct());
         }
     }
 

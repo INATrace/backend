@@ -674,13 +674,27 @@ public class ProductApiTools {
 		fb.setQuestionnaireAnswers(afb.questionnaireAnswers);
 	}
 
-	public static ApiFinalProduct toApiFinalProduct(FinalProduct entity) {
+	public static ApiFinalProduct toApiFinalProductBase(FinalProduct entity) {
 
 		if (entity == null) {
 			return null;
 		}
 
 		ApiFinalProduct apiFinalProduct = new ApiFinalProduct();
+		apiFinalProduct.setId(entity.getId());
+		apiFinalProduct.setName(entity.getName());
+
+		return apiFinalProduct;
+	}
+
+	public static ApiFinalProduct toApiFinalProduct(FinalProduct entity) {
+
+		ApiFinalProduct apiFinalProduct = toApiFinalProductBase(entity);
+
+		if (apiFinalProduct == null) {
+			return null;
+		}
+
 		apiFinalProduct.setId(entity.getId());
 		apiFinalProduct.setName(entity.getName());
 		apiFinalProduct.setDescription(entity.getDescription());

@@ -193,6 +193,9 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Generated UUID tag for this stock order QR code")
     private String qrCodeTag;
 
+    @ApiModelProperty(value = "The final product for which the QR code tag is generated")
+    private ApiFinalProduct qrCodeTagFinalProduct;
+
     public String getIdentifier() {
         return identifier;
     }
@@ -612,4 +615,13 @@ public class ApiStockOrder extends ApiBaseEntity {
     public void setQrCodeTag(String qrCodeTag) {
         this.qrCodeTag = qrCodeTag;
     }
+
+    public ApiFinalProduct getQrCodeTagFinalProduct() {
+        return qrCodeTagFinalProduct;
+    }
+
+    public void setQrCodeTagFinalProduct(ApiFinalProduct qrCodeTagFinalProduct) {
+        this.qrCodeTagFinalProduct = qrCodeTagFinalProduct;
+    }
+
 }
