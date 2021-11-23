@@ -25,6 +25,7 @@ import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProductCompanyType;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -63,8 +64,8 @@ public class FacilityService extends BaseService {
 
 	public ApiPaginatedList<ApiFacility> getFacilityList(ApiPaginatedRequest request, Language language) {
 
-		return PaginationTools.createPaginatedResponse(em, request, () -> facilityQueryObject(request, language), facility -> FacilityMapper.toApiFacility(facility, language));
-
+		return PaginationTools.createPaginatedResponse(em, request, () -> facilityQueryObject(request, language),
+				facility -> FacilityMapper.toApiFacility(facility, language));
 	}
 
 	private Facility facilityQueryObject(ApiPaginatedRequest request, Language language) {
@@ -190,7 +191,6 @@ public class FacilityService extends BaseService {
 
 		Facility facility = fetchFacility(id);
 		em.remove(facility);
-
 	}
 
 	public Facility fetchFacility(Long id) throws ApiException {
@@ -201,9 +201,23 @@ public class FacilityService extends BaseService {
 		}
 
 		return facility;
-
 	}
-	
+
+	/**
+	 * List all (active and deactivated) facilities by provided company ID.
+	 */
+	public ApiPaginatedList<ApiFacility> listAllFacilitiesByCompany(Long companyId,
+	                                                                ApiPaginatedRequest request,
+	                                                                Language language) {
+
+		return PaginationTools.createPaginatedResponse(em, request, () ->
+						listFacilitiesByCompanyQuery(companyId, null, null, language, null),
+				facility -> FacilityMapper.toApiFacility(facility, language));
+	}
+
+	/**
+	 * List only currently active facilities by provided company ID.
+	 */
 	public ApiPaginatedList<ApiFacility> listFacilitiesByCompany(Long companyId,
 	                                                             Long semiProductId,
 	                                                             Long finalProductId,
@@ -211,11 +225,11 @@ public class FacilityService extends BaseService {
 	                                                             Language language) {
 
 		return PaginationTools.createPaginatedResponse(em, request, () ->
-						listFacilitiesByCompanyQuery(companyId, semiProductId, finalProductId, language),
+						listFacilitiesByCompanyQuery(companyId, semiProductId, finalProductId, language, true),
 				facility -> FacilityMapper.toApiFacility(facility, language));
 	}
 
-	private Facility listFacilitiesByCompanyQuery(Long companyId, Long semiProductId, Long finalProductId, Language language) {
+	private Facility listFacilitiesByCompanyQuery(Long companyId, Long semiProductId, Long finalProductId, Language language, Boolean activated) {
 
 		Facility facilityProxy = Torpedo.from(Facility.class);
 		FacilityTranslation ft = Torpedo.innerJoin(facilityProxy.getFacilityTranslations());
@@ -224,6 +238,10 @@ public class FacilityService extends BaseService {
 
 		condition = condition.and(ft.getLanguage()).eq(language);
 		condition = condition.and(facilityProxy.getCompany().getId()).eq(companyId);
+
+		if (BooleanUtils.isTrue(activated)) {
+			condition = condition.and(facilityProxy.getIsDeactivated()).neq(Boolean.TRUE);
+		}
 
 		if (semiProductId != null) {
 			FacilitySemiProduct fsp = Torpedo.leftJoin(facilityProxy.getFacilitySemiProducts());
@@ -236,42 +254,6 @@ public class FacilityService extends BaseService {
 		Torpedo.where(condition);
 
 		return facilityProxy;
-	}
-
-	public ApiPaginatedList<ApiFacility> listActivatedFacilitiesByCompany(Long companyId, Long semiProductId, ApiPaginatedRequest request, Language language) {
-
-		TypedQuery<Facility> facilitiesQuery;
-		Long count;
-
-		if (semiProductId != null) {
-
-			facilitiesQuery = em.createNamedQuery("Facility.listActivatedFacilitiesByCompanyAndSemiProduct", Facility.class)
-					.setParameter("companyId", companyId)
-					.setParameter("semiProductId", semiProductId)
-					.setParameter("language", language)
-					.setFirstResult(request.getOffset())
-					.setMaxResults(request.getLimit());
-
-			count = em.createNamedQuery("Facility.countActivatedFacilitiesByCompanyAndSemiProduct", Long.class)
-					.setParameter("companyId", companyId)
-					.setParameter("semiProductId", semiProductId)
-					.getSingleResult();
-		} else {
-
-			facilitiesQuery = em.createNamedQuery("Facility.listActivatedFacilitiesByCompany", Facility.class)
-					.setParameter("companyId", companyId)
-					.setParameter("language", language)
-					.setFirstResult(request.getOffset())
-					.setMaxResults(request.getLimit());
-
-			count = em.createNamedQuery("Facility.countActivatedFacilitiesByCompany", Long.class)
-					.setParameter("companyId", companyId).getSingleResult();
-		}
-
-		List<Facility> facilities = facilitiesQuery.getResultList();
-
-		return new ApiPaginatedList<>(
-				facilities.stream().map(facility -> FacilityMapper.toApiFacility(facility, language)).collect(Collectors.toList()), count);
 	}
 	
 	public ApiPaginatedList<ApiFacility> listCollectingFacilitiesByCompany(Long companyId, ApiPaginatedRequest request, Language language) {

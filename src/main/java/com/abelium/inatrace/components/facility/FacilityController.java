@@ -7,6 +7,7 @@ import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -29,10 +30,20 @@ public class FacilityController {
 
 	@GetMapping("list")
 	@ApiOperation("Get a paginated list of facilities.")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ApiPaginatedResponse<ApiFacility> getFacilityList(
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 			@Valid ApiPaginatedRequest request) {
 		return new ApiPaginatedResponse<>(facilityService.getFacilityList(request, language));
+	}
+
+	@GetMapping("list/company/{id}/all")
+	public ApiPaginatedResponse<ApiFacility> listAllFacilitiesByCompany(
+			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
+			@Valid ApiPaginatedRequest request) {
+
+		return new ApiPaginatedResponse<>(facilityService.listAllFacilitiesByCompany(companyId, request, language));
 	}
 	
 	@GetMapping("list/company/{id}")
@@ -45,16 +56,6 @@ public class FacilityController {
 			@Valid ApiPaginatedRequest request) {
 
 		return new ApiPaginatedResponse<>(facilityService.listFacilitiesByCompany(companyId, semiProductId, finalProductId, request, language));
-	}
-
-	@GetMapping("list/company/{id}/activated")
-	@ApiOperation("Get a list of activated facilities by company ID.")
-	public ApiPaginatedResponse<ApiFacility> listActivatedFacilitiesByCompany(
-			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
-			@Valid @ApiParam(value = "Semi product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
-			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
-			@Valid ApiPaginatedRequest request) {
-		return new ApiPaginatedResponse<>(facilityService.listActivatedFacilitiesByCompany(companyId, semiProductId, request, language));
 	}
 
 	@GetMapping("list/company/{id}/available-selling")
