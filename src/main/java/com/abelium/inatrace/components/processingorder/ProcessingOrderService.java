@@ -14,6 +14,7 @@ import com.abelium.inatrace.components.transaction.TransactionService;
 import com.abelium.inatrace.components.transaction.api.ApiTransaction;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
+import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
@@ -37,11 +38,15 @@ import java.util.stream.Collectors;
 @Service
 public class ProcessingOrderService extends BaseService {
 
-    @Autowired
-    private StockOrderService stockOrderService;
+    private final StockOrderService stockOrderService;
+
+    private final TransactionService transactionService;
 
     @Autowired
-    private TransactionService transactionService;
+    public ProcessingOrderService(StockOrderService stockOrderService, TransactionService transactionService) {
+        this.stockOrderService = stockOrderService;
+        this.transactionService = transactionService;
+    }
 
     public ApiProcessingOrder getProcessingOrder(Long id, Language language) throws ApiException {
         return ProcessingOrderMapper.toApiProcessingOrder(fetchEntity(id, ProcessingOrder.class), language);
@@ -242,7 +247,16 @@ public class ProcessingOrderService extends BaseService {
             }
         }
 
-        // Create new or update existing input Transactions
+        // Get the first input Transaction with generated QR code tag (if present)
+        String presentQrCodeTag = apiProcessingOrder.getInputTransactions()
+                .stream()
+                .filter(apiTransaction -> apiTransaction.getSourceStockOrder().getQrCodeTag() != null)
+                .map(apiTransaction -> apiTransaction.getSourceStockOrder().getQrCodeTag())
+                .findFirst()
+                .orElse(null);
+        FinalProduct qrCodeFinalProduct = null;
+
+        // Create new or update existing input Transactions and validate conditions if there is an input Transaction with generated QR code tag
         for (int i = 0; i < apiProcessingOrder.getInputTransactions().size(); i++) {
 
             ApiTransaction apiTransaction = apiProcessingOrder.getInputTransactions().get(i);
@@ -262,6 +276,16 @@ public class ProcessingOrderService extends BaseService {
                         "Generate QR code action cannot contain input transactions that have already generated QR code tag.");
             }
 
+            // If we have input Transaction which has QR code tag generated, check that we have consistency
+            // between all the input Transactions (all shall have the same QR code tag)
+            if (presentQrCodeTag != null) {
+                if (!presentQrCodeTag.equals(insertedTransaction.getSourceStockOrder().getQrCodeTag())) {
+                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "There are input transactions present with different QR code tags.");
+                } else {
+                    qrCodeFinalProduct = insertedTransaction.getSourceStockOrder().getQrCodeTagFinalProduct();
+                }
+            }
+
             entity.getInputTransactions().remove(insertedTransaction);
             entity.getInputTransactions().add(insertedTransaction);
 
@@ -276,9 +300,14 @@ public class ProcessingOrderService extends BaseService {
 
             // Set targetStockOrders for TRANSFER
             if (processingAction.getType() == ProcessingActionType.TRANSFER) {
+
                 Long targetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiProcessingOrder.getTargetStockOrders().get(i), userId, entity).getId();
                 StockOrder targetStockOrder = fetchEntity(targetStockOrderId, StockOrder.class);
                 targetStockOrder.setProcessingOrder(entity);
+
+                // Transfer the QR code tag (if present) to the target Stock order
+                targetStockOrder.setQrCodeTag(presentQrCodeTag);
+                targetStockOrder.setQrCodeTagFinalProduct(qrCodeFinalProduct);
 
                 insertedTransaction.setOutputMeasureUnitType(targetStockOrder.getMeasurementUnitType());
                 insertedTransaction.setTargetFacility(targetStockOrder.getFacility());
@@ -291,9 +320,17 @@ public class ProcessingOrderService extends BaseService {
         if (processingAction.getType() != ProcessingActionType.TRANSFER) {
 
             for (ApiStockOrder apiTargetStockOrder: apiProcessingOrder.getTargetStockOrders()) {
+
                 Long insertedTargetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiTargetStockOrder, userId, entity).getId();
                 StockOrder targetStockOrder = fetchEntity(insertedTargetStockOrderId, StockOrder.class);
                 targetStockOrder.setProcessingOrder(entity);
+
+                // Transfer the QR code tag (if present) to the target Stock order
+                if (presentQrCodeTag != null) {
+                    targetStockOrder.setQrCodeTag(presentQrCodeTag);
+                    targetStockOrder.setQrCodeTagFinalProduct(qrCodeFinalProduct);
+                }
+
                 entity.getTargetStockOrders().add(targetStockOrder);
             }
 

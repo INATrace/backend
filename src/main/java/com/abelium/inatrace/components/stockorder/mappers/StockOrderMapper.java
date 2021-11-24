@@ -40,6 +40,7 @@ public class StockOrderMapper {
         apiStockOrder.setOrderType(entity.getOrderType());
         apiStockOrder.setMeasureUnitType(
                 MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(entity.getMeasurementUnitType()));
+        apiStockOrder.setQrCodeTag(entity.getQrCodeTag());
 
         // Map women share and organic only
         apiStockOrder.setWomenShare(entity.getWomenShare());
