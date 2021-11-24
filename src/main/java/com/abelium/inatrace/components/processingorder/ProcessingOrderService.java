@@ -124,7 +124,7 @@ public class ProcessingOrderService extends BaseService {
                     }
                 }
 
-                // In case we have 'GENERATE_QR_CODE', only one target stock order is permited
+                // In case we have 'GENERATE_QR_CODE', only one target stock order is permitted
                 if (processingAction.getType() == ProcessingActionType.GENERATE_QR_CODE) {
                     if (apiProcessingOrder.getTargetStockOrders().size() > 1) {
                         throw new ApiException(ApiStatus.VALIDATION_ERROR,
@@ -254,6 +254,14 @@ public class ProcessingOrderService extends BaseService {
             Transaction insertedTransaction = fetchEntity(insertedApiTransaction.getId(), Transaction.class);
             insertedTransaction.setTargetProcessingOrder(entity);
 
+            // If we have 'GENERATE_QR_CODE' verify that there no input transaction with generated
+            // QR code tag (only transactions without QR code tag are permitted)
+            if (processingAction.getType() == ProcessingActionType.GENERATE_QR_CODE &&
+                    insertedTransaction.getSourceStockOrder().getQrCodeTag() != null) {
+                throw new ApiException(ApiStatus.VALIDATION_ERROR,
+                        "Generate QR code action cannot contain input transactions that have already generated QR code tag.");
+            }
+
             entity.getInputTransactions().remove(insertedTransaction);
             entity.getInputTransactions().add(insertedTransaction);
 
@@ -279,7 +287,7 @@ public class ProcessingOrderService extends BaseService {
             }
         }
 
-        // Create new or update existing target for PROCESSING
+        // Create new or update existing target stock order for PROCESSING
         if (processingAction.getType() != ProcessingActionType.TRANSFER) {
 
             for (ApiStockOrder apiTargetStockOrder: apiProcessingOrder.getTargetStockOrders()) {
