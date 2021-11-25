@@ -247,22 +247,16 @@ public class ProcessingOrderService extends BaseService {
             }
         }
 
+        Boolean isProcessing = processingAction.getType() != ProcessingActionType.TRANSFER;
+
         // Get the first input Transaction with generated QR code tag (if present)
-        String presentQrCodeTag = apiProcessingOrder.getInputTransactions()
-                .stream()
-                .filter(apiTransaction -> apiTransaction.getSourceStockOrder().getQrCodeTag() != null)
-                .map(apiTransaction -> apiTransaction.getSourceStockOrder().getQrCodeTag())
-                .findFirst()
-                .orElse(null);
+        String presentQrCodeTag = findFirstQRCodeTagTransaction(apiProcessingOrder.getInputTransactions());
         FinalProduct qrCodeFinalProduct = null;
 
         // Create new or update existing input Transactions and validate conditions if there is an input Transaction with generated QR code tag
         for (int i = 0; i < apiProcessingOrder.getInputTransactions().size(); i++) {
 
             ApiTransaction apiTransaction = apiProcessingOrder.getInputTransactions().get(i);
-            Boolean isProcessing = processingAction.getType() == ProcessingActionType.PROCESSING ||
-                    processingAction.getType() == ProcessingActionType.FINAL_PROCESSING ||
-                    processingAction.getType() == ProcessingActionType.GENERATE_QR_CODE;
 
             ApiBaseEntity insertedApiTransaction = transactionService.createOrUpdateTransaction(apiTransaction, isProcessing);
             Transaction insertedTransaction = fetchEntity(insertedApiTransaction.getId(), Transaction.class);
@@ -278,13 +272,7 @@ public class ProcessingOrderService extends BaseService {
 
             // If we have input Transaction which has QR code tag generated, check that we have consistency
             // between all the input Transactions (all shall have the same QR code tag)
-            if (presentQrCodeTag != null) {
-                if (!presentQrCodeTag.equals(insertedTransaction.getSourceStockOrder().getQrCodeTag())) {
-                    throw new ApiException(ApiStatus.VALIDATION_ERROR, "There are input transactions present with different QR code tags.");
-                } else {
-                    qrCodeFinalProduct = insertedTransaction.getSourceStockOrder().getQrCodeTagFinalProduct();
-                }
-            }
+            qrCodeFinalProduct = validateQRCodeTag(presentQrCodeTag, insertedTransaction);
 
             entity.getInputTransactions().remove(insertedTransaction);
             entity.getInputTransactions().add(insertedTransaction);
@@ -371,15 +359,20 @@ public class ProcessingOrderService extends BaseService {
             }
         }
 
+        // Get the first input Transaction with generated QR code tag (if present)
+        String presentQrCodeTag = findFirstQRCodeTagTransaction(apiProcessingOrder.getInputTransactions());
+        FinalProduct qrCodeFinalProduct = null;
+
         // Create new or update existing input Transactions
         for (int i = 0; i < apiProcessingOrder.getInputTransactions().size(); i++) {
 
             ApiTransaction apiTransaction = apiProcessingOrder.getInputTransactions().get(i);
-            Boolean isProcessing = entity.getProcessingAction().getType() == ProcessingActionType.PROCESSING ||
-                    entity.getProcessingAction().getType() == ProcessingActionType.FINAL_PROCESSING;
-
-            Long insertedTransactionId = transactionService.createOrUpdateTransaction(apiTransaction, isProcessing).getId();
+            Long insertedTransactionId = transactionService.createOrUpdateTransaction(apiTransaction, false).getId();
             Transaction insertedTransaction = fetchEntity(insertedTransactionId, Transaction.class);
+
+            // If we have input Transaction which has QR code tag generated, check that we have consistency
+            // between all the input Transactions (all shall have the same QR code tag)
+            qrCodeFinalProduct = validateQRCodeTag(presentQrCodeTag, insertedTransaction);
 
             entity.getInputTransactions().remove(insertedTransaction);
             entity.getInputTransactions().add(insertedTransaction);
@@ -393,7 +386,6 @@ public class ProcessingOrderService extends BaseService {
                         entity
                 );
             }
-
         }
 
         ApiStockOrder apiQuoteStockOrder = apiProcessingOrder.getTargetStockOrders().get(0);
@@ -413,6 +405,9 @@ public class ProcessingOrderService extends BaseService {
         StockOrder quoteStockOrder = fetchEntity(insertedStockOrderId, StockOrder.class);
 
         quoteStockOrder.setProcessingOrder(entity);
+        quoteStockOrder.setQrCodeTag(presentQrCodeTag);
+        quoteStockOrder.setQrCodeTagFinalProduct(qrCodeFinalProduct);
+
         entity.setTargetStockOrders(List.of(quoteStockOrder));
 
         if (entity.getId() == null) {
@@ -440,6 +435,47 @@ public class ProcessingOrderService extends BaseService {
         }
 
         em.remove(entity);
+    }
+
+    /**
+     * Finds the first input Transaction which has QR code tag generated.
+     *
+     * @param inputTransactions List of input Transactions from which to find the first one with QR code tag.
+     *
+     * @return The QR code tag or null if there is no input Transaction with generated one.
+     */
+    private String findFirstQRCodeTagTransaction(List<ApiTransaction> inputTransactions) {
+
+        return inputTransactions
+                .stream()
+                .filter(apiTransaction -> apiTransaction.getSourceStockOrder().getQrCodeTag() != null)
+                .map(apiTransaction -> apiTransaction.getSourceStockOrder().getQrCodeTag())
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Check if the provided QR code tag is the same in the provided input Transaction.
+     * When we have multiple input transactions and present QR code tag, all the present transaction should have the same QR code tag.
+     *
+     * @param qrCodeTag The present QR code tag.
+     * @param transaction The input transaction to validate.
+     *
+     * @return The final product for which the QR code tag is generated.
+     *
+     * @throws ApiException If the input Transaction validation fails.
+     */
+    private FinalProduct validateQRCodeTag(String qrCodeTag, Transaction transaction) throws ApiException {
+
+        if (qrCodeTag != null) {
+            if (!qrCodeTag.equals(transaction.getSourceStockOrder().getQrCodeTag())) {
+                throw new ApiException(ApiStatus.VALIDATION_ERROR, "There are input transactions present with different QR code tags.");
+            } else {
+                return transaction.getSourceStockOrder().getQrCodeTagFinalProduct();
+            }
+        }
+
+        return null;
     }
 
     private <E> E fetchEntity(Long id, Class<E> entityClass) throws ApiException {
