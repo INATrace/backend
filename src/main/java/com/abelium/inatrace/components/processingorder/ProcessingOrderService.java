@@ -23,6 +23,7 @@ import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -335,12 +336,20 @@ public class ProcessingOrderService extends BaseService {
         return new ApiBaseEntity(entity);
     }
 
-    @Transactional
-    public ApiBaseEntity createOrUpdateQuoteOrder(ProcessingOrder entity, ApiProcessingOrder apiProcessingOrder, Long userId, Language language) throws ApiException {
+    private ApiBaseEntity createOrUpdateQuoteOrder(ProcessingOrder entity, ApiProcessingOrder apiProcessingOrder, Long userId, Language language) throws ApiException {
 
-        if (apiProcessingOrder.getTargetStockOrders().size() < 1) {
+        // Validate that there is target Stock order provided
+        if (apiProcessingOrder.getTargetStockOrders().size() != 1) {
             throw new ApiException(ApiStatus.INVALID_REQUEST,
-                    "At least one target StockOrder should be present in the request.");
+                    "One target StockOrder should be present in the request.");
+        }
+
+        // Get the target Quote order
+        ApiStockOrder apiQuoteStockOrder = apiProcessingOrder.getTargetStockOrders().get(0);
+
+        // Validate that order ID is not provided if we have Product order present
+        if (apiQuoteStockOrder.getProductOrder() != null && StringUtils.isNotBlank(apiQuoteStockOrder.getOrderId())) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Order ID cannot be provided when there is a Product ID present");
         }
 
         // Remove transactions that are not present in request
@@ -387,8 +396,6 @@ public class ProcessingOrderService extends BaseService {
             }
         }
 
-        ApiStockOrder apiQuoteStockOrder = apiProcessingOrder.getTargetStockOrders().get(0);
-
         if (apiQuoteStockOrder.getOrderType() != OrderType.GENERAL_ORDER) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Order must be of orderType " +  OrderType.GENERAL_ORDER
                     + " to allow input transactions");
@@ -403,9 +410,15 @@ public class ProcessingOrderService extends BaseService {
         Long insertedStockOrderId = stockOrderService.createOrUpdateStockOrder(apiQuoteStockOrder, userId, entity).getId();
         StockOrder quoteStockOrder = fetchEntity(insertedStockOrderId, StockOrder.class);
 
+        // Set the back reference for the Processing order
         quoteStockOrder.setProcessingOrder(entity);
+
+        // Set the QR code tag data
         quoteStockOrder.setQrCodeTag(presentQrCodeTag);
         quoteStockOrder.setQrCodeTagFinalProduct(qrCodeFinalProduct);
+
+        // Set the user entered Order ID
+        quoteStockOrder.setOrderId(apiQuoteStockOrder.getOrderId());
 
         entity.setTargetStockOrders(List.of(quoteStockOrder));
 

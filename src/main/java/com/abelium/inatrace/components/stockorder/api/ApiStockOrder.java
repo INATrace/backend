@@ -118,6 +118,9 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "The produrct order that triggered creation of this stock order")
     private ApiProductOrder productOrder;
 
+    @ApiModelProperty(value = "User entered Order ID when placing Quote order")
+    private String orderId;
+
     @ApiModelProperty(value = "The processing order that created this stock order")
     private ApiProcessingOrder processingOrder;
 
@@ -422,6 +425,14 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setProductOrder(ApiProductOrder productOrder) {
         this.productOrder = productOrder;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 
     public ApiProcessingOrder getProcessingOrder() {

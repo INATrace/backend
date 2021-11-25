@@ -70,7 +70,7 @@ public class StockOrder extends TimestampEntity {
 	@ManyToOne
 	private SemiProduct semiProduct;
 
-	// Set when this stock order represnts a uint of quantity for a final product (used in final processing)
+	// Set when this stock order represents a uint of quantity for a final product (used in final processing)
 	@ManyToOne
 	private FinalProduct finalProduct;
 	
@@ -115,6 +115,15 @@ public class StockOrder extends TimestampEntity {
 	// The product order that created this stock order (this stock order represents final product item with the requested quantity)
 	@ManyToOne
 	private ProductOrder productOrder;
+
+	/**
+	 * User entered Order ID - relevant for Quote orders.
+	 *
+	 * Can be set only when productOrder is not provided. If productOrder is set, then
+	 * the user entered Order ID in the ProductOrder should be used.
+ 	 */
+	@Column
+	private String orderId;
 
 	// Contains net quantity
 	@Column
@@ -330,6 +339,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setProductOrder(ProductOrder productOrder) {
 		this.productOrder = productOrder;
+	}
+
+	public String getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
 	}
 
 	public MeasureUnitType getMeasurementUnitType() {

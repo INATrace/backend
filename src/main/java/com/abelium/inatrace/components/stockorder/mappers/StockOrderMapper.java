@@ -132,8 +132,11 @@ public class StockOrderMapper {
         apiStockOrder.setConsumerCompanyCustomer(CompanyCustomerMapper.toApiCompanyCustomer(
                 entity.getConsumerCompanyCustomer()));
 
-        // Set the product order that triggered the creation of this stock order
+        // Set the product order that triggered the creation of this stock order (if product order is not provided, set orderId from this Stock order)
         apiStockOrder.setProductOrder(ProductOrderMapper.toApiProductOrder(entity.getProductOrder(), language));
+        if (apiStockOrder.getProductOrder() == null) {
+            apiStockOrder.setOrderId(entity.getOrderId());
+        }
 
         // Set the stock order quantities
         apiStockOrder.setTotalQuantity(entity.getTotalQuantity());
