@@ -352,7 +352,6 @@ public class ProcessingOrderService extends BaseService {
                             .noneMatch(apiTransaction -> transaction.getId().equals(apiTransaction.getId())))
                     .collect(Collectors.toList());
 
-
             entity.getInputTransactions().removeAll(transactionsToBeDeleted);
             for (Transaction t: transactionsToBeDeleted) {
                 transactionService.deleteTransaction(t.getId(), userId, language);
