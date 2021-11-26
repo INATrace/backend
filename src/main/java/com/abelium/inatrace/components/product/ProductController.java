@@ -18,18 +18,21 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/product")
 public class ProductController {
-	
+
+	private final ProductService productService;
+
+	private final ProductDocumentService productDocumentEngine;
+
 	@Autowired
-	private ProductService productService;
-	
-	@Autowired
-	private ProductDocumentService productDocumentEngine;
-	
-    @PostMapping(value = "/create")
+	public ProductController(ProductService productService, ProductDocumentService productDocumentEngine) {
+		this.productService = productService;
+		this.productDocumentEngine = productDocumentEngine;
+	}
+
+	@PostMapping(value = "/create")
     @ApiOperation(value = "Create a new product")
     public ApiResponse<ApiBaseEntity> createProduct(@AuthenticationPrincipal CustomUserDetails authUser, 
     		@Valid @RequestBody ApiProduct request) throws ApiException {
@@ -75,6 +78,14 @@ public class ProductController {
     	productService.deleteProduct(authUser, id);
     	return new ApiDefaultResponse();
     }
+
+	@GetMapping(value = "/{id}/labels")
+	@ApiOperation(value = "Get labels for product")
+	public ApiResponse<List<ApiProductLabelBase>> getProductLabels(
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid @ApiParam(value = "Product id", required = true)  @PathVariable("id") Long id) throws ApiException {
+		return new ApiResponse<>(productService.getProductLabels(authUser, id));
+	}
 
     @PostMapping(value = "/label/create")
     @ApiOperation(value = "Create a new product label")
@@ -131,20 +142,13 @@ public class ProductController {
     public ApiResponse<ApiProductLabelContent> getProductLabelContent(@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @ApiParam(value = "Label id", required = true)  @PathVariable("id") Long id) throws ApiException {
     	return new ApiResponse<>(productService.getProductLabelContent(authUser, id));
-    }    
-    
-    @GetMapping(value = "/labels/{id}")
-    @ApiOperation(value = "Get labels for product")
-    public ApiResponse<List<ApiProductLabelBase>> getProductLabels(@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @ApiParam(value = "Product id", required = true)  @PathVariable("id") Long id) throws ApiException {
-    	return new ApiResponse<>(productService.getProductLabels(authUser, id));
     }
 
     @PostMapping(value = "/label/execute/{action}")
     @ApiOperation(value = "Execute action")
     public ApiDefaultResponse executeAction(@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @RequestBody ApiBaseEntity request, 
-    		@Valid @PathVariable(value = "action", required = true) ProductLabelAction action) throws ApiException {
+    		@Valid @PathVariable(value = "action") ProductLabelAction action) throws ApiException {
     	productService.executeAction(authUser, request, action);
     	return new ApiDefaultResponse();
     }
