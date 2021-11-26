@@ -518,15 +518,14 @@ public class ProductApiTools {
 		return plf;
 	}
 	
-	
 	private static void updateApiProductLabelBase(ApiProductLabelBase apl, ProductLabel pl) {
 		CommonApiTools.updateApiBaseEntity(apl, pl);
 		apl.status = pl.getStatus();
 		apl.uuid = pl.getUuid();
 		apl.productId = pl.getProduct().getId();
-		apl.title = pl.getTitle();		
+		apl.title = pl.getTitle();
+		apl.language = pl.getLanguage();
 	}
-	
 	
 	public static void updateProductLabelBase(ProductLabel pl, ApiProductLabelBase apl) {
 		pl.setTitle(apl.title);
@@ -704,6 +703,21 @@ public class ProductApiTools {
 		apiFinalProduct.setProduct(new ApiProductBase());
 		apiFinalProduct.getProduct().setId(entity.getProduct().getId());
 		apiFinalProduct.getProduct().setName(entity.getProduct().getName());
+
+		return apiFinalProduct;
+	}
+
+	public static ApiFinalProduct toApiFinalProductWithLabels(FinalProduct entity) {
+
+		ApiFinalProduct apiFinalProduct = toApiFinalProduct(entity);
+
+		if (apiFinalProduct == null) {
+			return null;
+		}
+
+		apiFinalProduct.setLabels(entity.getFinalProductLabels().stream()
+				.map(finalProductLabel -> ProductApiTools.toApiProductLabelBase(finalProductLabel.getProductLabel()))
+				.collect(Collectors.toList()));
 
 		return apiFinalProduct;
 	}

@@ -4,6 +4,9 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ApiFinalProduct extends ApiBaseEntity {
 
     @ApiModelProperty(value = "Name of final product")
@@ -17,6 +20,8 @@ public class ApiFinalProduct extends ApiBaseEntity {
 
     @ApiModelProperty(value = "Measurement unit type of final product")
     private ApiMeasureUnitType measurementUnitType;
+
+    private List<ApiProductLabelBase> labels;
 
     public String getName() {
         return name;
@@ -49,4 +54,16 @@ public class ApiFinalProduct extends ApiBaseEntity {
     public void setMeasurementUnitType(ApiMeasureUnitType measurementUnitType) {
         this.measurementUnitType = measurementUnitType;
     }
+
+    public List<ApiProductLabelBase> getLabels() {
+        if (labels == null) {
+            labels = new ArrayList<>();
+        }
+        return labels;
+    }
+
+    public void setLabels(List<ApiProductLabelBase> labels) {
+        this.labels = labels;
+    }
+
 }

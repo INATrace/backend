@@ -218,11 +218,15 @@ public class ProductService extends BaseService {
 		productQueries.checkProductLabelPermissionAssoc(authUser, uid);
 		return analyticsEngine.createAnalyticsForLabel(uid);
 	}
-
     
     @Transactional
 	public ApiBaseEntity createProductLabel(CustomUserDetails authUser, ApiProductLabel request) throws ApiException {
-    	Product p = fetchProductAssoc(authUser, request.productId);
+
+		if (request.getLanguage() == null) {
+			throw new ApiException(ApiStatus.VALIDATION_ERROR, "Label language is required");
+		}
+
+		Product p = fetchProductAssoc(authUser, request.productId);
     	
     	ProductLabelContent plc = ProductLabelContent.fromProduct(p);
     	em.persist(plc.getProcess());
@@ -235,8 +239,11 @@ public class ProductService extends BaseService {
 		ProductLabel pl = new ProductLabel();
 		pl.setContent(plc);
 		pl.setProduct(p);
+		pl.setLanguage(request.getLanguage());
 		ProductApiTools.updateProductLabel(pl, request);
+
 		em.persist(pl);
+
 		return new ApiBaseEntity(pl.getId());
 	}
     
@@ -642,7 +649,7 @@ public class ProductService extends BaseService {
     private void checkProductPermission(CustomUserDetails authUser, Long productId) throws ApiException {
 		if (authUser.getUserRole() == UserRole.ADMIN) return;
     
-    	Number count = em.createQuery("SELECT count(*) FROM Product p INNER JOIN CompanyUser cu ON cu.company.id = p.company.id "
+    	Number count = em.createQuery("SELECT count(p) FROM Product p INNER JOIN CompanyUser cu ON cu.company.id = p.company.id "
     			+ "WHERE cu.user.id = :userId AND p.id = :productId", Number.class).
     		setParameter("userId", authUser.getUserId()).
     		setParameter("productId", productId).
@@ -653,8 +660,7 @@ public class ProductService extends BaseService {
     }
     
 	@SuppressWarnings("unchecked")
-    public List<Long> userCompanies(CustomUserDetails authUser, Long productId) throws ApiException {
-		// if (authUser.getUserRole() == UserRole.ADMIN) return Arrays.asList(); 
+    public List<Long> userCompanies(CustomUserDetails authUser, Long productId) {
     
 		List<Long> companyIds = (List<Long>) em.createQuery("SELECT cu.company.id FROM Product p INNER JOIN CompanyUser cu ON cu.company.id = p.company.id "
     			+ "WHERE cu.user.id = :userId AND p.id = :productId").
@@ -667,14 +673,14 @@ public class ProductService extends BaseService {
     private void checkProductPermissionAssoc(CustomUserDetails authUser, Long productId) throws ApiException {
 		if (authUser.getUserRole() == UserRole.ADMIN) return; 
     
-    	Number count = em.createQuery("SELECT count(*) FROM Product p INNER JOIN CompanyUser cu ON cu.company.id = p.company.id "
+    	Number count = em.createQuery("SELECT count(p) FROM Product p INNER JOIN CompanyUser cu ON cu.company.id = p.company.id "
     			+ "WHERE cu.user.id = :userId AND p.id = :productId", Number.class).
     		setParameter("userId", authUser.getUserId()).
     		setParameter("productId", productId).
     		getSingleResult();
     	if (count.longValue() > 0) return;
     	
-    	Number countAssoc = em.createQuery("SELECT count(*) FROM ProductCompany pc INNER JOIN "
+    	Number countAssoc = em.createQuery("SELECT count(pc) FROM ProductCompany pc INNER JOIN "
     			+ "CompanyUser cu ON cu.company.id = pc.company.id WHERE cu.user.id = :userId AND pc.product.id = :productId", Number.class).
     		setParameter("userId", authUser.getUserId()).
     		setParameter("productId", productId).
@@ -687,7 +693,7 @@ public class ProductService extends BaseService {
     private void checkProductLabelBatchPermission(CustomUserDetails authUser, Long batchId) throws ApiException {
 		if (authUser.getUserRole() == UserRole.ADMIN) return; 
     
-    	Number count = em.createQuery("SELECT count(*) FROM ProductLabelBatch plb INNER JOIN CompanyUser cu ON cu.company.id = plb.label.product.company.id "
+    	Number count = em.createQuery("SELECT count(plb) FROM ProductLabelBatch plb INNER JOIN CompanyUser cu ON cu.company.id = plb.label.product.company.id "
     			+ "WHERE cu.user.id = :userId AND plb.id = :batchId", Number.class).
     		setParameter("userId", authUser.getUserId()).
     		setParameter("batchId", batchId).
@@ -700,14 +706,14 @@ public class ProductService extends BaseService {
     private void checkProductLabelBatchPermissionAssoc(CustomUserDetails authUser, Long batchId) throws ApiException {
 		if (authUser.getUserRole() == UserRole.ADMIN) return; 
     
-    	Number count = em.createQuery("SELECT count(*) FROM ProductLabelBatch plb INNER JOIN CompanyUser cu ON cu.company.id = plb.label.product.company.id "
+    	Number count = em.createQuery("SELECT count(plb) FROM ProductLabelBatch plb INNER JOIN CompanyUser cu ON cu.company.id = plb.label.product.company.id "
     			+ "WHERE cu.user.id = :userId AND plb.id = :batchId", Number.class).
     		setParameter("userId", authUser.getUserId()).
     		setParameter("batchId", batchId).
     		getSingleResult();
     	if (count.longValue() > 0) return;
     	
-    	Number countAssoc = em.createQuery("SELECT count(*) FROM ProductCompany pc "
+    	Number countAssoc = em.createQuery("SELECT count(pc) FROM ProductCompany pc "
     			+ "INNER JOIN CompanyUser cu ON cu.company.id = pc.company.id "
     			+ "INNER JOIN ProductLabelBatch plb ON plb.label.product.id = pc.product.id "
     			+ "WHERE cu.user.id = :userId AND plb.id = :batchId", Number.class).

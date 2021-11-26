@@ -33,7 +33,7 @@ public class FinalProductService extends BaseService {
 	 */
 	public ApiPaginatedList<ApiFinalProduct> getFinalProductsForCompany(ApiPaginatedRequest request, Long companyId) {
 
-		// Fetch the prodcuts that the company with the provded ID is in any role in the value chain
+		// Fetch the products that the company with the provided ID is in any role in the value chain
 		TypedQuery<Product> companyProductsQuery = em.createNamedQuery("ProductCompany.getCompanyProductsWithAnyRole",
 				Product.class).setParameter("companyId", companyId);
 		List<Long> companyProductsIds = companyProductsQuery.getResultList().stream().map(BaseEntity::getId)
@@ -43,7 +43,7 @@ public class FinalProductService extends BaseService {
 			return new ApiPaginatedList<>(Collections.emptyList(), 0);
 		}
 
-		// Fetch the final prodcuts for the products IDs of the provided company
+		// Fetch the final products for the products IDs of the provided company
 		List<ApiFinalProduct> finalProducts = em.createNamedQuery("FinalProduct.getFinalProductsForProductsIds", FinalProduct.class)
 				.setParameter("productsIds", companyProductsIds)
 				.setFirstResult(request.getOffset())

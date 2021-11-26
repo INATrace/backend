@@ -4,6 +4,8 @@ import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NamedQueries({
@@ -11,6 +13,9 @@ import javax.persistence.*;
         @NamedQuery(name = "FinalProduct.countFinalProductsForProductsIds", query = "SELECT COUNT(fp) From FinalProduct fp WHERE fp.product.id IN :productsIds")
 })
 public class FinalProduct extends TimestampEntity {
+
+    @Version
+    private long entityVersion;
 
     @Column(nullable = false)
     private String name;
@@ -23,6 +28,9 @@ public class FinalProduct extends TimestampEntity {
 
     @ManyToOne
     private Product product;
+
+    @OneToMany(mappedBy = "finalProduct")
+    private List<FinalProductLabel> finalProductLabels;
 
     public String getName() {
         return name;
@@ -55,4 +63,12 @@ public class FinalProduct extends TimestampEntity {
     public void setProduct(Product product) {
         this.product = product;
     }
+
+    public List<FinalProductLabel> getFinalProductLabels() {
+        if (finalProductLabels == null) {
+            finalProductLabels = new ArrayList<>();
+        }
+        return finalProductLabels;
+    }
+
 }

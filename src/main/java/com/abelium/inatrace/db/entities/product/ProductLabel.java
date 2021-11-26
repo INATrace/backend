@@ -2,6 +2,7 @@ package com.abelium.inatrace.db.entities.product;
 
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
+import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProductLabelStatus;
 
 import javax.persistence.*;
@@ -37,8 +38,15 @@ public class ProductLabel extends BaseEntity {
 	/**
 	 * label title
 	 */
-	@Column(length = Lengths.DEFAULT)
+	@Column
 	private String title;
+
+	/**
+	 * label language
+	 */
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = Lengths.ENUM)
+	private Language language = Language.EN;
 	
 	/**
 	 * product's fields displayed for this label
@@ -80,16 +88,20 @@ public class ProductLabel extends BaseEntity {
 		return uuid;
 	}
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
 	public String getTitle() {
 		return title;
 	}
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public Language getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(Language language) {
+		this.language = language;
 	}
 
 	public List<ProductLabelField> getFields() {
