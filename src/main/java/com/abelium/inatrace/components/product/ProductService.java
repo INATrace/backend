@@ -24,6 +24,7 @@ import com.abelium.inatrace.types.ProductCompanyType;
 import com.abelium.inatrace.types.ProductLabelStatus;
 import com.abelium.inatrace.types.RequestLogType;
 import com.abelium.inatrace.types.UserRole;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -581,11 +582,18 @@ public class ProductService extends BaseService {
     	return ProductApiTools.toApiFinalProductWithLabels(fetchFinalProduct(productId, finalProductId));
 	}
 
-	public List<ApiProductLabelBase> getFinalProductLabels(Long productId, Long finalProductId) throws ApiException {
+	public List<ApiProductLabelBase> getFinalProductLabels(Long productId, Long finalProductId, Boolean returnUnpublished) throws ApiException {
 
 		FinalProduct finalProduct = fetchFinalProduct(productId, finalProductId);
 
-		return finalProduct.getFinalProductLabels().stream()
+		return finalProduct.getFinalProductLabels()
+				.stream()
+				.filter(finalProductLabel -> {
+					if (BooleanUtils.isNotTrue(returnUnpublished)) {
+						return finalProductLabel.getProductLabel().getStatus().equals(ProductLabelStatus.PUBLISHED);
+					}
+					return true;
+				})
 				.map(finalProductLabel -> ProductApiTools.toApiProductLabelBase(finalProductLabel.getProductLabel()))
 				.collect(Collectors.toList());
 	}

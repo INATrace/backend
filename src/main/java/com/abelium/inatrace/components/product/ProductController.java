@@ -297,8 +297,9 @@ public class ProductController {
 	@ApiOperation(value = "Get final product labels.")
 	public ApiResponse<List<ApiProductLabelBase>> getFinalProductLabels(
 			@Valid @ApiParam(value = "Product ID", required = true) @PathVariable("productId") Long productId,
-			@Valid @ApiParam(value = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId) throws ApiException {
-		return new ApiResponse<>(productService.getFinalProductLabels(productId, finalProductId));
+			@Valid @ApiParam(value = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId,
+			@Valid @ApiParam(value = "Also return the unpublished labels") @RequestParam(value = "returnUnpublished", required = false) Boolean returnUnpublished) throws ApiException {
+		return new ApiResponse<>(productService.getFinalProductLabels(productId, finalProductId, returnUnpublished));
 	}
 
     @GetMapping(value = "/{productId}/finalProduct/list")
