@@ -29,7 +29,7 @@ public class FinalProduct extends TimestampEntity {
     @ManyToOne
     private Product product;
 
-    @OneToMany(mappedBy = "finalProduct")
+    @OneToMany(mappedBy = "finalProduct", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FinalProductLabel> finalProductLabels;
 
     public String getName() {

@@ -578,7 +578,7 @@ public class ProductService extends BaseService {
 	}
 
 	public ApiFinalProduct getFinalProduct(Long productId, Long finalProductId) throws ApiException {
-    	return ProductApiTools.toApiFinalProduct(fetchFinalProduct(productId, finalProductId));
+    	return ProductApiTools.toApiFinalProductWithLabels(fetchFinalProduct(productId, finalProductId));
 	}
 
 	public ApiPaginatedList<ApiFinalProduct> getFinalProductList(ApiPaginatedRequest request,
@@ -634,6 +634,21 @@ public class ProductService extends BaseService {
 		entity.setName(apiFinalProduct.getName());
 		entity.setDescription(apiFinalProduct.getDescription());
 		entity.setMeasurementUnitType(measureUnitTypeService.fetchMeasureUnitType(apiFinalProduct.getMeasurementUnitType().getId()));
+
+		// Create or update Final product labels (connections between a Final product and Product labels)
+		entity.getFinalProductLabels().removeIf(finalProductLabel -> apiFinalProduct.getLabels().stream().noneMatch(
+				apiProductLabel -> finalProductLabel.getProductLabel().getId().equals(apiProductLabel.getId())));
+
+		for (ApiProductLabelBase apiProductLabel : apiFinalProduct.getLabels()) {
+			FinalProductLabel finalProductLabel = entity.getFinalProductLabels().stream()
+					.filter(fpl -> fpl.getProductLabel().getId().equals(apiProductLabel.getId())).findFirst()
+					.orElse(new FinalProductLabel());
+			if (finalProductLabel.getId() == null) {
+				finalProductLabel.setFinalProduct(entity);
+				finalProductLabel.setProductLabel(fetchProductLabel(apiProductLabel.getId()));
+				entity.getFinalProductLabels().add(finalProductLabel);
+			}
+		}
 
 		if (entity.getId() == null) {
 			em.persist(entity);
@@ -785,6 +800,14 @@ public class ProductService extends BaseService {
 		if (pl == null || pl.getStatus() == ProductLabelStatus.UNPUBLISHED) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid label id");
 		}		
+		return pl;
+	}
+
+	private ProductLabel fetchProductLabel(Long id) throws ApiException {
+		ProductLabel pl = Queries.get(em, ProductLabel.class, id);
+		if (pl == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid label id");
+		}
 		return pl;
 	}
 	
