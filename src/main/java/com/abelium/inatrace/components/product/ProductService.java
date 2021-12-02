@@ -581,6 +581,15 @@ public class ProductService extends BaseService {
     	return ProductApiTools.toApiFinalProductWithLabels(fetchFinalProduct(productId, finalProductId));
 	}
 
+	public List<ApiProductLabelBase> getFinalProductLabels(Long productId, Long finalProductId) throws ApiException {
+
+		FinalProduct finalProduct = fetchFinalProduct(productId, finalProductId);
+
+		return finalProduct.getFinalProductLabels().stream()
+				.map(finalProductLabel -> ProductApiTools.toApiProductLabelBase(finalProductLabel.getProductLabel()))
+				.collect(Collectors.toList());
+	}
+
 	public ApiPaginatedList<ApiFinalProduct> getFinalProductList(ApiPaginatedRequest request,
 																 FinalProductQueryRequest queryRequest) {
 

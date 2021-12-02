@@ -683,6 +683,11 @@ public class ProductApiTools {
 		apiFinalProduct.setId(entity.getId());
 		apiFinalProduct.setName(entity.getName());
 
+		// Map the basic info of the owner product
+		apiFinalProduct.setProduct(new ApiProductBase());
+		apiFinalProduct.getProduct().setId(entity.getProduct().getId());
+		apiFinalProduct.getProduct().setName(entity.getProduct().getName());
+
 		return apiFinalProduct;
 	}
 
@@ -698,11 +703,6 @@ public class ProductApiTools {
 		apiFinalProduct.setName(entity.getName());
 		apiFinalProduct.setDescription(entity.getDescription());
 		apiFinalProduct.setMeasurementUnitType(MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getMeasurementUnitType()));
-
-		// Map the basic info of the owner product
-		apiFinalProduct.setProduct(new ApiProductBase());
-		apiFinalProduct.getProduct().setId(entity.getProduct().getId());
-		apiFinalProduct.getProduct().setName(entity.getProduct().getName());
 
 		return apiFinalProduct;
 	}

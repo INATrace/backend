@@ -293,6 +293,14 @@ public class ProductController {
         return new ApiResponse<>(productService.getFinalProduct(productId, finalProductId));
     }
 
+	@GetMapping(value = "/{productId}/finalProduct/{finalProductId}/labels")
+	@ApiOperation(value = "Get final product labels.")
+	public ApiResponse<List<ApiProductLabelBase>> getFinalProductLabels(
+			@Valid @ApiParam(value = "Product ID", required = true) @PathVariable("productId") Long productId,
+			@Valid @ApiParam(value = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId) throws ApiException {
+		return new ApiResponse<>(productService.getFinalProductLabels(productId, finalProductId));
+	}
+
     @GetMapping(value = "/{productId}/finalProduct/list")
     @ApiOperation(value = "Get final product list by product ID.")
     public ApiPaginatedResponse<ApiFinalProduct> getFinalProductList(
