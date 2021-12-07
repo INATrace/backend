@@ -1,16 +1,14 @@
 package com.abelium.inatrace.components.company.api;
 
-import javax.validation.Valid;
-
-import org.hibernate.validator.constraints.Length;
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.types.CompanyDocumentCategory;
 import com.abelium.inatrace.types.CompanyDocumentType;
-
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.validator.constraints.Length;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.Valid;
 
 @Validated
 public class ApiCompanyDocument {
@@ -30,7 +28,7 @@ public class ApiCompanyDocument {
 	public String description;
 
 	@Length(max = 2000)
-	@ApiModelProperty(value = "description of this document", position = 5)
+	@ApiModelProperty(value = "quote of this document", position = 5)
 	public String quote;
 	
 	@Length(max = Lengths.DEFAULT)

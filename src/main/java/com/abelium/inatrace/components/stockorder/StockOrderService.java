@@ -228,6 +228,49 @@ public class StockOrderService extends BaseService {
         return stockOrderProxy;
     }
 
+    /**
+     * Return the public data for the stock order(s) with the provided QR code tag. Multiple stock orders can contain the provided QR code tag.
+     * @param qrTag The QR code tag for which public data is returned.
+     *
+     * @return The public data to be used by the public B2C page.
+     */
+    public ApiStockOrderPublic getStockOrderPublicData(String qrTag, Boolean withHistory) {
+
+        ApiStockOrderPublic apiStockOrderPublic = new ApiStockOrderPublic();
+
+        // Get the top level Stock order for the provided QR tag (the Stock order that is
+        // not used as an input transaction in other Processing orders)
+        StockOrder topLevelStockOrder = em.createNamedQuery("StockOrder.getTopLevelStockOrdersForQrTag", StockOrder.class)
+                .setParameter("qrTag", qrTag)
+                .getResultList()
+                .stream()
+                .findFirst()
+                .orElse(null);
+
+        if (topLevelStockOrder != null) {
+
+            // Get and set the orderId
+            String orderId;
+            if (topLevelStockOrder.getProductOrder() != null) {
+                orderId = topLevelStockOrder.getProductOrder().getOrderId();
+            } else {
+                orderId = topLevelStockOrder.getOrderId();
+            }
+
+            apiStockOrderPublic.setOrderId(orderId);
+
+            // Set the aggregated history (if requested from the API call)
+            if (BooleanUtils.isTrue(withHistory)) {
+                // TODO: get and set the aggregated history
+            }
+        }
+
+        return apiStockOrderPublic;
+    }
+
+    /**
+     * Returns the history (the chain of stock orders from top to bottom) for the provided Stock order ID.
+     */
     public ApiPaginatedList<ApiStockOrderAggregatedHistory> getStockOrderAggregatedHistoryList(
             ApiPaginatedRequest request, Long id, Long userId, Language language) throws ApiException {
 
@@ -365,7 +408,7 @@ public class StockOrderService extends BaseService {
                         resultHistoryList
                                 .addAll(addNextAggregationLevels(currentDepth + 1, paginatedRequest, sourceOrderList.get(0), userId, language));
                     } else {
-                        // proceed recursion with all leafs
+                        // proceed recursion with all leaf
                           sourceOrderList.forEach(sourceOrder -> resultHistoryList
                                   .addAll(addNextAggregationLevels(currentDepth + 1, paginatedRequest, sourceOrder, userId, language)));
                     }

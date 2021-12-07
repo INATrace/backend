@@ -31,7 +31,9 @@ import java.util.List;
 						+ "AND so.orderType = 'PURCHASE_ORDER'"),
 	@NamedQuery(name = "StockOrder.getStockOrdersByProcessingOrderId",
 	            query = "SELECT so FROM StockOrder so "
-			            + "WHERE so.processingOrder.id = :processingOrderId")
+			            + "WHERE so.processingOrder.id = :processingOrderId"),
+	@NamedQuery(name = "StockOrder.getTopLevelStockOrdersForQrTag",
+	            query = "SELECT so FROM StockOrder so WHERE so.qrCodeTag = :qrTag AND NOT EXISTS (SELECT t FROM Transaction t WHERE t.sourceStockOrder = so)")
 })
 public class StockOrder extends TimestampEntity {
 
@@ -62,7 +64,7 @@ public class StockOrder extends TimestampEntity {
 	@OneToOne(cascade = CascadeType.ALL)
 	private StockOrderLocation productionLocation;
 
-	// The comopany customer for which the stock order was placed
+	// The company customer for which the stock order was placed
 	@OneToOne
 	private CompanyCustomer consumerCompanyCustomer;
 

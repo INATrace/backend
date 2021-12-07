@@ -1,19 +1,17 @@
 package com.abelium.inatrace.components.company.api;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.validation.Valid;
-
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.components.common.api.ApiCertification;
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Map;
 
 @Validated
 public class ApiCompanyPublic {
 
-	@ApiModelProperty(value = "interview", position = 1)
+	@ApiModelProperty(value = "name", position = 1)
 	public String name;
 
 	@ApiModelProperty(value = "interview", position = 2)
@@ -32,8 +30,6 @@ public class ApiCompanyPublic {
 	
 	@ApiModelProperty(value = "social media URL links (Facebook, Instagram, Twitter, YouTube, ...)", position = 6)
 	public Map<String, String> mediaLinks;
-	
-
 	
 	public String getName() {
 		return name;
