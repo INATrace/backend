@@ -258,9 +258,14 @@ public class StockOrderService extends BaseService {
             }
 
             apiStockOrderPublic.setOrderId(orderId);
+            apiStockOrderPublic.setQrTag(topLevelStockOrder.getQrCodeTag());
 
             // Set the aggregated history (if requested from the API call)
             if (BooleanUtils.isTrue(withHistory)) {
+
+                ApiHistoryTimeline historyTimeline = new ApiHistoryTimeline();
+                apiStockOrderPublic.setHistoryTimeline(historyTimeline);
+
                 // TODO: get and set the aggregated history
             }
         }
