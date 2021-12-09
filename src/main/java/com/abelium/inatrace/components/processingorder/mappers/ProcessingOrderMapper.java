@@ -41,4 +41,19 @@ public class ProcessingOrderMapper {
         return apiProcessingOrder;
     }
 
+    public static ApiProcessingOrder toApiProcessingOrderHistory(ProcessingOrder entity, Language language) {
+
+        ApiProcessingOrder apiProcessingOrder = toApiProcessingOrderBase(entity);
+
+        if (apiProcessingOrder == null) {
+            return null;
+        }
+
+        apiProcessingOrder.setCreationTimestamp(entity.getCreationTimestamp());
+        apiProcessingOrder.setProcessingDate(entity.getProcessingDate());
+        apiProcessingOrder.setProcessingAction(ProcessingActionMapper.toApiProcessingActionHistory(entity.getProcessingAction(), language));
+
+        return apiProcessingOrder;
+    }
+
 }

@@ -195,4 +195,68 @@ public class StockOrderMapper {
         return apiStockOrder;
     }
 
+    public static ApiStockOrder toApiStockOrderHistoryItem(StockOrder entity, Language language) {
+
+        if (entity == null) {
+            return null;
+        }
+
+        ApiStockOrder apiStockOrder = new ApiStockOrder();
+        apiStockOrder.setId(entity.getId());
+        apiStockOrder.setIdentifier(entity.getIdentifier());
+        apiStockOrder.setInternalLotNumber(entity.getInternalLotNumber());
+        apiStockOrder.setProductionDate(entity.getProductionDate());
+        apiStockOrder.setCreationTimestamp(entity.getCreationTimestamp());
+
+        apiStockOrder.setTotalQuantity(entity.getTotalQuantity());
+        apiStockOrder.setMeasureUnitType(
+                MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(entity.getMeasurementUnitType()));
+
+        apiStockOrder.setFacility(FacilityMapper.toApiFacilityBase(entity.getFacility(), language));
+
+        apiStockOrder.setWomenShare(entity.getWomenShare());
+        apiStockOrder.setOrganic(entity.getOrganic());
+
+        return apiStockOrder;
+    }
+
+    public static ApiStockOrder toApiStockOrderHistory(StockOrder entity, Language language) {
+
+        ApiStockOrder apiStockOrder = toApiStockOrderHistoryItem(entity, language);
+
+        if (apiStockOrder == null) {
+            return null;
+        }
+
+        apiStockOrder.setUpdateTimestamp(entity.getUpdateTimestamp());
+        apiStockOrder.setOrderType(entity.getOrderType());
+
+        apiStockOrder.setFulfilledQuantity(entity.getFulfilledQuantity());
+        apiStockOrder.setAvailableQuantity(entity.getAvailableQuantity());
+
+        apiStockOrder.setComments(entity.getComments());
+        apiStockOrder.setPurchaseOrder(entity.getPurchaseOrder());
+
+        if (BooleanUtils.isTrue(entity.getPurchaseOrder())) {
+
+            // Farmer
+            apiStockOrder.setProducerUserCustomer(
+                    UserCustomerMapper.toApiUserCustomerBase(entity.getProducerUserCustomer()));
+
+            // Collector
+            apiStockOrder.setRepresentativeOfProducerUserCustomer(
+                    UserCustomerMapper.toApiUserCustomerBase(entity.getRepresentativeOfProducerUserCustomer()));
+
+            apiStockOrder.setCurrency(entity.getCurrency());
+            apiStockOrder.setCost(entity.getCost());
+            apiStockOrder.setPaid(entity.getPaid());
+            apiStockOrder.setBalance(entity.getBalance());
+        }
+
+        apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProductBase(entity.getSemiProduct(), language));
+        apiStockOrder.setFinalProduct(ProductApiTools.toApiFinalProductBase(entity.getFinalProduct()));
+
+        return apiStockOrder;
+    }
+
 }

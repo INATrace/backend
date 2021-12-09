@@ -5,19 +5,14 @@ import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
-
 @Validated
-public class ApiStockOrderAggregatedHistory extends ApiBaseEntity {
+public class ApiStockOrderHistoryTimelineItem extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "Processing order for this aggregation history")
+	@ApiModelProperty(value = "The Processing order representing this processing step (used when not Purchase order)")
 	private ApiProcessingOrder processingOrder;
 
-	@ApiModelProperty(value = "Stock order for that aggregation history is calculated")
+	@ApiModelProperty(value = "Stock order representing this processing step (used in Purchase orders)")
 	private ApiStockOrder stockOrder;
-
-	@ApiModelProperty(value = "List of aggregations, that represent stock order siblings for this aggregation history")
-	private List<ApiStockOrderAggregation> aggregations;
 
 	@ApiModelProperty(value = "Depth of aggregation history")
 	private Integer depth;
@@ -38,14 +33,6 @@ public class ApiStockOrderAggregatedHistory extends ApiBaseEntity {
 		this.stockOrder = stockOrder;
 	}
 
-	public List<ApiStockOrderAggregation> getAggregations() {
-		return aggregations;
-	}
-
-	public void setAggregations(List<ApiStockOrderAggregation> aggregations) {
-		this.aggregations = aggregations;
-	}
-
 	public Integer getDepth() {
 		return depth;
 	}
@@ -53,4 +40,5 @@ public class ApiStockOrderAggregatedHistory extends ApiBaseEntity {
 	public void setDepth(Integer depth) {
 		this.depth = depth;
 	}
+
 }

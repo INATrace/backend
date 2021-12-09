@@ -144,4 +144,32 @@ public final class ProcessingActionMapper {
 		return apiProcessingAction;
 	}
 
+	public static ApiProcessingAction toApiProcessingActionHistory(ProcessingAction entity, Language language) {
+
+		if (entity == null) {
+			return null;
+		}
+
+		ApiProcessingAction apiProcessingAction = new ApiProcessingAction();
+		apiProcessingAction.setId(entity.getId());
+
+		// Set the translated name and description
+		entity.getProcessingActionTranslations().stream()
+				.filter(pat -> pat.getLanguage().equals(language)).findAny().ifPresent(pat -> apiProcessingAction.setName(pat.getName()));
+
+		apiProcessingAction.setPublicTimelineLabel(entity.getPublicTimelineLabel());
+		apiProcessingAction.setPublicTimelineIconType(entity.getPublicTimelineIconType());
+		apiProcessingAction.setType(entity.getType());
+
+		// Map the input and output semi-products
+		apiProcessingAction.setInputSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct(), language));
+		apiProcessingAction.setOutputSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getOutputSemiProduct(), language));
+
+		// Map the input and output final products
+		apiProcessingAction.setInputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getInputFinalProduct()));
+		apiProcessingAction.setOutputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getOutputFinalProduct()));
+
+		return apiProcessingAction;
+	}
+
 }
