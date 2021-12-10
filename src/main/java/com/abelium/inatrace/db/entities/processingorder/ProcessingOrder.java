@@ -28,7 +28,7 @@ public class ProcessingOrder extends TimestampEntity {
     @OneToMany(mappedBy = "targetProcessingOrder")
     private List<Transaction> inputTransactions;
 
-    @OneToMany(mappedBy = "processingOrder")
+    @OneToMany(mappedBy = "processingOrder", fetch = FetchType.EAGER)
     private List<StockOrder> targetStockOrders;
 
     public Long getInitiatorUserId() {

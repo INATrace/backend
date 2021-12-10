@@ -291,7 +291,17 @@ public class StockOrderService extends BaseService {
         List<ApiStockOrderHistoryTimelineItem> historyTimeline = addNextAggregationLevels(0, stockOrder, language);
         historyTimeline.sort(Comparator.comparingInt(ApiStockOrderHistoryTimelineItem::getDepth));
 
-        stockOrderHistory.setTimelineItems(historyTimeline);
+        // Prepare aggregated Purchase orders (group all into single history timeline item)
+        ApiStockOrderHistoryTimelineItem aggregatedPurchaseOrders = new ApiStockOrderHistoryTimelineItem();
+
+        stockOrderHistory.setTimelineItems(historyTimeline.stream().filter(timelineItem -> {
+            if (timelineItem.getStockOrder() != null) {
+                aggregatedPurchaseOrders.getPurchaseOrders().add(timelineItem.getStockOrder());
+                return false;
+            }
+            return true;
+        }).collect(Collectors.toList()));
+        stockOrderHistory.getTimelineItems().add(aggregatedPurchaseOrders);
 
         // TODO: modify this part to include the output transactions
         // additional code for setting data for the first history element (depth=0)
@@ -355,61 +365,53 @@ public class StockOrderService extends BaseService {
     private List<ApiStockOrderHistoryTimelineItem> addNextAggregationLevels(int currentDepth,
                                                                 StockOrder stockOrder, Language language) {
 
-        // TODO: finish the modifications to fulfill the requirements for B2C
-
         if (stockOrder != null) {
 
             List<ApiStockOrderHistoryTimelineItem> historyTimeline = new ArrayList<>();
 
             ApiStockOrderHistoryTimelineItem nextHistory = new ApiStockOrderHistoryTimelineItem();
 
+            // If we have Processing order defined, we are dealing with orders that involve
+            // processing (in the other case we have Purchase order - special case)
             if (stockOrder.getProcessingOrder() != null && !stockOrder.getProcessingOrder().getInputTransactions().isEmpty()) {
 
-                // get stockOrders that are inputs connected to this stockOrder, via the processing order
-                List<StockOrder> sourceOrderList = stockOrder.getProcessingOrder().getInputTransactions()
+                // Get the Stock order that were used as input when executing the Processing order
+                List<StockOrder> inputStockOrders = stockOrder.getProcessingOrder().getInputTransactions()
                         .stream()
                         .filter(transaction -> !transaction.getStatus().equals(TransactionStatus.CANCELED))
                         .map(Transaction::getSourceStockOrder)
                         .collect(Collectors.toList());
 
-                // get siblings list for this order
-                List<ApiStockOrder> siblingsStockOrderList = stockOrder.getProcessingOrder().getTargetStockOrders()
+                // Get the Stock orders that were created when executing the Processing order
+                List<ApiStockOrder> targetStockOrders = stockOrder.getProcessingOrder().getTargetStockOrders()
                         .stream()
                         .map(siblingOrder -> StockOrderMapper.toApiStockOrderHistoryItem(siblingOrder, language))
                         .collect(Collectors.toList());
 
-                siblingsStockOrderList.forEach(siblingOrder -> {
-                    ApiStockOrderHistoryTimelineItem aggregation = new ApiStockOrderHistoryTimelineItem();
-                    aggregation.setStockOrder(siblingOrder);
-                    //    aggregation.setFields(new ArrayList<>());// TODO: map fields
-                    //    aggregation.setDocuments(new ArrayList<>()); // todo map documents
-                });
-
                 nextHistory.setProcessingOrder(
                         ProcessingOrderMapper.toApiProcessingOrderHistory(stockOrder.getProcessingOrder(), language));
+                nextHistory.getProcessingOrder().setTargetStockOrders(targetStockOrders);
                 nextHistory.setDepth(currentDepth);
 
                 // next recursion for every child element
-                if (sourceOrderList.get(0).getSacNumber() != null) {
-                    // if sac number present, proceed with only first item leafs
+                if (inputStockOrders.get(0).getSacNumber() != null) {
+
+                    // if sac number present, proceed with only first item leaves
                     historyTimeline.addAll(
-                            addNextAggregationLevels(currentDepth + 1, sourceOrderList.get(0), language));
-                } else if (OrderType.TRANSFER_ORDER.equals(sourceOrderList.get(0).getOrderType())) {
-                    // if transfer order, go through with first item leafs
+                            addNextAggregationLevels(currentDepth + 1, inputStockOrders.get(0), language));
+                } else if (OrderType.TRANSFER_ORDER.equals(inputStockOrders.get(0).getOrderType())) {
+
+                    // if transfer order, go through with first item leaves
                     historyTimeline.addAll(
-                            addNextAggregationLevels(currentDepth + 1, sourceOrderList.get(0), language));
+                            addNextAggregationLevels(currentDepth + 1, inputStockOrders.get(0), language));
                 } else {
-                    // proceed recursion with all leaf
-                    sourceOrderList.forEach(sourceOrder -> historyTimeline.addAll(
+
+                    // proceed recursion with all leaves
+                    inputStockOrders.forEach(sourceOrder -> historyTimeline.addAll(
                             addNextAggregationLevels(currentDepth + 1, sourceOrder, language)));
                 }
-            } else {
 
-                // map last element, that does not contain processing order (these are Purchase orders)
-                ApiStockOrderHistoryTimelineItem aggregation = new ApiStockOrderHistoryTimelineItem();
-                aggregation.setStockOrder(StockOrderMapper.toApiStockOrderHistoryItem(stockOrder, language));
-                //    aggregation.setFields(new ArrayList<>());// TODO: map fields
-                //    aggregation.setDocuments(new ArrayList<>()); // todo map documents
+            } else {
 
                 nextHistory.setStockOrder(StockOrderMapper.toApiStockOrderHistory(stockOrder, language));
                 nextHistory.setDepth(currentDepth);

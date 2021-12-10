@@ -5,6 +5,9 @@ import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Validated
 public class ApiStockOrderHistoryTimelineItem extends ApiBaseEntity {
 
@@ -13,6 +16,9 @@ public class ApiStockOrderHistoryTimelineItem extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "Stock order representing this processing step (used in Purchase orders)")
 	private ApiStockOrder stockOrder;
+
+	@ApiModelProperty(value = "Aggregated Purchase orders")
+	private List<ApiStockOrder> purchaseOrders;
 
 	@ApiModelProperty(value = "Depth of aggregation history")
 	private Integer depth;
@@ -31,6 +37,17 @@ public class ApiStockOrderHistoryTimelineItem extends ApiBaseEntity {
 
 	public void setStockOrder(ApiStockOrder stockOrder) {
 		this.stockOrder = stockOrder;
+	}
+
+	public List<ApiStockOrder> getPurchaseOrders() {
+		if (purchaseOrders == null) {
+			purchaseOrders = new ArrayList<>();
+		}
+		return purchaseOrders;
+	}
+
+	public void setPurchaseOrders(List<ApiStockOrder> purchaseOrders) {
+		this.purchaseOrders = purchaseOrders;
 	}
 
 	public Integer getDepth() {
