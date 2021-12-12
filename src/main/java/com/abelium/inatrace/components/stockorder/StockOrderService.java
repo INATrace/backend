@@ -5,6 +5,7 @@ import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeMapper;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.ProcessingEvidenceTypeService;
 import com.abelium.inatrace.components.codebook.processingevidencefield.ProcessingEvidenceFieldService;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
@@ -15,6 +16,8 @@ import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMa
 import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.stockorder.api.*;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
+import com.abelium.inatrace.components.transaction.api.ApiTransaction;
+import com.abelium.inatrace.components.transaction.mappers.TransactionMapper;
 import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
@@ -283,9 +286,28 @@ public class StockOrderService extends BaseService {
 
         ApiStockOrderHistory stockOrderHistory = new ApiStockOrderHistory();
 
-        // Set the Stock order and Processing order for which the history is calculated
+        // Set the Stock order and Processing order for which the history is calculated (including the input transaction for the Processing order)
         stockOrderHistory.setStockOrder(StockOrderMapper.toApiStockOrderHistory(stockOrder, language));
         stockOrderHistory.setProcessingOrder(ProcessingOrderMapper.toApiProcessingOrderHistory(stockOrder.getProcessingOrder(), language));
+
+        if (stockOrder.getProcessingOrder() != null) {
+
+            // Set the input transactions for the Processing order
+            stockOrderHistory.getProcessingOrder().setInputTransactions(
+                    stockOrder.getProcessingOrder().getInputTransactions().stream()
+                            .map(TransactionMapper::toApiTransactionHistory).collect(Collectors.toList()));
+
+            // Set the sibling Stock orders
+            stockOrderHistory.getProcessingOrder().setTargetStockOrders(
+                    stockOrder.getProcessingOrder().getTargetStockOrders().stream().map(tSO -> {
+                        ApiStockOrder apiStockOrder = new ApiStockOrder();
+                        apiStockOrder.setId(tSO.getId());
+                        apiStockOrder.setTotalQuantity(tSO.getTotalQuantity());
+                        apiStockOrder.setMeasureUnitType(
+                                MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(tSO.getMeasurementUnitType()));
+                        return apiStockOrder;
+                    }).collect(Collectors.toList()));
+        }
 
         // Recursively add history, starting from depth 0
         List<ApiStockOrderHistoryTimelineItem> historyTimeline = addNextAggregationLevels(0, stockOrder, language);
@@ -303,48 +325,24 @@ public class StockOrderService extends BaseService {
         }).collect(Collectors.toList()));
         stockOrderHistory.getTimelineItems().add(aggregatedPurchaseOrders);
 
-        // TODO: modify this part to include the output transactions
-        // additional code for setting data for the first history element (depth=0)
-        // code sets output transactions, and connected stock orders
-//        if (!stockAggregationHistoryList.isEmpty()) {
-//
-//            List<Transaction> outputTransactions = findOutputTransactions(stockOrder);
-//
-//            if (outputTransactions != null && !outputTransactions.isEmpty()) {
-//
-//                // set output transactions only on first (root) element
-//                if (stockAggregationHistoryList.get(0).getProcessingOrder() == null) {
-//
-//                    stockAggregationHistoryList.get(0).setProcessingOrder(ProcessingOrderMapper
-//                            .toApiProcessingOrder(outputTransactions.get(0).getTargetProcessingOrder(), language));
-//                }
-//
-//                stockAggregationHistoryList.get(0).getProcessingOrder().setOutputTransactions(
-//                        outputTransactions.stream()
-//                                .map(transaction -> TransactionMapper.toApiTransaction(transaction, language))
-//                                .collect(Collectors.toList()));
-//
-//                // find and set targetSourceOrder for first outputTransaction.
-//                // search with query, because targetStockOrder is only set properly for TRANSFER types
-//                TypedQuery<StockOrder> outputStockOrdersQuery = em
-//                        .createNamedQuery("StockOrder.getStockOrdersByProcessingOrderId", StockOrder.class)
-//                        .setParameter("processingOrderId",
-//                                outputTransactions.get(0).getTargetProcessingOrder().getId());
-//                List<StockOrder> outputStockOrders = outputStockOrdersQuery.getResultList();
-//
-//                if (outputStockOrders != null && !outputStockOrders.isEmpty()) {
-//                    stockAggregationHistoryList.get(0).getProcessingOrder().getOutputTransactions().get(0)
-//                            .setTargetStockOrder(
-//                                    StockOrderMapper.toApiStockOrder(outputStockOrders.get(0), userId, language));
-//                }
-//            }
-//        }
+        // Set the output transaction for the chosen Stock order (the transactions where this Stock order was used as an input)
+        List<Transaction> outputTransactions = findOutputTransactions(stockOrder);
+        stockOrderHistory.setOutputTransactions(outputTransactions.stream().map(transaction -> {
+            ApiTransaction apiTransaction = TransactionMapper.toApiTransactionHistory(transaction);
+            transaction.getTargetProcessingOrder().getTargetStockOrders().stream().findAny().ifPresent(tSO -> {
+                ApiStockOrder apiTSO = new ApiStockOrder();
+                apiTSO.setId(tSO.getId());
+                apiTransaction.setTargetStockOrder(apiTSO);
+            });
+            return apiTransaction;
+        }).collect(Collectors.toList()));
 
         return stockOrderHistory;
     }
 
     private List<Transaction> findOutputTransactions(StockOrder stockOrder) {
-        // read involved transactions, and set them as output transactions
+
+        // Fetch the transactions where the provided Stock order was used as an input Stock order
         TypedQuery<Transaction> getTransactionsBySourceStockOrderQuery = em
                 .createNamedQuery("Transaction.getOutputTransactionsByStockOrderId", Transaction.class)
                 .setParameter("stockOrderId", stockOrder.getId());
