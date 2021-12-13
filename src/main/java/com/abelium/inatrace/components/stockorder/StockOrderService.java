@@ -234,11 +234,12 @@ public class StockOrderService extends BaseService {
      * Return the public data for the stock order(s) with the provided QR code tag. Multiple stock orders can contain the provided QR code tag.
      * @param qrTag The QR code tag for which public data is returned.
      *
+     * @param language The user selected language.
      * @return The public data to be used by the public B2C page.
      */
-    public ApiStockOrderPublic getStockOrderPublicData(String qrTag, Boolean withHistory) {
+    public ApiQRTagPublic getQRTagPublicData(String qrTag, Boolean withHistory, Language language) throws ApiException {
 
-        ApiStockOrderPublic apiStockOrderPublic = new ApiStockOrderPublic();
+        ApiQRTagPublic apiQRTagPublic = new ApiQRTagPublic();
 
         // Get the top level Stock order for the provided QR tag (the Stock order that is
         // not used as an input transaction in other Processing orders)
@@ -259,32 +260,87 @@ public class StockOrderService extends BaseService {
                 orderId = topLevelStockOrder.getOrderId();
             }
 
-            apiStockOrderPublic.setOrderId(orderId);
-            apiStockOrderPublic.setQrTag(topLevelStockOrder.getQrCodeTag());
+            apiQRTagPublic.setOrderId(orderId);
+            apiQRTagPublic.setQrTag(topLevelStockOrder.getQrCodeTag());
 
             // Set the aggregated history (if requested from the API call)
             if (BooleanUtils.isTrue(withHistory)) {
 
                 ApiHistoryTimeline historyTimeline = new ApiHistoryTimeline();
-                apiStockOrderPublic.setHistoryTimeline(historyTimeline);
+                apiQRTagPublic.setHistoryTimeline(historyTimeline);
 
-                // TODO: get and set the aggregated history
+                // Get the history for the selected Stock order
+                ApiStockOrderHistory stockOrderHistory = getStockOrderAggregatedHistoryList(topLevelStockOrder.getId(), language, false);
+
+                // Map the Stock order history timeline to the public QR code tag data
+                historyTimeline.setItems(stockOrderHistory.getTimelineItems()
+                        .stream()
+                        .map(processing -> {
+                            ApiHistoryTimelineItem historyTimelineItem = new ApiHistoryTimelineItem();
+
+                            if (processing.getProcessingOrder() != null) {
+
+                                // If processing item has no public timeline label defined, skip that processing
+                                if (StringUtils.isNotBlank(processing.getProcessingOrder().getProcessingAction().getPublicTimelineLabel())) {
+                                    historyTimelineItem.setType(processing.getProcessingOrder().getProcessingAction().getType().toString());
+                                    historyTimelineItem.setName(processing.getProcessingOrder().getProcessingAction().getName());
+                                    historyTimelineItem.setDate(processing.getProcessingOrder().getProcessingDate());
+                                    processing.getProcessingOrder().getTargetStockOrders().stream().findAny()
+                                            .ifPresent(tSO -> historyTimelineItem.setLocation(tSO.getFacility().getName()));
+                                }
+                            } else {
+
+                                processing.getPurchaseOrders().stream().findFirst().ifPresent(po -> {
+                                    historyTimelineItem.setDate(po.getProductionDate());
+                                    historyTimelineItem.setLocation(po.getFacility().getName());
+
+                                    apiQRTagPublic.setProducerName(po.getFacility().getCompany().getName());
+                                });
+                            }
+
+                            return historyTimelineItem;
+                        })
+                        .filter(historyTimelineItem -> historyTimelineItem.getDate() != null)
+                        .collect(Collectors.toList()));
             }
         }
 
-        return apiStockOrderPublic;
+        return apiQRTagPublic;
     }
 
     /**
      * Returns the history (the chain of stock orders from top to bottom) for the provided Stock order ID.
+     *
+     * @param id The Stock order ID.
+     * @param language User selected language.
+     * @param withDetails Should the response contain Stock and Processing order details.
      */
-    public ApiStockOrderHistory getStockOrderAggregatedHistoryList(Long id, Language language) throws ApiException {
-
-        // TODO: finish the modifications to fulfill the requirements for B2C
+    public ApiStockOrderHistory getStockOrderAggregatedHistoryList(Long id, Language language, boolean withDetails) throws ApiException {
 
         StockOrder stockOrder = fetchEntity(id, StockOrder.class);
 
         ApiStockOrderHistory stockOrderHistory = new ApiStockOrderHistory();
+
+        // Recursively add history, starting from depth 0
+        List<ApiStockOrderHistoryTimelineItem> historyTimeline = addNextAggregationLevels(0, stockOrder, language);
+        historyTimeline.sort(Comparator.comparingInt(ApiStockOrderHistoryTimelineItem::getDepth));
+
+        // Prepare aggregated Purchase orders (group all into single history timeline item)
+        ApiStockOrderHistoryTimelineItem aggregatedPurchaseOrders = new ApiStockOrderHistoryTimelineItem();
+
+        stockOrderHistory.setTimelineItems(historyTimeline.stream().filter(timelineItem -> {
+            if (timelineItem.getStockOrder() != null) {
+                aggregatedPurchaseOrders.getPurchaseOrders().add(timelineItem.getStockOrder());
+                return false;
+            }
+            return true;
+        }).collect(Collectors.toList()));
+        stockOrderHistory.getTimelineItems().add(aggregatedPurchaseOrders);
+
+        // If details are not request end the processing (we don't need the Stock and Processing order data including input and output transactions)
+        if (!withDetails) {
+            return stockOrderHistory;
+        }
 
         // Set the Stock order and Processing order for which the history is calculated (including the input transaction for the Processing order)
         stockOrderHistory.setStockOrder(StockOrderMapper.toApiStockOrderHistory(stockOrder, language));
@@ -308,22 +364,6 @@ public class StockOrderService extends BaseService {
                         return apiStockOrder;
                     }).collect(Collectors.toList()));
         }
-
-        // Recursively add history, starting from depth 0
-        List<ApiStockOrderHistoryTimelineItem> historyTimeline = addNextAggregationLevels(0, stockOrder, language);
-        historyTimeline.sort(Comparator.comparingInt(ApiStockOrderHistoryTimelineItem::getDepth));
-
-        // Prepare aggregated Purchase orders (group all into single history timeline item)
-        ApiStockOrderHistoryTimelineItem aggregatedPurchaseOrders = new ApiStockOrderHistoryTimelineItem();
-
-        stockOrderHistory.setTimelineItems(historyTimeline.stream().filter(timelineItem -> {
-            if (timelineItem.getStockOrder() != null) {
-                aggregatedPurchaseOrders.getPurchaseOrders().add(timelineItem.getStockOrder());
-                return false;
-            }
-            return true;
-        }).collect(Collectors.toList()));
-        stockOrderHistory.getTimelineItems().add(aggregatedPurchaseOrders);
 
         // Set the output transaction for the chosen Stock order (the transactions where this Stock order was used as an input)
         List<Transaction> outputTransactions = findOutputTransactions(stockOrder);

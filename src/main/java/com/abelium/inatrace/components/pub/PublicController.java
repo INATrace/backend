@@ -14,7 +14,7 @@ import com.abelium.inatrace.components.company.api.ApiCompanyPublic;
 import com.abelium.inatrace.components.product.ProductService;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.stockorder.StockOrderService;
-import com.abelium.inatrace.components.stockorder.api.ApiStockOrderPublic;
+import com.abelium.inatrace.components.stockorder.api.ApiQRTagPublic;
 import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -74,10 +74,11 @@ public class PublicController {
 
 	@GetMapping(value = "/stock-order/{qrTag}")
 	@ApiOperation(value = "Get public data for the Stock order with the given QR code tag")
-	public ApiResponse<ApiStockOrderPublic> getStockOrderPublicData(
+	public ApiResponse<ApiQRTagPublic> getQRTagPublicData(
 			@Valid @ApiParam(value = "QR code tag", required = true) @PathVariable("qrTag") String qrTag,
-			@Valid @ApiParam(value = "Return aggregated history") @RequestParam(value = "withHistory", required = false) Boolean withHistory) {
-		return new ApiResponse<>(stockOrderService.getStockOrderPublicData(qrTag, withHistory));
+			@Valid @ApiParam(value = "Return aggregated history") @RequestParam(value = "withHistory", required = false) Boolean withHistory,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
+		return new ApiResponse<>(stockOrderService.getQRTagPublicData(qrTag, withHistory, language));
 	}
     
     @GetMapping(value = "/product/knowledgeBlog/{id}")
