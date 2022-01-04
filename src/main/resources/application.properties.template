@@ -8,7 +8,7 @@ spring.main.banner-mode = off
 INATrace.service.group = develop
 
 # Server settings
-server.use-forward-headers = true
+server.forward-headers-strategy = framework
 server.port = 8080
 
 management.health.mail.enabled =  false
