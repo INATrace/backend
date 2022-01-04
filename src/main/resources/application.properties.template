@@ -11,6 +11,8 @@ INATrace.service.group = develop
 server.use-forward-headers = true
 server.port = 8080
 
+management.health.mail.enabled =  false
+
 # To allow uploads of large files (images)
 spring.servlet.multipart.max-file-size = 10MB
 
@@ -18,23 +20,19 @@ spring.servlet.multipart.max-file-size = 10MB
 spring.mvc.async.request-timeout = 120000
 
 # DataSource settings
-INATrace.database.name = coffee
+INATrace.database.name =
 INATrace.database.hostname = localhost
 INATrace.database.port = 3306
 
 spring.datasource.url = jdbc:mysql://${INATrace.database.hostname}:${INATrace.database.port}/${INATrace.database.name}?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
-spring.datasource.username = coffee
-spring.datasource.password = coffee
+spring.datasource.username =
+spring.datasource.password =
 # spring.jpa.show-sql = true
 spring.jpa.hibernate.ddl-auto = update
 spring.jpa.autocommit = true
 
 # disable jmx to prevent exceptions by hikari connection pool on localhost
 spring.jmx.enabled = false
-
-# there is a bug in AWS MySql that character_set_client 'utf8mb4' in parameter group is ignored; this is a hook that sets character set to utf8mb4 every time connection is opened
-#spring.datasource.tomcat.initSQL = set names 'utf8mb4';
-spring.datasource.hikari.connectionInitSql = set names 'utf8mb4';
 
 # increase the maximum pool size and make in growable
 spring.datasource.hikari.maximumPoolSize = 20
@@ -71,14 +69,13 @@ spring.thymeleaf.mode = HTML
 # set to true in production
 spring.thymeleaf.cache = false
 
-# SMTP settings (Amazon SES)
-spring.mail.protocol = smtps
-spring.mail.host =
-spring.mail.port = 1025
-spring.mail.username =
-spring.mail.password =
-spring.mail.properties.mail.smtp.ssl.checkserveridentity = true
-spring.mail.properties.mail.smtps.auth = true
+# SMTP settings
+#spring.mail.protocol = smtp
+#spring.mail.host =
+#spring.mail.port = 1025
+#spring.mail.username =
+#spring.mail.password =
+#spring.mail.properties.mail.smtp.auth = true
 # prevent hanging on unresponsive server
 spring.mail.properties.mail.smtp.connectiontimeout = 5000
 spring.mail.properties.mail.smtp.timeout = 3000
@@ -117,7 +114,7 @@ INATrace.import.path = import/
 INATrace.documents.root = documents/
 
 # file storage location (local path)
-INATrace.fileStorage.root = /Users/pecea/inatrace_file_storage
+INATrace.fileStorage.root = inatrace_file_storage_path
 
 # url (prefix) for email confirmation after registration
 INATrace.emailConfirmation.url = http://localhost:4200/confirm-email/
@@ -132,7 +129,7 @@ INATrace.fe.url =
 INATrace.maxmindDB.path =
 
 # "Secret" token for logging request
-INATrace.requestLog.token = eee222
+INATrace.requestLog.token =
 
 # Exchange rate API key
 INAtrace.exchangerate.apiKey =
