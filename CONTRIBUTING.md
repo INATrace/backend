@@ -1,4 +1,4 @@
-The list of contributors to the project so far:
+# The list of contributors to the project so far:
 
 * Product development: 
     * Alen Orbanić, Boris Horvat
@@ -10,3 +10,19 @@ The list of contributors to the project so far:
 	* Boris Horvat, Miha Burgar, Urška Saletinger
 	* Romina Kavčič 
 	* Claudia Schonter
+
+# INATrace 2
+
+* Product development:
+  * Claudia Schonter, Lars Kahnert 
+  * Pece Adjievski
+  * Boris Horvat
+
+* Software development:
+  * Pece Adjievski, Nejc Rebernik, Din Musić, Borče Paspalovski
+  * René Flores
+
+* UX Design:
+  * Claudia Schonter
+  * Pece Adjievski
+  * Boris Horvat
