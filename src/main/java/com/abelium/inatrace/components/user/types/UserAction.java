@@ -1,0 +1,13 @@
+package com.abelium.inatrace.components.user.types;
+
+public enum UserAction {
+	VIEW_USER_PROFILE,
+	CREATE_COMPANY,
+	UPDATE_USER_PROFILE,
+	ACTIVATE_USER,
+	CONFIRM_USER_EMAIL,
+	DEACTIVATE_USER,
+	SET_USER_ADMIN,
+	UNSET_USER_ADMIN,
+	SET_USER_ROLE,
+}
