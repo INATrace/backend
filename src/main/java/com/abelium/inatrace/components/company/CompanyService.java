@@ -463,6 +463,18 @@ public class CompanyService extends BaseService {
 		em.remove(userCustomer);
 	}
 
+	public Company getAssociationByName(String name) {
+		List<Company> companyList = em.createQuery("SELECT c FROM Company c WHERE LOWER(c.name) LIKE :name", Company.class)
+				.setParameter("name", name.strip().toLowerCase())
+				.getResultList();
+
+		if (companyList.isEmpty()) {
+			return null;
+		}
+
+		return companyList.get(0);
+	}
+
 	public ApiPaginatedList<ApiCompanyCustomer> listCompanyCustomers(CustomUserDetails authUser, Long companyId, ApiListCustomersRequest request) throws ApiException {
 		return PaginationTools.createPaginatedResponse(em, request, () -> customerListQueryObject(companyId, request), CompanyCustomerMapper::toApiCompanyCustomer);
 	}
