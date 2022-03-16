@@ -678,6 +678,10 @@ public class CompanyService extends BaseService {
 				case "BY_SURNAME":
 					queryCondition = Torpedo.condition(userCustomer.getSurname()).like().any(request.getQuery());
 					break;
+				case "BY_NAME_AND_SURNAME":
+					queryCondition = Torpedo.condition(userCustomer.getName()).like().any(request.getQuery())
+							.or(Torpedo.condition(userCustomer.getSurname()).like().any(request.getQuery()));
+					break;
 			}
 			condition = condition.and(queryCondition);
 		}
