@@ -2,10 +2,10 @@
 # https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # for full list of options
 
-spring.main.banner-mode = off
+# Deployment environment (DEV, TEST, PROD)
+INATrace.env = DEV
 
-# service group can be one of: develop (for developers' machines), test, master
-INATrace.service.group = develop
+spring.main.banner-mode = off
 
 # Server settings
 server.forward-headers-strategy = framework

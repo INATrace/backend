@@ -6,11 +6,14 @@ import com.abelium.inatrace.components.common.api.ApiUserCustomerImportResponse;
 import com.abelium.inatrace.components.company.CompanyService;
 import com.abelium.inatrace.components.company.api.ApiAddress;
 import com.abelium.inatrace.components.company.api.ApiUserCustomer;
+import com.abelium.inatrace.components.company.api.ApiUserCustomerAssociation;
 import com.abelium.inatrace.components.company.api.ApiUserCustomerLocation;
+import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.product.api.ApiBankInformation;
 import com.abelium.inatrace.components.product.api.ApiFarmInformation;
 import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.common.Document;
+import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.types.Gender;
 import com.abelium.inatrace.types.UserCustomerType;
 import org.apache.poi.ss.usermodel.*;
@@ -111,6 +114,25 @@ public class UserCustomerImportService extends BaseService {
                 apiUserCustomer.setSurname(getString(row.getCell(1)));
                 apiUserCustomer.setType(UserCustomerType.FARMER);
 
+                // Member of associations
+                if (!emptyCell(row.getCell(20))) {
+                    String content = getString(row.getCell(20));
+                    if (content != null) {
+                        String[] names = content.split(",");
+                        List<ApiUserCustomerAssociation> apiUserCustomerAssociationList = new ArrayList<>();
+                        for (String name : names) {
+                            Company association = companyService.getAssociationByName(name);
+                            if (association != null) {
+                                ApiUserCustomerAssociation apiUserCustomerAssociation = new ApiUserCustomerAssociation();
+                                apiUserCustomerAssociation.setCompany(CompanyMapper.toApiCompanyBase(association));
+                                apiUserCustomerAssociation.setUserCustomer(apiUserCustomer);
+                                apiUserCustomerAssociationList.add(apiUserCustomerAssociation);
+                            }
+                        }
+                        apiUserCustomer.setAssociations(apiUserCustomerAssociationList);
+                    }
+                }
+
                 if (companyService.existsUserCustomer(apiUserCustomer)) {
                     duplicates.add(apiUserCustomer);
                 } else {
@@ -146,38 +168,38 @@ public class UserCustomerImportService extends BaseService {
     }
 
     private boolean validRow(Row row) {
-        return validCell(row.getCell(0), List.of(CellType.STRING, CellType.NUMERIC)) &&
-                validCell(row.getCell(1), CellType.STRING) &&
-                validCell(row.getCell(2), CellType.STRING) &&
-                validCell(row.getCell(3), CellType.STRING) &&
-                validCell(row.getCell(4), CellType.STRING) &&
-                validCell(row.getCell(5), CellType.STRING) &&
-                validCell(row.getCell(6), CellType.STRING) &&
-                validCell(row.getCell(7), CellType.STRING) &&
-                validCell(row.getCell(8), CellType.STRING) &&
-                validCell(row.getCell(9), CellType.STRING) &&
-                validCell(row.getCell(10), CellType.STRING) &&
-                validCell(row.getCell(11), CellType.STRING) &&
-                validCell(row.getCell(12), CellType.STRING) &&
-                validCell(row.getCell(13), List.of(CellType.STRING, CellType.NUMERIC)) &&
-                validCell(row.getCell(14), CellType.STRING) &&
-                validCell(row.getCell(15), CellType.STRING) &&
-                validCell(row.getCell(16), List.of(CellType.STRING, CellType.NUMERIC)) &&
-                validCell(row.getCell(17), CellType.STRING) &&
-                validCell(row.getCell(18), CellType.STRING) &&
-                validCell(row.getCell(19), List.of()) &&
-                validCell(row.getCell(20), List.of()) &&
-                validCell(row.getCell(21), CellType.STRING) &&
-                validCell(row.getCell(22), CellType.NUMERIC) &&
-                validCell(row.getCell(23), CellType.NUMERIC) &&
-                validCell(row.getCell(24), CellType.NUMERIC) &&
-                validCell(row.getCell(25), CellType.STRING) &&
-                validCell(row.getCell(26), CellType.NUMERIC) &&
-                validCell(row.getCell(27), CellType.NUMERIC) &&
-                validCell(row.getCell(28), List.of(CellType.STRING, CellType.NUMERIC)) &&
-                validCell(row.getCell(29), List.of(CellType.STRING, CellType.NUMERIC)) &&
-                validCell(row.getCell(30), List.of(CellType.STRING, CellType.NUMERIC)) &&
-                validCell(row.getCell(31), List.of(CellType.STRING, CellType.NUMERIC));
+        return validCell(row.getCell(0), List.of(CellType.STRING, CellType.NUMERIC)) &&     // Company internal ID
+                validCell(row.getCell(1), CellType.STRING) &&                               // Last name
+                validCell(row.getCell(2), List.of(CellType.STRING)) &&                      // First name
+                validCell(row.getCell(3), List.of(CellType.STRING)) &&                      // Village
+                validCell(row.getCell(4), List.of(CellType.STRING)) &&                      // Cell
+                validCell(row.getCell(5), List.of(CellType.STRING)) &&                      // Sector
+                validCell(row.getCell(6), List.of(CellType.STRING)) &&                      // Caserio
+                validCell(row.getCell(7), List.of(CellType.STRING)) &&                      // Aldea
+                validCell(row.getCell(8), List.of(CellType.STRING)) &&                      // Municipio
+                validCell(row.getCell(9), List.of(CellType.STRING)) &&                      // Departamento
+                validCell(row.getCell(10), List.of(CellType.STRING)) &&                     // Address
+                validCell(row.getCell(11), List.of(CellType.STRING)) &&                     // City
+                validCell(row.getCell(12), List.of(CellType.STRING)) &&                     // State
+                validCell(row.getCell(13), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Zip
+                validCell(row.getCell(14), CellType.STRING) &&                              // Country
+                validCell(row.getCell(15), CellType.STRING) &&                              // Gender
+                validCell(row.getCell(16), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Phone number
+                validCell(row.getCell(17), List.of(CellType.STRING)) &&                     // E-mail
+                validCell(row.getCell(18), List.of(CellType.STRING)) &&                     // Smartphone
+                validCell(row.getCell(19), List.of(CellType.STRING)) &&                     // Supplier of
+                validCell(row.getCell(20), List.of(CellType.STRING)) &&                     // Member of associations
+                validCell(row.getCell(21), List.of(CellType.STRING)) &&                     // Area unit
+                validCell(row.getCell(22), List.of(CellType.NUMERIC)) &&                    // Total cultivated area
+                validCell(row.getCell(23), List.of(CellType.NUMERIC)) &&                    // Area cultivated with coffee
+                validCell(row.getCell(24), List.of(CellType.NUMERIC)) &&                    // Number of coffee trees
+                validCell(row.getCell(25), List.of(CellType.STRING)) &&                     // Organic production (EU)
+                validCell(row.getCell(26), List.of(CellType.NUMERIC)) &&                    // Area organic certified
+                validCell(row.getCell(27), List.of(CellType.NUMERIC)) &&                    // Start date of transitioning to organic
+                validCell(row.getCell(28), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Account number
+                validCell(row.getCell(29), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Account holder's name
+                validCell(row.getCell(30), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Bank name
+                validCell(row.getCell(31), List.of(CellType.STRING, CellType.NUMERIC));     // Additional information
     }
 
     private boolean validCell(Cell cell, List<CellType> cellTypeList) {

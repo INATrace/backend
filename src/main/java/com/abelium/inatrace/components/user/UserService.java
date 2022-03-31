@@ -14,6 +14,7 @@ import com.abelium.inatrace.components.user.types.UserAction;
 import com.abelium.inatrace.db.entities.auth.AuthenticationToken;
 import com.abelium.inatrace.db.entities.auth.ConfirmationToken;
 import com.abelium.inatrace.db.entities.common.User;
+import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -59,6 +60,8 @@ public class UserService extends BaseService {
     @Value("${INATrace.passwordReset.url}")
     private String passwordResetUrl;
 
+	@Value("${INATrace.env}")
+	private String env;
     
     @Autowired
     private MailEngine mailEngine;
@@ -214,24 +217,42 @@ public class UserService extends BaseService {
         user.setSurname(createUserRequest.surname);
         user.setLanguage(createUserRequest.language);
         em.persist(user);
-        
-        Pair<ConfirmationToken, String> ctPair = 
-        		ConfirmationToken.create(user, ConfirmationTokenType.CONFIRM_EMAIL);
-        em.persist(ctPair.getLeft());
-        
-        mailEngine.sendSimpleMailAsync(loginManagerMail, "", "New INATrace registration",
-        		"",
-                "<p>New registration in INATrace system</p><br/>" +
-        	    "<p>  User's email: " + createUserRequest.email + "</p><br/>" +
-        	    "<p>Please approve the registrant as soon as possible</p>"
-        );
-        	
-        String htmlMail = notificationEngine.createEmailConfirmationEmail(createUserRequest.name, 
-        		createUserRequest.surname, emailConfirmationUrl + ctPair.getRight());
-		mailEngine.sendSimpleMailAsync(createUserRequest.email, "",
-			"INATrace registration",
-			"",
-			htmlMail);
+
+		// If deployment environment is not 'DEMO', create confirmation email
+		if (!"DEMO".equals(env)) {
+
+			Pair<ConfirmationToken, String> ctPair =
+					ConfirmationToken.create(user, ConfirmationTokenType.CONFIRM_EMAIL);
+			em.persist(ctPair.getLeft());
+
+			mailEngine.sendSimpleMailAsync(loginManagerMail, "", "New INATrace registration",
+					"",
+					"<p>New registration in INATrace system</p><br/>" +
+							"<p>  User's email: " + createUserRequest.email + "</p><br/>" +
+							"<p>Please approve the registrant as soon as possible</p>"
+			);
+
+			String htmlMail = notificationEngine.createEmailConfirmationEmail(createUserRequest.name,
+					createUserRequest.surname, emailConfirmationUrl + ctPair.getRight());
+			mailEngine.sendSimpleMailAsync(createUserRequest.email, "",
+					"INATrace registration",
+					"",
+					htmlMail);
+		} else {
+
+			// In 'DEMO' environment, set the new user as ACTIVE and add it to the demo companies
+			user.setStatus(UserStatus.ACTIVE);
+
+			// Join the new user to all the active companies in the system
+			List<Company> companies = companyQueries.fetchAllActiveCompanies();
+			companies.forEach(c -> {
+				CompanyUser companyUser = new CompanyUser();
+				companyUser.setUser(user);
+				companyUser.setCompany(c);
+				companyUser.setRole(CompanyUserRole.ADMIN);
+				em.persist(companyUser);
+			});
+		}
 	}
 	
     private User adminUserListQueryObject(ApiListUsersRequest request) {

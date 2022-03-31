@@ -285,8 +285,14 @@ public class StockOrderService extends BaseService {
                                     historyTimelineItem.setType(processing.getProcessingOrder().getProcessingAction().getType().toString());
                                     historyTimelineItem.setName(processing.getProcessingOrder().getProcessingAction().getName());
                                     historyTimelineItem.setDate(processing.getProcessingOrder().getProcessingDate());
+                                    
+                                    processing.getProcessingOrder().getTargetStockOrders().stream().findAny().ifPresent(t -> {
+                                        historyTimelineItem.setLatitude(t.getFacility().getFacilityLocation().getLatitude());
+                                        historyTimelineItem.setLongitude(t.getFacility().getFacilityLocation().getLongitude());
+                                    });
                                     processing.getProcessingOrder().getTargetStockOrders().stream().findAny()
                                             .ifPresent(tSO -> historyTimelineItem.setLocation(tSO.getFacility().getName()));
+                                    
                                 }
                             } else {
 
