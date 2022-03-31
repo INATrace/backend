@@ -49,6 +49,11 @@ public final class FacilityMapper {
 		apiFacility.setIsCollectionFacility(entity.getIsCollectionFacility());
 		apiFacility.setIsPublic(entity.getIsPublic());
 		apiFacility.setDeactivated(entity.getIsDeactivated());
+        
+        ApiFacilityLocation apiFacilityLocation = new ApiFacilityLocation();
+        apiFacilityLocation.setLatitude(entity.getFacilityLocation().getLatitude());
+        apiFacilityLocation.setLongitude(entity.getFacilityLocation().getLongitude());
+        apiFacility.setFacilityLocation(apiFacilityLocation);
 
 		apiFacility.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
 
