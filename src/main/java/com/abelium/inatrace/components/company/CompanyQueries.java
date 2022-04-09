@@ -33,6 +33,13 @@ public class CompanyQueries extends BaseService {
     	}
     	return company;
 	}
+
+	public List<Company> fetchAllActiveCompanies() {
+
+		Company companyProxy = Torpedo.from(Company.class);
+		Torpedo.where(companyProxy.getStatus()).eq(CompanyStatus.ACTIVE);
+		return Torpedo.select(companyProxy).list(em);
+	}
 	
 	@Transactional
 	public List<Long> fetchCompanyIdsForUser(Long userId, List<CompanyStatus> statuses) {
