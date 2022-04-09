@@ -14,6 +14,9 @@ public class ApiHistoryTimeline {
 
 	@ApiModelProperty(value = "The items in the history timeline")
 	private List<ApiHistoryTimelineItem> items;
+    
+    @ApiModelProperty(value = "The items in the journey of history timeline")
+    private List<ApiHistoryTimelineItem> journeyMarkers;
 
 	public List<ApiHistoryTimelineItem> getItems() {
 		if (items == null) {
@@ -26,4 +29,14 @@ public class ApiHistoryTimeline {
 		this.items = items;
 	}
 
+    public List<ApiHistoryTimelineItem> getJourneyMarkers() {
+        if (journeyMarkers == null) {
+            journeyMarkers = new ArrayList<>();
+        }
+        return journeyMarkers;
+    }
+    
+    public void setJourneyMarkers(List<ApiHistoryTimelineItem> journeyMarkers) {
+        this.journeyMarkers = journeyMarkers;
+    }
 }

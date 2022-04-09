@@ -172,6 +172,11 @@ public class ProductService extends BaseService {
 			p.setComparisonOfPrice(new ComparisonOfPrice());
 			em.persist(p.getComparisonOfPrice());
 		}
+        
+        if (p.getJourney() == null) {
+            p.setJourney(new ProductJourney());
+            em.persist(p.getJourney());
+        }
 
 		productApiTools.updateProduct(authUser, p, ap);
 	}
