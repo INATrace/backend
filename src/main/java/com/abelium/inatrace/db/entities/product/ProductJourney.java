@@ -6,14 +6,16 @@ import com.abelium.inatrace.db.converters.MarkerListConverter;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class ProductJourney extends BaseEntity {
     
     @Convert(converter = MarkerListConverter.class)
     @Column(columnDefinition = "TEXT")
-    private List<JourneyMarker> markers;
+    private List<JourneyMarker> markers = new ArrayList<>();
     
     public List<JourneyMarker> getMarkers() {
         return markers;
@@ -21,6 +23,12 @@ public class ProductJourney extends BaseEntity {
     
     public void setMarkers(List<JourneyMarker> markers) {
         this.markers = markers;
+    }
+    
+    public ProductJourney copy() {
+        ProductJourney j = new ProductJourney();
+        j.setMarkers(getMarkers().stream().map(JourneyMarker::copy).collect(Collectors.toList()));
+        return j;
     }
     
     public static class JourneyMarker {
@@ -65,6 +73,13 @@ public class ProductJourney extends BaseEntity {
         @Override
         public String toString() {
             return longitude + DELIMITOR + latitude;
+        }
+        
+        public JourneyMarker copy() {
+            JourneyMarker marker = new JourneyMarker();
+            marker.setLatitude(getLatitude());
+            marker.setLongitude(getLongitude());
+            return marker;
         }
     }
 }

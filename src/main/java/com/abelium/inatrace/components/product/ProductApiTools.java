@@ -100,6 +100,16 @@ public class ProductApiTools {
 		
 		ap.origin.locations = p.getOriginLocations().stream().map(ProductApiTools::toApiLocation).collect(Collectors.toList());
 		ap.company = companyApiTools.toApiCompany(userId, p.getCompany(), null);
+        
+        if (p.getJourney() != null && p.getJourney().getMarkers() != null) {
+            ap.setJourneyMarkers(p.getJourney().getMarkers().stream().map(marker -> {
+                ApiProductJourneyMarker journeyMarker = new ApiProductJourneyMarker();
+                journeyMarker.setLatitude(marker.getLatitude());
+                journeyMarker.setLongitude(marker.getLongitude());
+                return journeyMarker;
+            }).collect(Collectors.toList()));
+        }
+        
 		return ap;
 	}
 	
@@ -352,6 +362,19 @@ public class ProductApiTools {
 		if (pu.origin != null) {
 			if (pu.origin.locations != null) updateOriginLocations(p, p.getOriginLocations(), pu.origin.locations);
 		}
+        
+        // Update product journey
+        if (pu.getJourneyMarkers() != null) {
+            List<ProductJourney.JourneyMarker> markers = pu.getJourneyMarkers()
+                .stream()
+                .map(marker -> {
+                    ProductJourney.JourneyMarker m = new ProductJourney.JourneyMarker();
+                    m.setLongitude(marker.getLongitude());
+                    m.setLatitude(marker.getLatitude());
+                    return m;
+                }).collect(Collectors.toList());
+            p.getJourney().setMarkers(markers);
+        }
 	}
 	
 	private void updateProductCompanies(Product p, List<ProductCompany> ac, List<ApiProductCompany> aac) throws ApiException {
