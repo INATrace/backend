@@ -308,16 +308,6 @@ public class StockOrderService extends BaseService {
                         })
                         .filter(historyTimelineItem -> historyTimelineItem.getDate() != null)
                         .collect(Collectors.toList()));
-    
-                historyTimeline.setJourneyMarkers(topLevelStockOrder.getFinalProduct().getProduct().getJourney().getMarkers()
-                    .stream()
-                    .map(marker -> {
-                        ApiHistoryTimelineItem item = new ApiHistoryTimelineItem();
-                        item.setLongitude(marker.getLongitude());
-                        item.setLatitude(marker.getLatitude());
-                        return item;
-                    })
-                    .collect(Collectors.toList()));
             }
         }
 
