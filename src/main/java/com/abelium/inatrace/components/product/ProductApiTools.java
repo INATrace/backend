@@ -82,12 +82,14 @@ public class ProductApiTools {
 				.map(pdsa -> ProductApiTools.toApiProductDataSharingAgreement(pdsa, userId))
 				.collect(Collectors.toList()));
         
-        ap.setJourneyMarkers(p.getJourney().getMarkers().stream().map(marker -> {
-            ApiProductJourneyMarker journeyMarker = new ApiProductJourneyMarker();
-            journeyMarker.setLatitude(marker.getLatitude());
-            journeyMarker.setLongitude(marker.getLongitude());
-            return journeyMarker;
-        }).collect(Collectors.toList()));
+        if (p.getJourney() != null) {
+            ap.setJourneyMarkers(p.getJourney().getMarkers().stream().map(marker -> {
+                ApiProductJourneyMarker journeyMarker = new ApiProductJourneyMarker();
+                journeyMarker.setLatitude(marker.getLatitude());
+                journeyMarker.setLongitude(marker.getLongitude());
+                return journeyMarker;
+            }).collect(Collectors.toList()));
+        }
 
 		return ap;
 	}
