@@ -142,6 +142,7 @@ public class ProductService extends BaseService {
 		em.persist(product.getSustainability());
 		em.persist(product.getSettings());
 		em.persist(product.getComparisonOfPrice());
+		em.persist(product.getBusinessToCustomerSettings());
 		em.persist(product);
 		return new ApiBaseEntity(product);
 	}
@@ -235,6 +236,7 @@ public class ProductService extends BaseService {
     	em.persist(plc.getSustainability());
     	em.persist(plc.getSettings());
     	em.persist(plc.getComparisonOfPrice());
+		em.persist(plc.getBusinessToCustomerSettings());
     	em.persist(plc);
     	
 		ProductLabel pl = new ProductLabel();

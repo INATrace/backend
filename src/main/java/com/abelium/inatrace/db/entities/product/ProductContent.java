@@ -114,6 +114,9 @@ public class ProductContent extends BaseEntity {
 	@Column
 	private Boolean knowledgeBlog;
 
+	@OneToOne
+	private BusinessToCustomerSettings businessToCustomerSettings = new BusinessToCustomerSettings();
+
 	public String getName() {
 		return name;
 	}
@@ -242,4 +245,11 @@ public class ProductContent extends BaseEntity {
 		this.knowledgeBlog = knowledgeBlog;
 	}
 
+	public BusinessToCustomerSettings getBusinessToCustomerSettings() {
+		return businessToCustomerSettings;
+	}
+
+	public void setBusinessToCustomerSettings(BusinessToCustomerSettings businessToCustomerSettings) {
+		this.businessToCustomerSettings = businessToCustomerSettings;
+	}
 }

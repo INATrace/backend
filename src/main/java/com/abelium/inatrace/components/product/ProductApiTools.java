@@ -115,6 +115,7 @@ public class ProductApiTools {
 		ap.knowledgeBlog = p.getKnowledgeBlog();
 		ap.specialityDocument = CommonApiTools.toApiDocument(p.getSpecialityDocument(), userId);
 		ap.specialityDescription = p.getSpecialityDescription();
+		ap.setBusinessToCustomerSettings(toApiBusinessToCustomerSettings(p.getBusinessToCustomerSettings()));
 	}
 	
 	
@@ -268,6 +269,21 @@ public class ProductApiTools {
 
 		return apiProductDataSharingAgreement;
 	}
+
+	public static ApiBusinessToCustomerSettings toApiBusinessToCustomerSettings(BusinessToCustomerSettings businessToCustomerSettings) {
+		if (businessToCustomerSettings == null) {
+			return null;
+		}
+
+		ApiBusinessToCustomerSettings apiBusinessToCustomerSettings = new ApiBusinessToCustomerSettings();
+		apiBusinessToCustomerSettings.setPrimaryColor(businessToCustomerSettings.getPrimaryColor());
+		apiBusinessToCustomerSettings.setSecondaryColor(businessToCustomerSettings.getSecondaryColor());
+		apiBusinessToCustomerSettings.setTernaryColor(businessToCustomerSettings.getTernaryColor());
+		apiBusinessToCustomerSettings.setHeaderColor(businessToCustomerSettings.getHeaderColor());
+		apiBusinessToCustomerSettings.setFooterColor(businessToCustomerSettings.getFooterColor());
+
+		return apiBusinessToCustomerSettings;
+	}
 	
 	public void updateProduct(CustomUserDetails authUser, Product p, ApiProduct pu) throws ApiException {
 
@@ -322,6 +338,9 @@ public class ProductApiTools {
 		if (pu.sustainability != null) updateSustainability(p.getSustainability(), pu.sustainability);
 		if (pu.settings != null) updateSettings(userId, p.getSettings(), pu.settings);
 		if (pu.comparisonOfPrice != null) updateComparisonOfPrice(p.getComparisonOfPrice(), pu.comparisonOfPrice);
+		if (pu.getBusinessToCustomerSettings() != null) {
+			updateBusinessToCustomerSettings(p.getBusinessToCustomerSettings(), pu.getBusinessToCustomerSettings());
+		}
 		p.setSpecialityDocument(commonEngine.fetchDocument(userId, pu.specialityDocument));
 		p.setSpecialityDescription(pu.specialityDescription);
 		p.setKnowledgeBlog(pu.knowledgeBlog);
@@ -406,6 +425,14 @@ public class ProductApiTools {
 	private void updateComparisonOfPrice(ComparisonOfPrice ps, ApiComparisonOfPrice aps) {
 		ps.setPrices(aps.prices);
 		ps.setDescription(aps.description);
+	}
+
+	private void updateBusinessToCustomerSettings(BusinessToCustomerSettings b2c, ApiBusinessToCustomerSettings ab2c) {
+		b2c.setPrimaryColor(ab2c.getPrimaryColor());
+		b2c.setSecondaryColor(ab2c.getSecondaryColor());
+		b2c.setTernaryColor(ab2c.getTernaryColor());
+		b2c.setHeaderColor(ab2c.getHeaderColor());
+		b2c.setFooterColor(ab2c.getFooterColor());
 	}
 	
 	private void updateResponsibility(Long userId, Responsibility r, ApiResponsibility ar) throws ApiException {
