@@ -202,6 +202,8 @@ public class ProductService extends BaseService {
 		ApiProductLabelValuesExtended aplx = new ApiProductLabelValuesExtended();
 		
 		productApiTools.updateApiProductLabelValues(null, pl, aplx);
+
+		productApiTools.loadBusinessToCustomerSettings(pl, aplx);
 		
 		aplx.numberOfBatches = Queries.getCountBy(em, ProductLabelBatch.class, ProductLabelBatch::getLabel, pl);
 		aplx.checkAuthenticityCount = countBatchFields(pl, ProductLabelBatch::getCheckAuthenticity, true);

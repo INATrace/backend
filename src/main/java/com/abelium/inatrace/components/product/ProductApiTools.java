@@ -748,5 +748,38 @@ public class ProductApiTools {
 
 		return apiFinalProduct;
 	}
+
+	public void loadBusinessToCustomerSettings(ProductLabel productLabel, ApiProductLabelValuesExtended apiProductLabelValuesExtended) {
+		if (apiProductLabelValuesExtended.getBusinessToCustomerSettings() == null) {
+			apiProductLabelValuesExtended.setBusinessToCustomerSettings(new ApiBusinessToCustomerSettings());
+		}
+		ApiBusinessToCustomerSettings b2cSettings = apiProductLabelValuesExtended.getBusinessToCustomerSettings();
+
+		// Load B2C settings from product
+		BusinessToCustomerSettings b2cSettingsProduct = productLabel.getProduct().getBusinessToCustomerSettings();
+		b2cSettings.setPrimaryColor(b2cSettingsProduct.getPrimaryColor());
+		b2cSettings.setSecondaryColor(b2cSettingsProduct.getSecondaryColor());
+		b2cSettings.setTernaryColor(b2cSettingsProduct.getTernaryColor());
+		b2cSettings.setHeaderColor(b2cSettingsProduct.getHeaderColor());
+		b2cSettings.setFooterColor(b2cSettingsProduct.getFooterColor());
+
+		// If product label defines values, overwrite settings from product
+		BusinessToCustomerSettings b2cSettingsProductLabel = productLabel.getContent().getBusinessToCustomerSettings();
+		if (b2cSettingsProductLabel.getPrimaryColor() != null) {
+			b2cSettings.setPrimaryColor(b2cSettingsProductLabel.getPrimaryColor());
+		}
+		if (b2cSettingsProductLabel.getSecondaryColor() != null) {
+			b2cSettings.setSecondaryColor(b2cSettingsProductLabel.getSecondaryColor());
+		}
+		if (b2cSettingsProductLabel.getTernaryColor() != null) {
+			b2cSettings.setTernaryColor(b2cSettingsProductLabel.getTernaryColor());
+		}
+		if (b2cSettingsProductLabel.getHeaderColor() != null) {
+			b2cSettings.setHeaderColor(b2cSettingsProductLabel.getHeaderColor());
+		}
+		if (b2cSettingsProductLabel.getFooterColor() != null) {
+			b2cSettings.setFooterColor(b2cSettingsProductLabel.getFooterColor());
+		}
+	}
 	
 }
