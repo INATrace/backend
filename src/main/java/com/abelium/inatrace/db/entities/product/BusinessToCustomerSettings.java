@@ -15,20 +15,29 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     @Version
     private Long entityVersion;
 
-    @Column(name = "primary_color", length = Lengths.HEX_COLOR_ALPHA)
+    @Column(name = "primary_color", length = Lengths.HEX_COLOR)
     private String primaryColor;
 
-    @Column(name = "secondary_color", length = Lengths.HEX_COLOR_ALPHA)
+    @Column(name = "secondary_color", length = Lengths.HEX_COLOR)
     private String secondaryColor;
 
-    @Column(name = "ternary_color", length = Lengths.HEX_COLOR_ALPHA)
-    private String ternaryColor;
+    @Column(name = "heading_color", length = Lengths.HEX_COLOR)
+    private String headingColor;
 
-    @Column(name = "header_color", length = Lengths.HEX_COLOR_ALPHA)
-    private String headerColor;
+    @Column(name = "text_color", length = Lengths.HEX_COLOR)
+    private String textColor;
 
-    @Column(name = "footer_color", length = Lengths.HEX_COLOR_ALPHA)
-    private String footerColor;
+    @Column(name = "tab_fair_prices")
+    private Boolean tabFairPrices;
+
+    @Column(name = "tab_producers")
+    private Boolean tabProducers;
+
+    @Column(name = "tab_quality")
+    private Boolean tabQuality;
+
+    @Column(name = "tab_feedback")
+    private Boolean tabFeedback;
 
     public String getPrimaryColor() {
         return primaryColor;
@@ -46,27 +55,51 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.secondaryColor = secondaryColor;
     }
 
-    public String getTernaryColor() {
-        return ternaryColor;
+    public String getHeadingColor() {
+        return headingColor;
     }
 
-    public void setTernaryColor(String ternaryColor) {
-        this.ternaryColor = ternaryColor;
+    public void setHeadingColor(String headingColor) {
+        this.headingColor = headingColor;
     }
 
-    public String getHeaderColor() {
-        return headerColor;
+    public String getTextColor() {
+        return textColor;
     }
 
-    public void setHeaderColor(String headerColor) {
-        this.headerColor = headerColor;
+    public void setTextColor(String textColor) {
+        this.textColor = textColor;
     }
 
-    public String getFooterColor() {
-        return footerColor;
+    public Boolean getTabFairPrices() {
+        return tabFairPrices;
     }
 
-    public void setFooterColor(String footerColor) {
-        this.footerColor = footerColor;
+    public void setTabFairPrices(Boolean tabFairPrices) {
+        this.tabFairPrices = tabFairPrices;
+    }
+
+    public Boolean getTabProducers() {
+        return tabProducers;
+    }
+
+    public void setTabProducers(Boolean tabProducers) {
+        this.tabProducers = tabProducers;
+    }
+
+    public Boolean getTabQuality() {
+        return tabQuality;
+    }
+
+    public void setTabQuality(Boolean tabQuality) {
+        this.tabQuality = tabQuality;
+    }
+
+    public Boolean getTabFeedback() {
+        return tabFeedback;
+    }
+
+    public void setTabFeedback(Boolean tabFeedback) {
+        this.tabFeedback = tabFeedback;
     }
 }

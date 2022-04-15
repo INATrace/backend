@@ -278,9 +278,12 @@ public class ProductApiTools {
 		ApiBusinessToCustomerSettings apiBusinessToCustomerSettings = new ApiBusinessToCustomerSettings();
 		apiBusinessToCustomerSettings.setPrimaryColor(businessToCustomerSettings.getPrimaryColor());
 		apiBusinessToCustomerSettings.setSecondaryColor(businessToCustomerSettings.getSecondaryColor());
-		apiBusinessToCustomerSettings.setTernaryColor(businessToCustomerSettings.getTernaryColor());
-		apiBusinessToCustomerSettings.setHeaderColor(businessToCustomerSettings.getHeaderColor());
-		apiBusinessToCustomerSettings.setFooterColor(businessToCustomerSettings.getFooterColor());
+		apiBusinessToCustomerSettings.setHeadingColor(businessToCustomerSettings.getHeadingColor());
+		apiBusinessToCustomerSettings.setTextColor(businessToCustomerSettings.getTextColor());
+		apiBusinessToCustomerSettings.setTabFairPrices(businessToCustomerSettings.getTabFairPrices());
+		apiBusinessToCustomerSettings.setTabFeedback(businessToCustomerSettings.getTabFeedback());
+		apiBusinessToCustomerSettings.setTabProducers(businessToCustomerSettings.getTabProducers());
+		apiBusinessToCustomerSettings.setTabQuality(businessToCustomerSettings.getTabQuality());
 
 		return apiBusinessToCustomerSettings;
 	}
@@ -430,9 +433,12 @@ public class ProductApiTools {
 	private void updateBusinessToCustomerSettings(BusinessToCustomerSettings b2c, ApiBusinessToCustomerSettings ab2c) {
 		b2c.setPrimaryColor(ab2c.getPrimaryColor());
 		b2c.setSecondaryColor(ab2c.getSecondaryColor());
-		b2c.setTernaryColor(ab2c.getTernaryColor());
-		b2c.setHeaderColor(ab2c.getHeaderColor());
-		b2c.setFooterColor(ab2c.getFooterColor());
+		b2c.setHeadingColor(ab2c.getHeadingColor());
+		b2c.setTextColor(ab2c.getTextColor());
+		b2c.setTabFairPrices(ab2c.getTabFairPrices());
+		b2c.setTabFeedback(ab2c.getTabFeedback());
+		b2c.setTabProducers(ab2c.getTabProducers());
+		b2c.setTabQuality(ab2c.getTabQuality());
 	}
 	
 	private void updateResponsibility(Long userId, Responsibility r, ApiResponsibility ar) throws ApiException {
@@ -759,9 +765,8 @@ public class ProductApiTools {
 		BusinessToCustomerSettings b2cSettingsProduct = productLabel.getProduct().getBusinessToCustomerSettings();
 		b2cSettings.setPrimaryColor(b2cSettingsProduct.getPrimaryColor());
 		b2cSettings.setSecondaryColor(b2cSettingsProduct.getSecondaryColor());
-		b2cSettings.setTernaryColor(b2cSettingsProduct.getTernaryColor());
-		b2cSettings.setHeaderColor(b2cSettingsProduct.getHeaderColor());
-		b2cSettings.setFooterColor(b2cSettingsProduct.getFooterColor());
+		b2cSettings.setHeadingColor(b2cSettings.getHeadingColor());
+		b2cSettings.setTextColor(b2cSettings.getTextColor());
 
 		// If product label defines values, overwrite settings from product
 		BusinessToCustomerSettings b2cSettingsProductLabel = productLabel.getContent().getBusinessToCustomerSettings();
@@ -771,14 +776,23 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getSecondaryColor() != null) {
 			b2cSettings.setSecondaryColor(b2cSettingsProductLabel.getSecondaryColor());
 		}
-		if (b2cSettingsProductLabel.getTernaryColor() != null) {
-			b2cSettings.setTernaryColor(b2cSettingsProductLabel.getTernaryColor());
+		if (b2cSettingsProductLabel.getHeadingColor() != null) {
+			b2cSettings.setHeadingColor(b2cSettingsProductLabel.getHeadingColor());
 		}
-		if (b2cSettingsProductLabel.getHeaderColor() != null) {
-			b2cSettings.setHeaderColor(b2cSettingsProductLabel.getHeaderColor());
+		if (b2cSettingsProductLabel.getTextColor() != null) {
+			b2cSettings.setTextColor(b2cSettingsProductLabel.getTextColor());
 		}
-		if (b2cSettingsProductLabel.getFooterColor() != null) {
-			b2cSettings.setFooterColor(b2cSettingsProductLabel.getFooterColor());
+		if (b2cSettingsProductLabel.getTabFairPrices() != null) {
+			b2cSettings.setTabFairPrices(b2cSettingsProductLabel.getTabFairPrices());
+		}
+		if (b2cSettingsProductLabel.getTabFeedback() != null) {
+			b2cSettings.setTabFeedback(b2cSettingsProductLabel.getTabFeedback());
+		}
+		if (b2cSettingsProductLabel.getTabProducers() != null) {
+			b2cSettings.setTabProducers(b2cSettingsProductLabel.getTabProducers());
+		}
+		if (b2cSettingsProductLabel.getTabQuality() != null) {
+			b2cSettings.setTabQuality(b2cSettingsProductLabel.getTabQuality());
 		}
 	}
 	

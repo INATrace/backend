@@ -91,6 +91,6 @@ public class Lengths
     public static final int ANALYTICS_KEY = 64;
 
     // B2C settings
-    public static final int HEX_COLOR_ALPHA = 9;
+    public static final int HEX_COLOR = 7;
 
 }

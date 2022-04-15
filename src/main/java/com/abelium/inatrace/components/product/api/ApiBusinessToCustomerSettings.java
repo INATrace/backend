@@ -6,9 +6,12 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
 
     private String primaryColor;
     private String secondaryColor;
-    private String ternaryColor;
-    private String headerColor;
-    private String footerColor;
+    private String headingColor;
+    private String textColor;
+    private Boolean tabFairPrices;
+    private Boolean tabProducers;
+    private Boolean tabQuality;
+    private Boolean tabFeedback;
 
     public String getPrimaryColor() {
         return primaryColor;
@@ -26,27 +29,51 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
         this.secondaryColor = secondaryColor;
     }
 
-    public String getTernaryColor() {
-        return ternaryColor;
+    public String getHeadingColor() {
+        return headingColor;
     }
 
-    public void setTernaryColor(String ternaryColor) {
-        this.ternaryColor = ternaryColor;
+    public void setHeadingColor(String headingColor) {
+        this.headingColor = headingColor;
     }
 
-    public String getHeaderColor() {
-        return headerColor;
+    public String getTextColor() {
+        return textColor;
     }
 
-    public void setHeaderColor(String headerColor) {
-        this.headerColor = headerColor;
+    public void setTextColor(String textColor) {
+        this.textColor = textColor;
     }
 
-    public String getFooterColor() {
-        return footerColor;
+    public Boolean getTabFairPrices() {
+        return tabFairPrices;
     }
 
-    public void setFooterColor(String footerColor) {
-        this.footerColor = footerColor;
+    public void setTabFairPrices(Boolean tabFairPrices) {
+        this.tabFairPrices = tabFairPrices;
+    }
+
+    public Boolean getTabProducers() {
+        return tabProducers;
+    }
+
+    public void setTabProducers(Boolean tabProducers) {
+        this.tabProducers = tabProducers;
+    }
+
+    public Boolean getTabQuality() {
+        return tabQuality;
+    }
+
+    public void setTabQuality(Boolean tabQuality) {
+        this.tabQuality = tabQuality;
+    }
+
+    public Boolean getTabFeedback() {
+        return tabFeedback;
+    }
+
+    public void setTabFeedback(Boolean tabFeedback) {
+        this.tabFeedback = tabFeedback;
     }
 }
