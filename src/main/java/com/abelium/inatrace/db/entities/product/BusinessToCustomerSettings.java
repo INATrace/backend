@@ -102,4 +102,19 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     public void setTabFeedback(Boolean tabFeedback) {
         this.tabFeedback = tabFeedback;
     }
+
+    public BusinessToCustomerSettings copy() {
+        BusinessToCustomerSettings businessToCustomerSettings = new BusinessToCustomerSettings();
+
+        businessToCustomerSettings.setPrimaryColor(getPrimaryColor());
+        businessToCustomerSettings.setSecondaryColor(getSecondaryColor());
+        businessToCustomerSettings.setHeadingColor(getHeadingColor());
+        businessToCustomerSettings.setTextColor(getTextColor());
+        businessToCustomerSettings.setTabFairPrices(getTabFairPrices());
+        businessToCustomerSettings.setTabProducers(getTabProducers());
+        businessToCustomerSettings.setTabQuality(getTabQuality());
+        businessToCustomerSettings.setTabFeedback(getTabFeedback());
+
+        return businessToCustomerSettings;
+    }
 }

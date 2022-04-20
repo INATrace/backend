@@ -343,6 +343,19 @@ public class ProductApiTools {
 		if (pu.comparisonOfPrice != null) updateComparisonOfPrice(p.getComparisonOfPrice(), pu.comparisonOfPrice);
 		if (pu.getBusinessToCustomerSettings() != null) {
 			updateBusinessToCustomerSettings(p.getBusinessToCustomerSettings(), pu.getBusinessToCustomerSettings());
+		} else {
+			// Fill defaults
+			ApiBusinessToCustomerSettings apiBusinessToCustomerSettings = new ApiBusinessToCustomerSettings();
+			apiBusinessToCustomerSettings.setPrimaryColor("#25265e");
+			apiBusinessToCustomerSettings.setSecondaryColor("#5dbccf");
+			apiBusinessToCustomerSettings.setHeadingColor("#000000");
+			apiBusinessToCustomerSettings.setTextColor("#000000");
+			apiBusinessToCustomerSettings.setTabFairPrices(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setTabProducers(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setTabQuality(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setTabFeedback(Boolean.TRUE);
+
+			updateBusinessToCustomerSettings(p.getBusinessToCustomerSettings(), apiBusinessToCustomerSettings);
 		}
 		p.setSpecialityDocument(commonEngine.fetchDocument(userId, pu.specialityDocument));
 		p.setSpecialityDescription(pu.specialityDescription);

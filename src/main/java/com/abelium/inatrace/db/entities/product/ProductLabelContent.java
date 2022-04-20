@@ -63,6 +63,7 @@ public class ProductLabelContent extends ProductContent {
 		plc.setComparisonOfPrice(p.getComparisonOfPrice().copy());
 		plc.setCompany(p.getCompany()); // no copy -- read only!
 		plc.setOriginLocations(p.getOriginLocations().stream().map(ProductLocation::copy).collect(Collectors.toList()));
+		plc.setBusinessToCustomerSettings(p.getBusinessToCustomerSettings().copy());
 		return plc;
 	}
 }
