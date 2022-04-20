@@ -172,6 +172,11 @@ public class ProductService extends BaseService {
 			p.setComparisonOfPrice(new ComparisonOfPrice());
 			em.persist(p.getComparisonOfPrice());
 		}
+        
+        if (p.getJourney() == null) {
+            p.setJourney(new ProductJourney());
+            em.persist(p.getJourney());
+        }
 
 		productApiTools.updateProduct(authUser, p, ap);
 	}
@@ -235,6 +240,7 @@ public class ProductService extends BaseService {
     	em.persist(plc.getSustainability());
     	em.persist(plc.getSettings());
     	em.persist(plc.getComparisonOfPrice());
+        em.persist(plc.getJourney());
     	em.persist(plc);
     	
 		ProductLabel pl = new ProductLabel();
@@ -266,6 +272,13 @@ public class ProductService extends BaseService {
 	public ApiDefaultResponse updateProductLabelContent(CustomUserDetails authUser, ApiProductLabelContent request) throws ApiException {
 		ProductLabel pl = productQueries.fetchProductLabelAssoc(authUser, request.labelId);
 		ProductLabelContent plc = pl.getContent();
+        
+        if (plc.getJourney() == null) {
+            ProductJourney journey = new ProductJourney();
+            em.persist(journey);
+            plc.setJourney(journey);
+        }
+        
 		productApiTools.updateProductLabelContent(authUser.getUserId(), plc, request);
 		return new ApiDefaultResponse();
 	}    

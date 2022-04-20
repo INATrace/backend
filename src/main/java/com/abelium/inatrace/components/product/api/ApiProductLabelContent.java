@@ -8,6 +8,8 @@ import com.abelium.inatrace.components.company.api.ApiCompany;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.List;
+
 @Validated
 public class ApiProductLabelContent extends ApiProductContent {
 
@@ -17,7 +19,9 @@ public class ApiProductLabelContent extends ApiProductContent {
 	
 	@ApiModelProperty(value = "label id", position = 21)
 	public Long labelId;
-	
+    
+    @ApiModelProperty(value = "Product journey path")
+    private List<ApiProductJourneyMarker> journeyMarkers;
 
 	public ApiCompany getCompany() {
 		return company;
@@ -34,5 +38,12 @@ public class ApiProductLabelContent extends ApiProductContent {
 	public void setLabelId(Long labelId) {
 		this.labelId = labelId;
 	}
-
+    
+    public List<ApiProductJourneyMarker> getJourneyMarkers() {
+        return journeyMarkers;
+    }
+    
+    public void setJourneyMarkers(List<ApiProductJourneyMarker> journeyMarkers) {
+        this.journeyMarkers = journeyMarkers;
+    }
 }

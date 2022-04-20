@@ -81,6 +81,15 @@ public class ProductApiTools {
 		ap.setDataSharingAgreements(p.getDataSharingAgreements().stream()
 				.map(pdsa -> ProductApiTools.toApiProductDataSharingAgreement(pdsa, userId))
 				.collect(Collectors.toList()));
+        
+        if (p.getJourney() != null) {
+            ap.setJourneyMarkers(p.getJourney().getMarkers().stream().map(marker -> {
+                ApiProductJourneyMarker journeyMarker = new ApiProductJourneyMarker();
+                journeyMarker.setLatitude(marker.getLatitude());
+                journeyMarker.setLongitude(marker.getLongitude());
+                return journeyMarker;
+            }).collect(Collectors.toList()));
+        }
 
 		return ap;
 	}
@@ -93,6 +102,16 @@ public class ProductApiTools {
 		
 		ap.origin.locations = p.getOriginLocations().stream().map(ProductApiTools::toApiLocation).collect(Collectors.toList());
 		ap.company = companyApiTools.toApiCompany(userId, p.getCompany(), null);
+        
+        if (p.getJourney() != null && p.getJourney().getMarkers() != null) {
+            ap.setJourneyMarkers(p.getJourney().getMarkers().stream().map(marker -> {
+                ApiProductJourneyMarker journeyMarker = new ApiProductJourneyMarker();
+                journeyMarker.setLatitude(marker.getLatitude());
+                journeyMarker.setLongitude(marker.getLongitude());
+                return journeyMarker;
+            }).collect(Collectors.toList()));
+        }
+        
 		return ap;
 	}
 	
@@ -285,6 +304,19 @@ public class ProductApiTools {
 		if (pu.associatedCompanies != null && authUser.getUserRole() == UserRole.ADMIN) {
 			updateProductCompanies(p, p.getAssociatedCompanies(), pu.associatedCompanies);
 		}
+        
+        // Update product journey
+        if (pu.getJourneyMarkers() != null) {
+            List<ProductJourney.JourneyMarker> markers = pu.getJourneyMarkers()
+                .stream()
+                .map(marker -> {
+                    ProductJourney.JourneyMarker m = new ProductJourney.JourneyMarker();
+                    m.setLongitude(marker.getLongitude());
+                    m.setLatitude(marker.getLatitude());
+                    return m;
+                }).collect(Collectors.toList());
+            p.getJourney().setMarkers(markers);
+        }
 
 		// Update the data sharing agreements
 		p.getDataSharingAgreements().removeIf(pdsa -> pu.getDataSharingAgreements().stream().noneMatch(item -> pdsa.getId().equals(item.getId())));
@@ -332,6 +364,19 @@ public class ProductApiTools {
 		if (pu.origin != null) {
 			if (pu.origin.locations != null) updateOriginLocations(p, p.getOriginLocations(), pu.origin.locations);
 		}
+        
+        // Update product journey
+        if (pu.getJourneyMarkers() != null) {
+            List<ProductJourney.JourneyMarker> markers = pu.getJourneyMarkers()
+                .stream()
+                .map(marker -> {
+                    ProductJourney.JourneyMarker m = new ProductJourney.JourneyMarker();
+                    m.setLongitude(marker.getLongitude());
+                    m.setLatitude(marker.getLatitude());
+                    return m;
+                }).collect(Collectors.toList());
+            p.getJourney().setMarkers(markers);
+        }
 	}
 	
 	private void updateProductCompanies(Product p, List<ProductCompany> ac, List<ApiProductCompany> aac) throws ApiException {
