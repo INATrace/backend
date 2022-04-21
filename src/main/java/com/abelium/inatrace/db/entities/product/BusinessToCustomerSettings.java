@@ -2,11 +2,9 @@ package com.abelium.inatrace.db.entities.product;
 
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
+import com.abelium.inatrace.db.entities.common.Document;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Version;
+import javax.persistence.*;
 
 @Entity
 @Table
@@ -38,6 +36,15 @@ public class BusinessToCustomerSettings extends TimestampEntity {
 
     @Column(name = "tab_feedback")
     private Boolean tabFeedback;
+
+    @OneToOne
+    private Document font;
+
+    @OneToOne
+    private Document headerImage;
+
+    @OneToOne
+    private Document footerImage;
 
     public String getPrimaryColor() {
         return primaryColor;
@@ -103,6 +110,30 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.tabFeedback = tabFeedback;
     }
 
+    public Document getFont() {
+        return font;
+    }
+
+    public void setFont(Document font) {
+        this.font = font;
+    }
+
+    public Document getHeaderImage() {
+        return headerImage;
+    }
+
+    public void setHeaderImage(Document headerImage) {
+        this.headerImage = headerImage;
+    }
+
+    public Document getFooterImage() {
+        return footerImage;
+    }
+
+    public void setFooterImage(Document footerImage) {
+        this.footerImage = footerImage;
+    }
+
     public BusinessToCustomerSettings copy() {
         BusinessToCustomerSettings businessToCustomerSettings = new BusinessToCustomerSettings();
 
@@ -114,6 +145,9 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         businessToCustomerSettings.setTabProducers(getTabProducers());
         businessToCustomerSettings.setTabQuality(getTabQuality());
         businessToCustomerSettings.setTabFeedback(getTabFeedback());
+        businessToCustomerSettings.setFont(getFont());
+        businessToCustomerSettings.setHeaderImage(getHeaderImage());
+        businessToCustomerSettings.setFooterImage(getFooterImage());
 
         return businessToCustomerSettings;
     }

@@ -1,6 +1,7 @@
 package com.abelium.inatrace.components.product.api;
 
 import com.abelium.inatrace.api.ApiTimestampEntity;
+import com.abelium.inatrace.components.common.api.ApiDocument;
 
 public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
 
@@ -12,6 +13,9 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
     private Boolean tabProducers;
     private Boolean tabQuality;
     private Boolean tabFeedback;
+    private ApiDocument font;
+    private ApiDocument headerImage;
+    private ApiDocument footerImage;
 
     public String getPrimaryColor() {
         return primaryColor;
@@ -75,5 +79,29 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
 
     public void setTabFeedback(Boolean tabFeedback) {
         this.tabFeedback = tabFeedback;
+    }
+
+    public ApiDocument getFont() {
+        return font;
+    }
+
+    public void setFont(ApiDocument font) {
+        this.font = font;
+    }
+
+    public ApiDocument getHeaderImage() {
+        return headerImage;
+    }
+
+    public void setHeaderImage(ApiDocument headerImage) {
+        this.headerImage = headerImage;
+    }
+
+    public ApiDocument getFooterImage() {
+        return footerImage;
+    }
+
+    public void setFooterImage(ApiDocument footerImage) {
+        this.footerImage = footerImage;
     }
 }

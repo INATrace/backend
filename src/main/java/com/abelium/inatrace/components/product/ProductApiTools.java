@@ -115,7 +115,7 @@ public class ProductApiTools {
 		ap.knowledgeBlog = p.getKnowledgeBlog();
 		ap.specialityDocument = CommonApiTools.toApiDocument(p.getSpecialityDocument(), userId);
 		ap.specialityDescription = p.getSpecialityDescription();
-		ap.setBusinessToCustomerSettings(toApiBusinessToCustomerSettings(p.getBusinessToCustomerSettings()));
+		ap.setBusinessToCustomerSettings(toApiBusinessToCustomerSettings(p.getBusinessToCustomerSettings(), userId));
 	}
 	
 	
@@ -270,7 +270,7 @@ public class ProductApiTools {
 		return apiProductDataSharingAgreement;
 	}
 
-	public static ApiBusinessToCustomerSettings toApiBusinessToCustomerSettings(BusinessToCustomerSettings businessToCustomerSettings) {
+	public static ApiBusinessToCustomerSettings toApiBusinessToCustomerSettings(BusinessToCustomerSettings businessToCustomerSettings, Long userId) {
 		if (businessToCustomerSettings == null) {
 			return null;
 		}
@@ -284,6 +284,9 @@ public class ProductApiTools {
 		apiBusinessToCustomerSettings.setTabFeedback(businessToCustomerSettings.getTabFeedback());
 		apiBusinessToCustomerSettings.setTabProducers(businessToCustomerSettings.getTabProducers());
 		apiBusinessToCustomerSettings.setTabQuality(businessToCustomerSettings.getTabQuality());
+		apiBusinessToCustomerSettings.setFont(CommonApiTools.toApiDocument(businessToCustomerSettings.getFont(), userId));
+		apiBusinessToCustomerSettings.setHeaderImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderImage(), userId));
+		apiBusinessToCustomerSettings.setFooterImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getFooterImage(), userId));
 
 		return apiBusinessToCustomerSettings;
 	}
@@ -342,7 +345,7 @@ public class ProductApiTools {
 		if (pu.settings != null) updateSettings(userId, p.getSettings(), pu.settings);
 		if (pu.comparisonOfPrice != null) updateComparisonOfPrice(p.getComparisonOfPrice(), pu.comparisonOfPrice);
 		if (pu.getBusinessToCustomerSettings() != null) {
-			updateBusinessToCustomerSettings(p.getBusinessToCustomerSettings(), pu.getBusinessToCustomerSettings());
+			updateBusinessToCustomerSettings(userId, p.getBusinessToCustomerSettings(), pu.getBusinessToCustomerSettings());
 		} else {
 			// Fill defaults
 			ApiBusinessToCustomerSettings apiBusinessToCustomerSettings = new ApiBusinessToCustomerSettings();
@@ -355,7 +358,7 @@ public class ProductApiTools {
 			apiBusinessToCustomerSettings.setTabQuality(Boolean.TRUE);
 			apiBusinessToCustomerSettings.setTabFeedback(Boolean.TRUE);
 
-			updateBusinessToCustomerSettings(p.getBusinessToCustomerSettings(), apiBusinessToCustomerSettings);
+			updateBusinessToCustomerSettings(userId, p.getBusinessToCustomerSettings(), apiBusinessToCustomerSettings);
 		}
 		p.setSpecialityDocument(commonEngine.fetchDocument(userId, pu.specialityDocument));
 		p.setSpecialityDescription(pu.specialityDescription);
@@ -443,7 +446,7 @@ public class ProductApiTools {
 		ps.setDescription(aps.description);
 	}
 
-	private void updateBusinessToCustomerSettings(BusinessToCustomerSettings b2c, ApiBusinessToCustomerSettings ab2c) {
+	private void updateBusinessToCustomerSettings(Long userId, BusinessToCustomerSettings b2c, ApiBusinessToCustomerSettings ab2c) throws ApiException {
 		b2c.setPrimaryColor(ab2c.getPrimaryColor());
 		b2c.setSecondaryColor(ab2c.getSecondaryColor());
 		b2c.setHeadingColor(ab2c.getHeadingColor());
@@ -452,6 +455,9 @@ public class ProductApiTools {
 		b2c.setTabFeedback(ab2c.getTabFeedback());
 		b2c.setTabProducers(ab2c.getTabProducers());
 		b2c.setTabQuality(ab2c.getTabQuality());
+		b2c.setFont(commonEngine.fetchDocument(userId, ab2c.getFont()));
+		b2c.setHeaderImage(commonEngine.fetchDocument(userId, ab2c.getHeaderImage()));
+		b2c.setFooterImage(commonEngine.fetchDocument(userId, ab2c.getFooterImage()));
 	}
 	
 	private void updateResponsibility(Long userId, Responsibility r, ApiResponsibility ar) throws ApiException {
