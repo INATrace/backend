@@ -19,6 +19,12 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     @Column(name = "secondary_color", length = Lengths.HEX_COLOR)
     private String secondaryColor;
 
+    @Column(name = "tertiary_color", length = Lengths.HEX_COLOR)
+    private String tertiaryColor;
+
+    @Column(name = "quaternary_color", length = Lengths.HEX_COLOR)
+    private String quaternaryColor;
+
     @Column(name = "heading_color", length = Lengths.HEX_COLOR)
     private String headingColor;
 
@@ -60,6 +66,22 @@ public class BusinessToCustomerSettings extends TimestampEntity {
 
     public void setSecondaryColor(String secondaryColor) {
         this.secondaryColor = secondaryColor;
+    }
+
+    public String getTertiaryColor() {
+        return tertiaryColor;
+    }
+
+    public void setTertiaryColor(String tertiaryColor) {
+        this.tertiaryColor = tertiaryColor;
+    }
+
+    public String getQuaternaryColor() {
+        return quaternaryColor;
+    }
+
+    public void setQuaternaryColor(String quaternaryColor) {
+        this.quaternaryColor = quaternaryColor;
     }
 
     public String getHeadingColor() {
@@ -139,6 +161,8 @@ public class BusinessToCustomerSettings extends TimestampEntity {
 
         businessToCustomerSettings.setPrimaryColor(getPrimaryColor());
         businessToCustomerSettings.setSecondaryColor(getSecondaryColor());
+        businessToCustomerSettings.setTertiaryColor(getTertiaryColor());
+        businessToCustomerSettings.setQuaternaryColor(getQuaternaryColor());
         businessToCustomerSettings.setHeadingColor(getHeadingColor());
         businessToCustomerSettings.setTextColor(getTextColor());
         businessToCustomerSettings.setTabFairPrices(getTabFairPrices());

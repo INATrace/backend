@@ -278,6 +278,8 @@ public class ProductApiTools {
 		ApiBusinessToCustomerSettings apiBusinessToCustomerSettings = new ApiBusinessToCustomerSettings();
 		apiBusinessToCustomerSettings.setPrimaryColor(businessToCustomerSettings.getPrimaryColor());
 		apiBusinessToCustomerSettings.setSecondaryColor(businessToCustomerSettings.getSecondaryColor());
+		apiBusinessToCustomerSettings.setTertiaryColor(businessToCustomerSettings.getTertiaryColor());
+		apiBusinessToCustomerSettings.setQuaternaryColor(businessToCustomerSettings.getQuaternaryColor());
 		apiBusinessToCustomerSettings.setHeadingColor(businessToCustomerSettings.getHeadingColor());
 		apiBusinessToCustomerSettings.setTextColor(businessToCustomerSettings.getTextColor());
 		apiBusinessToCustomerSettings.setTabFairPrices(businessToCustomerSettings.getTabFairPrices());
@@ -349,8 +351,10 @@ public class ProductApiTools {
 		} else {
 			// Fill defaults
 			ApiBusinessToCustomerSettings apiBusinessToCustomerSettings = new ApiBusinessToCustomerSettings();
-			apiBusinessToCustomerSettings.setPrimaryColor("#25265e");
-			apiBusinessToCustomerSettings.setSecondaryColor("#5dbccf");
+			apiBusinessToCustomerSettings.setPrimaryColor("#5c267b");
+			apiBusinessToCustomerSettings.setSecondaryColor("#0fae94");
+			apiBusinessToCustomerSettings.setTertiaryColor("#ac1b56");
+			apiBusinessToCustomerSettings.setQuaternaryColor("#e3b22b");
 			apiBusinessToCustomerSettings.setHeadingColor("#000000");
 			apiBusinessToCustomerSettings.setTextColor("#000000");
 			apiBusinessToCustomerSettings.setTabFairPrices(Boolean.TRUE);
@@ -449,6 +453,8 @@ public class ProductApiTools {
 	private void updateBusinessToCustomerSettings(Long userId, BusinessToCustomerSettings b2c, ApiBusinessToCustomerSettings ab2c) throws ApiException {
 		b2c.setPrimaryColor(ab2c.getPrimaryColor());
 		b2c.setSecondaryColor(ab2c.getSecondaryColor());
+		b2c.setTertiaryColor(ab2c.getTertiaryColor());
+		b2c.setQuaternaryColor(ab2c.getQuaternaryColor());
 		b2c.setHeadingColor(ab2c.getHeadingColor());
 		b2c.setTextColor(ab2c.getTextColor());
 		b2c.setTabFairPrices(ab2c.getTabFairPrices());
@@ -784,11 +790,16 @@ public class ProductApiTools {
 		BusinessToCustomerSettings b2cSettingsProduct = productLabel.getProduct().getBusinessToCustomerSettings();
 		b2cSettings.setPrimaryColor(b2cSettingsProduct.getPrimaryColor());
 		b2cSettings.setSecondaryColor(b2cSettingsProduct.getSecondaryColor());
+		b2cSettings.setTertiaryColor(b2cSettingsProduct.getTertiaryColor());
+		b2cSettings.setQuaternaryColor(b2cSettingsProduct.getQuaternaryColor());
 		b2cSettings.setHeadingColor(b2cSettingsProduct.getHeadingColor());
 		b2cSettings.setTextColor(b2cSettingsProduct.getTextColor());
 		b2cSettings.setFont(CommonApiTools.toApiDocument(b2cSettingsProduct.getFont(), null));
 		b2cSettings.setHeaderImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderImage(), null));
 		b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getFooterImage(), null));
+		b2cSettings.getFont().setStorageKey(StorageKeyCache.put(b2cSettingsProduct.getFont().getStorageKey(), null));
+		b2cSettings.getHeaderImage().setStorageKey(StorageKeyCache.put(b2cSettingsProduct.getHeaderImage().getStorageKey(), null));
+		b2cSettings.getFooterImage().setStorageKey(StorageKeyCache.put(b2cSettingsProduct.getFooterImage().getStorageKey(), null));
 
 		// If product label defines values, overwrite settings from product
 		BusinessToCustomerSettings b2cSettingsProductLabel = productLabel.getContent().getBusinessToCustomerSettings();
@@ -797,6 +808,12 @@ public class ProductApiTools {
 		}
 		if (b2cSettingsProductLabel.getSecondaryColor() != null) {
 			b2cSettings.setSecondaryColor(b2cSettingsProductLabel.getSecondaryColor());
+		}
+		if (b2cSettingsProductLabel.getTertiaryColor() != null) {
+			b2cSettings.setTertiaryColor(b2cSettingsProductLabel.getTertiaryColor());
+		}
+		if (b2cSettingsProductLabel.getQuaternaryColor() != null) {
+			b2cSettings.setQuaternaryColor(b2cSettingsProductLabel.getQuaternaryColor());
 		}
 		if (b2cSettingsProductLabel.getHeadingColor() != null) {
 			b2cSettings.setHeadingColor(b2cSettingsProductLabel.getHeadingColor());
@@ -825,6 +842,10 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getFooterImage() != null) {
 			b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getFooterImage(), null));
 		}
+
+		b2cSettings.getFont().setStorageKey(StorageKeyCache.put(b2cSettingsProductLabel.getFont().getStorageKey(), null));
+		b2cSettings.getHeaderImage().setStorageKey(StorageKeyCache.put(b2cSettingsProductLabel.getHeaderImage().getStorageKey(), null));
+		b2cSettings.getFooterImage().setStorageKey(StorageKeyCache.put(b2cSettingsProductLabel.getFooterImage().getStorageKey(), null));
 	}
 	
 }

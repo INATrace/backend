@@ -7,6 +7,8 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
 
     private String primaryColor;
     private String secondaryColor;
+    private String tertiaryColor;
+    private String quaternaryColor;
     private String headingColor;
     private String textColor;
     private Boolean tabFairPrices;
@@ -31,6 +33,22 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
 
     public void setSecondaryColor(String secondaryColor) {
         this.secondaryColor = secondaryColor;
+    }
+
+    public String getTertiaryColor() {
+        return tertiaryColor;
+    }
+
+    public void setTertiaryColor(String tertiaryColor) {
+        this.tertiaryColor = tertiaryColor;
+    }
+
+    public String getQuaternaryColor() {
+        return quaternaryColor;
+    }
+
+    public void setQuaternaryColor(String quaternaryColor) {
+        this.quaternaryColor = quaternaryColor;
     }
 
     public String getHeadingColor() {
