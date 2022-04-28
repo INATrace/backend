@@ -797,9 +797,6 @@ public class ProductApiTools {
 		b2cSettings.setFont(CommonApiTools.toApiDocument(b2cSettingsProduct.getFont(), null));
 		b2cSettings.setHeaderImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderImage(), null));
 		b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getFooterImage(), null));
-		b2cSettings.getFont().setStorageKey(StorageKeyCache.put(b2cSettingsProduct.getFont().getStorageKey(), null));
-		b2cSettings.getHeaderImage().setStorageKey(StorageKeyCache.put(b2cSettingsProduct.getHeaderImage().getStorageKey(), null));
-		b2cSettings.getFooterImage().setStorageKey(StorageKeyCache.put(b2cSettingsProduct.getFooterImage().getStorageKey(), null));
 
 		// If product label defines values, overwrite settings from product
 		BusinessToCustomerSettings b2cSettingsProductLabel = productLabel.getContent().getBusinessToCustomerSettings();
@@ -842,10 +839,6 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getFooterImage() != null) {
 			b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getFooterImage(), null));
 		}
-
-		b2cSettings.getFont().setStorageKey(StorageKeyCache.put(b2cSettingsProductLabel.getFont().getStorageKey(), null));
-		b2cSettings.getHeaderImage().setStorageKey(StorageKeyCache.put(b2cSettingsProductLabel.getHeaderImage().getStorageKey(), null));
-		b2cSettings.getFooterImage().setStorageKey(StorageKeyCache.put(b2cSettingsProductLabel.getFooterImage().getStorageKey(), null));
 	}
 	
 }
