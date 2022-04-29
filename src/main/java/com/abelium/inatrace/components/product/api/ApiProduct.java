@@ -26,6 +26,9 @@ public class ApiProduct extends ApiProductContent {
 
 	@ApiModelProperty(value = "Data sharing agreements")
 	private List<ApiProductDataSharingAgreement> dataSharingAgreements;
+    
+    @ApiModelProperty(value = "Product journey path")
+    private List<ApiProductJourneyMarker> journeyMarkers;
 
 	public ApiCompany getCompany() {
 		return company;
@@ -66,5 +69,12 @@ public class ApiProduct extends ApiProductContent {
 	public void setDataSharingAgreements(List<ApiProductDataSharingAgreement> dataSharingAgreements) {
 		this.dataSharingAgreements = dataSharingAgreements;
 	}
-
+    
+    public List<ApiProductJourneyMarker> getJourneyMarkers() {
+        return journeyMarkers;
+    }
+    
+    public void setJourneyMarkers(List<ApiProductJourneyMarker> journeyMarkers) {
+        this.journeyMarkers = journeyMarkers;
+    }
 }

@@ -83,7 +83,13 @@ public class ProductContent extends BaseEntity {
 	 */
 	@OneToOne(fetch = FetchType.LAZY)
 	private Sustainability sustainability = new Sustainability();
-	
+
+    /**
+     * journey coordinates
+     */
+    @OneToOne(fetch = FetchType.LAZY)
+    private ProductJourney journey = new ProductJourney();
+
 	/**
 	 * speciality document
 	 */
@@ -244,6 +250,14 @@ public class ProductContent extends BaseEntity {
 	public void setKnowledgeBlog(Boolean knowledgeBlog) {
 		this.knowledgeBlog = knowledgeBlog;
 	}
+
+    public ProductJourney getJourney() {
+        return journey;
+    }
+
+    public void setJourney(ProductJourney journey) {
+        this.journey = journey;
+    }
 
 	public BusinessToCustomerSettings getBusinessToCustomerSettings() {
 		return businessToCustomerSettings;
