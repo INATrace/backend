@@ -50,6 +50,9 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     private Document headerImage;
 
     @OneToOne
+    private Document headerBackgroundImage;
+
+    @OneToOne
     private Document footerImage;
 
     public String getPrimaryColor() {
@@ -148,6 +151,14 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.headerImage = headerImage;
     }
 
+    public Document getHeaderBackgroundImage() {
+        return headerBackgroundImage;
+    }
+
+    public void setHeaderBackgroundImage(Document headerBackgroundImage) {
+        this.headerBackgroundImage = headerBackgroundImage;
+    }
+
     public Document getFooterImage() {
         return footerImage;
     }
@@ -171,6 +182,7 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         businessToCustomerSettings.setTabFeedback(getTabFeedback());
         businessToCustomerSettings.setFont(getFont());
         businessToCustomerSettings.setHeaderImage(getHeaderImage());
+        businessToCustomerSettings.setHeaderBackgroundImage(getHeaderBackgroundImage());
         businessToCustomerSettings.setFooterImage(getFooterImage());
 
         return businessToCustomerSettings;

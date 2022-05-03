@@ -17,6 +17,7 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
     private Boolean tabFeedback;
     private ApiDocument font;
     private ApiDocument headerImage;
+    private ApiDocument headerBackgroundImage;
     private ApiDocument footerImage;
 
     public String getPrimaryColor() {
@@ -113,6 +114,14 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
 
     public void setHeaderImage(ApiDocument headerImage) {
         this.headerImage = headerImage;
+    }
+
+    public ApiDocument getHeaderBackgroundImage() {
+        return headerBackgroundImage;
+    }
+
+    public void setHeaderBackgroundImage(ApiDocument headerBackgroundImage) {
+        this.headerBackgroundImage = headerBackgroundImage;
     }
 
     public ApiDocument getFooterImage() {

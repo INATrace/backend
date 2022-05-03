@@ -307,6 +307,7 @@ public class ProductApiTools {
 		apiBusinessToCustomerSettings.setTabQuality(businessToCustomerSettings.getTabQuality());
 		apiBusinessToCustomerSettings.setFont(CommonApiTools.toApiDocument(businessToCustomerSettings.getFont(), userId));
 		apiBusinessToCustomerSettings.setHeaderImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderImage(), userId));
+		apiBusinessToCustomerSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderBackgroundImage(), userId));
 		apiBusinessToCustomerSettings.setFooterImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getFooterImage(), userId));
 
 		return apiBusinessToCustomerSettings;
@@ -508,6 +509,7 @@ public class ProductApiTools {
 		b2c.setTabQuality(ab2c.getTabQuality());
 		b2c.setFont(commonEngine.fetchDocument(userId, ab2c.getFont()));
 		b2c.setHeaderImage(commonEngine.fetchDocument(userId, ab2c.getHeaderImage()));
+		b2c.setHeaderBackgroundImage(commonEngine.fetchDocument(userId, ab2c.getHeaderBackgroundImage()));
 		b2c.setFooterImage(commonEngine.fetchDocument(userId, ab2c.getFooterImage()));
 	}
 	
@@ -841,6 +843,7 @@ public class ProductApiTools {
 		b2cSettings.setTextColor(b2cSettingsProduct.getTextColor());
 		b2cSettings.setFont(CommonApiTools.toApiDocument(b2cSettingsProduct.getFont(), null));
 		b2cSettings.setHeaderImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderImage(), null));
+		b2cSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderBackgroundImage(), null));
 		b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getFooterImage(), null));
 
 		// If product label defines values, overwrite settings from product
@@ -880,6 +883,9 @@ public class ProductApiTools {
 		}
 		if (b2cSettingsProductLabel.getHeaderImage() != null) {
 			b2cSettings.setHeaderImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getHeaderImage(), null));
+		}
+		if (b2cSettingsProductLabel.getHeaderBackgroundImage() != null) {
+			b2cSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getHeaderBackgroundImage(), null));
 		}
 		if (b2cSettingsProductLabel.getFooterImage() != null) {
 			b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getFooterImage(), null));
