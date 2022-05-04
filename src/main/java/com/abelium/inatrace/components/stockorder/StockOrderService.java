@@ -607,7 +607,7 @@ public class StockOrderService extends BaseService {
         entity.setCurrency(apiStockOrder.getCurrency());
 
         // Calculate the quantities for this stock order accommodating all different cases of stock orders
-        calculateQuantities(apiStockOrder, entity, processingOrder);
+        calculateQuantities(apiStockOrder, entity, processingOrder, null);
 
         // Set the measure unit from the contained semi-product
         if (entity.getSemiProduct() != null) {
@@ -729,7 +729,7 @@ public class StockOrderService extends BaseService {
         return new ApiBaseEntity(entity);
     }
 
-    public void calculateQuantities(ApiStockOrder apiStockOrder, StockOrder stockOrder, ProcessingOrder processingOrder) throws ApiException{
+    public void calculateQuantities(ApiStockOrder apiStockOrder, StockOrder stockOrder, ProcessingOrder processingOrder, Long newInputTransactionId) throws ApiException{
 
         if (apiStockOrder.getOrderType() == null) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "OrderType needs to be provided!");
@@ -776,13 +776,18 @@ public class StockOrderService extends BaseService {
 
                 // Calculate quantities based on input transactions
                 List<Transaction> inputTxs = processingOrder.getInputTransactions();
+                Transaction newInputTransaction = newInputTransactionId != null ? inputTxs
+                        .stream()
+                        .filter(t -> t.getId().equals(newInputTransactionId)).findAny()
+                        .orElse(null) : null;
 
                 if (apiStockOrder.getOrderType() == OrderType.GENERAL_ORDER) {
 
                     if (!processingOrder.getTargetStockOrders().contains(stockOrder)) {
 
                         // Quote order is part of another StockOrder (as source)
-                        stockOrder.setAvailableQuantity(stockOrder.getAvailableQuantity().subtract(calculateUsedQuantity(inputTxs, stockOrder.getId())));
+                        stockOrder.setAvailableQuantity(stockOrder.getAvailableQuantity()
+                                .subtract(calculateUsedQuantity(inputTxs, stockOrder.getId())));
                         stockOrder.setFulfilledQuantity(calculateFulfilledQuantity(inputTxs, stockOrder.getId()));
 
                     } else {
@@ -791,9 +796,17 @@ public class StockOrderService extends BaseService {
                     }
 
                 } else {
-                    stockOrder.setAvailableQuantity(stockOrder.getFulfilledQuantity()
-                            .subtract(lastUsedQuantity != null ? lastUsedQuantity : BigDecimal.ZERO)
-                            .subtract(calculateUsedQuantity(inputTxs, stockOrder.getId())));
+
+                    if (newInputTransaction != null) {
+
+                        stockOrder.setAvailableQuantity(stockOrder.getAvailableQuantity().subtract(newInputTransaction.getOutputQuantity()));
+
+                    } else {
+
+                        stockOrder.setAvailableQuantity(stockOrder.getFulfilledQuantity()
+                                .subtract(lastUsedQuantity != null ? lastUsedQuantity : BigDecimal.ZERO)
+                                .subtract(calculateUsedQuantity(inputTxs, stockOrder.getId())));
+                    }
                 }
 
             } else if (lastUsedQuantity != null) {
@@ -923,9 +936,11 @@ public class StockOrderService extends BaseService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private BigDecimal calculateUsedQuantity(List<Transaction> inputTransactions, Long stockOrderId){
-        if (stockOrderId == null || inputTransactions.isEmpty())
+    private BigDecimal calculateUsedQuantity(List<Transaction> inputTransactions, Long stockOrderId) {
+
+        if (stockOrderId == null || inputTransactions.isEmpty()) {
             return BigDecimal.ZERO;
+        }
 
         return inputTransactions.stream()
                 .filter(t -> t.getSourceStockOrder() != null

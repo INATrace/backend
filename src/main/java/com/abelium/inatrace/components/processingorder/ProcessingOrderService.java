@@ -283,7 +283,8 @@ public class ProcessingOrderService extends BaseService {
                 stockOrderService.calculateQuantities(
                         apiTransaction.getSourceStockOrder(),
                         fetchEntity(apiTransaction.getSourceStockOrder().getId(), StockOrder.class),
-                        entity
+                        entity,
+                        insertedTransaction.getId()
                 );
             }
 
@@ -391,7 +392,8 @@ public class ProcessingOrderService extends BaseService {
                 stockOrderService.calculateQuantities(
                         apiTransaction.getSourceStockOrder(),
                         fetchEntity(apiTransaction.getSourceStockOrder().getId(), StockOrder.class),
-                        entity
+                        entity,
+                        insertedTransaction.getId()
                 );
             }
         }
