@@ -43,7 +43,9 @@ public class ApiProductContent extends ApiProductBase {
 
 	@ApiModelProperty(value = "knowledge blog", position = 20)
 	public Boolean knowledgeBlog;
-	
+
+	@ApiModelProperty(value = "B2C settings", position = 21)
+	private ApiBusinessToCustomerSettings businessToCustomerSettings;
 	
 	public ApiDocument getPhoto() {
 		return photo;
@@ -117,4 +119,11 @@ public class ApiProductContent extends ApiProductBase {
 		this.knowledgeBlog = knowledgeBlog;
 	}
 
+	public ApiBusinessToCustomerSettings getBusinessToCustomerSettings() {
+		return businessToCustomerSettings;
+	}
+
+	public void setBusinessToCustomerSettings(ApiBusinessToCustomerSettings businessToCustomerSettings) {
+		this.businessToCustomerSettings = businessToCustomerSettings;
+	}
 }

@@ -134,6 +134,7 @@ public class ProductApiTools {
 		ap.knowledgeBlog = p.getKnowledgeBlog();
 		ap.specialityDocument = CommonApiTools.toApiDocument(p.getSpecialityDocument(), userId);
 		ap.specialityDescription = p.getSpecialityDescription();
+		ap.setBusinessToCustomerSettings(toApiBusinessToCustomerSettings(p.getBusinessToCustomerSettings(), userId));
 	}
 	
 	
@@ -287,6 +288,30 @@ public class ProductApiTools {
 
 		return apiProductDataSharingAgreement;
 	}
+
+	public static ApiBusinessToCustomerSettings toApiBusinessToCustomerSettings(BusinessToCustomerSettings businessToCustomerSettings, Long userId) {
+		if (businessToCustomerSettings == null) {
+			return null;
+		}
+
+		ApiBusinessToCustomerSettings apiBusinessToCustomerSettings = new ApiBusinessToCustomerSettings();
+		apiBusinessToCustomerSettings.setPrimaryColor(businessToCustomerSettings.getPrimaryColor());
+		apiBusinessToCustomerSettings.setSecondaryColor(businessToCustomerSettings.getSecondaryColor());
+		apiBusinessToCustomerSettings.setTertiaryColor(businessToCustomerSettings.getTertiaryColor());
+		apiBusinessToCustomerSettings.setQuaternaryColor(businessToCustomerSettings.getQuaternaryColor());
+		apiBusinessToCustomerSettings.setHeadingColor(businessToCustomerSettings.getHeadingColor());
+		apiBusinessToCustomerSettings.setTextColor(businessToCustomerSettings.getTextColor());
+		apiBusinessToCustomerSettings.setTabFairPrices(businessToCustomerSettings.getTabFairPrices());
+		apiBusinessToCustomerSettings.setTabFeedback(businessToCustomerSettings.getTabFeedback());
+		apiBusinessToCustomerSettings.setTabProducers(businessToCustomerSettings.getTabProducers());
+		apiBusinessToCustomerSettings.setTabQuality(businessToCustomerSettings.getTabQuality());
+		apiBusinessToCustomerSettings.setFont(CommonApiTools.toApiDocument(businessToCustomerSettings.getFont(), userId));
+		apiBusinessToCustomerSettings.setHeaderImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderImage(), userId));
+		apiBusinessToCustomerSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderBackgroundImage(), userId));
+		apiBusinessToCustomerSettings.setFooterImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getFooterImage(), userId));
+
+		return apiBusinessToCustomerSettings;
+	}
 	
 	public void updateProduct(CustomUserDetails authUser, Product p, ApiProduct pu) throws ApiException {
 
@@ -354,6 +379,24 @@ public class ProductApiTools {
 		if (pu.sustainability != null) updateSustainability(p.getSustainability(), pu.sustainability);
 		if (pu.settings != null) updateSettings(userId, p.getSettings(), pu.settings);
 		if (pu.comparisonOfPrice != null) updateComparisonOfPrice(p.getComparisonOfPrice(), pu.comparisonOfPrice);
+		if (pu.getBusinessToCustomerSettings() != null) {
+			updateBusinessToCustomerSettings(userId, p.getBusinessToCustomerSettings(), pu.getBusinessToCustomerSettings());
+		} else {
+			// Fill defaults
+			ApiBusinessToCustomerSettings apiBusinessToCustomerSettings = new ApiBusinessToCustomerSettings();
+			apiBusinessToCustomerSettings.setPrimaryColor("#5c267b");
+			apiBusinessToCustomerSettings.setSecondaryColor("#0fae94");
+			apiBusinessToCustomerSettings.setTertiaryColor("#ac1b56");
+			apiBusinessToCustomerSettings.setQuaternaryColor("#e3b22b");
+			apiBusinessToCustomerSettings.setHeadingColor("#000000");
+			apiBusinessToCustomerSettings.setTextColor("#000000");
+			apiBusinessToCustomerSettings.setTabFairPrices(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setTabProducers(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setTabQuality(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setTabFeedback(Boolean.TRUE);
+
+			updateBusinessToCustomerSettings(userId, p.getBusinessToCustomerSettings(), apiBusinessToCustomerSettings);
+		}
 		p.setSpecialityDocument(commonEngine.fetchDocument(userId, pu.specialityDocument));
 		p.setSpecialityDescription(pu.specialityDescription);
 		p.setKnowledgeBlog(pu.knowledgeBlog);
@@ -451,6 +494,23 @@ public class ProductApiTools {
 	private void updateComparisonOfPrice(ComparisonOfPrice ps, ApiComparisonOfPrice aps) {
 		ps.setPrices(aps.prices);
 		ps.setDescription(aps.description);
+	}
+
+	private void updateBusinessToCustomerSettings(Long userId, BusinessToCustomerSettings b2c, ApiBusinessToCustomerSettings ab2c) throws ApiException {
+		b2c.setPrimaryColor(ab2c.getPrimaryColor());
+		b2c.setSecondaryColor(ab2c.getSecondaryColor());
+		b2c.setTertiaryColor(ab2c.getTertiaryColor());
+		b2c.setQuaternaryColor(ab2c.getQuaternaryColor());
+		b2c.setHeadingColor(ab2c.getHeadingColor());
+		b2c.setTextColor(ab2c.getTextColor());
+		b2c.setTabFairPrices(ab2c.getTabFairPrices());
+		b2c.setTabFeedback(ab2c.getTabFeedback());
+		b2c.setTabProducers(ab2c.getTabProducers());
+		b2c.setTabQuality(ab2c.getTabQuality());
+		b2c.setFont(commonEngine.fetchDocument(userId, ab2c.getFont()));
+		b2c.setHeaderImage(commonEngine.fetchDocument(userId, ab2c.getHeaderImage()));
+		b2c.setHeaderBackgroundImage(commonEngine.fetchDocument(userId, ab2c.getHeaderBackgroundImage()));
+		b2c.setFooterImage(commonEngine.fetchDocument(userId, ab2c.getFooterImage()));
 	}
 	
 	private void updateResponsibility(Long userId, Responsibility r, ApiResponsibility ar) throws ApiException {
@@ -765,6 +825,71 @@ public class ProductApiTools {
 				.collect(Collectors.toList()));
 
 		return apiFinalProduct;
+	}
+
+	public void loadBusinessToCustomerSettings(ProductLabel productLabel, ApiProductLabelValuesExtended apiProductLabelValuesExtended) {
+		if (apiProductLabelValuesExtended.getBusinessToCustomerSettings() == null) {
+			apiProductLabelValuesExtended.setBusinessToCustomerSettings(new ApiBusinessToCustomerSettings());
+		}
+		ApiBusinessToCustomerSettings b2cSettings = apiProductLabelValuesExtended.getBusinessToCustomerSettings();
+
+		// Load B2C settings from product
+		BusinessToCustomerSettings b2cSettingsProduct = productLabel.getProduct().getBusinessToCustomerSettings();
+		b2cSettings.setPrimaryColor(b2cSettingsProduct.getPrimaryColor());
+		b2cSettings.setSecondaryColor(b2cSettingsProduct.getSecondaryColor());
+		b2cSettings.setTertiaryColor(b2cSettingsProduct.getTertiaryColor());
+		b2cSettings.setQuaternaryColor(b2cSettingsProduct.getQuaternaryColor());
+		b2cSettings.setHeadingColor(b2cSettingsProduct.getHeadingColor());
+		b2cSettings.setTextColor(b2cSettingsProduct.getTextColor());
+		b2cSettings.setFont(CommonApiTools.toApiDocument(b2cSettingsProduct.getFont(), null));
+		b2cSettings.setHeaderImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderImage(), null));
+		b2cSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderBackgroundImage(), null));
+		b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getFooterImage(), null));
+
+		// If product label defines values, overwrite settings from product
+		BusinessToCustomerSettings b2cSettingsProductLabel = productLabel.getContent().getBusinessToCustomerSettings();
+		if (b2cSettingsProductLabel.getPrimaryColor() != null) {
+			b2cSettings.setPrimaryColor(b2cSettingsProductLabel.getPrimaryColor());
+		}
+		if (b2cSettingsProductLabel.getSecondaryColor() != null) {
+			b2cSettings.setSecondaryColor(b2cSettingsProductLabel.getSecondaryColor());
+		}
+		if (b2cSettingsProductLabel.getTertiaryColor() != null) {
+			b2cSettings.setTertiaryColor(b2cSettingsProductLabel.getTertiaryColor());
+		}
+		if (b2cSettingsProductLabel.getQuaternaryColor() != null) {
+			b2cSettings.setQuaternaryColor(b2cSettingsProductLabel.getQuaternaryColor());
+		}
+		if (b2cSettingsProductLabel.getHeadingColor() != null) {
+			b2cSettings.setHeadingColor(b2cSettingsProductLabel.getHeadingColor());
+		}
+		if (b2cSettingsProductLabel.getTextColor() != null) {
+			b2cSettings.setTextColor(b2cSettingsProductLabel.getTextColor());
+		}
+		if (b2cSettingsProductLabel.getTabFairPrices() != null) {
+			b2cSettings.setTabFairPrices(b2cSettingsProductLabel.getTabFairPrices());
+		}
+		if (b2cSettingsProductLabel.getTabFeedback() != null) {
+			b2cSettings.setTabFeedback(b2cSettingsProductLabel.getTabFeedback());
+		}
+		if (b2cSettingsProductLabel.getTabProducers() != null) {
+			b2cSettings.setTabProducers(b2cSettingsProductLabel.getTabProducers());
+		}
+		if (b2cSettingsProductLabel.getTabQuality() != null) {
+			b2cSettings.setTabQuality(b2cSettingsProductLabel.getTabQuality());
+		}
+		if (b2cSettingsProductLabel.getFont() != null) {
+			b2cSettings.setFont(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getFont(), null));
+		}
+		if (b2cSettingsProductLabel.getHeaderImage() != null) {
+			b2cSettings.setHeaderImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getHeaderImage(), null));
+		}
+		if (b2cSettingsProductLabel.getHeaderBackgroundImage() != null) {
+			b2cSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getHeaderBackgroundImage(), null));
+		}
+		if (b2cSettingsProductLabel.getFooterImage() != null) {
+			b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getFooterImage(), null));
+		}
 	}
 	
 }

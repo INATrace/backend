@@ -16,6 +16,9 @@ public class ApiProductLabelValuesExtended extends ApiProductLabelValues {
 	@ApiModelProperty(value = "Number of true 'traceOrigin' fields over all of batches", position = 11)
 	public Integer traceOriginCount;
 
+	@ApiModelProperty(value = "B2C settings")
+	public ApiBusinessToCustomerSettings businessToCustomerSettings;
+
 	public Integer getNumberOfBatches() {
 		return numberOfBatches;
 	}
@@ -38,5 +41,13 @@ public class ApiProductLabelValuesExtended extends ApiProductLabelValues {
 
 	public void setTraceOriginCount(Integer traceOriginCount) {
 		this.traceOriginCount = traceOriginCount;
+	}
+
+	public ApiBusinessToCustomerSettings getBusinessToCustomerSettings() {
+		return businessToCustomerSettings;
+	}
+
+	public void setBusinessToCustomerSettings(ApiBusinessToCustomerSettings businessToCustomerSettings) {
+		this.businessToCustomerSettings = businessToCustomerSettings;
 	}
 }
