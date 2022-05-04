@@ -142,6 +142,7 @@ public class ProductService extends BaseService {
 		em.persist(product.getSustainability());
 		em.persist(product.getSettings());
 		em.persist(product.getComparisonOfPrice());
+		em.persist(product.getBusinessToCustomerSettings());
 		em.persist(product);
 		return new ApiBaseEntity(product);
 	}
@@ -172,7 +173,7 @@ public class ProductService extends BaseService {
 			p.setComparisonOfPrice(new ComparisonOfPrice());
 			em.persist(p.getComparisonOfPrice());
 		}
-        
+
         if (p.getJourney() == null) {
             p.setJourney(new ProductJourney());
             em.persist(p.getJourney());
@@ -206,7 +207,9 @@ public class ProductService extends BaseService {
 		ApiProductLabelValuesExtended aplx = new ApiProductLabelValuesExtended();
 		
 		productApiTools.updateApiProductLabelValues(null, pl, aplx);
-		
+
+		productApiTools.loadBusinessToCustomerSettings(pl, aplx);
+
 		aplx.numberOfBatches = Queries.getCountBy(em, ProductLabelBatch.class, ProductLabelBatch::getLabel, pl);
 		aplx.checkAuthenticityCount = countBatchFields(pl, ProductLabelBatch::getCheckAuthenticity, true);
 		aplx.traceOriginCount = countBatchFields(pl, ProductLabelBatch::getTraceOrigin, true);
@@ -241,6 +244,7 @@ public class ProductService extends BaseService {
     	em.persist(plc.getSettings());
     	em.persist(plc.getComparisonOfPrice());
         em.persist(plc.getJourney());
+		em.persist(plc.getBusinessToCustomerSettings());
     	em.persist(plc);
     	
 		ProductLabel pl = new ProductLabel();
@@ -272,13 +276,13 @@ public class ProductService extends BaseService {
 	public ApiDefaultResponse updateProductLabelContent(CustomUserDetails authUser, ApiProductLabelContent request) throws ApiException {
 		ProductLabel pl = productQueries.fetchProductLabelAssoc(authUser, request.labelId);
 		ProductLabelContent plc = pl.getContent();
-        
+
         if (plc.getJourney() == null) {
             ProductJourney journey = new ProductJourney();
             em.persist(journey);
             plc.setJourney(journey);
         }
-        
+
 		productApiTools.updateProductLabelContent(authUser.getUserId(), plc, request);
 		return new ApiDefaultResponse();
 	}    

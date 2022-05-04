@@ -64,6 +64,7 @@ public class ProductLabelContent extends ProductContent {
 		plc.setCompany(p.getCompany()); // no copy -- read only!
 		plc.setOriginLocations(p.getOriginLocations().stream().map(ProductLocation::copy).collect(Collectors.toList()));
         plc.setJourney(p.getJourney().copy());
+		plc.setBusinessToCustomerSettings(p.getBusinessToCustomerSettings().copy());
 		return plc;
 	}
 }
