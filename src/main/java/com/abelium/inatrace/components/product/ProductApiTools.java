@@ -384,10 +384,10 @@ public class ProductApiTools {
 		} else {
 			// Fill defaults
 			ApiBusinessToCustomerSettings apiBusinessToCustomerSettings = new ApiBusinessToCustomerSettings();
-			apiBusinessToCustomerSettings.setPrimaryColor("#5c267b");
-			apiBusinessToCustomerSettings.setSecondaryColor("#0fae94");
-			apiBusinessToCustomerSettings.setTertiaryColor("#ac1b56");
-			apiBusinessToCustomerSettings.setQuaternaryColor("#e3b22b");
+			apiBusinessToCustomerSettings.setPrimaryColor("#25265E");
+			apiBusinessToCustomerSettings.setSecondaryColor("#5DBCCF");
+			apiBusinessToCustomerSettings.setTertiaryColor("#F7F7F7");
+			apiBusinessToCustomerSettings.setQuaternaryColor("#25265E");
 			apiBusinessToCustomerSettings.setHeadingColor("#000000");
 			apiBusinessToCustomerSettings.setTextColor("#000000");
 			apiBusinessToCustomerSettings.setTabFairPrices(Boolean.TRUE);
