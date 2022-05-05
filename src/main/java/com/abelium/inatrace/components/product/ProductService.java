@@ -38,12 +38,10 @@ import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 
 @Lazy
 @Service
@@ -305,10 +303,15 @@ public class ProductService extends BaseService {
 	public void deleteProductLabel(CustomUserDetails authUser, Long id) throws ApiException {
 		ProductLabel pl = productQueries.fetchProductLabelAssoc(authUser, id);
 
-		removeProductLabelBatches(Arrays.asList(pl.getId()));
+		removeProductLabelBatches(List.of(pl.getId()));
     	em.remove(pl.getContent().getProcess());
     	em.remove(pl.getContent().getResponsibility());
     	em.remove(pl.getContent().getSustainability());
+
+		if (pl.getContent().getJourney() != null) {
+			em.remove(pl.getContent().getJourney());
+		}
+
     	em.remove(pl.getContent().getSettings());
     	em.remove(pl.getContent().getComparisonOfPrice());
 		em.remove(pl.getContent());

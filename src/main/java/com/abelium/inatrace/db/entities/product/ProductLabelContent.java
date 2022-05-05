@@ -63,7 +63,12 @@ public class ProductLabelContent extends ProductContent {
 		plc.setComparisonOfPrice(p.getComparisonOfPrice().copy());
 		plc.setCompany(p.getCompany()); // no copy -- read only!
 		plc.setOriginLocations(p.getOriginLocations().stream().map(ProductLocation::copy).collect(Collectors.toList()));
-        plc.setJourney(p.getJourney().copy());
+
+		// If product has journey points set, copy them to the Product label
+		if (p.getJourney() != null) {
+			plc.setJourney(p.getJourney().copy());
+		}
+
 		plc.setBusinessToCustomerSettings(p.getBusinessToCustomerSettings().copy());
 		return plc;
 	}
