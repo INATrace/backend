@@ -7,12 +7,15 @@ import com.abelium.inatrace.components.analytics.RequestLogService;
 import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeService;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
+import com.abelium.inatrace.components.company.CompanyApiTools;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
+import com.abelium.inatrace.components.company.api.ApiCompanyDocument;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.product.types.ProductLabelAction;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
+import com.abelium.inatrace.db.entities.company.CompanyDocument;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.product.*;
 import com.abelium.inatrace.security.service.CustomUserDetails;
@@ -20,10 +23,7 @@ import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.tools.TorpedoProjector;
-import com.abelium.inatrace.types.ProductCompanyType;
-import com.abelium.inatrace.types.ProductLabelStatus;
-import com.abelium.inatrace.types.RequestLogType;
-import com.abelium.inatrace.types.UserRole;
+import com.abelium.inatrace.types.*;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,8 +197,74 @@ public class ProductService extends BaseService {
 		ProductLabel pl = productQueries.fetchProductLabelAssoc(authUser, id);
 		return productApiTools.toApiProductLabelContent(authUser.getUserId(), pl.getContent());
 	}
-    
-    
+
+	public List<ApiCompanyDocument> getAvailableCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id) throws ApiException {
+		productQueries.checkProductLabelPermission(authUser, id);
+
+		return availableCompanyDocumentsForProductLabel(authUser, id).stream().map(companyDocument -> CompanyApiTools.toApiCompanyDocument(authUser.getUserId(), companyDocument)).collect(Collectors.toList());
+	}
+
+	private List<CompanyDocument> availableCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id) {
+		return em.createQuery("SELECT DISTINCT cd FROM ProductLabel pl JOIN pl.product p JOIN p.associatedCompanies ac JOIN ac.company c JOIN c.documents cd WHERE pl.id = :id AND cd.category IN (:meetTheFarmers, :video)", CompanyDocument.class)
+				.setParameter("id", id)
+				.setParameter("meetTheFarmers", CompanyDocumentCategory.MEET_THE_FARMER)
+				.setParameter("video", CompanyDocumentCategory.VIDEO)
+				.getResultList();
+	}
+
+	public List<ApiProductLabelCompanyDocument> getSelectedCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id) throws ApiException {
+		productQueries.checkProductLabelPermission(authUser, id);
+
+		List<ProductLabelCompanyDocument> productLabelCompanyDocuments = selectedCompanyDocumentsForProductLabel(authUser, id);
+
+		return productLabelCompanyDocuments.stream().map(productLabelCompanyDocument -> {
+			ApiProductLabelCompanyDocument apiProductLabelCompanyDocument = new ApiProductLabelCompanyDocument();
+			apiProductLabelCompanyDocument.setProductLabelId(productLabelCompanyDocument.getProductLabelId());
+			apiProductLabelCompanyDocument.setCompanyDocumentId(productLabelCompanyDocument.getCompanyDocumentId());
+			return apiProductLabelCompanyDocument;
+		}).collect(Collectors.toList());
+	}
+
+	private List<ProductLabelCompanyDocument> selectedCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id) {
+		return em.createQuery("SELECT plcd FROM ProductLabelCompanyDocument plcd WHERE plcd.productLabelId = :productLabelId", ProductLabelCompanyDocument.class)
+				.setParameter("productLabelId", id)
+				.getResultList();
+	}
+
+	@Transactional
+	public void updateCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id, List<ApiProductLabelCompanyDocument> companyDocumentList) throws ApiException {
+		productQueries.checkProductLabelPermission(authUser, id);
+
+		List<CompanyDocument> available = availableCompanyDocumentsForProductLabel(authUser, id);
+
+		// Validate input list
+		if (!companyDocumentList.stream().allMatch(apiProductLabelCompanyDocument -> id.equals(apiProductLabelCompanyDocument.getProductLabelId()) && available.stream().anyMatch(companyDocument -> companyDocument.getId().equals(apiProductLabelCompanyDocument.getCompanyDocumentId())))) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Document not available for label");
+		}
+
+		// Get existing state
+		List<ProductLabelCompanyDocument> existing = selectedCompanyDocumentsForProductLabel(authUser, id);
+
+		// If request does not have it, remove it
+		existing.forEach(productLabelCompanyDocument -> {
+			if (companyDocumentList.stream().noneMatch(apiProductLabelCompanyDocument -> productLabelCompanyDocument.getProductLabelId().equals(apiProductLabelCompanyDocument.getProductLabelId()) && productLabelCompanyDocument.getCompanyDocumentId().equals(apiProductLabelCompanyDocument.getCompanyDocumentId()))) {
+				em.remove(productLabelCompanyDocument);
+			}
+		});
+
+		// If its not in the existing list, add it
+		companyDocumentList.forEach(apiProductLabelCompanyDocument -> {
+			if (existing.stream().noneMatch(productLabelCompanyDocument -> productLabelCompanyDocument.getProductLabelId().equals(apiProductLabelCompanyDocument.getProductLabelId()) && productLabelCompanyDocument.getCompanyDocumentId().equals(apiProductLabelCompanyDocument.getCompanyDocumentId()))) {
+				ProductLabelCompanyDocument productLabelCompanyDocument = new ProductLabelCompanyDocument();
+
+				productLabelCompanyDocument.setProductLabelId(apiProductLabelCompanyDocument.getProductLabelId());
+				productLabelCompanyDocument.setCompanyDocumentId(apiProductLabelCompanyDocument.getCompanyDocumentId());
+
+				em.persist(productLabelCompanyDocument);
+			}
+		});
+	}
+
     @Transactional
 	public ApiProductLabelValuesExtended getProductLabelValuesPublic(String uid) throws ApiException {
 		ProductLabel pl = fetchProductLabelPublic(uid);

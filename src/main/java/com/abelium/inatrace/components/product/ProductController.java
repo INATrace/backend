@@ -3,6 +3,7 @@ package com.abelium.inatrace.components.product;
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
+import com.abelium.inatrace.components.company.api.ApiCompanyDocument;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.product.types.ProductLabelAction;
 import com.abelium.inatrace.security.service.CustomUserDetails;
@@ -142,6 +143,30 @@ public class ProductController {
     public ApiResponse<ApiProductLabelContent> getProductLabelContent(@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @ApiParam(value = "Label id", required = true)  @PathVariable("id") Long id) throws ApiException {
     	return new ApiResponse<>(productService.getProductLabelContent(authUser, id));
+    }
+
+    @GetMapping(value = "/label/{id}/documents/available")
+    @ApiOperation(value = "Get available company documents for product label")
+    public ApiResponse<List<ApiCompanyDocument>> getAvailableCompanyDocumentsForProductLabel(@AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "Label id", required = true) @PathVariable("id") Long id) throws ApiException {
+        return new ApiResponse<>(productService.getAvailableCompanyDocumentsForProductLabel(authUser, id));
+    }
+
+    @GetMapping(value = "/label/{id}/documents")
+    @ApiOperation(value = "Get selected company documents for product label")
+    public ApiResponse<List<ApiProductLabelCompanyDocument>> getSelectedCompanyDocuementsForProductLabel(@AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "Label id", required = true) @PathVariable("id") Long id) throws ApiException {
+        return new ApiResponse<>(productService.getSelectedCompanyDocumentsForProductLabel(authUser, id));
+    }
+
+
+    @PutMapping(value = "/label/{id}/documents")
+    @ApiOperation(value = "Update company document product label list")
+    public ApiDefaultResponse updateCompanyDocumentsForProductLabel(@AuthenticationPrincipal CustomUserDetails authUser,
+                                                                    @Valid @ApiParam(value = "Label ID", required = true) @PathVariable("id") Long id,
+                                                                    @Valid @ApiParam(value = "Company document list", required = true) @RequestBody List<ApiProductLabelCompanyDocument> documents) throws ApiException {
+        productService.updateCompanyDocumentsForProductLabel(authUser, id, documents);
+        return new ApiDefaultResponse();
     }
 
     @PostMapping(value = "/label/execute/{action}")
