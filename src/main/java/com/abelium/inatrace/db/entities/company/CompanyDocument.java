@@ -3,10 +3,15 @@ package com.abelium.inatrace.db.entities.company;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.common.Document;
+import com.abelium.inatrace.db.entities.product.ProductLabelCompanyDocument;
 import com.abelium.inatrace.types.CompanyDocumentCategory;
 import com.abelium.inatrace.types.CompanyDocumentType;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class CompanyDocument extends BaseEntity {
@@ -66,6 +71,10 @@ public class CompanyDocument extends BaseEntity {
 	 */
 	@ManyToOne
 	private Document document;
+
+	@OneToMany(mappedBy = "companyDocumentId")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private List<ProductLabelCompanyDocument> productLabels = new ArrayList<>();
 
 	public Company getCompany() {
 		return company;
@@ -137,5 +146,13 @@ public class CompanyDocument extends BaseEntity {
 
 	public void setDocument(Document document) {
 		this.document = document;
+	}
+
+	public List<ProductLabelCompanyDocument> getProductLabels() {
+		return productLabels;
+	}
+
+	public void setProductLabels(List<ProductLabelCompanyDocument> productLabels) {
+		this.productLabels = productLabels;
 	}
 }

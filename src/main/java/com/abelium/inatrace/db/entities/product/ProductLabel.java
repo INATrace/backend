@@ -4,6 +4,8 @@ import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProductLabelStatus;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -21,6 +23,10 @@ public class ProductLabel extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	private ProductLabelContent content;
+
+	@OneToMany(mappedBy = "productLabelId")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private List<ProductLabelCompanyDocument> companyDocuments = new ArrayList<>();
 	
 	/**
 	 * label status
@@ -74,6 +80,14 @@ public class ProductLabel extends BaseEntity {
 
 	public void setContent(ProductLabelContent content) {
 		this.content = content;
+	}
+
+	public List<ProductLabelCompanyDocument> getCompanyDocuments() {
+		return companyDocuments;
+	}
+
+	public void setCompanyDocuments(List<ProductLabelCompanyDocument> companyDocuments) {
+		this.companyDocuments = companyDocuments;
 	}
 
 	public ProductLabelStatus getStatus() {
