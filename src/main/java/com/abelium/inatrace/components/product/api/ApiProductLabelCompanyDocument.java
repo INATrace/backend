@@ -1,23 +1,18 @@
 package com.abelium.inatrace.components.product.api;
 
-public class ApiProductLabelCompanyDocument {
+import com.abelium.inatrace.components.company.api.ApiCompanyDocument;
+import org.springframework.validation.annotation.Validated;
 
-    private Long productLabelId;
-    private Long companyDocumentId;
+@Validated
+public class ApiProductLabelCompanyDocument extends ApiCompanyDocument {
 
-    public Long getProductLabelId() {
-        return productLabelId;
+    private Boolean active;
+
+    public Boolean getActive() {
+        return active;
     }
 
-    public void setProductLabelId(Long productLabelId) {
-        this.productLabelId = productLabelId;
-    }
-
-    public Long getCompanyDocumentId() {
-        return companyDocumentId;
-    }
-
-    public void setCompanyDocumentId(Long companyDocumentId) {
-        this.companyDocumentId = companyDocumentId;
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }

@@ -9,6 +9,7 @@ import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.company.CompanyApiTools;
 import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
+import com.abelium.inatrace.components.company.api.ApiCompanyDocument;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.value_chain.ValueChainApiTools;
 import com.abelium.inatrace.components.value_chain.ValueChainQueries;
@@ -890,6 +891,21 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getFooterImage() != null) {
 			b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getFooterImage(), null));
 		}
+	}
+
+	public static ApiProductLabelCompanyDocument toApiProductLabelCompanyDocument(ApiCompanyDocument apiCompanyDocument) {
+		ApiProductLabelCompanyDocument apiProductLabelCompanyDocument = new ApiProductLabelCompanyDocument();
+
+		apiProductLabelCompanyDocument.setCategory(apiCompanyDocument.getCategory());
+		apiProductLabelCompanyDocument.setDocument(apiCompanyDocument.getDocument());
+		apiProductLabelCompanyDocument.setDescription(apiCompanyDocument.getDescription());
+		apiProductLabelCompanyDocument.setId(apiCompanyDocument.getId());
+		apiProductLabelCompanyDocument.setLink(apiCompanyDocument.getLink());
+		apiProductLabelCompanyDocument.setName(apiCompanyDocument.getName());
+		apiProductLabelCompanyDocument.setQuote(apiCompanyDocument.getQuote());
+		apiProductLabelCompanyDocument.setType(apiCompanyDocument.getType());
+
+		return apiProductLabelCompanyDocument;
 	}
 	
 }

@@ -9,7 +9,6 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.company.CompanyApiTools;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
-import com.abelium.inatrace.components.company.api.ApiCompanyDocument;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.product.types.ProductLabelAction;
 import com.abelium.inatrace.db.entities.common.Document;
@@ -198,67 +197,54 @@ public class ProductService extends BaseService {
 		return productApiTools.toApiProductLabelContent(authUser.getUserId(), pl.getContent());
 	}
 
-	public List<ApiCompanyDocument> getAvailableCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id) throws ApiException {
+	public List<ApiProductLabelCompanyDocument> getCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id) throws ApiException {
 		productQueries.checkProductLabelPermission(authUser, id);
 
-		return availableCompanyDocumentsForProductLabel(authUser, id).stream().map(companyDocument -> CompanyApiTools.toApiCompanyDocument(authUser.getUserId(), companyDocument)).collect(Collectors.toList());
-	}
+		List<CompanyDocument> availableDocuments = availableCompanyDocumentsForProductLabel(id);
+		List<ProductLabelCompanyDocument> selectedDocuments = selectedCompanyDocumentsForProductLabel(id);
 
-	private List<CompanyDocument> availableCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id) {
-		return em.createQuery("SELECT DISTINCT cd FROM ProductLabel pl JOIN pl.product p JOIN p.associatedCompanies ac JOIN ac.company c JOIN c.documents cd WHERE pl.id = :id AND cd.category IN (:meetTheFarmers, :video)", CompanyDocument.class)
-				.setParameter("id", id)
-				.setParameter("meetTheFarmers", CompanyDocumentCategory.MEET_THE_FARMER)
-				.setParameter("video", CompanyDocumentCategory.VIDEO)
-				.getResultList();
-	}
+		return availableDocuments.stream().map(companyDocument -> {
+			ApiProductLabelCompanyDocument apiProductLabelCompanyDocument = ProductApiTools.toApiProductLabelCompanyDocument(CompanyApiTools.toApiCompanyDocument(authUser.getUserId(), companyDocument));
 
-	public List<ApiProductLabelCompanyDocument> getSelectedCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id) throws ApiException {
-		productQueries.checkProductLabelPermission(authUser, id);
+			apiProductLabelCompanyDocument.setActive(selectedDocuments.stream().anyMatch(productLabelCompanyDocument -> productLabelCompanyDocument.getCompanyDocumentId().equals(companyDocument.getId())));
 
-		List<ProductLabelCompanyDocument> productLabelCompanyDocuments = selectedCompanyDocumentsForProductLabel(authUser, id);
-
-		return productLabelCompanyDocuments.stream().map(productLabelCompanyDocument -> {
-			ApiProductLabelCompanyDocument apiProductLabelCompanyDocument = new ApiProductLabelCompanyDocument();
-			apiProductLabelCompanyDocument.setProductLabelId(productLabelCompanyDocument.getProductLabelId());
-			apiProductLabelCompanyDocument.setCompanyDocumentId(productLabelCompanyDocument.getCompanyDocumentId());
 			return apiProductLabelCompanyDocument;
 		}).collect(Collectors.toList());
 	}
 
-	private List<ProductLabelCompanyDocument> selectedCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id) {
+	private List<CompanyDocument> availableCompanyDocumentsForProductLabel(Long id) {
+		return em.createQuery("SELECT DISTINCT cd FROM ProductLabel pl JOIN pl.product p JOIN p.associatedCompanies ac JOIN ac.company c JOIN c.documents cd WHERE pl.id = :id", CompanyDocument.class)
+				.setParameter("id", id)
+				.getResultList();
+	}
+
+	private List<ProductLabelCompanyDocument> selectedCompanyDocumentsForProductLabel(Long id) {
 		return em.createQuery("SELECT plcd FROM ProductLabelCompanyDocument plcd WHERE plcd.productLabelId = :productLabelId", ProductLabelCompanyDocument.class)
 				.setParameter("productLabelId", id)
 				.getResultList();
 	}
 
 	@Transactional
-	public void updateCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id, List<ApiProductLabelCompanyDocument> companyDocumentList) throws ApiException {
+	public void updateCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id, List<ApiProductLabelCompanyDocument> documentList) throws ApiException {
 		productQueries.checkProductLabelPermission(authUser, id);
 
-		List<CompanyDocument> available = availableCompanyDocumentsForProductLabel(authUser, id);
-
-		// Validate input list
-		if (!companyDocumentList.stream().allMatch(apiProductLabelCompanyDocument -> id.equals(apiProductLabelCompanyDocument.getProductLabelId()) && available.stream().anyMatch(companyDocument -> companyDocument.getId().equals(apiProductLabelCompanyDocument.getCompanyDocumentId())))) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Document not available for label");
-		}
-
 		// Get existing state
-		List<ProductLabelCompanyDocument> existing = selectedCompanyDocumentsForProductLabel(authUser, id);
+		List<ProductLabelCompanyDocument> existing = selectedCompanyDocumentsForProductLabel(id);
 
-		// If request does not have it, remove it
-		existing.forEach(productLabelCompanyDocument -> {
-			if (companyDocumentList.stream().noneMatch(apiProductLabelCompanyDocument -> productLabelCompanyDocument.getProductLabelId().equals(apiProductLabelCompanyDocument.getProductLabelId()) && productLabelCompanyDocument.getCompanyDocumentId().equals(apiProductLabelCompanyDocument.getCompanyDocumentId()))) {
-				em.remove(productLabelCompanyDocument);
+		// Remove deactivated entries
+		existing.forEach(existingDocument -> {
+			if (documentList.stream().filter(ApiProductLabelCompanyDocument::getActive).noneMatch(apiProductLabelCompanyDocument -> existingDocument.getCompanyDocumentId().equals(apiProductLabelCompanyDocument.getId()))) {
+				em.remove(existingDocument);
 			}
 		});
 
-		// If its not in the existing list, add it
-		companyDocumentList.forEach(apiProductLabelCompanyDocument -> {
-			if (existing.stream().noneMatch(productLabelCompanyDocument -> productLabelCompanyDocument.getProductLabelId().equals(apiProductLabelCompanyDocument.getProductLabelId()) && productLabelCompanyDocument.getCompanyDocumentId().equals(apiProductLabelCompanyDocument.getCompanyDocumentId()))) {
+		// Add activated entries
+		documentList.stream().filter(ApiProductLabelCompanyDocument::getActive).forEach(apiProductLabelCompanyDocument -> {
+			if (existing.stream().noneMatch(existingDocument -> existingDocument.getCompanyDocumentId().equals(apiProductLabelCompanyDocument.getId()))) {
 				ProductLabelCompanyDocument productLabelCompanyDocument = new ProductLabelCompanyDocument();
 
-				productLabelCompanyDocument.setProductLabelId(apiProductLabelCompanyDocument.getProductLabelId());
-				productLabelCompanyDocument.setCompanyDocumentId(apiProductLabelCompanyDocument.getCompanyDocumentId());
+				productLabelCompanyDocument.setProductLabelId(id);
+				productLabelCompanyDocument.setCompanyDocumentId(apiProductLabelCompanyDocument.getId());
 
 				em.persist(productLabelCompanyDocument);
 			}
