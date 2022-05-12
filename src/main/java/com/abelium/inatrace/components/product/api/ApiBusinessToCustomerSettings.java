@@ -15,7 +15,8 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
     private Boolean tabProducers;
     private Boolean tabQuality;
     private Boolean tabFeedback;
-    private ApiDocument font;
+    private ApiDocument productFont;
+    private ApiDocument textFont;
     private ApiDocument headerImage;
     private ApiDocument headerBackgroundImage;
     private ApiDocument footerImage;
@@ -100,12 +101,20 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
         this.tabFeedback = tabFeedback;
     }
 
-    public ApiDocument getFont() {
-        return font;
+    public ApiDocument getProductFont() {
+        return productFont;
     }
 
-    public void setFont(ApiDocument font) {
-        this.font = font;
+    public void setProductFont(ApiDocument productFont) {
+        this.productFont = productFont;
+    }
+
+    public ApiDocument getTextFont() {
+        return textFont;
+    }
+
+    public void setTextFont(ApiDocument textFont) {
+        this.textFont = textFont;
     }
 
     public ApiDocument getHeaderImage() {

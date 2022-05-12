@@ -44,7 +44,10 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     private Boolean tabFeedback;
 
     @OneToOne
-    private Document font;
+    private Document productFont;
+
+    @OneToOne
+    private Document textFont;
 
     @OneToOne
     private Document headerImage;
@@ -135,12 +138,20 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.tabFeedback = tabFeedback;
     }
 
-    public Document getFont() {
-        return font;
+    public Document getProductFont() {
+        return productFont;
     }
 
-    public void setFont(Document font) {
-        this.font = font;
+    public void setProductFont(Document productFont) {
+        this.productFont = productFont;
+    }
+
+    public Document getTextFont() {
+        return textFont;
+    }
+
+    public void setTextFont(Document textFont) {
+        this.textFont = textFont;
     }
 
     public Document getHeaderImage() {
@@ -180,7 +191,8 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         businessToCustomerSettings.setTabProducers(getTabProducers());
         businessToCustomerSettings.setTabQuality(getTabQuality());
         businessToCustomerSettings.setTabFeedback(getTabFeedback());
-        businessToCustomerSettings.setFont(getFont());
+        businessToCustomerSettings.setProductFont(getProductFont());
+        businessToCustomerSettings.setTextFont(getTextFont());
         businessToCustomerSettings.setHeaderImage(getHeaderImage());
         businessToCustomerSettings.setHeaderBackgroundImage(getHeaderBackgroundImage());
         businessToCustomerSettings.setFooterImage(getFooterImage());

@@ -307,7 +307,8 @@ public class ProductApiTools {
 		apiBusinessToCustomerSettings.setTabFeedback(businessToCustomerSettings.getTabFeedback());
 		apiBusinessToCustomerSettings.setTabProducers(businessToCustomerSettings.getTabProducers());
 		apiBusinessToCustomerSettings.setTabQuality(businessToCustomerSettings.getTabQuality());
-		apiBusinessToCustomerSettings.setFont(CommonApiTools.toApiDocument(businessToCustomerSettings.getFont(), userId));
+		apiBusinessToCustomerSettings.setProductFont(CommonApiTools.toApiDocument(businessToCustomerSettings.getProductFont(), userId));
+		apiBusinessToCustomerSettings.setTextFont(CommonApiTools.toApiDocument(businessToCustomerSettings.getTextFont(), userId));
 		apiBusinessToCustomerSettings.setHeaderImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderImage(), userId));
 		apiBusinessToCustomerSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderBackgroundImage(), userId));
 		apiBusinessToCustomerSettings.setFooterImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getFooterImage(), userId));
@@ -509,7 +510,8 @@ public class ProductApiTools {
 		b2c.setTabFeedback(ab2c.getTabFeedback());
 		b2c.setTabProducers(ab2c.getTabProducers());
 		b2c.setTabQuality(ab2c.getTabQuality());
-		b2c.setFont(commonEngine.fetchDocument(userId, ab2c.getFont()));
+		b2c.setProductFont(commonEngine.fetchDocument(userId, ab2c.getProductFont()));
+		b2c.setTextFont(commonEngine.fetchDocument(userId, ab2c.getTextFont()));
 		b2c.setHeaderImage(commonEngine.fetchDocument(userId, ab2c.getHeaderImage()));
 		b2c.setHeaderBackgroundImage(commonEngine.fetchDocument(userId, ab2c.getHeaderBackgroundImage()));
 		b2c.setFooterImage(commonEngine.fetchDocument(userId, ab2c.getFooterImage()));
@@ -843,7 +845,8 @@ public class ProductApiTools {
 		b2cSettings.setQuaternaryColor(b2cSettingsProduct.getQuaternaryColor());
 		b2cSettings.setHeadingColor(b2cSettingsProduct.getHeadingColor());
 		b2cSettings.setTextColor(b2cSettingsProduct.getTextColor());
-		b2cSettings.setFont(CommonApiTools.toApiDocument(b2cSettingsProduct.getFont(), null));
+		b2cSettings.setProductFont(CommonApiTools.toApiDocument(b2cSettingsProduct.getProductFont(), null));
+		b2cSettings.setTextFont(CommonApiTools.toApiDocument(b2cSettingsProduct.getTextFont(), null));
 		b2cSettings.setHeaderImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderImage(), null));
 		b2cSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderBackgroundImage(), null));
 		b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getFooterImage(), null));
@@ -880,8 +883,11 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getTabQuality() != null) {
 			b2cSettings.setTabQuality(b2cSettingsProductLabel.getTabQuality());
 		}
-		if (b2cSettingsProductLabel.getFont() != null) {
-			b2cSettings.setFont(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getFont(), null));
+		if (b2cSettingsProductLabel.getProductFont() != null) {
+			b2cSettings.setProductFont(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getProductFont(), null));
+		}
+		if (b2cSettingsProductLabel.getTextFont() != null) {
+			b2cSettings.setTextFont(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getTextFont(), null));
 		}
 		if (b2cSettingsProductLabel.getHeaderImage() != null) {
 			b2cSettings.setHeaderImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getHeaderImage(), null));
