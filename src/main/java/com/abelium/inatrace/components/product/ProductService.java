@@ -260,13 +260,21 @@ public class ProductService extends BaseService {
 
 		productApiTools.loadBusinessToCustomerSettings(pl, aplx);
 
+		productApiTools.loadBusinessToCustomerMedia(aplx, getCompanyDocuments(pl));
+
 		aplx.numberOfBatches = Queries.getCountBy(em, ProductLabelBatch.class, ProductLabelBatch::getLabel, pl);
 		aplx.checkAuthenticityCount = countBatchFields(pl, ProductLabelBatch::getCheckAuthenticity, true);
 		aplx.traceOriginCount = countBatchFields(pl, ProductLabelBatch::getTraceOrigin, true);
 		return aplx;
-	}    
-    
-    private <P> int countBatchFields(ProductLabel pl, Function<ProductLabelBatch, P> property, P value) {
+	}
+
+	private List<CompanyDocument> getCompanyDocuments(ProductLabel pl) {
+		return em.createQuery("SELECT cd FROM CompanyDocument cd JOIN ProductLabelCompanyDocument plcd ON cd.id = plcd.companyDocumentId AND plcd.productLabelId = :plId", CompanyDocument.class)
+				.setParameter("plId", pl.getId())
+				.getResultList();
+	}
+
+	private <P> int countBatchFields(ProductLabel pl, Function<ProductLabelBatch, P> property, P value) {
 		ProductLabelBatch plbProxy = Torpedo.from(ProductLabelBatch.class);
         Torpedo.where(plbProxy.getLabel()).eq(pl).and(property.apply(plbProxy)).eq(value);
         Optional<Long> result = Torpedo.select(Torpedo.count(plbProxy)).get(em);

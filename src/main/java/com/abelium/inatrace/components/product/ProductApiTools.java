@@ -16,6 +16,7 @@ import com.abelium.inatrace.components.value_chain.ValueChainQueries;
 import com.abelium.inatrace.db.entities.common.BankInformation;
 import com.abelium.inatrace.db.entities.common.Location;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
+import com.abelium.inatrace.db.entities.company.CompanyDocument;
 import com.abelium.inatrace.db.entities.process.Process;
 import com.abelium.inatrace.db.entities.process.ProcessDocument;
 import com.abelium.inatrace.db.entities.process.ProcessStandard;
@@ -891,6 +892,25 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getFooterImage() != null) {
 			b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getFooterImage(), null));
 		}
+	}
+
+	public void loadBusinessToCustomerMedia(ApiProductLabelValuesExtended apiProductLabelValuesExtended, List<CompanyDocument> companyDocuments) {
+		apiProductLabelValuesExtended.setPhotosMeetTheFarmers(new ArrayList<>());
+		apiProductLabelValuesExtended.setProductionRecords(new ArrayList<>());
+
+		companyDocuments.forEach(companyDocument -> {
+			switch (companyDocument.getCategory()) {
+				case VIDEO:
+					apiProductLabelValuesExtended.setVideoMeetTheFarmers(CompanyApiTools.toApiCompanyDocument(null, companyDocument));
+					break;
+				case MEET_THE_FARMER:
+					apiProductLabelValuesExtended.getPhotosMeetTheFarmers().add(CompanyApiTools.toApiCompanyDocument(null, companyDocument));
+					break;
+				case PRODUCTION_RECORD:
+					apiProductLabelValuesExtended.getProductionRecords().add(CompanyApiTools.toApiCompanyDocument(null, companyDocument));
+					break;
+			}
+		});
 	}
 
 	public static ApiProductLabelCompanyDocument toApiProductLabelCompanyDocument(ApiCompanyDocument apiCompanyDocument) {
