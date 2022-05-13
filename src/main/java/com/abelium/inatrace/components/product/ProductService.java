@@ -11,6 +11,7 @@ import com.abelium.inatrace.components.company.CompanyApiTools;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.product.types.ProductLabelAction;
+import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Lazy
 @Service
@@ -139,6 +141,7 @@ public class ProductService extends BaseService {
 		em.persist(product.getSustainability());
 		em.persist(product.getSettings());
 		em.persist(product.getComparisonOfPrice());
+		em.persist(product.getJourney());
 		em.persist(product.getBusinessToCustomerSettings());
 		em.persist(product);
 		return new ApiBaseEntity(product);
@@ -177,6 +180,14 @@ public class ProductService extends BaseService {
         }
 
 		productApiTools.updateProduct(authUser, p, ap);
+
+		removeProductLabelCompanyDocumentsForRemovedCompanyAssociations(p);
+	}
+
+	private void removeProductLabelCompanyDocumentsForRemovedCompanyAssociations(Product p) {
+		em.createQuery("DELETE FROM ProductLabelCompanyDocument plcd WHERE plcd.productLabelId IN :plIds AND plcd.companyDocumentId NOT IN :cdIds")
+				.setParameter("plIds", p.getLabels().stream().map(ProductLabel::getId).collect(Collectors.toList()))
+				.setParameter("cdIds", p.getAssociatedCompanies().stream().flatMap(productCompany -> productCompany.getCompany().getDocuments().stream().map(CompanyDocument::getId)).collect(Collectors.toList())).executeUpdate();
 	}
 
     @Transactional
