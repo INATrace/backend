@@ -249,8 +249,10 @@ public class ProductService extends BaseService {
 			}
 		});
 
+		List<CompanyDocument> availableDocuments = availableCompanyDocumentsForProductLabel(id);
+
 		// Add activated entries
-		documentList.stream().filter(ApiProductLabelCompanyDocument::getActive).forEach(apiProductLabelCompanyDocument -> {
+		documentList.stream().filter(apiProductLabelCompanyDocument -> apiProductLabelCompanyDocument.getActive() && availableDocuments.stream().anyMatch(companyDocument -> companyDocument.getId().equals(apiProductLabelCompanyDocument.getId()))).forEach(apiProductLabelCompanyDocument -> {
 			if (existing.stream().noneMatch(existingDocument -> existingDocument.getCompanyDocumentId().equals(apiProductLabelCompanyDocument.getId()))) {
 				ProductLabelCompanyDocument productLabelCompanyDocument = new ProductLabelCompanyDocument();
 
