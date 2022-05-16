@@ -43,6 +43,15 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     @Column(name = "tab_feedback")
     private Boolean tabFeedback;
 
+    @Column(name = "graphic_fair_prices")
+    private Boolean graphicFairPrices;
+
+    @Column(name = "graphic_increase_of_income")
+    private Boolean graphicIncreaseOfIncome;
+
+    @Column(name = "graphic_quality")
+    private Boolean graphicQuality;
+
     @OneToOne
     private Document productFont;
 
@@ -178,6 +187,30 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.footerImage = footerImage;
     }
 
+    public Boolean getGraphicFairPrices() {
+        return graphicFairPrices;
+    }
+
+    public void setGraphicFairPrices(Boolean graphicFairPrices) {
+        this.graphicFairPrices = graphicFairPrices;
+    }
+
+    public Boolean getGraphicIncreaseOfIncome() {
+        return graphicIncreaseOfIncome;
+    }
+
+    public void setGraphicIncreaseOfIncome(Boolean graphicIncreaseOfIncome) {
+        this.graphicIncreaseOfIncome = graphicIncreaseOfIncome;
+    }
+
+    public Boolean getGraphicQuality() {
+        return graphicQuality;
+    }
+
+    public void setGraphicQuality(Boolean graphicQuality) {
+        this.graphicQuality = graphicQuality;
+    }
+
     public BusinessToCustomerSettings copy() {
         BusinessToCustomerSettings businessToCustomerSettings = new BusinessToCustomerSettings();
 
@@ -196,6 +229,9 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         businessToCustomerSettings.setHeaderImage(getHeaderImage());
         businessToCustomerSettings.setHeaderBackgroundImage(getHeaderBackgroundImage());
         businessToCustomerSettings.setFooterImage(getFooterImage());
+        businessToCustomerSettings.setGraphicFairPrices(getGraphicFairPrices());
+        businessToCustomerSettings.setGraphicIncreaseOfIncome(getGraphicIncreaseOfIncome());
+        businessToCustomerSettings.setGraphicQuality(getGraphicQuality());
 
         return businessToCustomerSettings;
     }

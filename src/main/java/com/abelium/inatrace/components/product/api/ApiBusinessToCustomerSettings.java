@@ -20,6 +20,9 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
     private ApiDocument headerImage;
     private ApiDocument headerBackgroundImage;
     private ApiDocument footerImage;
+    private Boolean graphicFairPrices;
+    private Boolean graphicIncreaseOfIncome;
+    private Boolean graphicQuality;
 
     public String getPrimaryColor() {
         return primaryColor;
@@ -139,5 +142,29 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
 
     public void setFooterImage(ApiDocument footerImage) {
         this.footerImage = footerImage;
+    }
+
+    public Boolean getGraphicFairPrices() {
+        return graphicFairPrices;
+    }
+
+    public void setGraphicFairPrices(Boolean graphicFairPrices) {
+        this.graphicFairPrices = graphicFairPrices;
+    }
+
+    public Boolean getGraphicIncreaseOfIncome() {
+        return graphicIncreaseOfIncome;
+    }
+
+    public void setGraphicIncreaseOfIncome(Boolean graphicIncreaseOfIncome) {
+        this.graphicIncreaseOfIncome = graphicIncreaseOfIncome;
+    }
+
+    public Boolean getGraphicQuality() {
+        return graphicQuality;
+    }
+
+    public void setGraphicQuality(Boolean graphicQuality) {
+        this.graphicQuality = graphicQuality;
     }
 }

@@ -312,6 +312,9 @@ public class ProductApiTools {
 		apiBusinessToCustomerSettings.setHeaderImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderImage(), userId));
 		apiBusinessToCustomerSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderBackgroundImage(), userId));
 		apiBusinessToCustomerSettings.setFooterImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getFooterImage(), userId));
+		apiBusinessToCustomerSettings.setGraphicFairPrices(businessToCustomerSettings.getGraphicFairPrices());
+		apiBusinessToCustomerSettings.setGraphicIncreaseOfIncome(businessToCustomerSettings.getGraphicIncreaseOfIncome());
+		apiBusinessToCustomerSettings.setGraphicQuality(businessToCustomerSettings.getGraphicQuality());
 
 		return apiBusinessToCustomerSettings;
 	}
@@ -397,6 +400,9 @@ public class ProductApiTools {
 			apiBusinessToCustomerSettings.setTabProducers(Boolean.TRUE);
 			apiBusinessToCustomerSettings.setTabQuality(Boolean.TRUE);
 			apiBusinessToCustomerSettings.setTabFeedback(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setGraphicFairPrices(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setGraphicIncreaseOfIncome(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setGraphicQuality(Boolean.TRUE);
 
 			updateBusinessToCustomerSettings(userId, p.getBusinessToCustomerSettings(), apiBusinessToCustomerSettings);
 		}
@@ -515,6 +521,9 @@ public class ProductApiTools {
 		b2c.setHeaderImage(commonEngine.fetchDocument(userId, ab2c.getHeaderImage()));
 		b2c.setHeaderBackgroundImage(commonEngine.fetchDocument(userId, ab2c.getHeaderBackgroundImage()));
 		b2c.setFooterImage(commonEngine.fetchDocument(userId, ab2c.getFooterImage()));
+		b2c.setGraphicFairPrices(ab2c.getGraphicFairPrices());
+		b2c.setGraphicIncreaseOfIncome(ab2c.getGraphicIncreaseOfIncome());
+		b2c.setGraphicQuality(ab2c.getGraphicQuality());
 	}
 	
 	private void updateResponsibility(Long userId, Responsibility r, ApiResponsibility ar) throws ApiException {
@@ -850,6 +859,9 @@ public class ProductApiTools {
 		b2cSettings.setHeaderImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderImage(), null));
 		b2cSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderBackgroundImage(), null));
 		b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getFooterImage(), null));
+		b2cSettings.setGraphicFairPrices(b2cSettingsProduct.getGraphicFairPrices());
+		b2cSettings.setGraphicIncreaseOfIncome(b2cSettingsProduct.getGraphicIncreaseOfIncome());
+		b2cSettings.setGraphicQuality(b2cSettingsProduct.getGraphicQuality());
 
 		// If product label defines values, overwrite settings from product
 		BusinessToCustomerSettings b2cSettingsProductLabel = productLabel.getContent().getBusinessToCustomerSettings();
@@ -897,6 +909,15 @@ public class ProductApiTools {
 		}
 		if (b2cSettingsProductLabel.getFooterImage() != null) {
 			b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getFooterImage(), null));
+		}
+		if (b2cSettingsProductLabel.getGraphicFairPrices() != null) {
+			b2cSettings.setGraphicFairPrices(b2cSettingsProductLabel.getGraphicFairPrices());
+		}
+		if (b2cSettingsProductLabel.getGraphicIncreaseOfIncome() != null) {
+			b2cSettings.setGraphicIncreaseOfIncome(b2cSettingsProductLabel.getGraphicIncreaseOfIncome());
+		}
+		if (b2cSettingsProductLabel.getGraphicQuality() != null) {
+			b2cSettings.setGraphicQuality(b2cSettingsProductLabel.getGraphicQuality());
 		}
 	}
 
