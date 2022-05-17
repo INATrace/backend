@@ -15,10 +15,14 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
     private Boolean tabProducers;
     private Boolean tabQuality;
     private Boolean tabFeedback;
-    private ApiDocument font;
+    private ApiDocument productFont;
+    private ApiDocument textFont;
     private ApiDocument headerImage;
     private ApiDocument headerBackgroundImage;
     private ApiDocument footerImage;
+    private Boolean graphicFairPrices;
+    private Boolean graphicIncreaseOfIncome;
+    private Boolean graphicQuality;
 
     public String getPrimaryColor() {
         return primaryColor;
@@ -100,12 +104,20 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
         this.tabFeedback = tabFeedback;
     }
 
-    public ApiDocument getFont() {
-        return font;
+    public ApiDocument getProductFont() {
+        return productFont;
     }
 
-    public void setFont(ApiDocument font) {
-        this.font = font;
+    public void setProductFont(ApiDocument productFont) {
+        this.productFont = productFont;
+    }
+
+    public ApiDocument getTextFont() {
+        return textFont;
+    }
+
+    public void setTextFont(ApiDocument textFont) {
+        this.textFont = textFont;
     }
 
     public ApiDocument getHeaderImage() {
@@ -130,5 +142,29 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
 
     public void setFooterImage(ApiDocument footerImage) {
         this.footerImage = footerImage;
+    }
+
+    public Boolean getGraphicFairPrices() {
+        return graphicFairPrices;
+    }
+
+    public void setGraphicFairPrices(Boolean graphicFairPrices) {
+        this.graphicFairPrices = graphicFairPrices;
+    }
+
+    public Boolean getGraphicIncreaseOfIncome() {
+        return graphicIncreaseOfIncome;
+    }
+
+    public void setGraphicIncreaseOfIncome(Boolean graphicIncreaseOfIncome) {
+        this.graphicIncreaseOfIncome = graphicIncreaseOfIncome;
+    }
+
+    public Boolean getGraphicQuality() {
+        return graphicQuality;
+    }
+
+    public void setGraphicQuality(Boolean graphicQuality) {
+        this.graphicQuality = graphicQuality;
     }
 }

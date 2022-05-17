@@ -1,8 +1,11 @@
 package com.abelium.inatrace.components.product.api;
 
+import com.abelium.inatrace.components.company.api.ApiCompanyDocument;
 import org.springframework.validation.annotation.Validated;
 
 import io.swagger.annotations.ApiModelProperty;
+
+import java.util.List;
 
 @Validated
 public class ApiProductLabelValuesExtended extends ApiProductLabelValues {
@@ -18,6 +21,15 @@ public class ApiProductLabelValuesExtended extends ApiProductLabelValues {
 
 	@ApiModelProperty(value = "B2C settings")
 	public ApiBusinessToCustomerSettings businessToCustomerSettings;
+
+	@ApiModelProperty(value = "Meet the farmers video")
+	public ApiCompanyDocument videoMeetTheFarmers;
+
+	@ApiModelProperty(value = "Meet the farmers photos")
+	public List<ApiCompanyDocument> photosMeetTheFarmers;
+
+	@ApiModelProperty(value = "Production records")
+	public List<ApiCompanyDocument> productionRecords;
 
 	public Integer getNumberOfBatches() {
 		return numberOfBatches;
@@ -49,5 +61,29 @@ public class ApiProductLabelValuesExtended extends ApiProductLabelValues {
 
 	public void setBusinessToCustomerSettings(ApiBusinessToCustomerSettings businessToCustomerSettings) {
 		this.businessToCustomerSettings = businessToCustomerSettings;
+	}
+
+	public ApiCompanyDocument getVideoMeetTheFarmers() {
+		return videoMeetTheFarmers;
+	}
+
+	public void setVideoMeetTheFarmers(ApiCompanyDocument videoMeetTheFarmers) {
+		this.videoMeetTheFarmers = videoMeetTheFarmers;
+	}
+
+	public List<ApiCompanyDocument> getPhotosMeetTheFarmers() {
+		return photosMeetTheFarmers;
+	}
+
+	public void setPhotosMeetTheFarmers(List<ApiCompanyDocument> photosMeetTheFarmers) {
+		this.photosMeetTheFarmers = photosMeetTheFarmers;
+	}
+
+	public List<ApiCompanyDocument> getProductionRecords() {
+		return productionRecords;
+	}
+
+	public void setProductionRecords(List<ApiCompanyDocument> productionRecords) {
+		this.productionRecords = productionRecords;
 	}
 }

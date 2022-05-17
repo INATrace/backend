@@ -1,5 +1,6 @@
 package com.abelium.inatrace.components.company.api;
 
+import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.types.CompanyDocumentCategory;
@@ -11,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 
 @Validated
-public class ApiCompanyDocument {
+public class ApiCompanyDocument extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "type of the document (link, file)", position = 1)
 	public CompanyDocumentType type;

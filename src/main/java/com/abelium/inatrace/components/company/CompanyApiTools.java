@@ -24,7 +24,9 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -171,11 +173,43 @@ public class CompanyApiTools {
 		
 		Company cc = (c instanceof Company) ? (Company) c : null;
 		CompanyTranslation cct = (c instanceof CompanyTranslation) ? (CompanyTranslation) c : null;
-		
+
 		if (ac.documents != null) {
-			c.getDocuments().clear();
-			c.getDocuments().addAll(ListTools.mapThrowable(ac.documents, acd -> toCompanyDocument(userId, cc, cct, acd)));
+			Set<Long> toRemove = new HashSet<>();
+
+			for (CompanyDocument cd : c.getDocuments()) {
+				Optional<ApiCompanyDocument> optionalApiCompanyDocument = ac.getDocuments().stream().filter(apiCompanyDocument -> cd.getId().equals(apiCompanyDocument.id)).findFirst();
+
+				// Update if document already exists
+				if (optionalApiCompanyDocument.isPresent()) {
+					ApiCompanyDocument acd = optionalApiCompanyDocument.get();
+
+					cd.setCompany(cc);
+					cd.setCompanyTranslation(cct);
+					cd.setType(acd.type);
+					cd.setCategory(acd.category);
+					cd.setName(acd.name);
+					cd.setQuote(acd.quote);
+					cd.setDescription(acd.description);
+					cd.setLink(acd.link);
+					cd.setDocument(commonEngine.fetchDocument(userId, acd.document));
+				} else {
+					// Mark for removal otherwise
+					toRemove.add(cd.getId());
+				}
+			}
+
+			// Remove marked
+			c.getDocuments().removeIf(companyDocument -> toRemove.contains(companyDocument.getId()));
+
+			// Add new
+			for (ApiCompanyDocument acd : ac.documents) {
+				if (acd.getId() == null) {
+					c.getDocuments().add(toCompanyDocument(userId, cc, cct, acd));
+				}
+			}
 		}
+
 		if (ac.certifications != null) {
 			c.getCertifications().clear();
 			c.getCertifications().addAll(ListTools.mapThrowable(ac.certifications, acc -> toCompanyCertification(userId, cc, cct, acc)));
@@ -224,6 +258,7 @@ public class CompanyApiTools {
 		if (cd == null) return null;
 		
 		ApiCompanyDocument acd = new ApiCompanyDocument();
+		acd.id = cd.getId();
 		acd.type = cd.getType();
 		acd.category = cd.getCategory();
 		acd.name = cd.getName();

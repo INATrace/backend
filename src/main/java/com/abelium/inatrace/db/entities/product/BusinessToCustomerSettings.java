@@ -43,8 +43,20 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     @Column(name = "tab_feedback")
     private Boolean tabFeedback;
 
+    @Column(name = "graphic_fair_prices")
+    private Boolean graphicFairPrices;
+
+    @Column(name = "graphic_increase_of_income")
+    private Boolean graphicIncreaseOfIncome;
+
+    @Column(name = "graphic_quality")
+    private Boolean graphicQuality;
+
     @OneToOne
-    private Document font;
+    private Document productFont;
+
+    @OneToOne
+    private Document textFont;
 
     @OneToOne
     private Document headerImage;
@@ -135,12 +147,20 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.tabFeedback = tabFeedback;
     }
 
-    public Document getFont() {
-        return font;
+    public Document getProductFont() {
+        return productFont;
     }
 
-    public void setFont(Document font) {
-        this.font = font;
+    public void setProductFont(Document productFont) {
+        this.productFont = productFont;
+    }
+
+    public Document getTextFont() {
+        return textFont;
+    }
+
+    public void setTextFont(Document textFont) {
+        this.textFont = textFont;
     }
 
     public Document getHeaderImage() {
@@ -167,6 +187,30 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.footerImage = footerImage;
     }
 
+    public Boolean getGraphicFairPrices() {
+        return graphicFairPrices;
+    }
+
+    public void setGraphicFairPrices(Boolean graphicFairPrices) {
+        this.graphicFairPrices = graphicFairPrices;
+    }
+
+    public Boolean getGraphicIncreaseOfIncome() {
+        return graphicIncreaseOfIncome;
+    }
+
+    public void setGraphicIncreaseOfIncome(Boolean graphicIncreaseOfIncome) {
+        this.graphicIncreaseOfIncome = graphicIncreaseOfIncome;
+    }
+
+    public Boolean getGraphicQuality() {
+        return graphicQuality;
+    }
+
+    public void setGraphicQuality(Boolean graphicQuality) {
+        this.graphicQuality = graphicQuality;
+    }
+
     public BusinessToCustomerSettings copy() {
         BusinessToCustomerSettings businessToCustomerSettings = new BusinessToCustomerSettings();
 
@@ -180,10 +224,14 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         businessToCustomerSettings.setTabProducers(getTabProducers());
         businessToCustomerSettings.setTabQuality(getTabQuality());
         businessToCustomerSettings.setTabFeedback(getTabFeedback());
-        businessToCustomerSettings.setFont(getFont());
+        businessToCustomerSettings.setProductFont(getProductFont());
+        businessToCustomerSettings.setTextFont(getTextFont());
         businessToCustomerSettings.setHeaderImage(getHeaderImage());
         businessToCustomerSettings.setHeaderBackgroundImage(getHeaderBackgroundImage());
         businessToCustomerSettings.setFooterImage(getFooterImage());
+        businessToCustomerSettings.setGraphicFairPrices(getGraphicFairPrices());
+        businessToCustomerSettings.setGraphicIncreaseOfIncome(getGraphicIncreaseOfIncome());
+        businessToCustomerSettings.setGraphicQuality(getGraphicQuality());
 
         return businessToCustomerSettings;
     }

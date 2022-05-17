@@ -144,6 +144,22 @@ public class ProductController {
     	return new ApiResponse<>(productService.getProductLabelContent(authUser, id));
     }
 
+    @GetMapping(value = "/label/{id}/documents")
+    @ApiOperation(value = "Get selected company documents for product label")
+    public ApiResponse<List<ApiProductLabelCompanyDocument>> getCompanyDocumentsForProductLabel(@AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "Label id", required = true) @PathVariable("id") Long id) throws ApiException {
+        return new ApiResponse<>(productService.getCompanyDocumentsForProductLabel(authUser, id));
+    }
+
+    @PutMapping(value = "/label/{id}/documents")
+    @ApiOperation(value = "Update company document product label list")
+    public ApiDefaultResponse updateCompanyDocumentsForProductLabel(@AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "Label ID", required = true) @PathVariable("id") Long id,
+            @Valid @ApiParam(value = "Company document list", required = true) @RequestBody List<ApiProductLabelCompanyDocument> documents) throws ApiException {
+        productService.updateCompanyDocumentsForProductLabel(authUser, id, documents);
+        return new ApiDefaultResponse();
+    }
+
     @PostMapping(value = "/label/execute/{action}")
     @ApiOperation(value = "Execute action")
     public ApiDefaultResponse executeAction(@AuthenticationPrincipal CustomUserDetails authUser,

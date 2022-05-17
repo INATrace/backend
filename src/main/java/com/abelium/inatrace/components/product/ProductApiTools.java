@@ -9,12 +9,14 @@ import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.company.CompanyApiTools;
 import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
+import com.abelium.inatrace.components.company.api.ApiCompanyDocument;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.value_chain.ValueChainApiTools;
 import com.abelium.inatrace.components.value_chain.ValueChainQueries;
 import com.abelium.inatrace.db.entities.common.BankInformation;
 import com.abelium.inatrace.db.entities.common.Location;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
+import com.abelium.inatrace.db.entities.company.CompanyDocument;
 import com.abelium.inatrace.db.entities.process.Process;
 import com.abelium.inatrace.db.entities.process.ProcessDocument;
 import com.abelium.inatrace.db.entities.process.ProcessStandard;
@@ -305,10 +307,14 @@ public class ProductApiTools {
 		apiBusinessToCustomerSettings.setTabFeedback(businessToCustomerSettings.getTabFeedback());
 		apiBusinessToCustomerSettings.setTabProducers(businessToCustomerSettings.getTabProducers());
 		apiBusinessToCustomerSettings.setTabQuality(businessToCustomerSettings.getTabQuality());
-		apiBusinessToCustomerSettings.setFont(CommonApiTools.toApiDocument(businessToCustomerSettings.getFont(), userId));
+		apiBusinessToCustomerSettings.setProductFont(CommonApiTools.toApiDocument(businessToCustomerSettings.getProductFont(), userId));
+		apiBusinessToCustomerSettings.setTextFont(CommonApiTools.toApiDocument(businessToCustomerSettings.getTextFont(), userId));
 		apiBusinessToCustomerSettings.setHeaderImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderImage(), userId));
 		apiBusinessToCustomerSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderBackgroundImage(), userId));
 		apiBusinessToCustomerSettings.setFooterImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getFooterImage(), userId));
+		apiBusinessToCustomerSettings.setGraphicFairPrices(businessToCustomerSettings.getGraphicFairPrices());
+		apiBusinessToCustomerSettings.setGraphicIncreaseOfIncome(businessToCustomerSettings.getGraphicIncreaseOfIncome());
+		apiBusinessToCustomerSettings.setGraphicQuality(businessToCustomerSettings.getGraphicQuality());
 
 		return apiBusinessToCustomerSettings;
 	}
@@ -394,6 +400,9 @@ public class ProductApiTools {
 			apiBusinessToCustomerSettings.setTabProducers(Boolean.TRUE);
 			apiBusinessToCustomerSettings.setTabQuality(Boolean.TRUE);
 			apiBusinessToCustomerSettings.setTabFeedback(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setGraphicFairPrices(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setGraphicIncreaseOfIncome(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setGraphicQuality(Boolean.TRUE);
 
 			updateBusinessToCustomerSettings(userId, p.getBusinessToCustomerSettings(), apiBusinessToCustomerSettings);
 		}
@@ -507,10 +516,14 @@ public class ProductApiTools {
 		b2c.setTabFeedback(ab2c.getTabFeedback());
 		b2c.setTabProducers(ab2c.getTabProducers());
 		b2c.setTabQuality(ab2c.getTabQuality());
-		b2c.setFont(commonEngine.fetchDocument(userId, ab2c.getFont()));
+		b2c.setProductFont(commonEngine.fetchDocument(userId, ab2c.getProductFont()));
+		b2c.setTextFont(commonEngine.fetchDocument(userId, ab2c.getTextFont()));
 		b2c.setHeaderImage(commonEngine.fetchDocument(userId, ab2c.getHeaderImage()));
 		b2c.setHeaderBackgroundImage(commonEngine.fetchDocument(userId, ab2c.getHeaderBackgroundImage()));
 		b2c.setFooterImage(commonEngine.fetchDocument(userId, ab2c.getFooterImage()));
+		b2c.setGraphicFairPrices(ab2c.getGraphicFairPrices());
+		b2c.setGraphicIncreaseOfIncome(ab2c.getGraphicIncreaseOfIncome());
+		b2c.setGraphicQuality(ab2c.getGraphicQuality());
 	}
 	
 	private void updateResponsibility(Long userId, Responsibility r, ApiResponsibility ar) throws ApiException {
@@ -841,10 +854,14 @@ public class ProductApiTools {
 		b2cSettings.setQuaternaryColor(b2cSettingsProduct.getQuaternaryColor());
 		b2cSettings.setHeadingColor(b2cSettingsProduct.getHeadingColor());
 		b2cSettings.setTextColor(b2cSettingsProduct.getTextColor());
-		b2cSettings.setFont(CommonApiTools.toApiDocument(b2cSettingsProduct.getFont(), null));
+		b2cSettings.setProductFont(CommonApiTools.toApiDocument(b2cSettingsProduct.getProductFont(), null));
+		b2cSettings.setTextFont(CommonApiTools.toApiDocument(b2cSettingsProduct.getTextFont(), null));
 		b2cSettings.setHeaderImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderImage(), null));
 		b2cSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderBackgroundImage(), null));
 		b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getFooterImage(), null));
+		b2cSettings.setGraphicFairPrices(b2cSettingsProduct.getGraphicFairPrices());
+		b2cSettings.setGraphicIncreaseOfIncome(b2cSettingsProduct.getGraphicIncreaseOfIncome());
+		b2cSettings.setGraphicQuality(b2cSettingsProduct.getGraphicQuality());
 
 		// If product label defines values, overwrite settings from product
 		BusinessToCustomerSettings b2cSettingsProductLabel = productLabel.getContent().getBusinessToCustomerSettings();
@@ -878,8 +895,11 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getTabQuality() != null) {
 			b2cSettings.setTabQuality(b2cSettingsProductLabel.getTabQuality());
 		}
-		if (b2cSettingsProductLabel.getFont() != null) {
-			b2cSettings.setFont(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getFont(), null));
+		if (b2cSettingsProductLabel.getProductFont() != null) {
+			b2cSettings.setProductFont(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getProductFont(), null));
+		}
+		if (b2cSettingsProductLabel.getTextFont() != null) {
+			b2cSettings.setTextFont(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getTextFont(), null));
 		}
 		if (b2cSettingsProductLabel.getHeaderImage() != null) {
 			b2cSettings.setHeaderImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getHeaderImage(), null));
@@ -890,6 +910,49 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getFooterImage() != null) {
 			b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getFooterImage(), null));
 		}
+		if (b2cSettingsProductLabel.getGraphicFairPrices() != null) {
+			b2cSettings.setGraphicFairPrices(b2cSettingsProductLabel.getGraphicFairPrices());
+		}
+		if (b2cSettingsProductLabel.getGraphicIncreaseOfIncome() != null) {
+			b2cSettings.setGraphicIncreaseOfIncome(b2cSettingsProductLabel.getGraphicIncreaseOfIncome());
+		}
+		if (b2cSettingsProductLabel.getGraphicQuality() != null) {
+			b2cSettings.setGraphicQuality(b2cSettingsProductLabel.getGraphicQuality());
+		}
+	}
+
+	public void loadBusinessToCustomerMedia(ApiProductLabelValuesExtended apiProductLabelValuesExtended, List<CompanyDocument> companyDocuments) {
+		apiProductLabelValuesExtended.setPhotosMeetTheFarmers(new ArrayList<>());
+		apiProductLabelValuesExtended.setProductionRecords(new ArrayList<>());
+
+		companyDocuments.forEach(companyDocument -> {
+			switch (companyDocument.getCategory()) {
+				case VIDEO:
+					apiProductLabelValuesExtended.setVideoMeetTheFarmers(CompanyApiTools.toApiCompanyDocument(null, companyDocument));
+					break;
+				case MEET_THE_FARMER:
+					apiProductLabelValuesExtended.getPhotosMeetTheFarmers().add(CompanyApiTools.toApiCompanyDocument(null, companyDocument));
+					break;
+				case PRODUCTION_RECORD:
+					apiProductLabelValuesExtended.getProductionRecords().add(CompanyApiTools.toApiCompanyDocument(null, companyDocument));
+					break;
+			}
+		});
+	}
+
+	public static ApiProductLabelCompanyDocument toApiProductLabelCompanyDocument(ApiCompanyDocument apiCompanyDocument) {
+		ApiProductLabelCompanyDocument apiProductLabelCompanyDocument = new ApiProductLabelCompanyDocument();
+
+		apiProductLabelCompanyDocument.setCategory(apiCompanyDocument.getCategory());
+		apiProductLabelCompanyDocument.setDocument(apiCompanyDocument.getDocument());
+		apiProductLabelCompanyDocument.setDescription(apiCompanyDocument.getDescription());
+		apiProductLabelCompanyDocument.setId(apiCompanyDocument.getId());
+		apiProductLabelCompanyDocument.setLink(apiCompanyDocument.getLink());
+		apiProductLabelCompanyDocument.setName(apiCompanyDocument.getName());
+		apiProductLabelCompanyDocument.setQuote(apiCompanyDocument.getQuote());
+		apiProductLabelCompanyDocument.setType(apiCompanyDocument.getType());
+
+		return apiProductLabelCompanyDocument;
 	}
 	
 }

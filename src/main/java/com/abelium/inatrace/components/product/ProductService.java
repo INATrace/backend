@@ -7,12 +7,15 @@ import com.abelium.inatrace.components.analytics.RequestLogService;
 import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeService;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
+import com.abelium.inatrace.components.company.CompanyApiTools;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.product.types.ProductLabelAction;
+import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
+import com.abelium.inatrace.db.entities.company.CompanyDocument;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.product.*;
 import com.abelium.inatrace.security.service.CustomUserDetails;
@@ -20,10 +23,7 @@ import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.tools.TorpedoProjector;
-import com.abelium.inatrace.types.ProductCompanyType;
-import com.abelium.inatrace.types.ProductLabelStatus;
-import com.abelium.inatrace.types.RequestLogType;
-import com.abelium.inatrace.types.UserRole;
+import com.abelium.inatrace.types.*;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Lazy
 @Service
@@ -140,6 +141,7 @@ public class ProductService extends BaseService {
 		em.persist(product.getSustainability());
 		em.persist(product.getSettings());
 		em.persist(product.getComparisonOfPrice());
+		em.persist(product.getJourney());
 		em.persist(product.getBusinessToCustomerSettings());
 		em.persist(product);
 		return new ApiBaseEntity(product);
@@ -178,6 +180,14 @@ public class ProductService extends BaseService {
         }
 
 		productApiTools.updateProduct(authUser, p, ap);
+
+		removeProductLabelCompanyDocumentsForRemovedCompanyAssociations(p);
+	}
+
+	private void removeProductLabelCompanyDocumentsForRemovedCompanyAssociations(Product p) {
+		em.createQuery("DELETE FROM ProductLabelCompanyDocument plcd WHERE plcd.productLabelId IN :plIds AND plcd.companyDocumentId NOT IN :cdIds")
+				.setParameter("plIds", p.getLabels().stream().map(ProductLabel::getId).collect(Collectors.toList()))
+				.setParameter("cdIds", p.getAssociatedCompanies().stream().flatMap(productCompany -> productCompany.getCompany().getDocuments().stream().map(CompanyDocument::getId)).collect(Collectors.toList())).executeUpdate();
 	}
 
     @Transactional
@@ -197,8 +207,63 @@ public class ProductService extends BaseService {
 		ProductLabel pl = productQueries.fetchProductLabelAssoc(authUser, id);
 		return productApiTools.toApiProductLabelContent(authUser.getUserId(), pl.getContent());
 	}
-    
-    
+
+	public List<ApiProductLabelCompanyDocument> getCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id) throws ApiException {
+		productQueries.checkProductLabelPermission(authUser, id);
+
+		List<CompanyDocument> availableDocuments = availableCompanyDocumentsForProductLabel(id);
+		List<ProductLabelCompanyDocument> selectedDocuments = selectedCompanyDocumentsForProductLabel(id);
+
+		return availableDocuments.stream().map(companyDocument -> {
+			ApiProductLabelCompanyDocument apiProductLabelCompanyDocument = ProductApiTools.toApiProductLabelCompanyDocument(CompanyApiTools.toApiCompanyDocument(authUser.getUserId(), companyDocument));
+
+			apiProductLabelCompanyDocument.setActive(selectedDocuments.stream().anyMatch(productLabelCompanyDocument -> productLabelCompanyDocument.getCompanyDocumentId().equals(companyDocument.getId())));
+
+			return apiProductLabelCompanyDocument;
+		}).collect(Collectors.toList());
+	}
+
+	private List<CompanyDocument> availableCompanyDocumentsForProductLabel(Long id) {
+		return em.createQuery("SELECT DISTINCT cd FROM ProductLabel pl JOIN pl.product p JOIN p.associatedCompanies ac JOIN ac.company c JOIN c.documents cd WHERE pl.id = :id", CompanyDocument.class)
+				.setParameter("id", id)
+				.getResultList();
+	}
+
+	private List<ProductLabelCompanyDocument> selectedCompanyDocumentsForProductLabel(Long id) {
+		return em.createQuery("SELECT plcd FROM ProductLabelCompanyDocument plcd WHERE plcd.productLabelId = :productLabelId", ProductLabelCompanyDocument.class)
+				.setParameter("productLabelId", id)
+				.getResultList();
+	}
+
+	@Transactional
+	public void updateCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id, List<ApiProductLabelCompanyDocument> documentList) throws ApiException {
+		productQueries.checkProductLabelPermission(authUser, id);
+
+		// Get existing state
+		List<ProductLabelCompanyDocument> existing = selectedCompanyDocumentsForProductLabel(id);
+
+		// Remove deactivated entries
+		existing.forEach(existingDocument -> {
+			if (documentList.stream().filter(ApiProductLabelCompanyDocument::getActive).noneMatch(apiProductLabelCompanyDocument -> existingDocument.getCompanyDocumentId().equals(apiProductLabelCompanyDocument.getId()))) {
+				em.remove(existingDocument);
+			}
+		});
+
+		List<CompanyDocument> availableDocuments = availableCompanyDocumentsForProductLabel(id);
+
+		// Add activated entries
+		documentList.stream().filter(apiProductLabelCompanyDocument -> apiProductLabelCompanyDocument.getActive() && availableDocuments.stream().anyMatch(companyDocument -> companyDocument.getId().equals(apiProductLabelCompanyDocument.getId()))).forEach(apiProductLabelCompanyDocument -> {
+			if (existing.stream().noneMatch(existingDocument -> existingDocument.getCompanyDocumentId().equals(apiProductLabelCompanyDocument.getId()))) {
+				ProductLabelCompanyDocument productLabelCompanyDocument = new ProductLabelCompanyDocument();
+
+				productLabelCompanyDocument.setProductLabelId(id);
+				productLabelCompanyDocument.setCompanyDocumentId(apiProductLabelCompanyDocument.getId());
+
+				em.persist(productLabelCompanyDocument);
+			}
+		});
+	}
+
     @Transactional
 	public ApiProductLabelValuesExtended getProductLabelValuesPublic(String uid) throws ApiException {
 		ProductLabel pl = fetchProductLabelPublic(uid);
@@ -208,13 +273,21 @@ public class ProductService extends BaseService {
 
 		productApiTools.loadBusinessToCustomerSettings(pl, aplx);
 
+		productApiTools.loadBusinessToCustomerMedia(aplx, getCompanyDocuments(pl));
+
 		aplx.numberOfBatches = Queries.getCountBy(em, ProductLabelBatch.class, ProductLabelBatch::getLabel, pl);
 		aplx.checkAuthenticityCount = countBatchFields(pl, ProductLabelBatch::getCheckAuthenticity, true);
 		aplx.traceOriginCount = countBatchFields(pl, ProductLabelBatch::getTraceOrigin, true);
 		return aplx;
-	}    
-    
-    private <P> int countBatchFields(ProductLabel pl, Function<ProductLabelBatch, P> property, P value) {
+	}
+
+	private List<CompanyDocument> getCompanyDocuments(ProductLabel pl) {
+		return em.createQuery("SELECT cd FROM CompanyDocument cd JOIN ProductLabelCompanyDocument plcd ON cd.id = plcd.companyDocumentId AND plcd.productLabelId = :plId", CompanyDocument.class)
+				.setParameter("plId", pl.getId())
+				.getResultList();
+	}
+
+	private <P> int countBatchFields(ProductLabel pl, Function<ProductLabelBatch, P> property, P value) {
 		ProductLabelBatch plbProxy = Torpedo.from(ProductLabelBatch.class);
         Torpedo.where(plbProxy.getLabel()).eq(pl).and(property.apply(plbProxy)).eq(value);
         Optional<Long> result = Torpedo.select(Torpedo.count(plbProxy)).get(em);
