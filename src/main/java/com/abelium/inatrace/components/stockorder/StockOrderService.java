@@ -308,10 +308,60 @@ public class StockOrderService extends BaseService {
                         })
                         .filter(historyTimelineItem -> historyTimelineItem.getDate() != null)
                         .collect(Collectors.toList()));
+
+                enumerateRepeatedEventNames(apiQRTagPublic.getHistoryTimeline().getItems());
             }
         }
 
         return apiQRTagPublic;
+    }
+
+    private void enumerateRepeatedEventNames(List<ApiHistoryTimelineItem> events) {
+        if (!events.isEmpty()) {
+            List<Integer> repeated = calculateRepetitions(events);
+
+            addStepCounters(events, repeated);
+        }
+    }
+
+    private void addStepCounters(List<ApiHistoryTimelineItem> events, List<Integer> repeated) {
+        int enumerateFrom = -1;
+        // now iterate through events from back to front
+        for (int i = events.size() - 1; i >= 0; i--) {
+            int repetition = repeated.get(i);
+            // if the current event is a repetition, select it as a counter reference
+            if (enumerateFrom == -1 && repetition > 0) {
+                enumerateFrom = repetition;
+            }
+            // if enumeration is in progress
+            if (enumerateFrom != -1) {
+                // add step enumeration
+                events.get(i).setStep(enumerateFrom - repetition + 1);
+                events.get(i).setSteps(enumerateFrom + 1);
+                // if we reached the first element, stop the enumeration
+                if (repetition == 0) {
+                    enumerateFrom = -1;
+                }
+            }
+        }
+    }
+
+    private List<Integer> calculateRepetitions(List<ApiHistoryTimelineItem> events) {
+        // create array with counter for consecutive repeated event names
+        List<Integer> repeated = new ArrayList<>(events.size());
+        // first element cannot be repeated since it is first
+        repeated.add(0);
+        // iterate through events from front to back
+        for (int i = 1; i < events.size(); i++) {
+            if (events.get(i).getName() != null && events.get(i).getName().equals(events.get(i - 1).getName())) {
+                // if current event is the same as previous, increase the repetition counter
+                repeated.add(repeated.get(i - 1) + 1);
+            } else {
+                // else start from beginning
+                repeated.add(0);
+            }
+        }
+        return repeated;
     }
 
     /**
