@@ -43,6 +43,18 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     @Column(name = "tab_feedback")
     private Boolean tabFeedback;
 
+    @Column(name = "order_fair_prices")
+    private Long orderFairPrices;
+
+    @Column(name = "order_producers")
+    private Long orderProducers;
+
+    @Column(name = "order_quality")
+    private Long orderQuality;
+
+    @Column(name = "order_feedback")
+    private Long orderFeedback;
+
     @Column(name = "graphic_fair_prices")
     private Boolean graphicFairPrices;
 
@@ -147,6 +159,38 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.tabFeedback = tabFeedback;
     }
 
+    public Long getOrderFairPrices() {
+        return orderFairPrices;
+    }
+
+    public void setOrderFairPrices(Long orderFairPrices) {
+        this.orderFairPrices = orderFairPrices;
+    }
+
+    public Long getOrderProducers() {
+        return orderProducers;
+    }
+
+    public void setOrderProducers(Long orderProducers) {
+        this.orderProducers = orderProducers;
+    }
+
+    public Long getOrderQuality() {
+        return orderQuality;
+    }
+
+    public void setOrderQuality(Long orderQuality) {
+        this.orderQuality = orderQuality;
+    }
+
+    public Long getOrderFeedback() {
+        return orderFeedback;
+    }
+
+    public void setOrderFeedback(Long orderFeedback) {
+        this.orderFeedback = orderFeedback;
+    }
+
     public Document getProductFont() {
         return productFont;
     }
@@ -224,6 +268,10 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         businessToCustomerSettings.setTabProducers(getTabProducers());
         businessToCustomerSettings.setTabQuality(getTabQuality());
         businessToCustomerSettings.setTabFeedback(getTabFeedback());
+        businessToCustomerSettings.setOrderFairPrices(getOrderFairPrices());
+        businessToCustomerSettings.setOrderFeedback(getOrderFeedback());
+        businessToCustomerSettings.setOrderProducers(getOrderProducers());
+        businessToCustomerSettings.setOrderQuality(getOrderQuality());
         businessToCustomerSettings.setProductFont(getProductFont());
         businessToCustomerSettings.setTextFont(getTextFont());
         businessToCustomerSettings.setHeaderImage(getHeaderImage());

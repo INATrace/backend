@@ -15,6 +15,10 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
     private Boolean tabProducers;
     private Boolean tabQuality;
     private Boolean tabFeedback;
+    private Long orderFairPrices;
+    private Long orderProducers;
+    private Long orderQuality;
+    private Long orderFeedback;
     private ApiDocument productFont;
     private ApiDocument textFont;
     private ApiDocument headerImage;
@@ -102,6 +106,38 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
 
     public void setTabFeedback(Boolean tabFeedback) {
         this.tabFeedback = tabFeedback;
+    }
+
+    public Long getOrderFairPrices() {
+        return orderFairPrices;
+    }
+
+    public void setOrderFairPrices(Long orderFairPrices) {
+        this.orderFairPrices = orderFairPrices;
+    }
+
+    public Long getOrderProducers() {
+        return orderProducers;
+    }
+
+    public void setOrderProducers(Long orderProducers) {
+        this.orderProducers = orderProducers;
+    }
+
+    public Long getOrderQuality() {
+        return orderQuality;
+    }
+
+    public void setOrderQuality(Long orderQuality) {
+        this.orderQuality = orderQuality;
+    }
+
+    public Long getOrderFeedback() {
+        return orderFeedback;
+    }
+
+    public void setOrderFeedback(Long orderFeedback) {
+        this.orderFeedback = orderFeedback;
     }
 
     public ApiDocument getProductFont() {
