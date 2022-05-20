@@ -105,7 +105,7 @@ public class StockOrder extends TimestampEntity {
 	private List<StockOrderActivityProof> activityProofs;
 
 	// A stock (purchase) order can be divided in many payments
-	@OneToMany(mappedBy = "payingCompany", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Payment> payments = new ArrayList<>();
 
 	@ManyToOne

@@ -11,7 +11,9 @@ import com.abelium.inatrace.components.codebook.processingevidencefield.Processi
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
+import com.abelium.inatrace.components.currencies.CurrencyService;
 import com.abelium.inatrace.components.facility.FacilityService;
+import com.abelium.inatrace.components.payment.api.ApiPayment;
 import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
 import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.stockorder.api.*;
@@ -22,11 +24,13 @@ import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
+import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
+import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.db.entities.productorder.ProductOrder;
 import com.abelium.inatrace.db.entities.stockorder.*;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
@@ -37,6 +41,7 @@ import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
+import com.abelium.inatrace.types.ProductCompanyType;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,10 +54,7 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Lazy
@@ -69,17 +71,21 @@ public class StockOrderService extends BaseService {
 
     private final FinalProductService finalProductService;
 
+    private final CurrencyService currencyService;
+
     @Autowired
     public StockOrderService(FacilityService facilityService,
                              ProcessingEvidenceFieldService procEvidenceFieldService,
                              ProcessingEvidenceTypeService procEvidenceTypeService,
                              SemiProductService semiProductService,
-                             FinalProductService finalProductService) {
+                             FinalProductService finalProductService,
+                             CurrencyService currencyService) {
         this.facilityService = facilityService;
         this.procEvidenceFieldService = procEvidenceFieldService;
         this.procEvidenceTypeService = procEvidenceTypeService;
         this.semiProductService = semiProductService;
         this.finalProductService = finalProductService;
+        this.currencyService = currencyService;
     }
 
     public ApiStockOrder getStockOrder(long id, Long userId, Language language, Boolean withProcessingOrder) throws ApiException {
@@ -252,6 +258,12 @@ public class StockOrderService extends BaseService {
 
         if (topLevelStockOrder != null) {
 
+            // Get list of producers for this product
+            List<Company> producers = topLevelStockOrder.getFinalProduct().getProduct().getAssociatedCompanies().stream()
+                    .filter(productCompany -> ProductCompanyType.PRODUCER.equals(productCompany.getType()))
+                    .map(ProductCompany::getCompany)
+                    .collect(Collectors.toList());
+
             // Get and set the orderId
             String orderId;
             if (topLevelStockOrder.getProductOrder() != null) {
@@ -310,6 +322,40 @@ public class StockOrderService extends BaseService {
                         .collect(Collectors.toList()));
 
                 enumerateRepeatedEventNames(apiQRTagPublic.getHistoryTimeline().getItems());
+
+                List<ApiPayment> producerPayments = stockOrderHistory.getTimelineItems().stream().flatMap(apiStockOrderHistoryTimelineItem -> {
+                    if (apiStockOrderHistoryTimelineItem.getProcessingOrder() != null && apiStockOrderHistoryTimelineItem.getProcessingOrder().getTargetStockOrders() != null) {
+                        return apiStockOrderHistoryTimelineItem.getProcessingOrder().getTargetStockOrders().stream().flatMap(apiStockOrder -> {
+                            if (apiStockOrder.getPayments() != null) {
+                                return apiStockOrder.getPayments().stream().filter(apiPayment -> {
+                                    if (apiPayment.getRecipientCompany() != null) {
+                                        return producers.stream().anyMatch(company -> company.getId().equals(apiPayment.getRecipientCompany().getId()));
+                                    }
+                                    return false;
+                                });
+                            }
+                            return null;
+                        });
+                    }
+                    return null;
+                }).collect(Collectors.toList());
+
+                BigDecimal producersPaidEur = BigDecimal.ZERO;
+                BigDecimal producersCoffeeKg = BigDecimal.ZERO;
+
+                for (ApiPayment apiPayment : producerPayments) {
+                    BigDecimal weightKg = new BigDecimal(apiPayment.getPurchased()).multiply(apiPayment.getStockOrder().getMeasureUnitType().getWeight());
+                    BigDecimal producerPriceEur = currencyService.convertToEurAtDate(
+                            apiPayment.getCurrency(),
+                            apiPayment.getAmount(),
+                            Date.from(apiPayment.getFormalCreationTime())
+                    );
+                    producersPaidEur = producersPaidEur.add(producerPriceEur);
+                    producersCoffeeKg = producersCoffeeKg.add(weightKg);
+
+                }
+
+                apiQRTagPublic.setPriceToProducer(producersPaidEur.divide(producersCoffeeKg, 3, RoundingMode.HALF_UP));
             }
         }
 

@@ -164,7 +164,7 @@ public class CurrencyService extends BaseService {
             List<String> enabled = getEnabledCurrencyCodes();
 
             for (String code : rates.keySet()) {
-                if (enabled.contains(code) && em.createNamedQuery("CurrencyPair.rateAtDate").setParameter("currency", code).setParameter("date", current).getResultList().isEmpty()) {
+                if (enabled.contains(code) && rateAtDateQuery(code, current).getResultList().isEmpty()) {
                     CurrencyPair currencyPair = new CurrencyPair();
                     CurrencyType from = currencyTypeService.getCurrencyTypeByCode("EUR");
                     CurrencyType to = currencyTypeService.getCurrencyTypeByCode(code);

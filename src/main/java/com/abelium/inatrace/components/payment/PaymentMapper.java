@@ -46,6 +46,7 @@ public final class PaymentMapper {
 		apiPayment.setPayingCompany(CompanyMapper.toApiCompanyBase(entity.getPayingCompany()));
 		apiPayment.setPaymentConfirmedByUser(UserMapper.toSimpleApiUser(entity.getPaymentConfirmedByUser()));
 		apiPayment.setStockOrder(StockOrderMapper.toApiStockOrderBase(entity.getStockOrder()));
+		apiPayment.setPurchased(entity.getPurchased().intValue());
 
 		if (entity.getReceiptDocument() != null) {
 			apiPayment.setReceiptDocument(CommonApiTools.toApiDocument(entity.getReceiptDocument(), userId));

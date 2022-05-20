@@ -2,6 +2,8 @@ package com.abelium.inatrace.components.stockorder.api;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
+
 /**
  * API model for QR code tag history (public Stock order data) used in B2C page.
  *
@@ -17,6 +19,9 @@ public class ApiQRTagPublic {
 
 	@ApiModelProperty(value = "The Producer name")
 	private String producerName;
+
+	@ApiModelProperty(value = "Price paid to producer in EUR/kg")
+	private BigDecimal priceToProducer;
 
 	private ApiHistoryTimeline historyTimeline;
 
@@ -42,6 +47,14 @@ public class ApiQRTagPublic {
 
 	public void setProducerName(String producerName) {
 		this.producerName = producerName;
+	}
+
+	public BigDecimal getPriceToProducer() {
+		return priceToProducer;
+	}
+
+	public void setPriceToProducer(BigDecimal priceToProducer) {
+		this.priceToProducer = priceToProducer;
 	}
 
 	public ApiHistoryTimeline getHistoryTimeline() {
