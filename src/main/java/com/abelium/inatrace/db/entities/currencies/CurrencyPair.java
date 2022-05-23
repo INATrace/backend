@@ -3,24 +3,20 @@ package com.abelium.inatrace.db.entities.currencies;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.codebook.CurrencyType;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@NamedQueries({
-        @NamedQuery(name = "CurrencyPair.getLatestDate",
-                    query = "SELECT c.date FROM CurrencyPair c ORDER BY c.date DESC"),
-        @NamedQuery(name = "CurrencyPair.latestRate",
-                    query = "SELECT c.value FROM CurrencyPair c WHERE c.from.code = 'EUR' AND c.to.code = :currency ORDER BY c.date DESC"),
-        @NamedQuery(name = "CurrencyPair.rateAtDate",
-                    query = "SELECT c.value FROM CurrencyPair c WHERE c.from.code = 'EUR' AND c.to.code = :currency AND c.date = :date")
-})
+@NamedQuery(name = "CurrencyPair.getLatestDate",
+            query = "SELECT c.date FROM CurrencyPair c ORDER BY c.date DESC")
+@NamedQuery(name = "CurrencyPair.latestRate",
+            query = "SELECT c.value FROM CurrencyPair c WHERE c.from.code = 'EUR' AND c.to.code = :currency ORDER BY c.date DESC")
+@NamedQuery(name = "CurrencyPair.rateAtDate",
+            query = "SELECT c.value FROM CurrencyPair c WHERE c.from.code = 'EUR' AND c.to.code = :currency AND c.date = :date")
 public class CurrencyPair extends BaseEntity {
 
+    @Temporal(TemporalType.DATE)
     private Date date;
 
     @ManyToOne
