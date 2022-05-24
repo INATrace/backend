@@ -258,12 +258,6 @@ public class StockOrderService extends BaseService {
 
         if (topLevelStockOrder != null) {
 
-            // Get list of producers for this product
-            List<Company> producers = topLevelStockOrder.getFinalProduct().getProduct().getAssociatedCompanies().stream()
-                    .filter(productCompany -> ProductCompanyType.PRODUCER.equals(productCompany.getType()))
-                    .map(ProductCompany::getCompany)
-                    .collect(Collectors.toList());
-
             // Get and set the orderId
             String orderId;
             if (topLevelStockOrder.getProductOrder() != null) {
@@ -323,43 +317,116 @@ public class StockOrderService extends BaseService {
 
                 enumerateRepeatedEventNames(apiQRTagPublic.getHistoryTimeline().getItems());
 
-                List<ApiPayment> producerPayments = stockOrderHistory.getTimelineItems().stream().flatMap(apiStockOrderHistoryTimelineItem -> {
-                    if (apiStockOrderHistoryTimelineItem.getProcessingOrder() != null && apiStockOrderHistoryTimelineItem.getProcessingOrder().getTargetStockOrders() != null) {
-                        return apiStockOrderHistoryTimelineItem.getProcessingOrder().getTargetStockOrders().stream().flatMap(apiStockOrder -> {
-                            if (apiStockOrder.getPayments() != null) {
-                                return apiStockOrder.getPayments().stream().filter(apiPayment -> {
-                                    if (apiPayment.getRecipientCompany() != null) {
-                                        return producers.stream().anyMatch(company -> company.getId().equals(apiPayment.getRecipientCompany().getId()));
-                                    }
-                                    return false;
-                                });
-                            }
-                            return null;
-                        });
-                    }
-                    return null;
-                }).collect(Collectors.toList());
+                // Get list of producers for this product
+                List<Company> producers = getProducers(topLevelStockOrder);
 
+                // Get list of payments to producers
+                List<ApiPayment> producerPayments = getProducerPayments(stockOrderHistory, producers);
+
+                Map<Long, BigDecimal> stockOrderWeights = new HashMap<>();
                 BigDecimal producersPaidEur = BigDecimal.ZERO;
-                BigDecimal producersCoffeeKg = BigDecimal.ZERO;
 
                 for (ApiPayment apiPayment : producerPayments) {
-                    BigDecimal weightKg = new BigDecimal(apiPayment.getPurchased()).multiply(apiPayment.getStockOrder().getMeasureUnitType().getWeight());
+                    // Add stock order weights only once
+                    if (!stockOrderWeights.containsKey(apiPayment.getStockOrder().getId())) {
+                        stockOrderWeights.put(apiPayment.getStockOrder().getId(), apiPayment.getStockOrder().getFulfilledQuantity().multiply(apiPayment.getStockOrder().getMeasureUnitType().getWeight()));
+                    }
+                    // Calculate price in EUR at date
                     BigDecimal producerPriceEur = currencyService.convertToEurAtDate(
                             apiPayment.getCurrency(),
                             apiPayment.getAmount(),
                             Date.from(apiPayment.getFormalCreationTime())
                     );
+                    // Accumulate payments
                     producersPaidEur = producersPaidEur.add(producerPriceEur);
-                    producersCoffeeKg = producersCoffeeKg.add(weightKg);
-
                 }
 
-                apiQRTagPublic.setPriceToProducer(producersPaidEur.divide(producersCoffeeKg, 3, RoundingMode.HALF_UP));
+                // Sum up order weights
+                BigDecimal producersCoffeeKg = stockOrderWeights.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                apiQRTagPublic.setPriceToProducer(calculateProducerPayments(producersPaidEur, producersCoffeeKg));
+                apiQRTagPublic.setPriceToFarmer(calculateFarmerPayments(stockOrderHistory));
             }
         }
 
         return apiQRTagPublic;
+    }
+
+    private List<ApiPayment> getProducerPayments(ApiStockOrderHistory stockOrderHistory, List<Company> producers) {
+        return stockOrderHistory.getTimelineItems().stream().flatMap(apiStockOrderHistoryTimelineItem -> {
+            if (apiStockOrderHistoryTimelineItem.getProcessingOrder() != null && apiStockOrderHistoryTimelineItem.getProcessingOrder().getTargetStockOrders() != null) {
+                return apiStockOrderHistoryTimelineItem.getProcessingOrder().getTargetStockOrders().stream().flatMap(apiStockOrder -> {
+                    if (apiStockOrder.getPayments() != null) {
+                        return apiStockOrder.getPayments().stream().filter(apiPayment -> {
+                            if (apiPayment.getRecipientCompany() != null) {
+                                return producers.stream().anyMatch(company -> company.getId().equals(apiPayment.getRecipientCompany().getId()));
+                            }
+                            return false;
+                        });
+                    }
+                    return null;
+                });
+            }
+            return null;
+        }).collect(Collectors.toList());
+    }
+
+    private List<Company> getProducers(StockOrder topLevelStockOrder) {
+        return topLevelStockOrder.getFinalProduct().getProduct().getAssociatedCompanies().stream()
+                .filter(productCompany -> ProductCompanyType.PRODUCER.equals(productCompany.getType()))
+                .map(ProductCompany::getCompany)
+                .collect(Collectors.toList());
+    }
+
+    private BigDecimal calculateProducerPayments(BigDecimal paidEur, BigDecimal coffeeKg) {
+        if (paidEur.equals(BigDecimal.ZERO) || coffeeKg.equals(BigDecimal.ZERO)) {
+            return null;
+        } else {
+            return paidEur.divide(coffeeKg, 3, RoundingMode.HALF_UP);
+        }
+    }
+
+    private BigDecimal calculateFarmerPayments(ApiStockOrderHistory stockOrderHistory) {
+        List<ApiStockOrder> farmerStockOrders = stockOrderHistory.getTimelineItems().stream().flatMap(apiStockOrderHistoryTimelineItem -> {
+            if (apiStockOrderHistoryTimelineItem.getPurchaseOrders() != null) {
+                return apiStockOrderHistoryTimelineItem.getPurchaseOrders().stream();
+            }
+            return null;
+        }).collect(Collectors.toList());
+
+        // Calculating farmer payments
+        if (farmersFullyPaid(farmerStockOrders)) {
+            BigDecimal paidEur = BigDecimal.ZERO;
+            BigDecimal coffeeKg = BigDecimal.ZERO;
+
+            for (ApiStockOrder apiStockOrder : farmerStockOrders) {
+                for (ApiPayment apiPayment : apiStockOrder.getPayments()) {
+                    paidEur = paidEur.add(currencyService.convertToEurAtDate(
+                            apiPayment.getCurrency(),
+                            apiPayment.getAmount(),
+                            Date.from(apiPayment.getFormalCreationTime())
+                    ));
+                }
+                coffeeKg = coffeeKg.add(apiStockOrder.getFulfilledQuantity().multiply(apiStockOrder.getMeasureUnitType().getWeight()));
+            }
+
+            if (BigDecimal.ZERO.equals(coffeeKg)) {
+                return null;
+            }
+
+            return paidEur.divide(coffeeKg, 3, RoundingMode.HALF_UP);
+        } else {
+            return null;
+        }
+    }
+
+    private boolean farmersFullyPaid(List<ApiStockOrder> apiStockOrderList) {
+        for (ApiStockOrder apiStockOrder : apiStockOrderList) {
+            if (apiStockOrder.getBalance().compareTo(BigDecimal.ZERO) > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void enumerateRepeatedEventNames(List<ApiHistoryTimelineItem> events) {

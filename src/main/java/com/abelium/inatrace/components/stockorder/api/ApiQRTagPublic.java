@@ -23,6 +23,9 @@ public class ApiQRTagPublic {
 	@ApiModelProperty(value = "Price paid to producer in EUR/kg")
 	private BigDecimal priceToProducer;
 
+	@ApiModelProperty(value = "Price paid to farmers in EUR/kg")
+	private BigDecimal priceToFarmer;
+
 	private ApiHistoryTimeline historyTimeline;
 
 	public String getQrTag() {
@@ -55,6 +58,14 @@ public class ApiQRTagPublic {
 
 	public void setPriceToProducer(BigDecimal priceToProducer) {
 		this.priceToProducer = priceToProducer;
+	}
+
+	public BigDecimal getPriceToFarmer() {
+		return priceToFarmer;
+	}
+
+	public void setPriceToFarmer(BigDecimal priceToFarmer) {
+		this.priceToFarmer = priceToFarmer;
 	}
 
 	public ApiHistoryTimeline getHistoryTimeline() {
