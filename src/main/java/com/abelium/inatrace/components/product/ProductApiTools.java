@@ -21,6 +21,7 @@ import com.abelium.inatrace.db.entities.process.Process;
 import com.abelium.inatrace.db.entities.process.ProcessDocument;
 import com.abelium.inatrace.db.entities.process.ProcessStandard;
 import com.abelium.inatrace.db.entities.product.*;
+import com.abelium.inatrace.db.entities.product.enums.FairPricesUnit;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.FieldTools;
 import com.abelium.inatrace.tools.ListTools;
@@ -319,6 +320,8 @@ public class ProductApiTools {
 		apiBusinessToCustomerSettings.setGraphicFairPrices(businessToCustomerSettings.getGraphicFairPrices());
 		apiBusinessToCustomerSettings.setGraphicIncreaseOfIncome(businessToCustomerSettings.getGraphicIncreaseOfIncome());
 		apiBusinessToCustomerSettings.setGraphicQuality(businessToCustomerSettings.getGraphicQuality());
+		apiBusinessToCustomerSettings.setGraphicPriceToProducer(businessToCustomerSettings.getGraphicPriceToProducer());
+		apiBusinessToCustomerSettings.setGraphicFarmGatePrice(businessToCustomerSettings.getGraphicFarmGatePrice());
 
 		return apiBusinessToCustomerSettings;
 	}
@@ -411,6 +414,8 @@ public class ProductApiTools {
 			apiBusinessToCustomerSettings.setGraphicFairPrices(Boolean.TRUE);
 			apiBusinessToCustomerSettings.setGraphicIncreaseOfIncome(Boolean.TRUE);
 			apiBusinessToCustomerSettings.setGraphicQuality(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setGraphicPriceToProducer(FairPricesUnit.PER_CONTAINER);
+			apiBusinessToCustomerSettings.setGraphicFarmGatePrice(FairPricesUnit.PERCENT_VALUE);
 
 			updateBusinessToCustomerSettings(userId, p.getBusinessToCustomerSettings(), apiBusinessToCustomerSettings);
 		}
@@ -536,6 +541,8 @@ public class ProductApiTools {
 		b2c.setGraphicFairPrices(ab2c.getGraphicFairPrices());
 		b2c.setGraphicIncreaseOfIncome(ab2c.getGraphicIncreaseOfIncome());
 		b2c.setGraphicQuality(ab2c.getGraphicQuality());
+		b2c.setGraphicPriceToProducer(ab2c.getGraphicPriceToProducer());
+		b2c.setGraphicFarmGatePrice(ab2c.getGraphicFarmGatePrice());
 	}
 	
 	private void updateResponsibility(Long userId, Responsibility r, ApiResponsibility ar) throws ApiException {
@@ -874,6 +881,8 @@ public class ProductApiTools {
 		b2cSettings.setGraphicFairPrices(b2cSettingsProduct.getGraphicFairPrices());
 		b2cSettings.setGraphicIncreaseOfIncome(b2cSettingsProduct.getGraphicIncreaseOfIncome());
 		b2cSettings.setGraphicQuality(b2cSettingsProduct.getGraphicQuality());
+		b2cSettings.setGraphicPriceToProducer(b2cSettingsProduct.getGraphicPriceToProducer());
+		b2cSettings.setGraphicFarmGatePrice(b2cSettingsProduct.getGraphicFarmGatePrice());
 
 		// If product label defines values, overwrite settings from product
 		BusinessToCustomerSettings b2cSettingsProductLabel = productLabel.getContent().getBusinessToCustomerSettings();
@@ -942,6 +951,12 @@ public class ProductApiTools {
 		}
 		if (b2cSettingsProductLabel.getGraphicQuality() != null) {
 			b2cSettings.setGraphicQuality(b2cSettingsProductLabel.getGraphicQuality());
+		}
+		if (b2cSettingsProductLabel.getGraphicPriceToProducer() != null) {
+			b2cSettings.setGraphicPriceToProducer(b2cSettingsProductLabel.getGraphicPriceToProducer());
+		}
+		if (b2cSettingsProductLabel.getGraphicFarmGatePrice() != null) {
+			b2cSettings.setGraphicFarmGatePrice(b2cSettingsProductLabel.getGraphicFarmGatePrice());
 		}
 	}
 

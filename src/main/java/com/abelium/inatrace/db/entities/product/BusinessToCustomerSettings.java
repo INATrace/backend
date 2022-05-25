@@ -3,6 +3,7 @@ package com.abelium.inatrace.db.entities.product;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.common.Document;
+import com.abelium.inatrace.db.entities.product.enums.FairPricesUnit;
 
 import javax.persistence.*;
 
@@ -63,6 +64,14 @@ public class BusinessToCustomerSettings extends TimestampEntity {
 
     @Column(name = "graphic_quality")
     private Boolean graphicQuality;
+
+    @Column(name = "graphic_price_to_producer")
+    @Enumerated(EnumType.STRING)
+    private FairPricesUnit graphicPriceToProducer;
+
+    @Column(name = "graphic_farm_gate_price")
+    @Enumerated(EnumType.STRING)
+    private FairPricesUnit graphicFarmGatePrice;
 
     @OneToOne
     private Document productFont;
@@ -255,6 +264,22 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.graphicQuality = graphicQuality;
     }
 
+    public FairPricesUnit getGraphicPriceToProducer() {
+        return graphicPriceToProducer;
+    }
+
+    public void setGraphicPriceToProducer(FairPricesUnit graphicPriceToProducer) {
+        this.graphicPriceToProducer = graphicPriceToProducer;
+    }
+
+    public FairPricesUnit getGraphicFarmGatePrice() {
+        return graphicFarmGatePrice;
+    }
+
+    public void setGraphicFarmGatePrice(FairPricesUnit graphicFarmGatePrice) {
+        this.graphicFarmGatePrice = graphicFarmGatePrice;
+    }
+
     public BusinessToCustomerSettings copy() {
         BusinessToCustomerSettings businessToCustomerSettings = new BusinessToCustomerSettings();
 
@@ -280,6 +305,8 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         businessToCustomerSettings.setGraphicFairPrices(getGraphicFairPrices());
         businessToCustomerSettings.setGraphicIncreaseOfIncome(getGraphicIncreaseOfIncome());
         businessToCustomerSettings.setGraphicQuality(getGraphicQuality());
+        businessToCustomerSettings.setGraphicPriceToProducer(getGraphicPriceToProducer());
+        businessToCustomerSettings.setGraphicFarmGatePrice(getGraphicFarmGatePrice());
 
         return businessToCustomerSettings;
     }
