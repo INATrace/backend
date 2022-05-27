@@ -19,8 +19,8 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 @Service
 public class CurrencyService extends BaseService {
 
+    private static final String CURRENCY = "currency";
+
     @Autowired
     private CurrencyTypeService currencyTypeService;
 
@@ -36,13 +38,14 @@ public class CurrencyService extends BaseService {
     private String apiKey;
 
     public BigDecimal convertFromEur(String to, BigDecimal value) {
-        return value.multiply(em.createNamedQuery("CurrencyPair.latestRate", BigDecimal.class).setParameter("currency", to).getResultList().get(0));
+        return value.multiply(em.createNamedQuery("CurrencyPair.latestRate", BigDecimal.class).setParameter(CURRENCY, to).getResultList().get(0));
     }
 
     public BigDecimal convertToEur(String from, BigDecimal value) {
-        return value.divide(em.createNamedQuery("CurrencyPair.latestRate", BigDecimal.class).setParameter("currency", from).getResultList().get(0), 6, RoundingMode.HALF_UP);
+        return value.divide(em.createNamedQuery("CurrencyPair.latestRate", BigDecimal.class).setParameter(CURRENCY, from).getResultList().get(0), 6, RoundingMode.HALF_UP);
     }
 
+    @Transactional
     public BigDecimal convertFromEurAtDate(String to, BigDecimal value, Date date) {
         List<BigDecimal> rates = rateAtDateQuery(to, date).getResultList();
         BigDecimal rate;
@@ -55,6 +58,7 @@ public class CurrencyService extends BaseService {
         return value.multiply(rate);
     }
 
+    @Transactional
     public BigDecimal convertToEurAtDate(String from, BigDecimal value, Date date) {
         List<BigDecimal> rates = rateAtDateQuery(from, date).getResultList();
         BigDecimal rate;
@@ -106,11 +110,11 @@ public class CurrencyService extends BaseService {
                 .block();
         if (apiCurrencySymbolsResponse != null && apiCurrencySymbolsResponse.isSuccess()) {
             Map<String, String> symbols = apiCurrencySymbolsResponse.getSymbols();
-            for (String code : symbols.keySet()) {
-                if (em.createNamedQuery("CurrencyType.getCurrencyTypeByCode").setParameter("code", code).getResultList().isEmpty()) {
+            for (Map.Entry<String, String> entry : symbols.entrySet()) {
+                if (em.createNamedQuery("CurrencyType.getCurrencyTypeByCode").setParameter("code", entry.getKey()).getResultList().isEmpty()) {
                     CurrencyType currencyType = new CurrencyType();
-                    currencyType.setCode(code);
-                    currencyType.setLabel(symbols.get(code));
+                    currencyType.setCode(entry.getKey());
+                    currencyType.setLabel(entry.getValue());
                     currencyType.setEnabled(Boolean.FALSE);
                     em.persist(currencyType);
                 }
@@ -131,15 +135,15 @@ public class CurrencyService extends BaseService {
 
             List<String> enabled = getEnabledCurrencyCodes();
 
-            for (String code : rates.keySet()) {
-                if (enabled.contains(code) && em.createNamedQuery("CurrencyPair.rateAtDate").setParameter("currency", code).setParameter("date", current).getResultList().isEmpty()) {
+            for (Map.Entry<String, BigDecimal> entry : rates.entrySet()) {
+                if (enabled.contains(entry.getKey()) && em.createNamedQuery("CurrencyPair.rateAtDate").setParameter(CURRENCY, entry.getKey()).setParameter("date", current).getResultList().isEmpty()) {
                     CurrencyPair currencyPair = new CurrencyPair();
                     CurrencyType from = currencyTypeService.getCurrencyTypeByCode("EUR");
-                    CurrencyType to = currencyTypeService.getCurrencyTypeByCode(code);
+                    CurrencyType to = currencyTypeService.getCurrencyTypeByCode(entry.getKey());
                     currencyPair.setFrom(from);
                     currencyPair.setTo(to);
                     currencyPair.setDate(current);
-                    currencyPair.setValue(rates.get(code));
+                    currencyPair.setValue(entry.getValue());
                     em.persist(currencyPair);
                 }
             }
@@ -147,8 +151,7 @@ public class CurrencyService extends BaseService {
     }
 
     public void fetchRates(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String isoDate = dateFormat.format(date);
+        String isoDate = DateTimeFormatter.ISO_LOCAL_DATE.format(date.toInstant().atZone(ZoneId.of("GMT")));
         WebClient webClient = WebClient.create("http://api.exchangeratesapi.io/v1/" + isoDate + "?access_key=" + apiKey + "&base=EUR");
         ApiCurrencyRatesResponse apiCurrencyRatesResponse = webClient
                 .get()
@@ -163,15 +166,15 @@ public class CurrencyService extends BaseService {
 
             List<String> enabled = getEnabledCurrencyCodes();
 
-            for (String code : rates.keySet()) {
-                if (enabled.contains(code) && rateAtDateQuery(code, current).getResultList().isEmpty()) {
+            for (Map.Entry<String, BigDecimal> entry : rates.entrySet()) {
+                if (enabled.contains(entry.getKey()) && rateAtDateQuery(entry.getKey(), current).getResultList().isEmpty()) {
                     CurrencyPair currencyPair = new CurrencyPair();
                     CurrencyType from = currencyTypeService.getCurrencyTypeByCode("EUR");
-                    CurrencyType to = currencyTypeService.getCurrencyTypeByCode(code);
+                    CurrencyType to = currencyTypeService.getCurrencyTypeByCode(entry.getKey());
                     currencyPair.setFrom(from);
                     currencyPair.setTo(to);
                     currencyPair.setDate(current);
-                    currencyPair.setValue(rates.get(code));
+                    currencyPair.setValue(entry.getValue());
                     em.persist(currencyPair);
                 }
             }
@@ -183,6 +186,6 @@ public class CurrencyService extends BaseService {
     }
 
     private TypedQuery<BigDecimal> rateAtDateQuery(String currency, Date date) {
-        return em.createNamedQuery("CurrencyPair.rateAtDate", BigDecimal.class).setParameter("currency", currency).setParameter("date", date);
+        return em.createNamedQuery("CurrencyPair.rateAtDate", BigDecimal.class).setParameter(CURRENCY, currency).setParameter("date", date);
     }
 }
