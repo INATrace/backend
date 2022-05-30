@@ -324,27 +324,28 @@ public class StockOrderService extends BaseService {
                 List<ApiPayment> producerPayments = getProducerPayments(stockOrderHistory, producers);
 
                 Map<Long, BigDecimal> stockOrderWeights = new HashMap<>();
-                BigDecimal producersPaidEur = BigDecimal.ZERO;
+                BigDecimal producersPaidUsd = BigDecimal.ZERO;
 
                 for (ApiPayment apiPayment : producerPayments) {
                     // Add stock order weights only once
                     if (!stockOrderWeights.containsKey(apiPayment.getStockOrder().getId())) {
                         stockOrderWeights.put(apiPayment.getStockOrder().getId(), apiPayment.getStockOrder().getFulfilledQuantity().multiply(apiPayment.getStockOrder().getMeasureUnitType().getWeight()));
                     }
-                    // Calculate price in EUR at date
-                    BigDecimal producerPriceEur = currencyService.convertToEurAtDate(
+                    // Calculate price in USD at date
+                    BigDecimal producerPriceUsd = currencyService.convertAtDate(
                             apiPayment.getCurrency(),
+                            "USD",
                             apiPayment.getAmount(),
                             Date.from(apiPayment.getFormalCreationTime())
                     );
                     // Accumulate payments
-                    producersPaidEur = producersPaidEur.add(producerPriceEur);
+                    producersPaidUsd = producersPaidUsd.add(producerPriceUsd);
                 }
 
                 // Sum up order weights
                 BigDecimal producersCoffeeKg = stockOrderWeights.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                apiQRTagPublic.setPriceToProducer(calculateProducerPayments(producersPaidEur, producersCoffeeKg));
+                apiQRTagPublic.setPriceToProducer(calculateProducerPayments(producersPaidUsd, producersCoffeeKg));
                 apiQRTagPublic.setPriceToFarmer(calculateFarmerPayments(stockOrderHistory));
             }
         }
@@ -396,16 +397,19 @@ public class StockOrderService extends BaseService {
 
         // Calculating farmer payments
         if (farmersFullyPaid(farmerStockOrders)) {
-            BigDecimal paidEur = BigDecimal.ZERO;
+            BigDecimal paidUsd = BigDecimal.ZERO;
             BigDecimal coffeeKg = BigDecimal.ZERO;
 
             for (ApiStockOrder apiStockOrder : farmerStockOrders) {
                 for (ApiPayment apiPayment : apiStockOrder.getPayments()) {
-                    paidEur = paidEur.add(currencyService.convertToEurAtDate(
-                            apiPayment.getCurrency(),
-                            apiPayment.getAmount(),
-                            Date.from(apiPayment.getFormalCreationTime())
-                    ));
+                    paidUsd = paidUsd.add(
+                            currencyService.convertAtDate(
+                                    apiPayment.getCurrency(),
+                                    "USD",
+                                    apiPayment.getAmount(),
+                                    Date.from(apiPayment.getFormalCreationTime())
+                            )
+                    );
                 }
                 coffeeKg = coffeeKg.add(apiStockOrder.getFulfilledQuantity().multiply(apiStockOrder.getMeasureUnitType().getWeight()));
             }
@@ -414,7 +418,7 @@ public class StockOrderService extends BaseService {
                 return null;
             }
 
-            return paidEur.divide(coffeeKg, 3, RoundingMode.HALF_UP);
+            return paidUsd.divide(coffeeKg, 3, RoundingMode.HALF_UP);
         } else {
             return null;
         }
