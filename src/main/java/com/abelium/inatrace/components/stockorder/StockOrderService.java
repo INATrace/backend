@@ -11,7 +11,9 @@ import com.abelium.inatrace.components.codebook.processingevidencefield.Processi
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
+import com.abelium.inatrace.components.currencies.CurrencyService;
 import com.abelium.inatrace.components.facility.FacilityService;
+import com.abelium.inatrace.components.payment.api.ApiPayment;
 import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
 import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.stockorder.api.*;
@@ -22,11 +24,13 @@ import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
+import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
+import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.db.entities.productorder.ProductOrder;
 import com.abelium.inatrace.db.entities.stockorder.*;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
@@ -37,6 +41,7 @@ import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
+import com.abelium.inatrace.types.ProductCompanyType;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,10 +54,7 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Lazy
@@ -69,17 +71,21 @@ public class StockOrderService extends BaseService {
 
     private final FinalProductService finalProductService;
 
+    private final CurrencyService currencyService;
+
     @Autowired
     public StockOrderService(FacilityService facilityService,
                              ProcessingEvidenceFieldService procEvidenceFieldService,
                              ProcessingEvidenceTypeService procEvidenceTypeService,
                              SemiProductService semiProductService,
-                             FinalProductService finalProductService) {
+                             FinalProductService finalProductService,
+                             CurrencyService currencyService) {
         this.facilityService = facilityService;
         this.procEvidenceFieldService = procEvidenceFieldService;
         this.procEvidenceTypeService = procEvidenceTypeService;
         this.semiProductService = semiProductService;
         this.finalProductService = finalProductService;
+        this.currencyService = currencyService;
     }
 
     public ApiStockOrder getStockOrder(long id, Long userId, Language language, Boolean withProcessingOrder) throws ApiException {
@@ -308,10 +314,171 @@ public class StockOrderService extends BaseService {
                         })
                         .filter(historyTimelineItem -> historyTimelineItem.getDate() != null)
                         .collect(Collectors.toList()));
+
+                enumerateRepeatedEventNames(apiQRTagPublic.getHistoryTimeline().getItems());
+
+                // Get list of producers for this product
+                List<Company> producers = getProducers(topLevelStockOrder);
+
+                // Get list of payments to producers
+                List<ApiPayment> producerPayments = getProducerPayments(stockOrderHistory, producers);
+
+                Map<Long, BigDecimal> stockOrderWeights = new HashMap<>();
+                BigDecimal producersPaidUsd = BigDecimal.ZERO;
+
+                for (ApiPayment apiPayment : producerPayments) {
+                    // Add stock order weights only once
+                    if (!stockOrderWeights.containsKey(apiPayment.getStockOrder().getId())) {
+                        stockOrderWeights.put(apiPayment.getStockOrder().getId(), apiPayment.getStockOrder().getFulfilledQuantity().multiply(apiPayment.getStockOrder().getMeasureUnitType().getWeight()));
+                    }
+                    // Calculate price in USD at date
+                    BigDecimal producerPriceUsd = currencyService.convertAtDate(
+                            apiPayment.getCurrency(),
+                            "USD",
+                            apiPayment.getAmount(),
+                            Date.from(apiPayment.getFormalCreationTime())
+                    );
+                    // Accumulate payments
+                    producersPaidUsd = producersPaidUsd.add(producerPriceUsd);
+                }
+
+                // Sum up order weights
+                BigDecimal producersCoffeeKg = stockOrderWeights.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                apiQRTagPublic.setPriceToProducer(calculateProducerPayments(producersPaidUsd, producersCoffeeKg));
+                apiQRTagPublic.setPriceToFarmer(calculateFarmerPayments(stockOrderHistory));
             }
         }
 
         return apiQRTagPublic;
+    }
+
+    private List<ApiPayment> getProducerPayments(ApiStockOrderHistory stockOrderHistory, List<Company> producers) {
+        return stockOrderHistory.getTimelineItems().stream().flatMap(apiStockOrderHistoryTimelineItem -> {
+            if (apiStockOrderHistoryTimelineItem.getProcessingOrder() != null && apiStockOrderHistoryTimelineItem.getProcessingOrder().getTargetStockOrders() != null) {
+                return apiStockOrderHistoryTimelineItem.getProcessingOrder().getTargetStockOrders().stream().flatMap(apiStockOrder -> {
+                    if (apiStockOrder.getPayments() != null) {
+                        return apiStockOrder.getPayments().stream().filter(apiPayment -> {
+                            if (apiPayment.getRecipientCompany() != null) {
+                                return producers.stream().anyMatch(company -> company.getId().equals(apiPayment.getRecipientCompany().getId()));
+                            }
+                            return false;
+                        });
+                    }
+                    return null;
+                });
+            }
+            return null;
+        }).collect(Collectors.toList());
+    }
+
+    private List<Company> getProducers(StockOrder topLevelStockOrder) {
+        return topLevelStockOrder.getFinalProduct().getProduct().getAssociatedCompanies().stream()
+                .filter(productCompany -> ProductCompanyType.PRODUCER.equals(productCompany.getType()))
+                .map(ProductCompany::getCompany)
+                .collect(Collectors.toList());
+    }
+
+    private BigDecimal calculateProducerPayments(BigDecimal paidEur, BigDecimal coffeeKg) {
+        if (paidEur.equals(BigDecimal.ZERO) || coffeeKg.equals(BigDecimal.ZERO)) {
+            return null;
+        } else {
+            return paidEur.divide(coffeeKg, 3, RoundingMode.HALF_UP);
+        }
+    }
+
+    private BigDecimal calculateFarmerPayments(ApiStockOrderHistory stockOrderHistory) {
+        List<ApiStockOrder> farmerStockOrders = stockOrderHistory.getTimelineItems().stream().flatMap(apiStockOrderHistoryTimelineItem -> {
+            if (apiStockOrderHistoryTimelineItem.getPurchaseOrders() != null) {
+                return apiStockOrderHistoryTimelineItem.getPurchaseOrders().stream();
+            }
+            return null;
+        }).collect(Collectors.toList());
+
+        // Calculating farmer payments
+        if (farmersFullyPaid(farmerStockOrders)) {
+            BigDecimal paidUsd = BigDecimal.ZERO;
+            BigDecimal coffeeKg = BigDecimal.ZERO;
+
+            for (ApiStockOrder apiStockOrder : farmerStockOrders) {
+                for (ApiPayment apiPayment : apiStockOrder.getPayments()) {
+                    paidUsd = paidUsd.add(
+                            currencyService.convertAtDate(
+                                    apiPayment.getCurrency(),
+                                    "USD",
+                                    apiPayment.getAmount(),
+                                    Date.from(apiPayment.getFormalCreationTime())
+                            )
+                    );
+                }
+                coffeeKg = coffeeKg.add(apiStockOrder.getFulfilledQuantity().multiply(apiStockOrder.getMeasureUnitType().getWeight()));
+            }
+
+            if (BigDecimal.ZERO.equals(coffeeKg)) {
+                return null;
+            }
+
+            return paidUsd.divide(coffeeKg, 3, RoundingMode.HALF_UP);
+        } else {
+            return null;
+        }
+    }
+
+    private boolean farmersFullyPaid(List<ApiStockOrder> apiStockOrderList) {
+        for (ApiStockOrder apiStockOrder : apiStockOrderList) {
+            if (apiStockOrder.getBalance().compareTo(BigDecimal.ZERO) > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void enumerateRepeatedEventNames(List<ApiHistoryTimelineItem> events) {
+        if (!events.isEmpty()) {
+            List<Integer> repeated = calculateRepetitions(events);
+
+            addStepCounters(events, repeated);
+        }
+    }
+
+    private void addStepCounters(List<ApiHistoryTimelineItem> events, List<Integer> repeated) {
+        int enumerateFrom = -1;
+        // now iterate through events from back to front
+        for (int i = events.size() - 1; i >= 0; i--) {
+            int repetition = repeated.get(i);
+            // if the current event is a repetition, select it as a counter reference
+            if (enumerateFrom == -1 && repetition > 0) {
+                enumerateFrom = repetition;
+            }
+            // if enumeration is in progress
+            if (enumerateFrom != -1) {
+                // add step enumeration
+                events.get(i).setStep(enumerateFrom - repetition + 1);
+                events.get(i).setSteps(enumerateFrom + 1);
+                // if we reached the first element, stop the enumeration
+                if (repetition == 0) {
+                    enumerateFrom = -1;
+                }
+            }
+        }
+    }
+
+    private List<Integer> calculateRepetitions(List<ApiHistoryTimelineItem> events) {
+        // create array with counter for consecutive repeated event names
+        List<Integer> repeated = new ArrayList<>(events.size());
+        // first element cannot be repeated since it is first
+        repeated.add(0);
+        // iterate through events from front to back
+        for (int i = 1; i < events.size(); i++) {
+            if (events.get(i).getName() != null && events.get(i).getName().equals(events.get(i - 1).getName())) {
+                // if current event is the same as previous, increase the repetition counter
+                repeated.add(repeated.get(i - 1) + 1);
+            } else {
+                // else start from beginning
+                repeated.add(0);
+            }
+        }
+        return repeated;
     }
 
     /**

@@ -21,6 +21,7 @@ import com.abelium.inatrace.db.entities.process.Process;
 import com.abelium.inatrace.db.entities.process.ProcessDocument;
 import com.abelium.inatrace.db.entities.process.ProcessStandard;
 import com.abelium.inatrace.db.entities.product.*;
+import com.abelium.inatrace.db.entities.product.enums.FairPricesUnit;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.FieldTools;
 import com.abelium.inatrace.tools.ListTools;
@@ -307,6 +308,10 @@ public class ProductApiTools {
 		apiBusinessToCustomerSettings.setTabFeedback(businessToCustomerSettings.getTabFeedback());
 		apiBusinessToCustomerSettings.setTabProducers(businessToCustomerSettings.getTabProducers());
 		apiBusinessToCustomerSettings.setTabQuality(businessToCustomerSettings.getTabQuality());
+		apiBusinessToCustomerSettings.setOrderFairPrices(businessToCustomerSettings.getOrderFairPrices());
+		apiBusinessToCustomerSettings.setOrderFeedback(businessToCustomerSettings.getOrderFeedback());
+		apiBusinessToCustomerSettings.setOrderProducers(businessToCustomerSettings.getOrderProducers());
+		apiBusinessToCustomerSettings.setOrderQuality(businessToCustomerSettings.getOrderQuality());
 		apiBusinessToCustomerSettings.setProductFont(CommonApiTools.toApiDocument(businessToCustomerSettings.getProductFont(), userId));
 		apiBusinessToCustomerSettings.setTextFont(CommonApiTools.toApiDocument(businessToCustomerSettings.getTextFont(), userId));
 		apiBusinessToCustomerSettings.setHeaderImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderImage(), userId));
@@ -315,6 +320,10 @@ public class ProductApiTools {
 		apiBusinessToCustomerSettings.setGraphicFairPrices(businessToCustomerSettings.getGraphicFairPrices());
 		apiBusinessToCustomerSettings.setGraphicIncreaseOfIncome(businessToCustomerSettings.getGraphicIncreaseOfIncome());
 		apiBusinessToCustomerSettings.setGraphicQuality(businessToCustomerSettings.getGraphicQuality());
+		apiBusinessToCustomerSettings.setGraphicPriceToProducer(businessToCustomerSettings.getGraphicPriceToProducer());
+		apiBusinessToCustomerSettings.setGraphicFarmGatePrice(businessToCustomerSettings.getGraphicFarmGatePrice());
+		apiBusinessToCustomerSettings.setManualFarmGatePrice(businessToCustomerSettings.getManualFarmGatePrice());
+		apiBusinessToCustomerSettings.setManualProducerPrice(businessToCustomerSettings.getManualProducerPrice());
 
 		return apiBusinessToCustomerSettings;
 	}
@@ -400,9 +409,15 @@ public class ProductApiTools {
 			apiBusinessToCustomerSettings.setTabProducers(Boolean.TRUE);
 			apiBusinessToCustomerSettings.setTabQuality(Boolean.TRUE);
 			apiBusinessToCustomerSettings.setTabFeedback(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setOrderFairPrices(1L);
+			apiBusinessToCustomerSettings.setOrderProducers(2L);
+			apiBusinessToCustomerSettings.setOrderQuality(3L);
+			apiBusinessToCustomerSettings.setOrderFeedback(4L);
 			apiBusinessToCustomerSettings.setGraphicFairPrices(Boolean.TRUE);
 			apiBusinessToCustomerSettings.setGraphicIncreaseOfIncome(Boolean.TRUE);
 			apiBusinessToCustomerSettings.setGraphicQuality(Boolean.TRUE);
+			apiBusinessToCustomerSettings.setGraphicPriceToProducer(FairPricesUnit.PER_CONTAINER);
+			apiBusinessToCustomerSettings.setGraphicFarmGatePrice(FairPricesUnit.PERCENT_VALUE);
 
 			updateBusinessToCustomerSettings(userId, p.getBusinessToCustomerSettings(), apiBusinessToCustomerSettings);
 		}
@@ -516,6 +531,10 @@ public class ProductApiTools {
 		b2c.setTabFeedback(ab2c.getTabFeedback());
 		b2c.setTabProducers(ab2c.getTabProducers());
 		b2c.setTabQuality(ab2c.getTabQuality());
+		b2c.setOrderFairPrices(ab2c.getOrderFairPrices());
+		b2c.setOrderFeedback(ab2c.getOrderFeedback());
+		b2c.setOrderProducers(ab2c.getOrderProducers());
+		b2c.setOrderQuality(ab2c.getOrderQuality());
 		b2c.setProductFont(commonEngine.fetchDocument(userId, ab2c.getProductFont()));
 		b2c.setTextFont(commonEngine.fetchDocument(userId, ab2c.getTextFont()));
 		b2c.setHeaderImage(commonEngine.fetchDocument(userId, ab2c.getHeaderImage()));
@@ -524,6 +543,10 @@ public class ProductApiTools {
 		b2c.setGraphicFairPrices(ab2c.getGraphicFairPrices());
 		b2c.setGraphicIncreaseOfIncome(ab2c.getGraphicIncreaseOfIncome());
 		b2c.setGraphicQuality(ab2c.getGraphicQuality());
+		b2c.setGraphicPriceToProducer(ab2c.getGraphicPriceToProducer());
+		b2c.setGraphicFarmGatePrice(ab2c.getGraphicFarmGatePrice());
+		b2c.setManualFarmGatePrice(ab2c.getManualFarmGatePrice());
+		b2c.setManualProducerPrice(ab2c.getManualProducerPrice());
 	}
 	
 	private void updateResponsibility(Long userId, Responsibility r, ApiResponsibility ar) throws ApiException {
@@ -862,6 +885,10 @@ public class ProductApiTools {
 		b2cSettings.setGraphicFairPrices(b2cSettingsProduct.getGraphicFairPrices());
 		b2cSettings.setGraphicIncreaseOfIncome(b2cSettingsProduct.getGraphicIncreaseOfIncome());
 		b2cSettings.setGraphicQuality(b2cSettingsProduct.getGraphicQuality());
+		b2cSettings.setGraphicPriceToProducer(b2cSettingsProduct.getGraphicPriceToProducer());
+		b2cSettings.setGraphicFarmGatePrice(b2cSettingsProduct.getGraphicFarmGatePrice());
+		b2cSettings.setManualFarmGatePrice(b2cSettingsProduct.getManualFarmGatePrice());
+		b2cSettings.setManualProducerPrice(b2cSettingsProduct.getManualProducerPrice());
 
 		// If product label defines values, overwrite settings from product
 		BusinessToCustomerSettings b2cSettingsProductLabel = productLabel.getContent().getBusinessToCustomerSettings();
@@ -895,6 +922,18 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getTabQuality() != null) {
 			b2cSettings.setTabQuality(b2cSettingsProductLabel.getTabQuality());
 		}
+		if (b2cSettingsProductLabel.getOrderFairPrices() != null) {
+			b2cSettings.setOrderFairPrices(b2cSettingsProductLabel.getOrderFairPrices());
+		}
+		if (b2cSettingsProductLabel.getOrderFeedback() != null) {
+			b2cSettings.setOrderFeedback(b2cSettingsProductLabel.getOrderFeedback());
+		}
+		if (b2cSettingsProductLabel.getOrderProducers() != null) {
+			b2cSettings.setOrderProducers(b2cSettingsProductLabel.getOrderProducers());
+		}
+		if (b2cSettingsProductLabel.getOrderQuality() != null) {
+			b2cSettings.setOrderQuality(b2cSettingsProductLabel.getOrderQuality());
+		}
 		if (b2cSettingsProductLabel.getProductFont() != null) {
 			b2cSettings.setProductFont(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getProductFont(), null));
 		}
@@ -918,6 +957,18 @@ public class ProductApiTools {
 		}
 		if (b2cSettingsProductLabel.getGraphicQuality() != null) {
 			b2cSettings.setGraphicQuality(b2cSettingsProductLabel.getGraphicQuality());
+		}
+		if (b2cSettingsProductLabel.getGraphicPriceToProducer() != null) {
+			b2cSettings.setGraphicPriceToProducer(b2cSettingsProductLabel.getGraphicPriceToProducer());
+		}
+		if (b2cSettingsProductLabel.getGraphicFarmGatePrice() != null) {
+			b2cSettings.setGraphicFarmGatePrice(b2cSettingsProductLabel.getGraphicFarmGatePrice());
+		}
+		if (b2cSettingsProductLabel.getManualFarmGatePrice() != null) {
+			b2cSettings.setManualFarmGatePrice(b2cSettingsProductLabel.getManualFarmGatePrice());
+		}
+		if (b2cSettingsProductLabel.getManualProducerPrice() != null) {
+			b2cSettings.setManualProducerPrice(b2cSettingsProductLabel.getManualProducerPrice());
 		}
 	}
 

@@ -2,6 +2,9 @@ package com.abelium.inatrace.components.product.api;
 
 import com.abelium.inatrace.api.ApiTimestampEntity;
 import com.abelium.inatrace.components.common.api.ApiDocument;
+import com.abelium.inatrace.db.entities.product.enums.FairPricesUnit;
+
+import java.math.BigDecimal;
 
 public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
 
@@ -15,6 +18,10 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
     private Boolean tabProducers;
     private Boolean tabQuality;
     private Boolean tabFeedback;
+    private Long orderFairPrices;
+    private Long orderProducers;
+    private Long orderQuality;
+    private Long orderFeedback;
     private ApiDocument productFont;
     private ApiDocument textFont;
     private ApiDocument headerImage;
@@ -23,6 +30,10 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
     private Boolean graphicFairPrices;
     private Boolean graphicIncreaseOfIncome;
     private Boolean graphicQuality;
+    private FairPricesUnit graphicPriceToProducer;
+    private FairPricesUnit graphicFarmGatePrice;
+    private BigDecimal manualFarmGatePrice;
+    private BigDecimal manualProducerPrice;
 
     public String getPrimaryColor() {
         return primaryColor;
@@ -104,6 +115,38 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
         this.tabFeedback = tabFeedback;
     }
 
+    public Long getOrderFairPrices() {
+        return orderFairPrices;
+    }
+
+    public void setOrderFairPrices(Long orderFairPrices) {
+        this.orderFairPrices = orderFairPrices;
+    }
+
+    public Long getOrderProducers() {
+        return orderProducers;
+    }
+
+    public void setOrderProducers(Long orderProducers) {
+        this.orderProducers = orderProducers;
+    }
+
+    public Long getOrderQuality() {
+        return orderQuality;
+    }
+
+    public void setOrderQuality(Long orderQuality) {
+        this.orderQuality = orderQuality;
+    }
+
+    public Long getOrderFeedback() {
+        return orderFeedback;
+    }
+
+    public void setOrderFeedback(Long orderFeedback) {
+        this.orderFeedback = orderFeedback;
+    }
+
     public ApiDocument getProductFont() {
         return productFont;
     }
@@ -166,5 +209,37 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
 
     public void setGraphicQuality(Boolean graphicQuality) {
         this.graphicQuality = graphicQuality;
+    }
+
+    public FairPricesUnit getGraphicPriceToProducer() {
+        return graphicPriceToProducer;
+    }
+
+    public void setGraphicPriceToProducer(FairPricesUnit graphicPriceToProducer) {
+        this.graphicPriceToProducer = graphicPriceToProducer;
+    }
+
+    public FairPricesUnit getGraphicFarmGatePrice() {
+        return graphicFarmGatePrice;
+    }
+
+    public void setGraphicFarmGatePrice(FairPricesUnit graphicFarmGatePrice) {
+        this.graphicFarmGatePrice = graphicFarmGatePrice;
+    }
+
+    public BigDecimal getManualFarmGatePrice() {
+        return manualFarmGatePrice;
+    }
+
+    public void setManualFarmGatePrice(BigDecimal manualFarmGatePrice) {
+        this.manualFarmGatePrice = manualFarmGatePrice;
+    }
+
+    public BigDecimal getManualProducerPrice() {
+        return manualProducerPrice;
+    }
+
+    public void setManualProducerPrice(BigDecimal manualProducerPrice) {
+        this.manualProducerPrice = manualProducerPrice;
     }
 }

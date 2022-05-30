@@ -3,8 +3,10 @@ package com.abelium.inatrace.db.entities.product;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.common.Document;
+import com.abelium.inatrace.db.entities.product.enums.FairPricesUnit;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table
@@ -43,6 +45,18 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     @Column(name = "tab_feedback")
     private Boolean tabFeedback;
 
+    @Column(name = "order_fair_prices")
+    private Long orderFairPrices;
+
+    @Column(name = "order_producers")
+    private Long orderProducers;
+
+    @Column(name = "order_quality")
+    private Long orderQuality;
+
+    @Column(name = "order_feedback")
+    private Long orderFeedback;
+
     @Column(name = "graphic_fair_prices")
     private Boolean graphicFairPrices;
 
@@ -51,6 +65,20 @@ public class BusinessToCustomerSettings extends TimestampEntity {
 
     @Column(name = "graphic_quality")
     private Boolean graphicQuality;
+
+    @Column(name = "graphic_price_to_producer")
+    @Enumerated(EnumType.STRING)
+    private FairPricesUnit graphicPriceToProducer;
+
+    @Column(name = "graphic_farm_gate_price")
+    @Enumerated(EnumType.STRING)
+    private FairPricesUnit graphicFarmGatePrice;
+
+    @Column(name = "manual_farm_gate_price")
+    private BigDecimal manualFarmGatePrice;
+
+    @Column(name = "manual_producer_price")
+    private BigDecimal manualProducerPrice;
 
     @OneToOne
     private Document productFont;
@@ -147,6 +175,38 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.tabFeedback = tabFeedback;
     }
 
+    public Long getOrderFairPrices() {
+        return orderFairPrices;
+    }
+
+    public void setOrderFairPrices(Long orderFairPrices) {
+        this.orderFairPrices = orderFairPrices;
+    }
+
+    public Long getOrderProducers() {
+        return orderProducers;
+    }
+
+    public void setOrderProducers(Long orderProducers) {
+        this.orderProducers = orderProducers;
+    }
+
+    public Long getOrderQuality() {
+        return orderQuality;
+    }
+
+    public void setOrderQuality(Long orderQuality) {
+        this.orderQuality = orderQuality;
+    }
+
+    public Long getOrderFeedback() {
+        return orderFeedback;
+    }
+
+    public void setOrderFeedback(Long orderFeedback) {
+        this.orderFeedback = orderFeedback;
+    }
+
     public Document getProductFont() {
         return productFont;
     }
@@ -211,6 +271,38 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.graphicQuality = graphicQuality;
     }
 
+    public FairPricesUnit getGraphicPriceToProducer() {
+        return graphicPriceToProducer;
+    }
+
+    public void setGraphicPriceToProducer(FairPricesUnit graphicPriceToProducer) {
+        this.graphicPriceToProducer = graphicPriceToProducer;
+    }
+
+    public FairPricesUnit getGraphicFarmGatePrice() {
+        return graphicFarmGatePrice;
+    }
+
+    public void setGraphicFarmGatePrice(FairPricesUnit graphicFarmGatePrice) {
+        this.graphicFarmGatePrice = graphicFarmGatePrice;
+    }
+
+    public BigDecimal getManualFarmGatePrice() {
+        return manualFarmGatePrice;
+    }
+
+    public void setManualFarmGatePrice(BigDecimal manualFarmGatePrice) {
+        this.manualFarmGatePrice = manualFarmGatePrice;
+    }
+
+    public BigDecimal getManualProducerPrice() {
+        return manualProducerPrice;
+    }
+
+    public void setManualProducerPrice(BigDecimal manualProducerPrice) {
+        this.manualProducerPrice = manualProducerPrice;
+    }
+
     public BusinessToCustomerSettings copy() {
         BusinessToCustomerSettings businessToCustomerSettings = new BusinessToCustomerSettings();
 
@@ -224,6 +316,10 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         businessToCustomerSettings.setTabProducers(getTabProducers());
         businessToCustomerSettings.setTabQuality(getTabQuality());
         businessToCustomerSettings.setTabFeedback(getTabFeedback());
+        businessToCustomerSettings.setOrderFairPrices(getOrderFairPrices());
+        businessToCustomerSettings.setOrderFeedback(getOrderFeedback());
+        businessToCustomerSettings.setOrderProducers(getOrderProducers());
+        businessToCustomerSettings.setOrderQuality(getOrderQuality());
         businessToCustomerSettings.setProductFont(getProductFont());
         businessToCustomerSettings.setTextFont(getTextFont());
         businessToCustomerSettings.setHeaderImage(getHeaderImage());
@@ -232,6 +328,10 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         businessToCustomerSettings.setGraphicFairPrices(getGraphicFairPrices());
         businessToCustomerSettings.setGraphicIncreaseOfIncome(getGraphicIncreaseOfIncome());
         businessToCustomerSettings.setGraphicQuality(getGraphicQuality());
+        businessToCustomerSettings.setGraphicPriceToProducer(getGraphicPriceToProducer());
+        businessToCustomerSettings.setGraphicFarmGatePrice(getGraphicFarmGatePrice());
+        businessToCustomerSettings.setManualFarmGatePrice(getManualFarmGatePrice());
+        businessToCustomerSettings.setManualProducerPrice(getManualProducerPrice());
 
         return businessToCustomerSettings;
     }

@@ -7,6 +7,7 @@ import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.company.mappers.UserCustomerMapper;
 import com.abelium.inatrace.components.facility.FacilityMapper;
+import com.abelium.inatrace.components.payment.PaymentMapper;
 import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
 import com.abelium.inatrace.components.product.ProductApiTools;
 import com.abelium.inatrace.components.productorder.mappers.ProductOrderMapper;
@@ -39,7 +40,7 @@ public class StockOrderMapper {
         apiStockOrder.setBalance(entity.getBalance());
         apiStockOrder.setOrderType(entity.getOrderType());
         apiStockOrder.setMeasureUnitType(
-                MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(entity.getMeasurementUnitType()));
+                MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getMeasurementUnitType()));
         apiStockOrder.setQrCodeTag(entity.getQrCodeTag());
 
         // Map women share and organic only
@@ -192,6 +193,8 @@ public class StockOrderMapper {
             apiStockOrder.setProcessingOrder(ProcessingOrderMapper.toApiProcessingOrderBase(entity.getProcessingOrder()));
         }
 
+        apiStockOrder.setPayments(entity.getPayments().stream().map(payment -> PaymentMapper.toApiPayment(payment, null)).collect(Collectors.toList()));
+
         return apiStockOrder;
     }
 
@@ -210,12 +213,13 @@ public class StockOrderMapper {
 
         apiStockOrder.setTotalQuantity(entity.getTotalQuantity());
         apiStockOrder.setMeasureUnitType(
-                MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(entity.getMeasurementUnitType()));
+                MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getMeasurementUnitType()));
 
         apiStockOrder.setFacility(FacilityMapper.toApiFacilityBase(entity.getFacility(), language));
 
         apiStockOrder.setWomenShare(entity.getWomenShare());
         apiStockOrder.setOrganic(entity.getOrganic());
+        apiStockOrder.setPayments(entity.getPayments().stream().map(payment -> PaymentMapper.toApiPayment(payment, null)).collect(Collectors.toList()));
 
         return apiStockOrder;
     }

@@ -8,6 +8,7 @@ import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.company.api.ApiUserCustomer;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
+import com.abelium.inatrace.components.payment.api.ApiPayment;
 import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.product.api.ApiFinalProduct;
 import com.abelium.inatrace.components.productorder.api.ApiProductOrder;
@@ -198,6 +199,9 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     @ApiModelProperty(value = "The final product for which the QR code tag is generated")
     private ApiFinalProduct qrCodeTagFinalProduct;
+
+    @ApiModelProperty(value = "Payments for stock order")
+    private List<ApiPayment> payments;
 
     public String getIdentifier() {
         return identifier;
@@ -635,4 +639,11 @@ public class ApiStockOrder extends ApiBaseEntity {
         this.qrCodeTagFinalProduct = qrCodeTagFinalProduct;
     }
 
+    public List<ApiPayment> getPayments() {
+        return payments;
+    }
+
+    public void setPayments(List<ApiPayment> payments) {
+        this.payments = payments;
+    }
 }

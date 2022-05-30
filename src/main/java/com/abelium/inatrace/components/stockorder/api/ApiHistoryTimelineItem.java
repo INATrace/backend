@@ -28,6 +28,10 @@ public class ApiHistoryTimelineItem {
     
     private Double latitude;
 
+	private Integer step;
+
+	private Integer steps;
+
 	private PublicTimelineIconType iconType;
 
 	public String getType() {
@@ -85,4 +89,20 @@ public class ApiHistoryTimelineItem {
     public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
+
+	public Integer getStep() {
+		return step;
+	}
+
+	public void setStep(Integer step) {
+		this.step = step;
+	}
+
+	public Integer getSteps() {
+		return steps;
+	}
+
+	public void setSteps(Integer steps) {
+		this.steps = steps;
+	}
 }
