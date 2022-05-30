@@ -322,6 +322,8 @@ public class ProductApiTools {
 		apiBusinessToCustomerSettings.setGraphicQuality(businessToCustomerSettings.getGraphicQuality());
 		apiBusinessToCustomerSettings.setGraphicPriceToProducer(businessToCustomerSettings.getGraphicPriceToProducer());
 		apiBusinessToCustomerSettings.setGraphicFarmGatePrice(businessToCustomerSettings.getGraphicFarmGatePrice());
+		apiBusinessToCustomerSettings.setManualFarmGatePrice(businessToCustomerSettings.getManualFarmGatePrice());
+		apiBusinessToCustomerSettings.setManualProducerPrice(businessToCustomerSettings.getManualProducerPrice());
 
 		return apiBusinessToCustomerSettings;
 	}
@@ -543,6 +545,8 @@ public class ProductApiTools {
 		b2c.setGraphicQuality(ab2c.getGraphicQuality());
 		b2c.setGraphicPriceToProducer(ab2c.getGraphicPriceToProducer());
 		b2c.setGraphicFarmGatePrice(ab2c.getGraphicFarmGatePrice());
+		b2c.setManualFarmGatePrice(ab2c.getManualFarmGatePrice());
+		b2c.setManualProducerPrice(ab2c.getManualProducerPrice());
 	}
 	
 	private void updateResponsibility(Long userId, Responsibility r, ApiResponsibility ar) throws ApiException {
@@ -883,6 +887,8 @@ public class ProductApiTools {
 		b2cSettings.setGraphicQuality(b2cSettingsProduct.getGraphicQuality());
 		b2cSettings.setGraphicPriceToProducer(b2cSettingsProduct.getGraphicPriceToProducer());
 		b2cSettings.setGraphicFarmGatePrice(b2cSettingsProduct.getGraphicFarmGatePrice());
+		b2cSettings.setManualFarmGatePrice(b2cSettingsProduct.getManualFarmGatePrice());
+		b2cSettings.setManualProducerPrice(b2cSettingsProduct.getManualProducerPrice());
 
 		// If product label defines values, overwrite settings from product
 		BusinessToCustomerSettings b2cSettingsProductLabel = productLabel.getContent().getBusinessToCustomerSettings();
@@ -957,6 +963,12 @@ public class ProductApiTools {
 		}
 		if (b2cSettingsProductLabel.getGraphicFarmGatePrice() != null) {
 			b2cSettings.setGraphicFarmGatePrice(b2cSettingsProductLabel.getGraphicFarmGatePrice());
+		}
+		if (b2cSettingsProductLabel.getManualFarmGatePrice() != null) {
+			b2cSettings.setManualFarmGatePrice(b2cSettingsProductLabel.getManualFarmGatePrice());
+		}
+		if (b2cSettingsProductLabel.getManualProducerPrice() != null) {
+			b2cSettings.setManualProducerPrice(b2cSettingsProductLabel.getManualProducerPrice());
 		}
 	}
 

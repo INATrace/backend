@@ -4,6 +4,8 @@ import com.abelium.inatrace.api.ApiTimestampEntity;
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.db.entities.product.enums.FairPricesUnit;
 
+import java.math.BigDecimal;
+
 public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
 
     private String primaryColor;
@@ -30,6 +32,8 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
     private Boolean graphicQuality;
     private FairPricesUnit graphicPriceToProducer;
     private FairPricesUnit graphicFarmGatePrice;
+    private BigDecimal manualFarmGatePrice;
+    private BigDecimal manualProducerPrice;
 
     public String getPrimaryColor() {
         return primaryColor;
@@ -221,5 +225,21 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
 
     public void setGraphicFarmGatePrice(FairPricesUnit graphicFarmGatePrice) {
         this.graphicFarmGatePrice = graphicFarmGatePrice;
+    }
+
+    public BigDecimal getManualFarmGatePrice() {
+        return manualFarmGatePrice;
+    }
+
+    public void setManualFarmGatePrice(BigDecimal manualFarmGatePrice) {
+        this.manualFarmGatePrice = manualFarmGatePrice;
+    }
+
+    public BigDecimal getManualProducerPrice() {
+        return manualProducerPrice;
+    }
+
+    public void setManualProducerPrice(BigDecimal manualProducerPrice) {
+        this.manualProducerPrice = manualProducerPrice;
     }
 }

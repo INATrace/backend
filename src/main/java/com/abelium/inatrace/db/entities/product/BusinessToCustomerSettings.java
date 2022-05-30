@@ -6,6 +6,7 @@ import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.product.enums.FairPricesUnit;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table
@@ -72,6 +73,12 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     @Column(name = "graphic_farm_gate_price")
     @Enumerated(EnumType.STRING)
     private FairPricesUnit graphicFarmGatePrice;
+
+    @Column(name = "manual_farm_gate_price")
+    private BigDecimal manualFarmGatePrice;
+
+    @Column(name = "manual_producer_price")
+    private BigDecimal manualProducerPrice;
 
     @OneToOne
     private Document productFont;
@@ -280,6 +287,22 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.graphicFarmGatePrice = graphicFarmGatePrice;
     }
 
+    public BigDecimal getManualFarmGatePrice() {
+        return manualFarmGatePrice;
+    }
+
+    public void setManualFarmGatePrice(BigDecimal manualFarmGatePrice) {
+        this.manualFarmGatePrice = manualFarmGatePrice;
+    }
+
+    public BigDecimal getManualProducerPrice() {
+        return manualProducerPrice;
+    }
+
+    public void setManualProducerPrice(BigDecimal manualProducerPrice) {
+        this.manualProducerPrice = manualProducerPrice;
+    }
+
     public BusinessToCustomerSettings copy() {
         BusinessToCustomerSettings businessToCustomerSettings = new BusinessToCustomerSettings();
 
@@ -307,6 +330,8 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         businessToCustomerSettings.setGraphicQuality(getGraphicQuality());
         businessToCustomerSettings.setGraphicPriceToProducer(getGraphicPriceToProducer());
         businessToCustomerSettings.setGraphicFarmGatePrice(getGraphicFarmGatePrice());
+        businessToCustomerSettings.setManualFarmGatePrice(getManualFarmGatePrice());
+        businessToCustomerSettings.setManualProducerPrice(getManualProducerPrice());
 
         return businessToCustomerSettings;
     }
