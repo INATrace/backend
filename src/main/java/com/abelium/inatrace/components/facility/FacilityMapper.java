@@ -72,6 +72,7 @@ public final class FacilityMapper {
 		apiFacility.setDisplayMayInvolveCollectors(entity.getDisplayMayInvolveCollectors());
 		apiFacility.setDisplayOrganic(entity.getDisplayOrganic());
 		apiFacility.setDisplayPriceDeductionDamage(entity.getDisplayPriceDeductionDamage());
+		apiFacility.setDisplayWeightDeductionDamage(entity.getDisplayWeightDeductionDamage());
 		apiFacility.setDisplayTare(entity.getDisplayTare());
 		apiFacility.setDisplayWomenOnly(entity.getDisplayWomenOnly());
 

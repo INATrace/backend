@@ -686,6 +686,7 @@ public class StockOrderService extends BaseService {
             apiStockOrder.setIdentifier(farmer.getIdentifier());
             apiStockOrder.setOrganic(farmer.getOrganic());
             apiStockOrder.setDamagedPriceDeduction(farmer.getDamagedPriceDeduction());
+            apiStockOrder.setDamagedWeightDeduction(farmer.getDamagedWeightDeduction());
             apiStockOrder.setSemiProduct(farmer.getSemiProduct());
             apiStockOrder.setTare(farmer.getTare());
             apiStockOrder.setPricePerUnit(farmer.getPricePerUnit());
@@ -771,6 +772,7 @@ public class StockOrderService extends BaseService {
         entity.setTare(apiStockOrder.getTare());
         entity.setWomenShare(apiStockOrder.getWomenShare());
         entity.setDamagedPriceDeduction(apiStockOrder.getDamagedPriceDeduction());
+        entity.setDamagedWeightDeduction(apiStockOrder.getDamagedWeightDeduction());
         entity.setCurrency(apiStockOrder.getCurrency());
 
         // Calculate the quantities for this stock order accommodating all different cases of stock orders
@@ -814,6 +816,9 @@ public class StockOrderService extends BaseService {
                     apiStockOrder.setTotalQuantity(apiStockOrder.getTotalGrossQuantity().subtract(apiStockOrder.getTare()));
                 } else {
                     apiStockOrder.setTotalQuantity(apiStockOrder.getTotalGrossQuantity());
+                }
+                if (apiStockOrder.getDamagedWeightDeduction() != null) {
+                    apiStockOrder.setTotalQuantity(apiStockOrder.getTotalQuantity().subtract(apiStockOrder.getDamagedWeightDeduction()));
                 }
                 entity.setTotalQuantity(apiStockOrder.getTotalQuantity());
                 entity.setTotalGrossQuantity(apiStockOrder.getTotalGrossQuantity());

@@ -192,7 +192,10 @@ public class StockOrder extends TimestampEntity {
 
 	@Column
 	private BigDecimal damagedPriceDeduction;
-	
+
+	@Column
+	private BigDecimal damagedWeightDeduction;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	private ProcessingOrder processingOrder;
 	
@@ -658,5 +661,13 @@ public class StockOrder extends TimestampEntity {
 
 	public void setDamagedPriceDeduction(BigDecimal damagedPriceDeduction) {
 		this.damagedPriceDeduction = damagedPriceDeduction;
+	}
+
+	public BigDecimal getDamagedWeightDeduction() {
+		return damagedWeightDeduction;
+	}
+
+	public void setDamagedWeightDeduction(BigDecimal damagedWeightDeduction) {
+		this.damagedWeightDeduction = damagedWeightDeduction;
 	}
 }
