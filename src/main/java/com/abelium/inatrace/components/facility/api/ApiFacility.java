@@ -30,6 +30,9 @@ public class ApiFacility extends ApiBaseEntity {
 	@ApiModelProperty(value = "Enable form control 'Price deduction damage'")
 	private Boolean displayPriceDeductionDamage;
 
+	@ApiModelProperty(value = "Enable form control 'Weight deduction damage'")
+	private Boolean displayWeightDeductionDamage;
+
 	@ApiModelProperty(value = "Enable form control 'Tare'")
 	private Boolean displayTare;
 
@@ -103,6 +106,14 @@ public class ApiFacility extends ApiBaseEntity {
 
 	public void setDisplayPriceDeductionDamage(Boolean displayPriceDeductionDamage) {
 		this.displayPriceDeductionDamage = displayPriceDeductionDamage;
+	}
+
+	public Boolean getDisplayWeightDeductionDamage() {
+		return displayWeightDeductionDamage;
+	}
+
+	public void setDisplayWeightDeductionDamage(Boolean displayWeightDeductionDamage) {
+		this.displayWeightDeductionDamage = displayWeightDeductionDamage;
 	}
 
 	public Boolean getDisplayTare() {

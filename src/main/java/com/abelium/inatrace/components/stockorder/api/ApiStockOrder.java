@@ -193,6 +193,9 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Damaged price deduction")
     private BigDecimal damagedPriceDeduction;
 
+    @ApiModelProperty(value = "Damaged weight deduction")
+    private BigDecimal damagedWeightDeduction;
+
     @ApiModelProperty(value = "Generated UUID tag for this stock order QR code")
     private String qrCodeTag;
 
@@ -617,6 +620,14 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setDamagedPriceDeduction(BigDecimal damagedPriceDeduction) {
         this.damagedPriceDeduction = damagedPriceDeduction;
+    }
+
+    public BigDecimal getDamagedWeightDeduction() {
+        return damagedWeightDeduction;
+    }
+
+    public void setDamagedWeightDeduction(BigDecimal damagedWeightDeduction) {
+        this.damagedWeightDeduction = damagedWeightDeduction;
     }
 
     public String getQrCodeTag() {

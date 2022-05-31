@@ -40,6 +40,9 @@ public class Facility extends TimestampEntity {
 	private Boolean displayPriceDeductionDamage;
 
 	@Column
+	private Boolean displayWeightDeductionDamage;
+
+	@Column
 	private Boolean displayTare;
 
 	@Column
@@ -115,6 +118,14 @@ public class Facility extends TimestampEntity {
 
 	public void setDisplayPriceDeductionDamage(Boolean displayPriceDeductionDamage) {
 		this.displayPriceDeductionDamage = displayPriceDeductionDamage;
+	}
+
+	public Boolean getDisplayWeightDeductionDamage() {
+		return displayWeightDeductionDamage;
+	}
+
+	public void setDisplayWeightDeductionDamage(Boolean displayWeightDeductionDamage) {
+		this.displayWeightDeductionDamage = displayWeightDeductionDamage;
 	}
 
 	public Boolean getDisplayTare() {
