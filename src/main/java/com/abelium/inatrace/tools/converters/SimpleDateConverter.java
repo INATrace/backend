@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class SimpleDateConverter {
 
@@ -22,7 +23,11 @@ public class SimpleDateConverter {
         public Instant deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonParseException {
             String date = jsonParser.getValueAsString();
             try {
-                return new SimpleDateFormat(SIMPLE_DATE_FORMAT).parse(date).toInstant();
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat(SIMPLE_DATE_FORMAT);
+                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                return dateFormat.parse(date).toInstant();
             } catch (ParseException e) {
                 throw new IOException("Failed parsing input date. Date '" + date + "' should be in '" + SIMPLE_DATE_FORMAT + "' format.");
             }
