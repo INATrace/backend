@@ -42,6 +42,9 @@ public class ApiFacility extends ApiBaseEntity {
 	@ApiModelProperty(value = "Facility is activated")
 	private Boolean isDeactivated;
 
+	@ApiModelProperty(value = "Enable form control 'Price determined later'")
+	private Boolean displayPriceDeterminedLater;
+
 	@ApiModelProperty(value = "Facility location")
 	private ApiFacilityLocation facilityLocation;
 
@@ -140,6 +143,14 @@ public class ApiFacility extends ApiBaseEntity {
 		isDeactivated = deactivated;
 	}
 
+	public Boolean getDisplayPriceDeterminedLater() {
+		return displayPriceDeterminedLater;
+	}
+
+	public void setDisplayPriceDeterminedLater(Boolean displayPriceDeterminedLater) {
+		this.displayPriceDeterminedLater = displayPriceDeterminedLater;
+	}
+
 	public ApiFacilityLocation getFacilityLocation() {
 		return facilityLocation;
 	}
@@ -192,7 +203,7 @@ public class ApiFacility extends ApiBaseEntity {
 		super();
 	}
 
-	public ApiFacility(String name, Boolean isCollectionFacility, Boolean isPublic, Boolean isDeactivated,
+	public ApiFacility(String name, Boolean isCollectionFacility, Boolean isPublic, Boolean isDeactivated, Boolean displayPriceDeterminedLater,
 			ApiFacilityLocation facilityLocation, ApiCompanyBase company, ApiFacilityType facilityType,
 			List<ApiSemiProduct> facilitySemiProductList, List<ApiFacilityTranslation> facilityTranslationList) {
 		super();
@@ -200,6 +211,7 @@ public class ApiFacility extends ApiBaseEntity {
 		this.isCollectionFacility = isCollectionFacility;
 		this.isPublic = isPublic;
 		this.isDeactivated = isDeactivated;
+		this.displayPriceDeterminedLater = displayPriceDeterminedLater;
 		this.facilityLocation = facilityLocation;
 		this.company = company;
 		this.facilityType = facilityType;

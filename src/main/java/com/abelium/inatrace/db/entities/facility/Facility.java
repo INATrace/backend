@@ -51,6 +51,9 @@ public class Facility extends TimestampEntity {
 	@Column
 	private Boolean isDeactivated;
 
+	@Column
+	private Boolean displayPriceDeterminedLater;
+
 	@OneToOne(cascade = CascadeType.ALL)
 	private FacilityLocation facilityLocation;
 
@@ -150,6 +153,14 @@ public class Facility extends TimestampEntity {
 
 	public void setIsDeactivated(Boolean deactivated) {
 		isDeactivated = deactivated;
+	}
+
+	public Boolean getDisplayPriceDeterminedLater() {
+		return displayPriceDeterminedLater;
+	}
+
+	public void setDisplayPriceDeterminedLater(Boolean priceDeterminedLater) {
+		this.displayPriceDeterminedLater = priceDeterminedLater;
 	}
 
 	public FacilityLocation getFacilityLocation() {

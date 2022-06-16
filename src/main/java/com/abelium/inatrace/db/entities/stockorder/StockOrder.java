@@ -72,6 +72,9 @@ public class StockOrder extends TimestampEntity {
 	@ManyToOne
 	private SemiProduct semiProduct;
 
+	@Column
+	private Boolean priceDeterminedLater;
+
 	// Set when this stock order represents a uint of quantity for a final product (used in final processing)
 	@ManyToOne
 	private FinalProduct finalProduct;
@@ -312,6 +315,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setSemiProduct(SemiProduct semiProduct) {
 		this.semiProduct = semiProduct;
+	}
+
+	public Boolean getPriceDeterminedLater() {
+		return priceDeterminedLater;
+	}
+
+	public void setPriceDeterminedLater(Boolean priceDeterminedLater) {
+		this.priceDeterminedLater = priceDeterminedLater;
 	}
 
 	public FinalProduct getFinalProduct() {
