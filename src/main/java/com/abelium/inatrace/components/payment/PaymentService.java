@@ -229,7 +229,7 @@ public class PaymentService extends BaseService {
 				entity.setRecipientCompany(fetchEntityOrElse(apiPayment.getRecipientCompany().getId(), Company.class, null));
 			}
 
-			if (stockOrder.getOrderType() == OrderType.PURCHASE_ORDER) {
+			if (stockOrder.getOrderType() == OrderType.PURCHASE_ORDER && !Boolean.TRUE.equals(stockOrder.getPriceDeterminedLater())) {
 				stockOrder.setBalance(stockOrder.getBalance().subtract(entity.getTotalPaid()));
 				stockOrder.setUpdatedBy(currentUser);
 			}

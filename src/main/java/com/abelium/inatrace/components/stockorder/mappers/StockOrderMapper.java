@@ -113,6 +113,8 @@ public class StockOrderMapper {
         // Map the semi-product that is represented by this stock order
         apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct(), language));
 
+        apiStockOrder.setPriceDeterminedLater(entity.getPriceDeterminedLater());
+
         // Map the final product that is represented by this stock order
         apiStockOrder.setFinalProduct(ProductApiTools.toApiFinalProduct(entity.getFinalProduct()));
 

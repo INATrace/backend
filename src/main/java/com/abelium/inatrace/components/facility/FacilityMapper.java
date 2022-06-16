@@ -75,6 +75,7 @@ public final class FacilityMapper {
 		apiFacility.setDisplayWeightDeductionDamage(entity.getDisplayWeightDeductionDamage());
 		apiFacility.setDisplayTare(entity.getDisplayTare());
 		apiFacility.setDisplayWomenOnly(entity.getDisplayWomenOnly());
+		apiFacility.setDisplayPriceDeterminedLater(entity.getDisplayPriceDeterminedLater());
 
 		// Map facility location data
 		ApiFacilityLocation apiFacilityLocation = new ApiFacilityLocation();

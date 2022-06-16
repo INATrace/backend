@@ -768,6 +768,7 @@ public class StockOrderService extends BaseService {
             entity.setFinalProduct(finalProductService.fetchFinalProduct(apiStockOrder.getFinalProduct().getId()));
         }
 
+        entity.setPriceDeterminedLater(apiStockOrder.getPriceDeterminedLater() == null ? Boolean.FALSE : apiStockOrder.getPriceDeterminedLater());
         entity.setOrganic(apiStockOrder.getOrganic());
         entity.setTare(apiStockOrder.getTare());
         entity.setWomenShare(apiStockOrder.getWomenShare());
@@ -832,23 +833,30 @@ public class StockOrderService extends BaseService {
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Total quantity needs to be provided!");
                 }
 
-                if (apiStockOrder.getPricePerUnit() == null) {
+                if (apiStockOrder.getPricePerUnit() == null && !Boolean.TRUE.equals(apiStockOrder.getPriceDeterminedLater())) {
                     throw new ApiException(ApiStatus.VALIDATION_ERROR, "Price per unit needs to be provided!");
                 }
 
                 entity.setPricePerUnit(apiStockOrder.getPricePerUnit());
                 BigDecimal pricePerUnitReduced = entity.getPricePerUnit();
+                // if pay later remove payable but keep balance
                 if (entity.getDamagedPriceDeduction() != null){
                     pricePerUnitReduced = entity.getPricePerUnit().subtract(entity.getDamagedPriceDeduction());
                 }
-                entity.setCost(pricePerUnitReduced.multiply(entity.getTotalQuantity()));
+                if (!Boolean.TRUE.equals(apiStockOrder.getPriceDeterminedLater())) {
+                    entity.setCost(pricePerUnitReduced.multiply(entity.getTotalQuantity()));
 
-                if (processingOrder == null) {
-                    entity.setBalance(calculateBalanceForPurchaseOrder(entity));
-                } else if (entity.getId() == null){
-                    entity.setBalance(entity.getCost());
+                    if (processingOrder == null) {
+                        entity.setBalance(calculateBalanceForPurchaseOrder(entity));
+                    } else if (entity.getId() == null){
+                        entity.setBalance(entity.getCost());
+                    }
+                    entity.setPaid(entity.getCost().subtract(entity.getBalance()));
+                } else {
+                    entity.setCost(null);
+                    entity.setBalance(null);
+                    entity.setPaid(null);
                 }
-                entity.setPaid(entity.getCost().subtract(entity.getBalance()));
 
                 entity.setProducerUserCustomer(fetchEntity(apiStockOrder.getProducerUserCustomer().getId(), UserCustomer.class));
                 entity.setPurchaseOrder(true);

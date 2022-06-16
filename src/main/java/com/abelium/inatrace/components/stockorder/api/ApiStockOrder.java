@@ -78,6 +78,9 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Semi product", position = 7)
     private ApiSemiProduct semiProduct;
 
+    @ApiModelProperty(value = "Option to determine price later after taking delivery")
+    private Boolean priceDeterminedLater;
+
     @ApiModelProperty(value = "Final product")
     private ApiFinalProduct finalProduct;
 
@@ -328,6 +331,14 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setSemiProduct(ApiSemiProduct semiProduct) {
         this.semiProduct = semiProduct;
+    }
+
+    public Boolean getPriceDeterminedLater() {
+        return priceDeterminedLater;
+    }
+
+    public void setPriceDeterminedLater(Boolean priceDeterminedLater) {
+        this.priceDeterminedLater = priceDeterminedLater;
     }
 
     public ApiFinalProduct getFinalProduct() {
