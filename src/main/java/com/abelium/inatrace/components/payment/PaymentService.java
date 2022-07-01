@@ -230,7 +230,11 @@ public class PaymentService extends BaseService {
 			}
 
 			if (stockOrder.getOrderType() == OrderType.PURCHASE_ORDER && !Boolean.TRUE.equals(stockOrder.getPriceDeterminedLater())) {
-				stockOrder.setBalance(stockOrder.getBalance().subtract(entity.getTotalPaid()));
+				BigDecimal sumTotalPaid = stockOrder.getPayments().stream()
+						.map(p -> p.getTotalPaid() != null ? p.getTotalPaid() : BigDecimal.ZERO)
+						.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+				stockOrder.setBalance(stockOrder.getCost().subtract(sumTotalPaid).subtract(entity.getTotalPaid() != null ? entity.getTotalPaid() : BigDecimal.ZERO));
 				stockOrder.setUpdatedBy(currentUser);
 			}
 
@@ -326,8 +330,23 @@ public class PaymentService extends BaseService {
 	}
 
 	@Transactional
-	public void deletePayment(Long id) throws ApiException {
-		em.remove(fetchEntity(id, Payment.class));
+	public void deletePayment(Long id, Long userId) throws ApiException {
+		Payment payment = fetchEntity(id, Payment.class);
+
+		User currentUser = userService.fetchUserById(userId);
+		StockOrder stockOrder = payment.getStockOrder();
+		if (stockOrder.getOrderType() == OrderType.PURCHASE_ORDER && !Boolean.TRUE.equals(stockOrder.getPriceDeterminedLater())) {
+			BigDecimal sumTotalPaid = stockOrder.getPayments().stream()
+					.map(p -> p.getTotalPaid() != null ? p.getTotalPaid() : BigDecimal.ZERO)
+					.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+			stockOrder.setBalance(stockOrder.getCost().subtract(sumTotalPaid).add(payment.getTotalPaid() != null ? payment.getTotalPaid() : BigDecimal.ZERO));
+			stockOrder.setUpdatedBy(currentUser);
+		}
+
+		// Remove mapping on both sides, otherwise it does not delete
+		stockOrder.getPayments().removeIf(p -> p.getId().equals(payment.getId()));
+		em.remove(payment);
 	}
 
 	private <E> E fetchEntity(Long id, Class<E> entityClass) throws ApiException {

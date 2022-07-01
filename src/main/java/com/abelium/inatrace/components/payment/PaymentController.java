@@ -152,9 +152,9 @@ public class PaymentController {
 
 	@DeleteMapping("{id}")
 	@ApiOperation("Deletes a payment with the provided ID.")
-	public ApiDefaultResponse deletePayment(@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id) throws ApiException {
+	public ApiDefaultResponse deletePayment(@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id, @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		paymentService.deletePayment(id);
+		paymentService.deletePayment(id, authUser.getUserId());
 		return new ApiDefaultResponse();
 	}
 }
