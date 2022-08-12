@@ -61,6 +61,10 @@ import java.util.stream.Collectors;
 @Service
 public class StockOrderService extends BaseService {
 
+    private static final String CUPPING_SCORE_FIELD_NAME = "CUPPING_SCORE";
+    private static final String CUPPING_FLAVOUR_FIELD_NAME = "CUPPING_FLAVOUR";
+    private static final String ROASTING_PROFILE_FIELD_NAME = "ROASTING_PROFILE";
+
     private final FacilityService facilityService;
 
     private final ProcessingEvidenceFieldService procEvidenceFieldService;
@@ -300,6 +304,36 @@ public class StockOrderService extends BaseService {
                                             .ifPresent(tSO -> historyTimelineItem.setLocation(tSO.getFacility().getName()));
                                     
                                 }
+
+                                // If current processing contains data for cupping score, flavour and roasting profile, get this data
+                                processing.getProcessingOrder().getTargetStockOrders().stream().findFirst().ifPresent(tStockOrder ->
+                                        tStockOrder.getRequiredEvidenceFieldValues().forEach(evidenceField -> {
+
+                                    // Find and set cupping score field
+                                    if (StockOrderService.CUPPING_SCORE_FIELD_NAME.equals(evidenceField.getEvidenceFieldName()) &&
+                                            StringUtils.isNotBlank(evidenceField.getStringValue()) &&
+                                            apiQRTagPublic.getCuppingScore() == null) {
+
+                                        apiQRTagPublic.setCuppingScore(new BigDecimal(evidenceField.getStringValue()));
+                                    }
+
+                                    // Find and set cupping flavour field
+                                    if (StockOrderService.CUPPING_FLAVOUR_FIELD_NAME.equals(evidenceField.getEvidenceFieldName()) &&
+                                            StringUtils.isNotBlank(evidenceField.getStringValue()) &&
+                                            apiQRTagPublic.getCuppingFlavour() == null) {
+
+                                        apiQRTagPublic.setCuppingFlavour(evidenceField.getStringValue());
+                                    }
+
+                                    // Find and set roasting profile field
+                                    if (StockOrderService.ROASTING_PROFILE_FIELD_NAME.equals(evidenceField.getEvidenceFieldName()) &&
+                                            StringUtils.isNotBlank(evidenceField.getStringValue()) &&
+                                            apiQRTagPublic.getRoastingProfile() == null) {
+
+                                        apiQRTagPublic.setRoastingProfile(evidenceField.getStringValue());
+                                    }
+                                }));
+
                             } else {
 
                                 processing.getPurchaseOrders().stream().findFirst().ifPresent(po -> {

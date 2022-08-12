@@ -222,7 +222,16 @@ public class StockOrderMapper {
 
         apiStockOrder.setWomenShare(entity.getWomenShare());
         apiStockOrder.setOrganic(entity.getOrganic());
+
+        // Map payments
         apiStockOrder.setPayments(entity.getPayments().stream().map(payment -> PaymentMapper.toApiPayment(payment, null)).collect(Collectors.toList()));
+
+        // Map the instances (values) of processing evidence fields
+        if (!entity.getProcessingEFValues().isEmpty()) {
+            apiStockOrder.setRequiredEvidenceFieldValues(entity.getProcessingEFValues().stream()
+                    .map(StockOrderEvidenceFieldValueMapper::toApiStockOrderEvidenceFieldValue)
+                    .collect(Collectors.toList()));
+        }
 
         return apiStockOrder;
     }

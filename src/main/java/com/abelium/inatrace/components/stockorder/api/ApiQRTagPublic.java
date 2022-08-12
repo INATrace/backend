@@ -26,6 +26,15 @@ public class ApiQRTagPublic {
 	@ApiModelProperty(value = "Price paid to farmers in EUR/kg")
 	private BigDecimal priceToFarmer;
 
+	@ApiModelProperty(value = "The cupping score entered during one of the processing actions")
+	private BigDecimal cuppingScore;
+
+	@ApiModelProperty(value = "The cupping flavour entered during one of the processing actions")
+	private String cuppingFlavour;
+
+	@ApiModelProperty(value = "The roasting profile entered during one of the processing actions")
+	private String roastingProfile;
+
 	private ApiHistoryTimeline historyTimeline;
 
 	public String getQrTag() {
@@ -66,6 +75,30 @@ public class ApiQRTagPublic {
 
 	public void setPriceToFarmer(BigDecimal priceToFarmer) {
 		this.priceToFarmer = priceToFarmer;
+	}
+
+	public BigDecimal getCuppingScore() {
+		return cuppingScore;
+	}
+
+	public void setCuppingScore(BigDecimal cuppingScore) {
+		this.cuppingScore = cuppingScore;
+	}
+
+	public String getCuppingFlavour() {
+		return cuppingFlavour;
+	}
+
+	public void setCuppingFlavour(String cuppingFlavour) {
+		this.cuppingFlavour = cuppingFlavour;
+	}
+
+	public String getRoastingProfile() {
+		return roastingProfile;
+	}
+
+	public void setRoastingProfile(String roastingProfile) {
+		this.roastingProfile = roastingProfile;
 	}
 
 	public ApiHistoryTimeline getHistoryTimeline() {

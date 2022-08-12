@@ -11,7 +11,6 @@ import com.abelium.inatrace.components.company.CompanyApiTools;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.product.types.ProductLabelAction;
-import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
@@ -23,7 +22,10 @@ import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.tools.TorpedoProjector;
-import com.abelium.inatrace.types.*;
+import com.abelium.inatrace.types.ProductCompanyType;
+import com.abelium.inatrace.types.ProductLabelStatus;
+import com.abelium.inatrace.types.RequestLogType;
+import com.abelium.inatrace.types.UserRole;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +44,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Lazy
 @Service
@@ -209,15 +210,20 @@ public class ProductService extends BaseService {
 	}
 
 	public List<ApiProductLabelCompanyDocument> getCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id) throws ApiException {
+
 		productQueries.checkProductLabelPermission(authUser, id);
 
 		List<CompanyDocument> availableDocuments = availableCompanyDocumentsForProductLabel(id);
 		List<ProductLabelCompanyDocument> selectedDocuments = selectedCompanyDocumentsForProductLabel(id);
 
 		return availableDocuments.stream().map(companyDocument -> {
-			ApiProductLabelCompanyDocument apiProductLabelCompanyDocument = ProductApiTools.toApiProductLabelCompanyDocument(CompanyApiTools.toApiCompanyDocument(authUser.getUserId(), companyDocument));
 
-			apiProductLabelCompanyDocument.setActive(selectedDocuments.stream().anyMatch(productLabelCompanyDocument -> productLabelCompanyDocument.getCompanyDocumentId().equals(companyDocument.getId())));
+			ApiProductLabelCompanyDocument apiProductLabelCompanyDocument = ProductApiTools.toApiProductLabelCompanyDocument(
+					CompanyApiTools.toApiCompanyDocument(authUser.getUserId(), companyDocument));
+
+			apiProductLabelCompanyDocument.setActive(selectedDocuments.stream().anyMatch(
+					productLabelCompanyDocument -> productLabelCompanyDocument.getCompanyDocumentId()
+							.equals(companyDocument.getId())));
 
 			return apiProductLabelCompanyDocument;
 		}).collect(Collectors.toList());
@@ -237,6 +243,7 @@ public class ProductService extends BaseService {
 
 	@Transactional
 	public void updateCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id, List<ApiProductLabelCompanyDocument> documentList) throws ApiException {
+
 		productQueries.checkProductLabelPermission(authUser, id);
 
 		// Get existing state
@@ -244,7 +251,10 @@ public class ProductService extends BaseService {
 
 		// Remove deactivated entries
 		existing.forEach(existingDocument -> {
-			if (documentList.stream().filter(ApiProductLabelCompanyDocument::getActive).noneMatch(apiProductLabelCompanyDocument -> existingDocument.getCompanyDocumentId().equals(apiProductLabelCompanyDocument.getId()))) {
+
+			if (documentList.stream().filter(ApiProductLabelCompanyDocument::getActive).noneMatch(
+					apiProductLabelCompanyDocument -> existingDocument.getCompanyDocumentId()
+							.equals(apiProductLabelCompanyDocument.getId()))) {
 				em.remove(existingDocument);
 			}
 		});
@@ -252,16 +262,23 @@ public class ProductService extends BaseService {
 		List<CompanyDocument> availableDocuments = availableCompanyDocumentsForProductLabel(id);
 
 		// Add activated entries
-		documentList.stream().filter(apiProductLabelCompanyDocument -> apiProductLabelCompanyDocument.getActive() && availableDocuments.stream().anyMatch(companyDocument -> companyDocument.getId().equals(apiProductLabelCompanyDocument.getId()))).forEach(apiProductLabelCompanyDocument -> {
-			if (existing.stream().noneMatch(existingDocument -> existingDocument.getCompanyDocumentId().equals(apiProductLabelCompanyDocument.getId()))) {
-				ProductLabelCompanyDocument productLabelCompanyDocument = new ProductLabelCompanyDocument();
+		documentList
+				.stream()
+				.filter(apiProductLabelCompanyDocument -> apiProductLabelCompanyDocument.getActive() && availableDocuments
+						.stream()
+						.anyMatch(companyDocument -> companyDocument.getId().equals(apiProductLabelCompanyDocument.getId())))
+				.forEach(apiProductLabelCompanyDocument -> {
 
-				productLabelCompanyDocument.setProductLabelId(id);
-				productLabelCompanyDocument.setCompanyDocumentId(apiProductLabelCompanyDocument.getId());
+					if (existing.stream().noneMatch(existingDocument -> existingDocument.getCompanyDocumentId()
+							.equals(apiProductLabelCompanyDocument.getId()))) {
+						ProductLabelCompanyDocument productLabelCompanyDocument = new ProductLabelCompanyDocument();
 
-				em.persist(productLabelCompanyDocument);
-			}
-		});
+						productLabelCompanyDocument.setProductLabelId(id);
+						productLabelCompanyDocument.setCompanyDocumentId(apiProductLabelCompanyDocument.getId());
+
+						em.persist(productLabelCompanyDocument);
+					}
+				});
 	}
 
     @Transactional
