@@ -1,12 +1,11 @@
 package com.abelium.inatrace.components.product.api;
 
-import javax.validation.Valid;
-
+import com.abelium.inatrace.components.common.api.ApiDocument;
+import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
-import com.abelium.inatrace.components.common.api.ApiDocument;
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.Valid;
 
 @Validated
 public class ApiProductContent extends ApiProductBase {
@@ -36,10 +35,6 @@ public class ApiProductContent extends ApiProductBase {
 	@ApiModelProperty(value = "settings", position = 18)
 	@Valid
 	public ApiProductSettings settings;
-
-	@ApiModelProperty(value = "comparison of price", position = 19)
-	@Valid
-	public ApiComparisonOfPrice comparisonOfPrice;
 
 	@ApiModelProperty(value = "knowledge blog", position = 20)
 	public Boolean knowledgeBlog;
@@ -103,14 +98,6 @@ public class ApiProductContent extends ApiProductBase {
 		this.settings = settings;
 	}
 
-	public ApiComparisonOfPrice getComparisonOfPrice() {
-		return comparisonOfPrice;
-	}
-
-	public void setComparisonOfPrice(ApiComparisonOfPrice comparisonOfPrice) {
-		this.comparisonOfPrice = comparisonOfPrice;
-	}
-
 	public Boolean getKnowledgeBlog() {
 		return knowledgeBlog;
 	}
@@ -126,4 +113,5 @@ public class ApiProductContent extends ApiProductBase {
 	public void setBusinessToCustomerSettings(ApiBusinessToCustomerSettings businessToCustomerSettings) {
 		this.businessToCustomerSettings = businessToCustomerSettings;
 	}
+
 }

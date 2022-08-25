@@ -60,7 +60,6 @@ public class ProductLabelContent extends ProductContent {
 		plc.setSpecialityDocument(p.getSpecialityDocument());
 		plc.setSpecialityDescription(p.getSpecialityDescription());
 		plc.setSettings(p.getSettings().copy());
-		plc.setComparisonOfPrice(p.getComparisonOfPrice().copy());
 		plc.setCompany(p.getCompany()); // no copy -- read only!
 		plc.setOriginLocations(p.getOriginLocations().stream().map(ProductLocation::copy).collect(Collectors.toList()));
 

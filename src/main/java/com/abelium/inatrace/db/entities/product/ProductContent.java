@@ -109,12 +109,6 @@ public class ProductContent extends BaseEntity {
 	private ProductSettings settings = new ProductSettings();
 	
 	/**
-	 * comparison of price
-	 */
-	@OneToOne(fetch = FetchType.LAZY)
-	private ComparisonOfPrice comparisonOfPrice = new ComparisonOfPrice();
-	
-	/**
 	 * knowledge blog
 	 */
 	@Column
@@ -233,14 +227,6 @@ public class ProductContent extends BaseEntity {
 
 	public void setSettings(ProductSettings settings) {
 		this.settings = settings;
-	}
-
-	public ComparisonOfPrice getComparisonOfPrice() {
-		return comparisonOfPrice;
-	}
-
-	public void setComparisonOfPrice(ComparisonOfPrice comparisonOfPrice) {
-		this.comparisonOfPrice = comparisonOfPrice;
 	}
 
 	public Boolean getKnowledgeBlog() {

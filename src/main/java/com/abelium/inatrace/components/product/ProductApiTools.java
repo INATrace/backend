@@ -133,13 +133,11 @@ public class ProductApiTools {
 		ap.responsibility = toApiResponsibility(userId, p.getResponsibility());
 		ap.sustainability = toApiSustainability(p.getSustainability());
 		ap.settings = toApiSettings(userId, p.getSettings());
-		ap.comparisonOfPrice = toApiComparisonOfPrice(p.getComparisonOfPrice());
 		ap.knowledgeBlog = p.getKnowledgeBlog();
 		ap.specialityDocument = CommonApiTools.toApiDocument(p.getSpecialityDocument(), userId);
 		ap.specialityDescription = p.getSpecialityDescription();
 		ap.setBusinessToCustomerSettings(toApiBusinessToCustomerSettings(p.getBusinessToCustomerSettings(), userId));
 	}
-	
 	
 	public static ApiProcess toApiProcess(Long userId, Process p) {
 		if (p == null) return null;
@@ -180,15 +178,6 @@ public class ProductApiTools {
 		aps.privacyPolicyText = ps.getPrivacyPolicyText();
 		aps.termsOfUseText = ps.getTermsOfUseText();
 		return aps;
-	}
-
-	public static ApiComparisonOfPrice toApiComparisonOfPrice(ComparisonOfPrice cp) {
-		if (cp == null) return null;
-		
-		ApiComparisonOfPrice acp = new ApiComparisonOfPrice();
-		acp.description = cp.getDescription();
-		acp.prices = cp.getPrices();
-		return acp;
 	}
 	
 	public static ApiResponsibility toApiResponsibility(Long userId, Responsibility r) {
@@ -393,7 +382,7 @@ public class ProductApiTools {
 		if (pu.responsibility != null) updateResponsibility(userId, p.getResponsibility(), pu.responsibility);
 		if (pu.sustainability != null) updateSustainability(p.getSustainability(), pu.sustainability);
 		if (pu.settings != null) updateSettings(userId, p.getSettings(), pu.settings);
-		if (pu.comparisonOfPrice != null) updateComparisonOfPrice(p.getComparisonOfPrice(), pu.comparisonOfPrice);
+
 		if (pu.getBusinessToCustomerSettings() != null) {
 			updateBusinessToCustomerSettings(userId, p.getBusinessToCustomerSettings(), pu.getBusinessToCustomerSettings());
 		} else {
@@ -513,11 +502,6 @@ public class ProductApiTools {
 		ps.setGdprText(aps.gdprText);
 		ps.setPrivacyPolicyText(aps.privacyPolicyText);
 		ps.setTermsOfUseText(aps.termsOfUseText);
-	}
-
-	private void updateComparisonOfPrice(ComparisonOfPrice ps, ApiComparisonOfPrice aps) {
-		ps.setPrices(aps.prices);
-		ps.setDescription(aps.description);
 	}
 
 	private void updateBusinessToCustomerSettings(Long userId, BusinessToCustomerSettings b2c, ApiBusinessToCustomerSettings ab2c) throws ApiException {

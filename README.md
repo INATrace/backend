@@ -287,7 +287,6 @@ Response:
   "specialityDocument": ApiDocument,
   "specialityDescription":"string",
   "settings": ApiProductSettings,
-  "comparisonOfPrice": ApiComparisonOfPrice,
   "knowledgeBlog":"boolean"
 }
 ```

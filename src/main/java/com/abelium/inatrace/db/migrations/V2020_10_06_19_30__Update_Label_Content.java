@@ -1,14 +1,13 @@
 package com.abelium.inatrace.db.migrations;
 
-import java.util.List;
-
-import javax.persistence.EntityManager;
-
-import org.springframework.core.env.Environment;
 import com.abelium.inatrace.components.flyway.JpaMigration;
 import com.abelium.inatrace.db.entities.product.ProductLabel;
 import com.abelium.inatrace.db.entities.product.ProductLabelContent;
 import com.abelium.inatrace.tools.Queries;
+import org.springframework.core.env.Environment;
+
+import javax.persistence.EntityManager;
+import java.util.List;
 
 public class V2020_10_06_19_30__Update_Label_Content implements JpaMigration {
     
@@ -23,7 +22,6 @@ public class V2020_10_06_19_30__Update_Label_Content implements JpaMigration {
         	em.persist(plc.getResponsibility());
         	em.persist(plc.getSustainability());
         	em.persist(plc.getSettings());
-        	em.persist(plc.getComparisonOfPrice());
         	em.persist(plc);
         	pl.setContent(plc);
         }

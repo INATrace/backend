@@ -141,7 +141,6 @@ public class ProductService extends BaseService {
 		em.persist(product.getResponsibility());
 		em.persist(product.getSustainability());
 		em.persist(product.getSettings());
-		em.persist(product.getComparisonOfPrice());
 		em.persist(product.getJourney());
 		em.persist(product.getBusinessToCustomerSettings());
 		em.persist(product);
@@ -168,11 +167,6 @@ public class ProductService extends BaseService {
 		if (p.getSettings() == null) {
 			p.setSettings(new ProductSettings());
 			em.persist(p.getSettings());
-		}
-
-		if (p.getComparisonOfPrice() == null) {
-			p.setComparisonOfPrice(new ComparisonOfPrice());
-			em.persist(p.getComparisonOfPrice());
 		}
 
         if (p.getJourney() == null) {
@@ -330,7 +324,6 @@ public class ProductService extends BaseService {
     	em.persist(plc.getResponsibility());
     	em.persist(plc.getSustainability());
     	em.persist(plc.getSettings());
-    	em.persist(plc.getComparisonOfPrice());
         em.persist(plc.getJourney());
 		em.persist(plc.getBusinessToCustomerSettings());
     	em.persist(plc);
@@ -403,7 +396,6 @@ public class ProductService extends BaseService {
 		}
 
     	em.remove(pl.getContent().getSettings());
-    	em.remove(pl.getContent().getComparisonOfPrice());
 		em.remove(pl.getContent());
 		em.remove(pl);
 	}
