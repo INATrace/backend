@@ -303,7 +303,8 @@ public class ProductApiTools {
 		apiBusinessToCustomerSettings.setOrderQuality(businessToCustomerSettings.getOrderQuality());
 		apiBusinessToCustomerSettings.setProductFont(CommonApiTools.toApiDocument(businessToCustomerSettings.getProductFont(), userId));
 		apiBusinessToCustomerSettings.setTextFont(CommonApiTools.toApiDocument(businessToCustomerSettings.getTextFont(), userId));
-		apiBusinessToCustomerSettings.setHeaderImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderImage(), userId));
+		apiBusinessToCustomerSettings.setLandingPageImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getLandingPageImage(), userId));
+		apiBusinessToCustomerSettings.setLandingPageBackgroundImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getLandingPageBackgroundImage(), userId));
 		apiBusinessToCustomerSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderBackgroundImage(), userId));
 		apiBusinessToCustomerSettings.setFooterImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getFooterImage(), userId));
 		apiBusinessToCustomerSettings.setGraphicFairPrices(businessToCustomerSettings.getGraphicFairPrices());
@@ -521,7 +522,8 @@ public class ProductApiTools {
 		b2c.setOrderQuality(ab2c.getOrderQuality());
 		b2c.setProductFont(commonEngine.fetchDocument(userId, ab2c.getProductFont()));
 		b2c.setTextFont(commonEngine.fetchDocument(userId, ab2c.getTextFont()));
-		b2c.setHeaderImage(commonEngine.fetchDocument(userId, ab2c.getHeaderImage()));
+		b2c.setLandingPageImage(commonEngine.fetchDocument(userId, ab2c.getLandingPageImage()));
+		b2c.setLandingPageBackgroundImage(commonEngine.fetchDocument(userId, ab2c.getLandingPageBackgroundImage()));
 		b2c.setHeaderBackgroundImage(commonEngine.fetchDocument(userId, ab2c.getHeaderBackgroundImage()));
 		b2c.setFooterImage(commonEngine.fetchDocument(userId, ab2c.getFooterImage()));
 		b2c.setGraphicFairPrices(ab2c.getGraphicFairPrices());
@@ -863,7 +865,8 @@ public class ProductApiTools {
 		b2cSettings.setTextColor(b2cSettingsProduct.getTextColor());
 		b2cSettings.setProductFont(CommonApiTools.toApiDocument(b2cSettingsProduct.getProductFont(), null));
 		b2cSettings.setTextFont(CommonApiTools.toApiDocument(b2cSettingsProduct.getTextFont(), null));
-		b2cSettings.setHeaderImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderImage(), null));
+		b2cSettings.setLandingPageImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getLandingPageImage(), null));
+		b2cSettings.setLandingPageBackgroundImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getLandingPageBackgroundImage(), null));
 		b2cSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderBackgroundImage(), null));
 		b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getFooterImage(), null));
 		b2cSettings.setGraphicFairPrices(b2cSettingsProduct.getGraphicFairPrices());
@@ -924,8 +927,11 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getTextFont() != null) {
 			b2cSettings.setTextFont(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getTextFont(), null));
 		}
-		if (b2cSettingsProductLabel.getHeaderImage() != null) {
-			b2cSettings.setHeaderImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getHeaderImage(), null));
+		if (b2cSettingsProductLabel.getLandingPageImage() != null) {
+			b2cSettings.setLandingPageImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getLandingPageImage(), null));
+		}
+		if (b2cSettingsProductLabel.getLandingPageBackgroundImage() != null) {
+			b2cSettings.setLandingPageBackgroundImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getLandingPageBackgroundImage(), null));
 		}
 		if (b2cSettingsProductLabel.getHeaderBackgroundImage() != null) {
 			b2cSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getHeaderBackgroundImage(), null));

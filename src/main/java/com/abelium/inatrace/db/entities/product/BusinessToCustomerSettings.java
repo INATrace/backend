@@ -87,7 +87,10 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     private Document textFont;
 
     @OneToOne
-    private Document headerImage;
+    private Document landingPageImage;
+
+    @OneToOne
+    private Document landingPageBackgroundImage;
 
     @OneToOne
     private Document headerBackgroundImage;
@@ -223,12 +226,20 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.textFont = textFont;
     }
 
-    public Document getHeaderImage() {
-        return headerImage;
+    public Document getLandingPageImage() {
+        return landingPageImage;
     }
 
-    public void setHeaderImage(Document headerImage) {
-        this.headerImage = headerImage;
+    public void setLandingPageImage(Document headerImage) {
+        this.landingPageImage = headerImage;
+    }
+
+    public Document getLandingPageBackgroundImage() {
+        return landingPageBackgroundImage;
+    }
+
+    public void setLandingPageBackgroundImage(Document headerBackgroundImage) {
+        this.landingPageBackgroundImage = headerBackgroundImage;
     }
 
     public Document getHeaderBackgroundImage() {
@@ -304,6 +315,7 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     }
 
     public BusinessToCustomerSettings copy() {
+
         BusinessToCustomerSettings businessToCustomerSettings = new BusinessToCustomerSettings();
 
         businessToCustomerSettings.setPrimaryColor(getPrimaryColor());
@@ -322,7 +334,8 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         businessToCustomerSettings.setOrderQuality(getOrderQuality());
         businessToCustomerSettings.setProductFont(getProductFont());
         businessToCustomerSettings.setTextFont(getTextFont());
-        businessToCustomerSettings.setHeaderImage(getHeaderImage());
+        businessToCustomerSettings.setLandingPageImage(getLandingPageImage());
+        businessToCustomerSettings.setLandingPageBackgroundImage(getLandingPageBackgroundImage());
         businessToCustomerSettings.setHeaderBackgroundImage(getHeaderBackgroundImage());
         businessToCustomerSettings.setFooterImage(getFooterImage());
         businessToCustomerSettings.setGraphicFairPrices(getGraphicFairPrices());

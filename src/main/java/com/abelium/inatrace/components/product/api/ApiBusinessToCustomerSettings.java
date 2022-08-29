@@ -24,7 +24,8 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
     private Long orderFeedback;
     private ApiDocument productFont;
     private ApiDocument textFont;
-    private ApiDocument headerImage;
+    private ApiDocument landingPageImage;
+    private ApiDocument landingPageBackgroundImage;
     private ApiDocument headerBackgroundImage;
     private ApiDocument footerImage;
     private Boolean graphicFairPrices;
@@ -163,12 +164,20 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
         this.textFont = textFont;
     }
 
-    public ApiDocument getHeaderImage() {
-        return headerImage;
+    public ApiDocument getLandingPageImage() {
+        return landingPageImage;
     }
 
-    public void setHeaderImage(ApiDocument headerImage) {
-        this.headerImage = headerImage;
+    public void setLandingPageImage(ApiDocument landingPageImage) {
+        this.landingPageImage = landingPageImage;
+    }
+
+    public ApiDocument getLandingPageBackgroundImage() {
+        return landingPageBackgroundImage;
+    }
+
+    public void setLandingPageBackgroundImage(ApiDocument landingPageBackgroundImage) {
+        this.landingPageBackgroundImage = landingPageBackgroundImage;
     }
 
     public ApiDocument getHeaderBackgroundImage() {
