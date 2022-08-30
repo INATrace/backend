@@ -315,6 +315,10 @@ public class ProductApiTools {
 		apiBusinessToCustomerSettings.setGraphicFarmGatePrice(businessToCustomerSettings.getGraphicFarmGatePrice());
 		apiBusinessToCustomerSettings.setManualFarmGatePrice(businessToCustomerSettings.getManualFarmGatePrice());
 		apiBusinessToCustomerSettings.setManualProducerPrice(businessToCustomerSettings.getManualProducerPrice());
+		apiBusinessToCustomerSettings.setContainerSize(businessToCustomerSettings.getContainerSize());
+		apiBusinessToCustomerSettings.setWorldMarket(businessToCustomerSettings.getWorldMarket());
+		apiBusinessToCustomerSettings.setFairTrade(businessToCustomerSettings.getFairTrade());
+		apiBusinessToCustomerSettings.setAverageRegionFarmGatePrice(businessToCustomerSettings.getAverageRegionFarmGatePrice());
 
 		return apiBusinessToCustomerSettings;
 	}
@@ -508,34 +512,46 @@ public class ProductApiTools {
 	}
 
 	private void updateBusinessToCustomerSettings(Long userId, BusinessToCustomerSettings b2c, ApiBusinessToCustomerSettings ab2c) throws ApiException {
+
 		b2c.setPrimaryColor(ab2c.getPrimaryColor());
 		b2c.setSecondaryColor(ab2c.getSecondaryColor());
 		b2c.setTertiaryColor(ab2c.getTertiaryColor());
 		b2c.setQuaternaryColor(ab2c.getQuaternaryColor());
+
 		b2c.setProductTitleColor(ab2c.getProductTitleColor());
 		b2c.setHeadingColor(ab2c.getHeadingColor());
 		b2c.setTextColor(ab2c.getTextColor());
+
 		b2c.setTabFairPrices(ab2c.getTabFairPrices());
 		b2c.setTabFeedback(ab2c.getTabFeedback());
 		b2c.setTabProducers(ab2c.getTabProducers());
 		b2c.setTabQuality(ab2c.getTabQuality());
+
 		b2c.setOrderFairPrices(ab2c.getOrderFairPrices());
 		b2c.setOrderFeedback(ab2c.getOrderFeedback());
 		b2c.setOrderProducers(ab2c.getOrderProducers());
 		b2c.setOrderQuality(ab2c.getOrderQuality());
+
 		b2c.setProductFont(commonEngine.fetchDocument(userId, ab2c.getProductFont()));
 		b2c.setTextFont(commonEngine.fetchDocument(userId, ab2c.getTextFont()));
+
 		b2c.setLandingPageImage(commonEngine.fetchDocument(userId, ab2c.getLandingPageImage()));
 		b2c.setLandingPageBackgroundImage(commonEngine.fetchDocument(userId, ab2c.getLandingPageBackgroundImage()));
 		b2c.setHeaderBackgroundImage(commonEngine.fetchDocument(userId, ab2c.getHeaderBackgroundImage()));
 		b2c.setFooterImage(commonEngine.fetchDocument(userId, ab2c.getFooterImage()));
+
 		b2c.setGraphicFairPrices(ab2c.getGraphicFairPrices());
 		b2c.setGraphicIncreaseOfIncome(ab2c.getGraphicIncreaseOfIncome());
 		b2c.setGraphicQuality(ab2c.getGraphicQuality());
 		b2c.setGraphicPriceToProducer(ab2c.getGraphicPriceToProducer());
 		b2c.setGraphicFarmGatePrice(ab2c.getGraphicFarmGatePrice());
+
 		b2c.setManualFarmGatePrice(ab2c.getManualFarmGatePrice());
 		b2c.setManualProducerPrice(ab2c.getManualProducerPrice());
+		b2c.setContainerSize(ab2c.getContainerSize());
+		b2c.setWorldMarket(ab2c.getWorldMarket());
+		b2c.setFairTrade(ab2c.getFairTrade());
+		b2c.setAverageRegionFarmGatePrice(ab2c.getAverageRegionFarmGatePrice());
 	}
 	
 	private void updateResponsibility(Long userId, Responsibility r, ApiResponsibility ar) throws ApiException {
@@ -880,6 +896,10 @@ public class ProductApiTools {
 		b2cSettings.setGraphicFarmGatePrice(b2cSettingsProduct.getGraphicFarmGatePrice());
 		b2cSettings.setManualFarmGatePrice(b2cSettingsProduct.getManualFarmGatePrice());
 		b2cSettings.setManualProducerPrice(b2cSettingsProduct.getManualProducerPrice());
+		b2cSettings.setContainerSize(b2cSettingsProduct.getContainerSize());
+		b2cSettings.setWorldMarket(b2cSettingsProduct.getWorldMarket());
+		b2cSettings.setFairTrade(b2cSettingsProduct.getFairTrade());
+		b2cSettings.setAverageRegionFarmGatePrice(b2cSettingsProduct.getAverageRegionFarmGatePrice());
 
 		// If product label defines values, overwrite settings from product
 		BusinessToCustomerSettings b2cSettingsProductLabel = productLabel.getContent().getBusinessToCustomerSettings();
@@ -895,6 +915,7 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getQuaternaryColor() != null) {
 			b2cSettings.setQuaternaryColor(b2cSettingsProductLabel.getQuaternaryColor());
 		}
+
 		if (b2cSettingsProductLabel.getProductTitleColor() != null) {
 			b2cSettings.setProductTitleColor(b2cSettingsProductLabel.getProductTitleColor());
 		}
@@ -904,6 +925,7 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getTextColor() != null) {
 			b2cSettings.setTextColor(b2cSettingsProductLabel.getTextColor());
 		}
+
 		if (b2cSettingsProductLabel.getTabFairPrices() != null) {
 			b2cSettings.setTabFairPrices(b2cSettingsProductLabel.getTabFairPrices());
 		}
@@ -916,6 +938,7 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getTabQuality() != null) {
 			b2cSettings.setTabQuality(b2cSettingsProductLabel.getTabQuality());
 		}
+
 		if (b2cSettingsProductLabel.getOrderFairPrices() != null) {
 			b2cSettings.setOrderFairPrices(b2cSettingsProductLabel.getOrderFairPrices());
 		}
@@ -928,12 +951,14 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getOrderQuality() != null) {
 			b2cSettings.setOrderQuality(b2cSettingsProductLabel.getOrderQuality());
 		}
+
 		if (b2cSettingsProductLabel.getProductFont() != null) {
 			b2cSettings.setProductFont(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getProductFont(), null));
 		}
 		if (b2cSettingsProductLabel.getTextFont() != null) {
 			b2cSettings.setTextFont(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getTextFont(), null));
 		}
+
 		if (b2cSettingsProductLabel.getLandingPageImage() != null) {
 			b2cSettings.setLandingPageImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getLandingPageImage(), null));
 		}
@@ -946,6 +971,7 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getFooterImage() != null) {
 			b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getFooterImage(), null));
 		}
+
 		if (b2cSettingsProductLabel.getGraphicFairPrices() != null) {
 			b2cSettings.setGraphicFairPrices(b2cSettingsProductLabel.getGraphicFairPrices());
 		}
@@ -961,12 +987,26 @@ public class ProductApiTools {
 		if (b2cSettingsProductLabel.getGraphicFarmGatePrice() != null) {
 			b2cSettings.setGraphicFarmGatePrice(b2cSettingsProductLabel.getGraphicFarmGatePrice());
 		}
+
 		if (b2cSettingsProductLabel.getManualFarmGatePrice() != null) {
 			b2cSettings.setManualFarmGatePrice(b2cSettingsProductLabel.getManualFarmGatePrice());
 		}
 		if (b2cSettingsProductLabel.getManualProducerPrice() != null) {
 			b2cSettings.setManualProducerPrice(b2cSettingsProductLabel.getManualProducerPrice());
 		}
+		if (b2cSettingsProductLabel.getContainerSize() != null) {
+			b2cSettings.setContainerSize(b2cSettingsProductLabel.getContainerSize());
+		}
+		if (b2cSettingsProductLabel.getWorldMarket() != null) {
+			b2cSettings.setWorldMarket(b2cSettingsProductLabel.getWorldMarket());
+		}
+		if (b2cSettingsProductLabel.getFairTrade() != null) {
+			b2cSettings.setFairTrade(b2cSettingsProductLabel.getFairTrade());
+		}
+		if (b2cSettingsProductLabel.getAverageRegionFarmGatePrice() != null) {
+			b2cSettings.setAverageRegionFarmGatePrice(b2cSettingsProductLabel.getAverageRegionFarmGatePrice());
+		}
+
 	}
 
 	public void loadBusinessToCustomerMedia(ApiProductLabelValuesExtended apiProductLabelValuesExtended, List<CompanyDocument> companyDocuments) {

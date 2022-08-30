@@ -83,6 +83,18 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     @Column(name = "manual_producer_price")
     private BigDecimal manualProducerPrice;
 
+    @Column(name = "container_size")
+    private BigDecimal containerSize;
+
+    @Column(name = "world_market")
+    private BigDecimal worldMarket;
+
+    @Column(name = "fair_trade")
+    private BigDecimal fairTrade;
+
+    @Column(name = "average_region_farm_gate_price")
+    private BigDecimal averageRegionFarmGatePrice;
+
     @OneToOne
     private Document productFont;
 
@@ -325,6 +337,38 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.manualProducerPrice = manualProducerPrice;
     }
 
+    public BigDecimal getContainerSize() {
+        return containerSize;
+    }
+
+    public void setContainerSize(BigDecimal containerSize) {
+        this.containerSize = containerSize;
+    }
+
+    public BigDecimal getWorldMarket() {
+        return worldMarket;
+    }
+
+    public void setWorldMarket(BigDecimal worldMarket) {
+        this.worldMarket = worldMarket;
+    }
+
+    public BigDecimal getFairTrade() {
+        return fairTrade;
+    }
+
+    public void setFairTrade(BigDecimal fairTrade) {
+        this.fairTrade = fairTrade;
+    }
+
+    public BigDecimal getAverageRegionFarmGatePrice() {
+        return averageRegionFarmGatePrice;
+    }
+
+    public void setAverageRegionFarmGatePrice(BigDecimal averageRegionFarmGatePrice) {
+        this.averageRegionFarmGatePrice = averageRegionFarmGatePrice;
+    }
+
     public BusinessToCustomerSettings copy() {
 
         BusinessToCustomerSettings businessToCustomerSettings = new BusinessToCustomerSettings();
@@ -364,6 +408,10 @@ public class BusinessToCustomerSettings extends TimestampEntity {
 
         businessToCustomerSettings.setManualFarmGatePrice(getManualFarmGatePrice());
         businessToCustomerSettings.setManualProducerPrice(getManualProducerPrice());
+        businessToCustomerSettings.setContainerSize(getContainerSize());
+        businessToCustomerSettings.setWorldMarket(getWorldMarket());
+        businessToCustomerSettings.setFairTrade(getWorldMarket());
+        businessToCustomerSettings.setAverageRegionFarmGatePrice(getAverageRegionFarmGatePrice());
 
         return businessToCustomerSettings;
     }

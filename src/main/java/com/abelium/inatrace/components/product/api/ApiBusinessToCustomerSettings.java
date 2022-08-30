@@ -12,30 +12,41 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
     private String secondaryColor;
     private String tertiaryColor;
     private String quaternaryColor;
+
     private String productTitleColor;
     private String headingColor;
     private String textColor;
+
     private Boolean tabFairPrices;
     private Boolean tabProducers;
     private Boolean tabQuality;
     private Boolean tabFeedback;
+
     private Long orderFairPrices;
     private Long orderProducers;
     private Long orderQuality;
     private Long orderFeedback;
+
     private ApiDocument productFont;
     private ApiDocument textFont;
+
     private ApiDocument landingPageImage;
     private ApiDocument landingPageBackgroundImage;
     private ApiDocument headerBackgroundImage;
     private ApiDocument footerImage;
+
     private Boolean graphicFairPrices;
     private Boolean graphicIncreaseOfIncome;
     private Boolean graphicQuality;
     private FairPricesUnit graphicPriceToProducer;
     private FairPricesUnit graphicFarmGatePrice;
+
     private BigDecimal manualFarmGatePrice;
     private BigDecimal manualProducerPrice;
+    private BigDecimal containerSize;
+    private BigDecimal worldMarket;
+    private BigDecimal fairTrade;
+    private BigDecimal averageRegionFarmGatePrice;
 
     public String getPrimaryColor() {
         return primaryColor;
@@ -260,4 +271,37 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
     public void setManualProducerPrice(BigDecimal manualProducerPrice) {
         this.manualProducerPrice = manualProducerPrice;
     }
+
+    public BigDecimal getContainerSize() {
+        return containerSize;
+    }
+
+    public void setContainerSize(BigDecimal containerSize) {
+        this.containerSize = containerSize;
+    }
+
+    public BigDecimal getWorldMarket() {
+        return worldMarket;
+    }
+
+    public void setWorldMarket(BigDecimal worldMarket) {
+        this.worldMarket = worldMarket;
+    }
+
+    public BigDecimal getFairTrade() {
+        return fairTrade;
+    }
+
+    public void setFairTrade(BigDecimal fairTrade) {
+        this.fairTrade = fairTrade;
+    }
+
+    public BigDecimal getAverageRegionFarmGatePrice() {
+        return averageRegionFarmGatePrice;
+    }
+
+    public void setAverageRegionFarmGatePrice(BigDecimal averageRegionFarmGatePrice) {
+        this.averageRegionFarmGatePrice = averageRegionFarmGatePrice;
+    }
+
 }
