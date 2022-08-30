@@ -27,6 +27,9 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     @Column(name = "quaternary_color", length = Lengths.HEX_COLOR)
     private String quaternaryColor;
 
+    @Column(name = "product_title_color", length = Lengths.HEX_COLOR)
+    private String productTitleColor;
+
     @Column(name = "heading_color", length = Lengths.HEX_COLOR)
     private String headingColor;
 
@@ -128,6 +131,14 @@ public class BusinessToCustomerSettings extends TimestampEntity {
 
     public void setQuaternaryColor(String quaternaryColor) {
         this.quaternaryColor = quaternaryColor;
+    }
+
+    public String getProductTitleColor() {
+        return productTitleColor;
+    }
+
+    public void setProductTitleColor(String productTitleColor) {
+        this.productTitleColor = productTitleColor;
     }
 
     public String getHeadingColor() {
@@ -322,27 +333,35 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         businessToCustomerSettings.setSecondaryColor(getSecondaryColor());
         businessToCustomerSettings.setTertiaryColor(getTertiaryColor());
         businessToCustomerSettings.setQuaternaryColor(getQuaternaryColor());
+
+        businessToCustomerSettings.setProductTitleColor(getProductTitleColor());
         businessToCustomerSettings.setHeadingColor(getHeadingColor());
         businessToCustomerSettings.setTextColor(getTextColor());
+
         businessToCustomerSettings.setTabFairPrices(getTabFairPrices());
         businessToCustomerSettings.setTabProducers(getTabProducers());
         businessToCustomerSettings.setTabQuality(getTabQuality());
         businessToCustomerSettings.setTabFeedback(getTabFeedback());
+
         businessToCustomerSettings.setOrderFairPrices(getOrderFairPrices());
         businessToCustomerSettings.setOrderFeedback(getOrderFeedback());
         businessToCustomerSettings.setOrderProducers(getOrderProducers());
         businessToCustomerSettings.setOrderQuality(getOrderQuality());
+
         businessToCustomerSettings.setProductFont(getProductFont());
         businessToCustomerSettings.setTextFont(getTextFont());
+
         businessToCustomerSettings.setLandingPageImage(getLandingPageImage());
         businessToCustomerSettings.setLandingPageBackgroundImage(getLandingPageBackgroundImage());
         businessToCustomerSettings.setHeaderBackgroundImage(getHeaderBackgroundImage());
         businessToCustomerSettings.setFooterImage(getFooterImage());
+
         businessToCustomerSettings.setGraphicFairPrices(getGraphicFairPrices());
         businessToCustomerSettings.setGraphicIncreaseOfIncome(getGraphicIncreaseOfIncome());
         businessToCustomerSettings.setGraphicQuality(getGraphicQuality());
         businessToCustomerSettings.setGraphicPriceToProducer(getGraphicPriceToProducer());
         businessToCustomerSettings.setGraphicFarmGatePrice(getGraphicFarmGatePrice());
+
         businessToCustomerSettings.setManualFarmGatePrice(getManualFarmGatePrice());
         businessToCustomerSettings.setManualProducerPrice(getManualProducerPrice());
 

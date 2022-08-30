@@ -291,6 +291,7 @@ public class ProductApiTools {
 		apiBusinessToCustomerSettings.setSecondaryColor(businessToCustomerSettings.getSecondaryColor());
 		apiBusinessToCustomerSettings.setTertiaryColor(businessToCustomerSettings.getTertiaryColor());
 		apiBusinessToCustomerSettings.setQuaternaryColor(businessToCustomerSettings.getQuaternaryColor());
+		apiBusinessToCustomerSettings.setProductTitleColor(businessToCustomerSettings.getProductTitleColor());
 		apiBusinessToCustomerSettings.setHeadingColor(businessToCustomerSettings.getHeadingColor());
 		apiBusinessToCustomerSettings.setTextColor(businessToCustomerSettings.getTextColor());
 		apiBusinessToCustomerSettings.setTabFairPrices(businessToCustomerSettings.getTabFairPrices());
@@ -393,6 +394,7 @@ public class ProductApiTools {
 			apiBusinessToCustomerSettings.setSecondaryColor("#5DBCCF");
 			apiBusinessToCustomerSettings.setTertiaryColor("#F7F7F7");
 			apiBusinessToCustomerSettings.setQuaternaryColor("#25265E");
+			apiBusinessToCustomerSettings.setProductTitleColor("25265E");
 			apiBusinessToCustomerSettings.setHeadingColor("#000000");
 			apiBusinessToCustomerSettings.setTextColor("#000000");
 			apiBusinessToCustomerSettings.setTabFairPrices(Boolean.TRUE);
@@ -510,6 +512,7 @@ public class ProductApiTools {
 		b2c.setSecondaryColor(ab2c.getSecondaryColor());
 		b2c.setTertiaryColor(ab2c.getTertiaryColor());
 		b2c.setQuaternaryColor(ab2c.getQuaternaryColor());
+		b2c.setProductTitleColor(ab2c.getProductTitleColor());
 		b2c.setHeadingColor(ab2c.getHeadingColor());
 		b2c.setTextColor(ab2c.getTextColor());
 		b2c.setTabFairPrices(ab2c.getTabFairPrices());
@@ -861,6 +864,7 @@ public class ProductApiTools {
 		b2cSettings.setSecondaryColor(b2cSettingsProduct.getSecondaryColor());
 		b2cSettings.setTertiaryColor(b2cSettingsProduct.getTertiaryColor());
 		b2cSettings.setQuaternaryColor(b2cSettingsProduct.getQuaternaryColor());
+		b2cSettings.setProductTitleColor(b2cSettingsProduct.getProductTitleColor());
 		b2cSettings.setHeadingColor(b2cSettingsProduct.getHeadingColor());
 		b2cSettings.setTextColor(b2cSettingsProduct.getTextColor());
 		b2cSettings.setProductFont(CommonApiTools.toApiDocument(b2cSettingsProduct.getProductFont(), null));
@@ -890,6 +894,9 @@ public class ProductApiTools {
 		}
 		if (b2cSettingsProductLabel.getQuaternaryColor() != null) {
 			b2cSettings.setQuaternaryColor(b2cSettingsProductLabel.getQuaternaryColor());
+		}
+		if (b2cSettingsProductLabel.getProductTitleColor() != null) {
+			b2cSettings.setProductTitleColor(b2cSettingsProductLabel.getProductTitleColor());
 		}
 		if (b2cSettingsProductLabel.getHeadingColor() != null) {
 			b2cSettings.setHeadingColor(b2cSettingsProductLabel.getHeadingColor());
