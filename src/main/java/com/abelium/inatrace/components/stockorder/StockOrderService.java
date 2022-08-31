@@ -11,8 +11,11 @@ import com.abelium.inatrace.components.codebook.processingevidencefield.Processi
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
+import com.abelium.inatrace.components.common.api.ApiCertification;
+import com.abelium.inatrace.components.company.CompanyApiTools;
 import com.abelium.inatrace.components.currencies.CurrencyService;
 import com.abelium.inatrace.components.facility.FacilityService;
+import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
 import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
 import com.abelium.inatrace.components.product.FinalProductService;
@@ -25,6 +28,7 @@ import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.company.CompanyCertification;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
@@ -279,6 +283,9 @@ public class StockOrderService extends BaseService {
                 ApiHistoryTimeline historyTimeline = new ApiHistoryTimeline();
                 apiQRTagPublic.setHistoryTimeline(historyTimeline);
 
+                // Set holding company IDs that are participating in this Stock order chain
+                Set<Long> participatingCompaniesIds = new HashSet<>();
+
                 // Get the history for the selected Stock order
                 ApiStockOrderHistory stockOrderHistory = getStockOrderAggregatedHistoryList(topLevelStockOrder.getId(), language, false);
 
@@ -286,23 +293,36 @@ public class StockOrderService extends BaseService {
                 historyTimeline.setItems(stockOrderHistory.getTimelineItems()
                         .stream()
                         .map(processing -> {
+
                             ApiHistoryTimelineItem historyTimelineItem = new ApiHistoryTimelineItem();
 
                             if (processing.getProcessingOrder() != null) {
 
+                                ApiFacility apiFacility = processing.getProcessingOrder().getTargetStockOrders()
+                                        .stream().findAny().map(ApiStockOrder::getFacility).orElse(null);
+
+                                // Add the facility company ID in the participating companies IDs for this Sto order chain
+                                if (apiFacility != null) {
+                                    participatingCompaniesIds.add(apiFacility.getCompany().getId());
+                                }
+
                                 // If processing item has no public timeline label defined, skip that processing
                                 if (StringUtils.isNotBlank(processing.getProcessingOrder().getProcessingAction().getPublicTimelineLabel())) {
+
                                     historyTimelineItem.setType(processing.getProcessingOrder().getProcessingAction().getType().toString());
                                     historyTimelineItem.setName(processing.getProcessingOrder().getProcessingAction().getName());
                                     historyTimelineItem.setDate(processing.getProcessingOrder().getProcessingDate());
-                                    
-                                    processing.getProcessingOrder().getTargetStockOrders().stream().findAny().ifPresent(t -> {
-                                        historyTimelineItem.setLatitude(t.getFacility().getFacilityLocation().getLatitude());
-                                        historyTimelineItem.setLongitude(t.getFacility().getFacilityLocation().getLongitude());
-                                    });
-                                    processing.getProcessingOrder().getTargetStockOrders().stream().findAny()
-                                            .ifPresent(tSO -> historyTimelineItem.setLocation(tSO.getFacility().getName()));
-                                    
+
+                                    // Set the location name (facility name)
+                                    if (apiFacility != null) {
+                                        historyTimelineItem.setLocation(apiFacility.getName());
+                                    }
+
+                                    // Set the location (facility) coordinates
+                                    if (apiFacility != null && apiFacility.getFacilityLocation() != null) {
+                                        historyTimelineItem.setLatitude(apiFacility.getFacilityLocation().getLatitude());
+                                        historyTimelineItem.setLongitude(apiFacility.getFacilityLocation().getLongitude());
+                                    }
                                 }
 
                                 // If current processing contains data for cupping score, flavour and roasting profile, get this data
@@ -361,10 +381,12 @@ public class StockOrderService extends BaseService {
                 BigDecimal producersPaidUsd = BigDecimal.ZERO;
 
                 for (ApiPayment apiPayment : producerPayments) {
+
                     // Add stock order weights only once
                     if (!stockOrderWeights.containsKey(apiPayment.getStockOrder().getId())) {
                         stockOrderWeights.put(apiPayment.getStockOrder().getId(), apiPayment.getStockOrder().getFulfilledQuantity().multiply(apiPayment.getStockOrder().getMeasureUnitType().getWeight()));
                     }
+
                     // Calculate price in USD at date
                     BigDecimal producerPriceUsd = currencyService.convertAtDate(
                             apiPayment.getCurrency(),
@@ -372,6 +394,7 @@ public class StockOrderService extends BaseService {
                             apiPayment.getAmount(),
                             Date.from(apiPayment.getFormalCreationTime())
                     );
+
                     // Accumulate payments
                     producersPaidUsd = producersPaidUsd.add(producerPriceUsd);
                 }
@@ -381,6 +404,17 @@ public class StockOrderService extends BaseService {
 
                 apiQRTagPublic.setPriceToProducer(calculateProducerPayments(producersPaidUsd, producersCoffeeKg));
                 apiQRTagPublic.setPriceToFarmer(calculateFarmerPayments(stockOrderHistory));
+
+                // Get all the certificates from the participating companies
+                if (!participatingCompaniesIds.isEmpty()) {
+                    List<ApiCertification> apiCertificates = em.createNamedQuery("CompanyCertification.getCertificatesForCompanyIDs", CompanyCertification.class)
+                            .setParameter("companyIDs", participatingCompaniesIds)
+                            .getResultList()
+                            .stream()
+                            .map(cc -> CompanyApiTools.toApiCertification(null, cc))
+                            .collect(Collectors.toList());
+                    apiQRTagPublic.setCertificates(apiCertificates);
+                }
             }
         }
 

@@ -1,8 +1,10 @@
 package com.abelium.inatrace.components.stockorder.api;
 
+import com.abelium.inatrace.components.common.api.ApiCertification;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * API model for QR code tag history (public Stock order data) used in B2C page.
@@ -34,6 +36,9 @@ public class ApiQRTagPublic {
 
 	@ApiModelProperty(value = "The roasting profile entered during one of the processing actions")
 	private String roastingProfile;
+
+	@ApiModelProperty(value = "List of certificates of the participating companies in this Stock order")
+	private List<ApiCertification> certificates;
 
 	private ApiHistoryTimeline historyTimeline;
 
@@ -99,6 +104,14 @@ public class ApiQRTagPublic {
 
 	public void setRoastingProfile(String roastingProfile) {
 		this.roastingProfile = roastingProfile;
+	}
+
+	public List<ApiCertification> getCertificates() {
+		return certificates;
+	}
+
+	public void setCertificates(List<ApiCertification> certificates) {
+		this.certificates = certificates;
 	}
 
 	public ApiHistoryTimeline getHistoryTimeline() {

@@ -8,6 +8,10 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@NamedQueries({
+		@NamedQuery(name = "CompanyCertification.getCertificatesForCompanyIDs",
+		            query = "SELECT cc FROM CompanyCertification cc WHERE cc.company.id IN :companyIDs")
+})
 public class CompanyCertification extends BaseEntity {
 
 	/**

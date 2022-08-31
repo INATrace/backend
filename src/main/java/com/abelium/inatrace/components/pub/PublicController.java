@@ -10,7 +10,6 @@ import com.abelium.inatrace.components.common.CommonService;
 import com.abelium.inatrace.components.common.GlobalSettingsService;
 import com.abelium.inatrace.components.common.api.ApiGlobalSettingsValue;
 import com.abelium.inatrace.components.company.CompanyService;
-import com.abelium.inatrace.components.company.api.ApiCompanyPublic;
 import com.abelium.inatrace.components.product.ProductService;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.stockorder.StockOrderService;
@@ -56,14 +55,6 @@ public class PublicController {
 		this.requestLogService = requestLogService;
 		this.globalSettingsService = globalSettingsService;
 	}
-
-	@GetMapping(value = "/company/{id}")
-    @ApiOperation(value = "Get public data about company")
-    public ApiResponse<ApiCompanyPublic> getPublicCompany(
-    		@Valid @ApiParam(value = "id", required = true) @PathVariable("id") Long id,
-    		@Valid @ApiParam(value = "language") @RequestParam(value = "language", defaultValue = "EN") String language) throws ApiException {
-    	return new ApiResponse<>(companyService.getCompanyPublic(id, Language.valueOf(language)));
-    }
     
     @GetMapping(value = "/product/label/{uid}")
     @ApiOperation(value = "Get label with field values")

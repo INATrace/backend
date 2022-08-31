@@ -79,14 +79,6 @@ public class CompanyApiTools {
 		ac.displayPrefferedWayOfPayment = c.getDisplayPrefferedWayOfPayment();
 		ac.purchaseProofDocumentMultipleFarmers = c.getPurchaseProofDocumentMultipleFarmers();
 	}
-
-	public void updateApiCompanyPublic(ApiCompanyPublic ac, Company c, Language language) {
-		if (language == null || Language.EN == language) updateApiCompanyPublicTranslatables(ac, c);
-		else {
-			CompanyTranslation ct = companyQueries.fetchCompanyTranslation(c, language);
-			if (ct != null) updateApiCompanyPublicTranslatables(ac, ct);
-		}
-	}
 	
 	public ApiCompanyGet toApiCompanyGet(Long userId, Company c, Language language, 
 			List<CompanyAction> actions,
@@ -97,14 +89,6 @@ public class CompanyApiTools {
 		updateApiCompany(userId, ac, c, language);
 		ac.actions = actions;
 		ac.users = users;
-		return ac;
-	}
-
-	public ApiCompanyPublic toApiCompanyPublic(Company c, Language language) {
-		if (c == null) return null;
-		
-		ApiCompanyPublic ac = new ApiCompanyPublic();
-		updateApiCompanyPublic(ac, c, language);
 		return ac;
 	}
 	
@@ -225,15 +209,6 @@ public class CompanyApiTools {
 		ac.mediaLinks = c.getMediaLinks();
 		ac.documents = c.getDocuments().stream().map(cd -> toApiCompanyDocument(userId, cd)).collect(Collectors.toList());
 		ac.certifications = c.getCertifications().stream().map(cd -> toApiCertification(userId, cd)).collect(Collectors.toList());
-	}
-	
-	private static void updateApiCompanyPublicTranslatables(ApiCompanyPublic ac, CompanyTranslatables c) {
-		ac.name = c.getName();
-		ac.interview = c.getInterview();
-		ac.documents = c.getDocuments().stream().map(cd -> toApiCompanyDocument(null, cd)).collect(Collectors.toList());
-		ac.certifications = c.getCertifications().stream().map(cd -> toApiCertification(null, cd)).collect(Collectors.toList());
-		ac.about = c.getAbout();
-		ac.mediaLinks = c.getMediaLinks();
 	}
 	
 	public void updateCompanyWithUsers(Long userId, Company c, ApiCompanyUpdate ac) throws ApiException {

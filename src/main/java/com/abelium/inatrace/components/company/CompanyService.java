@@ -188,12 +188,6 @@ public class CompanyService extends BaseService {
 	}
 
 	@Transactional
-	public ApiCompanyPublic getCompanyPublic(long id, Language language) throws ApiException {
-		Company c = companyQueries.fetchCompany(id);
-		return companyApiTools.toApiCompanyPublic(c, language);
-	}
-
-	@Transactional
 	public void updateCompany(CustomUserDetails authUser, ApiCompanyUpdate ac) throws ApiException {
 		Company c = companyQueries.fetchCompany(authUser, ac.id);
 		companyApiTools.updateCompanyWithUsers(authUser.getUserId(), c, ac);
