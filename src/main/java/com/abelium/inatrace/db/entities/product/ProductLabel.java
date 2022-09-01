@@ -10,7 +10,9 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 public class ProductLabel extends BaseEntity {
@@ -118,11 +120,13 @@ public class ProductLabel extends BaseEntity {
 		this.language = language;
 	}
 
+	// @ElementCollection with @OrderColumn can return null elements when the order column contains gaps in values
 	public List<ProductLabelField> getFields() {
-		return fields;
+		return fields.stream().filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
 	public void setFields(List<ProductLabelField> fields) {
 		this.fields = fields;
 	}
+
 }
