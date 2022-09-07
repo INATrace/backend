@@ -169,7 +169,6 @@ public class ProductApiTools {
 		aps.traceOrigin = ps.getTraceOrigin();
 		aps.giveFeedback = ps.getGiveFeedback();
 		aps.costBreakdown = ps.getCostBreakdown();
-		aps.increaseOfCoffee = ps.getIncreaseOfCoffee();
 		aps.pricingTransparency = ps.getPricingTransparency();
 		aps.incomeIncreaseDocument = CommonApiTools.toApiDocument(ps.getIncomeIncreaseDocument(), userId);
 		aps.incomeIncreaseDescription = ps.getIncomeIncreaseDescription();
@@ -501,7 +500,6 @@ public class ProductApiTools {
 		ps.setTraceOrigin(aps.traceOrigin);
 		ps.setGiveFeedback(aps.giveFeedback);
 		ps.setCostBreakdown(aps.costBreakdown);
-		ps.setIncreaseOfCoffee(aps.increaseOfCoffee);
 		ps.setPricingTransparency(aps.pricingTransparency);
 		ps.setIncomeIncreaseDocument(commonEngine.fetchDocument(userId, aps.incomeIncreaseDocument));
 		ps.setIncomeIncreaseDescription(aps.incomeIncreaseDescription);

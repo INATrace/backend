@@ -1,14 +1,12 @@
 package com.abelium.inatrace.components.product.api;
 
-import java.util.Map;
-
+import com.abelium.inatrace.components.common.api.ApiDocument;
+import com.abelium.inatrace.types.Language;
+import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
-import com.abelium.inatrace.components.common.api.ApiDocument;
-import com.abelium.inatrace.types.Language;
-
-import io.swagger.annotations.ApiModelProperty;
+import java.util.Map;
 
 @Validated
 public class ApiProductSettings {
@@ -24,9 +22,6 @@ public class ApiProductSettings {
 
 	@ApiModelProperty(value = "cost breakdown", position = 4)
 	public Boolean costBreakdown;
-
-	@ApiModelProperty(value = "increase of coffee", position = 5)
-	public Double increaseOfCoffee;
 	
 	@ApiModelProperty(value = "pricing transparency - string-number map", position = 6)
     public Map<String, Double> pricingTransparency;
@@ -84,14 +79,6 @@ public class ApiProductSettings {
 
 	public void setCostBreakdown(Boolean costBreakdown) {
 		this.costBreakdown = costBreakdown;
-	}
-
-	public Double getIncreaseOfCoffee() {
-		return increaseOfCoffee;
-	}
-
-	public void setIncreaseOfCoffee(Double increaseOfCoffee) {
-		this.increaseOfCoffee = increaseOfCoffee;
 	}
 
 	public Map<String, Double> getPricingTransparency() {

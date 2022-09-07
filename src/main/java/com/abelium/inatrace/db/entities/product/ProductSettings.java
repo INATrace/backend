@@ -37,12 +37,6 @@ public class ProductSettings extends BaseEntity {
 	private Boolean costBreakdown;
 	
 	/**
-	 * increase of coffee
-	 */
-	@Column
-	private Double increaseOfCoffee;
-	
-	/**
 	 * pricing transparency
 	 */
 	@ElementCollection(fetch = FetchType.EAGER)
@@ -120,14 +114,6 @@ public class ProductSettings extends BaseEntity {
 		this.costBreakdown = costBreakdown;
 	}
 
-	public Double getIncreaseOfCoffee() {
-		return increaseOfCoffee;
-	}
-
-	public void setIncreaseOfCoffee(Double increaseOfCoffee) {
-		this.increaseOfCoffee = increaseOfCoffee;
-	}
-
 	public Map<String, Double> getPricingTransparency() {
 		return pricingTransparency;
 	}
@@ -190,7 +176,6 @@ public class ProductSettings extends BaseEntity {
 		s.setTraceOrigin(getTraceOrigin());
 		s.setGiveFeedback(getGiveFeedback());
 		s.setCostBreakdown(getCostBreakdown());
-		s.setIncreaseOfCoffee(getIncreaseOfCoffee());
 		s.setPricingTransparency(new HashMap<>(getPricingTransparency()));
 		s.setIncomeIncreaseDescription(getIncomeIncreaseDescription());
 		s.setIncomeIncreaseDocument(getIncomeIncreaseDocument());
