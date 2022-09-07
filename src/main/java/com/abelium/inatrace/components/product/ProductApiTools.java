@@ -306,7 +306,6 @@ public class ProductApiTools {
 		apiBusinessToCustomerSettings.setLandingPageImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getLandingPageImage(), userId));
 		apiBusinessToCustomerSettings.setLandingPageBackgroundImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getLandingPageBackgroundImage(), userId));
 		apiBusinessToCustomerSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getHeaderBackgroundImage(), userId));
-		apiBusinessToCustomerSettings.setFooterImage(CommonApiTools.toApiDocument(businessToCustomerSettings.getFooterImage(), userId));
 		apiBusinessToCustomerSettings.setGraphicFairPrices(businessToCustomerSettings.getGraphicFairPrices());
 		apiBusinessToCustomerSettings.setGraphicIncreaseOfIncome(businessToCustomerSettings.getGraphicIncreaseOfIncome());
 		apiBusinessToCustomerSettings.setGraphicQuality(businessToCustomerSettings.getGraphicQuality());
@@ -536,7 +535,6 @@ public class ProductApiTools {
 		b2c.setLandingPageImage(commonEngine.fetchDocument(userId, ab2c.getLandingPageImage()));
 		b2c.setLandingPageBackgroundImage(commonEngine.fetchDocument(userId, ab2c.getLandingPageBackgroundImage()));
 		b2c.setHeaderBackgroundImage(commonEngine.fetchDocument(userId, ab2c.getHeaderBackgroundImage()));
-		b2c.setFooterImage(commonEngine.fetchDocument(userId, ab2c.getFooterImage()));
 
 		b2c.setGraphicFairPrices(ab2c.getGraphicFairPrices());
 		b2c.setGraphicIncreaseOfIncome(ab2c.getGraphicIncreaseOfIncome());
@@ -886,7 +884,6 @@ public class ProductApiTools {
 		b2cSettings.setLandingPageImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getLandingPageImage(), null));
 		b2cSettings.setLandingPageBackgroundImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getLandingPageBackgroundImage(), null));
 		b2cSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getHeaderBackgroundImage(), null));
-		b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProduct.getFooterImage(), null));
 		b2cSettings.setGraphicFairPrices(b2cSettingsProduct.getGraphicFairPrices());
 		b2cSettings.setGraphicIncreaseOfIncome(b2cSettingsProduct.getGraphicIncreaseOfIncome());
 		b2cSettings.setGraphicQuality(b2cSettingsProduct.getGraphicQuality());
@@ -965,9 +962,6 @@ public class ProductApiTools {
 		}
 		if (b2cSettingsProductLabel.getHeaderBackgroundImage() != null) {
 			b2cSettings.setHeaderBackgroundImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getHeaderBackgroundImage(), null));
-		}
-		if (b2cSettingsProductLabel.getFooterImage() != null) {
-			b2cSettings.setFooterImage(CommonApiTools.toApiDocument(b2cSettingsProductLabel.getFooterImage(), null));
 		}
 
 		if (b2cSettingsProductLabel.getGraphicFairPrices() != null) {

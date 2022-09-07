@@ -33,7 +33,6 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
     private ApiDocument landingPageImage;
     private ApiDocument landingPageBackgroundImage;
     private ApiDocument headerBackgroundImage;
-    private ApiDocument footerImage;
 
     private Boolean graphicFairPrices;
     private Boolean graphicIncreaseOfIncome;
@@ -206,14 +205,6 @@ public class ApiBusinessToCustomerSettings extends ApiTimestampEntity {
 
     public void setHeaderBackgroundImage(ApiDocument headerBackgroundImage) {
         this.headerBackgroundImage = headerBackgroundImage;
-    }
-
-    public ApiDocument getFooterImage() {
-        return footerImage;
-    }
-
-    public void setFooterImage(ApiDocument footerImage) {
-        this.footerImage = footerImage;
     }
 
     public Boolean getGraphicFairPrices() {

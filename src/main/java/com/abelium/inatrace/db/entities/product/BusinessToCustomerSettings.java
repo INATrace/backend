@@ -110,9 +110,6 @@ public class BusinessToCustomerSettings extends TimestampEntity {
     @OneToOne
     private Document headerBackgroundImage;
 
-    @OneToOne
-    private Document footerImage;
-
     public String getPrimaryColor() {
         return primaryColor;
     }
@@ -273,14 +270,6 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         this.headerBackgroundImage = headerBackgroundImage;
     }
 
-    public Document getFooterImage() {
-        return footerImage;
-    }
-
-    public void setFooterImage(Document footerImage) {
-        this.footerImage = footerImage;
-    }
-
     public Boolean getGraphicFairPrices() {
         return graphicFairPrices;
     }
@@ -398,7 +387,6 @@ public class BusinessToCustomerSettings extends TimestampEntity {
         businessToCustomerSettings.setLandingPageImage(getLandingPageImage());
         businessToCustomerSettings.setLandingPageBackgroundImage(getLandingPageBackgroundImage());
         businessToCustomerSettings.setHeaderBackgroundImage(getHeaderBackgroundImage());
-        businessToCustomerSettings.setFooterImage(getFooterImage());
 
         businessToCustomerSettings.setGraphicFairPrices(getGraphicFairPrices());
         businessToCustomerSettings.setGraphicIncreaseOfIncome(getGraphicIncreaseOfIncome());
