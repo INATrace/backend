@@ -441,6 +441,13 @@ public class StockOrderService extends BaseService {
     }
 
     private List<Company> getProducers(StockOrder topLevelStockOrder) {
+
+        // If the stock order doesn't have final product, it means there is no final processing done, and we cannot connect
+        // the stock order with the companies from the product stakeholders
+        if (topLevelStockOrder.getFinalProduct() == null) {
+            return Collections.emptyList();
+        }
+
         return topLevelStockOrder.getFinalProduct().getProduct().getAssociatedCompanies().stream()
                 .filter(productCompany -> ProductCompanyType.PRODUCER.equals(productCompany.getType()))
                 .map(ProductCompany::getCompany)
