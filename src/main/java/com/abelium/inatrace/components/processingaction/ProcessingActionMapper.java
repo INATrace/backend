@@ -4,6 +4,7 @@ import com.abelium.inatrace.components.codebook.processing_evidence_type.api.Api
 import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
+import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.components.processingactiontranslation.ProcessingActionTranslationMapper;
 import com.abelium.inatrace.components.product.ProductApiTools;
@@ -12,7 +13,10 @@ import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceField;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceFieldTranslation;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceType;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceTypeTranslation;
+import com.abelium.inatrace.db.entities.facility.Facility;
+import com.abelium.inatrace.db.entities.facility.FacilityTranslation;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
+import com.abelium.inatrace.db.entities.processingaction.ProcessingActionFacility;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
 import com.abelium.inatrace.types.Language;
@@ -31,7 +35,7 @@ public final class ProcessingActionMapper {
 	private ProcessingActionMapper() {
 		throw new IllegalStateException("Utility class");
 	}
-	
+
 	public static ApiProcessingAction toApiProcessingAction(ProcessingAction entity, Language language) {
 
 		ApiProcessingAction apiProcessingAction = new ApiProcessingAction();
@@ -57,7 +61,7 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setPublicTimelineIconType(entity.getPublicTimelineIconType());
 		apiProcessingAction.setType(entity.getType());
 		apiProcessingAction.setFinalProductAction(entity.getFinalProductAction());
-		
+
 		ApiCompanyBase apiCompany = new ApiCompanyBase();
 		apiCompany.setId(entity.getCompany().getId());
 		apiCompany.setName(entity.getCompany().getName());
@@ -74,7 +78,7 @@ public final class ProcessingActionMapper {
 		// Set the estimated output quantity per unit
 		apiProcessingAction.setEstimatedOutputQuantityPerUnit(entity.getEstimatedOutputQuantityPerUnit());
 
-		// Map the final prodcut for which a QR code should be generated
+		// Map the final product for which a QR code should be generated
 		apiProcessingAction.setQrCodeForFinalProduct(ProductApiTools.toApiFinalProduct(entity.getQrCodeForFinalProduct()));
 
 		// Processing evidence fields
@@ -102,9 +106,9 @@ public final class ProcessingActionMapper {
 			}
 		);
 		apiProcessingAction.setRequiredEvidenceFields(apiRequiredEvidenceFields);
-		
+
 		List<ApiProcessingEvidenceType> apiRequiredDocumentTypes = new ArrayList<>();
-		
+
 		// Processing evidence types
 		List<ProcessingActionPET> processingActionProcessingEvidenceTypes = entity.getRequiredDocumentTypes();
 		processingActionProcessingEvidenceTypes.forEach(
@@ -117,7 +121,7 @@ public final class ProcessingActionMapper {
 								() -> procEvidenceType.getTranslations().stream()
 										.filter(t -> t.getLanguage().equals(Language.EN)).findAny()
 										.orElse(new ProcessingEvidenceTypeTranslation()));
-				
+
 				ApiProcessingEvidenceType apiRequiredDocumentType = new ApiProcessingEvidenceType();
 				apiRequiredDocumentType.setId(procEvidenceType.getId());
 				apiRequiredDocumentType.setCode(procEvidenceType.getCode());
@@ -129,6 +133,30 @@ public final class ProcessingActionMapper {
 			}
 		);
 		apiProcessingAction.setRequiredDocumentTypes(apiRequiredDocumentTypes);
+
+		// Map the suppoerted facilities for this
+		List<ApiFacility> supportedFacilities = new ArrayList<>();
+		List<ProcessingActionFacility> processingActionFacilities = entity.getProcessingActionFacilities();
+		processingActionFacilities.forEach(processingActionFacility -> {
+
+			// Get the translated facility name
+			Facility facility = processingActionFacility.getFacility();
+			FacilityTranslation facilityTranslation = facility.getFacilityTranslations()
+					.stream()
+					.filter(ft -> ft.getLanguage().equals(language))
+					.findFirst()
+					.orElseGet(() -> facility.getFacilityTranslations()
+							.stream()
+							.filter(ft -> ft.getLanguage().equals(Language.EN))
+							.findAny()
+							.orElse(new FacilityTranslation()));
+
+			ApiFacility supportedFacility = new ApiFacility();
+			supportedFacility.setId(processingActionFacility.getId());
+			supportedFacility.setName(facilityTranslation.getName());
+			supportedFacilities.add(supportedFacility);
+		});
+		apiProcessingAction.setSupportedFacilities(supportedFacilities);
 
 		return apiProcessingAction;
 	}

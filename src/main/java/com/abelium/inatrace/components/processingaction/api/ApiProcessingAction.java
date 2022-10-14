@@ -4,6 +4,7 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
+import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.processingactiontranslation.api.ApiProcessingActionTranslation;
 import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.components.product.api.ApiFinalProduct;
@@ -89,6 +90,9 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Processing action required evidence fields")
 	private List<ApiProcessingEvidenceField> requiredEvidenceFields = new ArrayList<>();
+
+	@ApiModelProperty(value = "List of facilities where this processing starts")
+	private List<ApiFacility> supportedFacilities = new ArrayList<>();
 
 	@ApiModelProperty(value = "Processing action translations")
 	private List<ApiProcessingActionTranslation> translations = new ArrayList<>();
@@ -271,6 +275,14 @@ public class ApiProcessingAction extends ApiBaseEntity {
 
 	public void setRequiredEvidenceFields(List<ApiProcessingEvidenceField> requiredEvidenceFields) {
 		this.requiredEvidenceFields = requiredEvidenceFields;
+	}
+
+	public List<ApiFacility> getSupportedFacilities() {
+		return supportedFacilities;
+	}
+
+	public void setSupportedFacilities(List<ApiFacility> supportedFacilities) {
+		this.supportedFacilities = supportedFacilities;
 	}
 
 	public List<ApiProcessingActionTranslation> getTranslations() {

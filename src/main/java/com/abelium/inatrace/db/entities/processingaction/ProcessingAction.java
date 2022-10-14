@@ -96,7 +96,7 @@ public class ProcessingAction extends TimestampEntity {
 	private PublicTimelineIconType publicTimelineIconType;
 
 	/**
-	 * Used to set if we are working with transfer or quote action for final products (fron final product to final product)
+	 * Used to set if we are working with transfer or quote action for final products (from final product to final product)
 	 */
 	@Column
 	private Boolean finalProductAction;
@@ -112,6 +112,9 @@ public class ProcessingAction extends TimestampEntity {
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionPEF> processingEvidenceFields = new ArrayList<>();
+
+	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProcessingActionFacility> processingActionFacilities = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionTranslation> processingActionTranslations = new ArrayList<>();
@@ -271,7 +274,15 @@ public class ProcessingAction extends TimestampEntity {
 	public void setProcessingEvidenceFields(List<ProcessingActionPEF> processingEvidenceFields) {
 		this.processingEvidenceFields = processingEvidenceFields;
 	}
-	
+
+	public List<ProcessingActionFacility> getProcessingActionFacilities() {
+		return processingActionFacilities;
+	}
+
+	public void setProcessingActionFacilities(List<ProcessingActionFacility> processingActionFacilities) {
+		this.processingActionFacilities = processingActionFacilities;
+	}
+
 	public List<ProcessingActionTranslation> getProcessingActionTranslations() {
 		return processingActionTranslations;
 	}

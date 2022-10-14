@@ -10,15 +10,14 @@ import com.abelium.inatrace.components.codebook.processingevidencefield.Processi
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.company.CompanyQueries;
+import com.abelium.inatrace.components.facility.FacilityService;
+import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.value_chain.ValueChainService;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingActionTranslation;
+import com.abelium.inatrace.db.entities.processingaction.*;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
@@ -57,19 +56,23 @@ public class ProcessingActionService extends BaseService {
 
 	private final ProcessingEvidenceFieldService processingEvidenceFieldService;
 
+	private final FacilityService facilityService;
+
 	@Autowired
 	public ProcessingActionService(CompanyQueries companyQueries,
 								   ValueChainService valueChainService,
 	                               SemiProductService semiProductService,
 								   FinalProductService finalProductService,
 	                               ProcessingEvidenceTypeService processingEvidenceTypeService,
-	                               ProcessingEvidenceFieldService processingEvidenceFieldService) {
+	                               ProcessingEvidenceFieldService processingEvidenceFieldService,
+	                               FacilityService facilityService) {
 		this.companyQueries = companyQueries;
 		this.valueChainService = valueChainService;
 		this.semiProductService = semiProductService;
 		this.finalProductService = finalProductService;
 		this.processingEvidenceTypeService = processingEvidenceTypeService;
 		this.processingEvidenceFieldService = processingEvidenceFieldService;
+		this.facilityService = facilityService;
 	}
 
 	public ApiPaginatedList<ApiProcessingAction> listProcessingActions(ApiPaginatedRequest request, Language language) {
@@ -140,7 +143,7 @@ public class ProcessingActionService extends BaseService {
 			entity.setCompany(company);
 		}
 
-		// Set semi-prodcuts and final products (depending on the Processing action type)
+		// Set semi-products and final products (depending on the Processing action type)
 		setSemiAndFinalProducts(apiProcessingAction, entity);
 
 		// Set the estimated output quantity per unit
@@ -155,7 +158,10 @@ public class ProcessingActionService extends BaseService {
 		// Create or update required processing evidence types
 		updateRequiredEvidenceTypes(apiProcessingAction, entity);
 
-		// If actino type is GENERATE_QR_CODE, set Final product for QR code
+		// Create or update the supported facilities for this processing action (the facilities where this processing starts)
+		updateSupportedFacilities(apiProcessingAction, entity);
+
+		// If action type is GENERATE_QR_CODE, set Final product for QR code
 		if (ProcessingActionType.GENERATE_QR_CODE.equals(apiProcessingAction.getType())) {
 			entity.setQrCodeForFinalProduct(
 					finalProductService.fetchFinalProduct(apiProcessingAction.getQrCodeForFinalProduct().getId()));
@@ -448,6 +454,36 @@ public class ProcessingActionService extends BaseService {
 					entity.getRequiredDocumentTypes().add(processingActionProcessingEvidenceType);
 				}
 		);
+	}
+
+	private void updateSupportedFacilities(ApiProcessingAction apiProcessingAction, ProcessingAction entity) throws ApiException {
+
+		// Delete facilities that are not present
+		entity.getProcessingActionFacilities().removeAll(
+				entity.getProcessingActionFacilities()
+						.stream()
+						.filter(paf -> apiProcessingAction.getSupportedFacilities()
+								.stream()
+								.noneMatch(f -> f.getId().equals(paf.getFacility().getId())))
+						.collect(Collectors.toList())
+		);
+
+		// Create newly added supported facilities
+		for (ApiFacility supportedFacility : apiProcessingAction.getSupportedFacilities()) {
+			ProcessingActionFacility processingActionFacility = entity.getProcessingActionFacilities()
+					.stream()
+					.filter(paf -> supportedFacility.getId().equals(paf.getFacility().getId()))
+					.findAny()
+					.orElse(new ProcessingActionFacility());
+
+			if (processingActionFacility.getId() == null) {
+
+				processingActionFacility.setFacility(facilityService.fetchFacility(supportedFacility.getId()));
+				processingActionFacility.setProcessingAction(entity);
+
+				entity.getProcessingActionFacilities().add(processingActionFacility);
+			}
+		}
 	}
 
 	private void updateProcActionTranslations(ApiProcessingAction apiProcessingAction, ProcessingAction entity) {
