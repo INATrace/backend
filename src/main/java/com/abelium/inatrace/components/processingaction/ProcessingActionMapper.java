@@ -152,7 +152,7 @@ public final class ProcessingActionMapper {
 							.orElse(new FacilityTranslation()));
 
 			ApiFacility supportedFacility = new ApiFacility();
-			supportedFacility.setId(processingActionFacility.getId());
+			supportedFacility.setId(processingActionFacility.getFacility().getId());
 			supportedFacility.setName(facilityTranslation.getName());
 			supportedFacilities.add(supportedFacility);
 		});
