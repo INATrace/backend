@@ -1,0 +1,137 @@
+package com.abelium.inatrace.components.beycoorder;
+
+import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.beycoorder.api.*;
+import com.abelium.inatrace.components.common.BaseService;
+import com.abelium.inatrace.components.stockorder.StockOrderService;
+import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+import com.abelium.inatrace.db.entities.stockorder.StockOrderPEFieldValue;
+import com.abelium.inatrace.db.entities.stockorder.Transaction;
+import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
+import com.abelium.inatrace.types.BeycoGradeType;
+import com.abelium.inatrace.types.BeycoPrivacy;
+import com.abelium.inatrace.types.BeycoQualitySegmentType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+@Lazy
+@Service
+public class BeycoOrderService extends BaseService {
+
+    private static final String GRADE_FIELD_NAME = "GRADE";
+    private static final String SCREEN_SIZE_FIELD_NAME = "SCREEN_SIZE";
+    private static final String CUPPING_SCORE_FIELD_NAME = "CUPPING_SCORE";
+
+    private final StockOrderService stockOrderService;
+
+    @Autowired
+    public BeycoOrderService(
+            StockOrderService stockOrderService
+    ) {
+        this.stockOrderService = stockOrderService;
+    }
+
+    public ApiBeycoOrderFields getBeycoOrderFieldList(List<Long> stockOrderIds) throws ApiException {
+        ApiBeycoOrderFields beycoOrderFields = new ApiBeycoOrderFields();
+        StockOrder stockOrder = stockOrderService.fetchEntity(stockOrderIds.get(0), StockOrder.class);
+        beycoOrderFields.setPrivacy(BeycoPrivacy.PRIVATE);
+        beycoOrderFields.setPortOfExport(new ApiBeycoPortOfExport());
+        beycoOrderFields.setOfferCoffees(new ArrayList<>());
+
+        String cityAddress = Stream.of(
+                stockOrder.getFacility().getFacilityLocation().getAddress().getAddress(),
+                stockOrder.getFacility().getFacilityLocation().getAddress().getCity(),
+                stockOrder.getFacility().getFacilityLocation().getAddress().getZip()
+        ).filter(s -> s != null && !s.isEmpty()).collect(Collectors.joining(", "));
+        String villageAddress = Stream.of(
+                stockOrder.getFacility().getFacilityLocation().getAddress().getCell(),
+                stockOrder.getFacility().getFacilityLocation().getAddress().getSector(),
+                stockOrder.getFacility().getFacilityLocation().getAddress().getVillage()
+        ).filter(s -> s != null && !s.isEmpty()).collect(Collectors.joining(", "));
+        beycoOrderFields.getPortOfExport().setAddress(!cityAddress.isEmpty() ? cityAddress : villageAddress);
+        beycoOrderFields.getPortOfExport().setCountry(stockOrder.getFacility().getFacilityLocation().getAddress().getCountry().getName());
+        beycoOrderFields.getPortOfExport().setLatitude(stockOrder.getFacility().getFacilityLocation().getLatitude());
+        beycoOrderFields.getPortOfExport().setLatitude(stockOrder.getFacility().getFacilityLocation().getLongitude());
+
+        for(Long stockOrderId : stockOrderIds) {
+            stockOrder = stockOrderService.fetchEntity(stockOrderId, StockOrder.class);
+            ApiBeycoOrderCoffees orderCoffees = new ApiBeycoOrderCoffees();
+            orderCoffees.setCoffee(new ApiBeycoCoffee());
+
+            orderCoffees.getCoffee().setName(stockOrder.getInternalLotNumber());
+            orderCoffees.getCoffee().setRegion(stockOrder.getFacility().getFacilityLocation().getAddress().getState());
+            orderCoffees.getCoffee().setCountry(beycoOrderFields.getPortOfExport().getCountry());
+            orderCoffees.getCoffee().setHarvestAt(stockOrder.getProductionDate());
+
+            findRequiredFieldsInHistory(orderCoffees.getCoffee(), stockOrder);
+            beycoOrderFields.getOfferCoffees().add(orderCoffees);
+        }
+        return beycoOrderFields;
+    }
+
+    private void findRequiredFieldsInHistory(ApiBeycoCoffee coffee, StockOrder stockOrder) {
+        if(stockOrder != null && (coffee.getMinScreenSize() == null || coffee.getCuppingScore() == null || coffee.getGrades() == null)) {
+            if(coffee.getMinScreenSize() == null) {
+                StockOrderPEFieldValue field = stockOrder.getProcessingEFValues().stream().filter(
+                                v -> v.getProcessingEvidenceField().getFieldName().equals(SCREEN_SIZE_FIELD_NAME)
+                        ).findFirst().orElse(null);
+
+                Integer screenSize = field != null && field.getStringValue() != null && field.getStringValue().matches("-?\\d+") ?
+                        Integer.parseInt(field.getStringValue()) : null;
+                coffee.setMinScreenSize(screenSize);
+                coffee.setMaxScreenSize(screenSize);
+            }
+
+            if(coffee.getCuppingScore() == null) {
+                StockOrderPEFieldValue field = stockOrder.getProcessingEFValues().stream().filter(
+                                v -> v.getProcessingEvidenceField().getFieldName().equals(CUPPING_SCORE_FIELD_NAME)
+                        ).findFirst().orElse(null);
+                Integer cuppingScore = field != null && field.getStringValue().matches("-?\\d+") ?
+                        Integer.parseInt(field.getStringValue()) : null;
+
+                if(cuppingScore != null) {
+                    coffee.setCuppingScore(cuppingScore);
+                    ApiBeycoCoffeeQuality coffeeQuality = new ApiBeycoCoffeeQuality();
+                    coffeeQuality.setType(
+                            cuppingScore >= 80 ?
+                                BeycoQualitySegmentType.SPECIALTY : BeycoQualitySegmentType.COMMODITY_CONVENTIONAL
+                    );
+                    coffee.setQualitySegments(List.of(coffeeQuality));
+                }
+
+            }
+
+            if(coffee.getGrades() == null) {
+                StockOrderPEFieldValue field = stockOrder.getProcessingEFValues().stream().filter(
+                                v -> v.getProcessingEvidenceField().getFieldName().equals(GRADE_FIELD_NAME)
+                        ).findFirst().orElse(null);
+
+                if(field != null && field.getStringValue() != null) {
+                    try {
+                        ApiBeycoCoffeeGrade coffeeGrade = new ApiBeycoCoffeeGrade();
+                        coffeeGrade.setType(BeycoGradeType.valueOf(field.getStringValue()));
+                        coffee.setGrades(List.of(coffeeGrade));
+                    } catch (IllegalArgumentException e) {  }
+                }
+            }
+
+            if (stockOrder.getProcessingOrder() != null && !stockOrder.getProcessingOrder().getInputTransactions().isEmpty()) {
+                // Get the Stock order that were used as input when executing the Processing order
+                List<StockOrder> inputStockOrders = stockOrder.getProcessingOrder().getInputTransactions()
+                        .stream()
+                        .filter(transaction -> !transaction.getStatus().equals(TransactionStatus.CANCELED))
+                        .map(Transaction::getSourceStockOrder)
+                        .collect(Collectors.toList());
+
+                inputStockOrders.forEach(sourceOrder -> findRequiredFieldsInHistory(coffee, sourceOrder));
+            }
+        }
+    }
+
+}
