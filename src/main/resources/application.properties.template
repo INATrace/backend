@@ -133,3 +133,8 @@ INATrace.requestLog.token =
 
 # Exchange rate API key
 INAtrace.exchangerate.apiKey =
+
+# Beyco integration OAuth2 data
+beyco.oauth2.clientId =
+beyco.oauth2.clientSecret =
+beyco.oauth2.url =

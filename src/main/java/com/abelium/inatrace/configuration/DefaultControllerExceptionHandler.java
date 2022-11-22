@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,6 +22,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -44,6 +46,14 @@ public class DefaultControllerExceptionHandler {
 
     @Autowired
     private SpringExceptionResponseBuilder exceptionResponseBuilder;
+
+    @ExceptionHandler
+    public ResponseEntity<?> handleRestClientException(HttpClientErrorException exc, HttpServletRequest request) {
+        return ResponseEntity.status(exc.getStatusCode()).contentType(
+                exc.getResponseHeaders() != null && exc.getResponseHeaders().getContentType() != null ?
+                        exc.getResponseHeaders().getContentType() : MediaType.TEXT_PLAIN
+        ).body(exc.getResponseBodyAsString());
+    }
 
     // ApiImageException - do not log (either a consequence of an exception that was logged before or a valid error return)
     @ExceptionHandler

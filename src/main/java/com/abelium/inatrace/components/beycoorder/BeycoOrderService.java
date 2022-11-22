@@ -11,9 +11,15 @@ import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
 import com.abelium.inatrace.types.BeycoGradeType;
 import com.abelium.inatrace.types.BeycoPrivacy;
 import com.abelium.inatrace.types.BeycoQualitySegmentType;
+import com.abelium.inatrace.types.TokenGrantType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +29,15 @@ import java.util.stream.Stream;
 @Lazy
 @Service
 public class BeycoOrderService extends BaseService {
+
+    @Value("${beyco.oauth2.clientId}")
+    private String clientId;
+
+    @Value("${beyco.oauth2.clientSecret}")
+    private String clientSecret;
+
+    @Value("${beyco.oauth2.url}")
+    private String authUrl;
 
     private static final String GRADE_FIELD_NAME = "GRADE";
     private static final String SCREEN_SIZE_FIELD_NAME = "SCREEN_SIZE";
@@ -35,6 +50,32 @@ public class BeycoOrderService extends BaseService {
             StockOrderService stockOrderService
     ) {
         this.stockOrderService = stockOrderService;
+    }
+
+    public ApiBeycoTokenResponse getBeycoAuthToken(String authCode) {
+        RestTemplate restTemplate = new RestTemplate();
+        ApiBeycoTokenRequest tokenRequest = new ApiBeycoTokenRequest();
+        tokenRequest.setCode(authCode);
+        tokenRequest.setClientSecret(this.clientSecret);
+        tokenRequest.setClientId(this.clientId);
+        tokenRequest.setGrantType(TokenGrantType.AuthorizationCode);
+
+        ResponseEntity<ApiBeycoTokenResponse> response = restTemplate.exchange(this.authUrl, HttpMethod.POST,
+                new HttpEntity<>(tokenRequest), ApiBeycoTokenResponse.class);
+        return response.getBody();
+    }
+
+    public ApiBeycoTokenResponse refreshBeycoAuthToken(String refreshToken) {
+        RestTemplate restTemplate = new RestTemplate();
+        ApiBeycoTokenRequest tokenRequest = new ApiBeycoTokenRequest();
+        tokenRequest.setRefreshToken(refreshToken);
+        tokenRequest.setClientSecret(this.clientSecret);
+        tokenRequest.setClientId(this.clientId);
+        tokenRequest.setGrantType(TokenGrantType.RefreshToken);
+
+        ResponseEntity<ApiBeycoTokenResponse> response = restTemplate.exchange(this.authUrl, HttpMethod.POST,
+                new HttpEntity<>(tokenRequest), ApiBeycoTokenResponse.class);
+        return response.getBody();
     }
 
     public ApiBeycoOrderFields getBeycoOrderFieldList(List<Long> stockOrderIds) throws ApiException {
