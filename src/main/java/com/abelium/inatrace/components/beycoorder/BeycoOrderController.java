@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -46,6 +47,15 @@ public class BeycoOrderController {
             @ApiParam(value = "ID's of selected stock orders", required = true) @RequestParam(value = "id") List<Long> stockOrderIds
     ) throws ApiException {
         return new ApiResponse<>(beycoOrderService.getBeycoOrderFieldList(stockOrderIds));
+    }
+
+    @PostMapping("/order")
+    @ApiOperation("Send order to Beyco")
+    public ApiResponse<Object> sendBeycoOrder(
+            @Valid @ApiParam(value = "Beyco offer", required = true) @RequestBody ApiBeycoOrderFields beycoOrder,
+            @ApiParam(value = "JWT token", required = true) @RequestParam(value = "token") String token
+    ) {
+        return new ApiResponse<>(this.beycoOrderService.sendBeycoOrder(beycoOrder, token));
     }
 
 }

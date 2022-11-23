@@ -67,12 +67,12 @@ public class ApiBeycoOrderCoffees {
         this.currency = currency;
     }
 
-    public Boolean getFixedPrice() {
+    public Boolean getIsFixedPrice() {
         return isFixedPrice;
     }
 
-    public void setFixedPrice(Boolean fixedPrice) {
-        isFixedPrice = fixedPrice;
+    public void setIsFixedPrice(Boolean isFixedPrice) {
+        this.isFixedPrice = isFixedPrice;
     }
 
 }

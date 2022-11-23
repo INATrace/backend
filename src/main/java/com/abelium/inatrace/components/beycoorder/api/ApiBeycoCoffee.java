@@ -1,6 +1,8 @@
 package com.abelium.inatrace.components.beycoorder.api;
 
+import com.abelium.inatrace.tools.converters.InstantConverter;
 import com.abelium.inatrace.types.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.Max;
@@ -24,6 +26,7 @@ public class ApiBeycoCoffee {
     private String country;
 
     @ApiModelProperty(value = "Harvest date")
+    @JsonSerialize(using = InstantConverter.Serializer.class)
     private Instant harvestAt;
 
     @ApiModelProperty(value = "Coffee species")
@@ -180,12 +183,12 @@ public class ApiBeycoCoffee {
         this.quantity = quantity;
     }
 
-    public Boolean getBulk() {
+    public Boolean getIsBulk() {
         return isBulk;
     }
 
-    public void setBulk(Boolean bulk) {
-        isBulk = bulk;
+    public void setIsBulk(Boolean isBulk) {
+        this.isBulk = isBulk;
     }
 
     public BeycoCoffeeUnit getUnit() {

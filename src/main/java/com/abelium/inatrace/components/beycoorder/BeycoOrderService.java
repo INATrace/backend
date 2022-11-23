@@ -4,18 +4,17 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.beycoorder.api.*;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.stockorder.StockOrderService;
+import com.abelium.inatrace.db.entities.company.CompanyCertification;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderPEFieldValue;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
 import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
-import com.abelium.inatrace.types.BeycoGradeType;
-import com.abelium.inatrace.types.BeycoPrivacy;
-import com.abelium.inatrace.types.BeycoQualitySegmentType;
-import com.abelium.inatrace.types.TokenGrantType;
+import com.abelium.inatrace.types.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -39,9 +38,13 @@ public class BeycoOrderService extends BaseService {
     @Value("${beyco.oauth2.url}")
     private String authUrl;
 
+    @Value("${beyco.integration.url}")
+    private String beycoUrl;
+
     private static final String GRADE_FIELD_NAME = "GRADE";
     private static final String SCREEN_SIZE_FIELD_NAME = "SCREEN_SIZE";
     private static final String CUPPING_SCORE_FIELD_NAME = "CUPPING_SCORE";
+    private static final String BEYCO_ORDER_ENDPOINT = "/api/Offers";
 
     private final StockOrderService stockOrderService;
 
@@ -78,6 +81,28 @@ public class BeycoOrderService extends BaseService {
         return response.getBody();
     }
 
+    public Object sendBeycoOrder(ApiBeycoOrderFields beycoOrder, String token) {
+        beycoOrder.setPrivacy(BeycoPrivacy.Private);
+        for(ApiBeycoOrderCoffees beycoCoffees : beycoOrder.getOfferCoffees()) {
+            beycoCoffees.setIsFixedPrice(true);
+            beycoCoffees.getCoffee().setIsBulk(true);
+            beycoCoffees.getCoffee().setUnit(BeycoCoffeeUnit.Kg);
+        }
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + token);
+        HttpEntity<ApiBeycoOrderFields> request = new HttpEntity<>(beycoOrder, headers);
+
+        ResponseEntity<Object> response = restTemplate.exchange(
+                this.beycoUrl + BeycoOrderService.BEYCO_ORDER_ENDPOINT,
+                HttpMethod.POST,
+                request,
+                Object.class
+        );
+        return response.getBody();
+    }
+
     public ApiBeycoOrderFields getBeycoOrderFieldList(List<Long> stockOrderIds) throws ApiException {
         ApiBeycoOrderFields beycoOrderFields = new ApiBeycoOrderFields();
         StockOrder stockOrder = stockOrderService.fetchEntity(stockOrderIds.get(0), StockOrder.class);
@@ -109,6 +134,20 @@ public class BeycoOrderService extends BaseService {
             orderCoffees.getCoffee().setRegion(stockOrder.getFacility().getFacilityLocation().getAddress().getState());
             orderCoffees.getCoffee().setCountry(beycoOrderFields.getPortOfExport().getCountry());
             orderCoffees.getCoffee().setHarvestAt(stockOrder.getProductionDate());
+
+            List<ApiBeycoCoffeeCertificate> apiCerts = new ArrayList<>();
+            for (CompanyCertification cert : stockOrder.getCompany().getCertifications()) {
+                if (cert.getType().equals("FAIRTRADE")) {
+                    ApiBeycoCoffeeCertificate apiCert = new ApiBeycoCoffeeCertificate();
+                    apiCert.setType(BeycoCertificateType.Fairtrade);
+                    apiCerts.add(apiCert);
+                } else if(cert.getType().equals("EU_ORGANIC")) {
+                    ApiBeycoCoffeeCertificate apiCert = new ApiBeycoCoffeeCertificate();
+                    apiCert.setType(BeycoCertificateType.Organic);
+                    apiCerts.add(apiCert);
+                }
+            }
+            orderCoffees.getCoffee().setCertificates(apiCerts);
 
             findRequiredFieldsInHistory(orderCoffees.getCoffee(), stockOrder);
             beycoOrderFields.getOfferCoffees().add(orderCoffees);

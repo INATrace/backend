@@ -138,3 +138,5 @@ INAtrace.exchangerate.apiKey =
 beyco.oauth2.clientId =
 beyco.oauth2.clientSecret =
 beyco.oauth2.url =
+
+beyco.integration.url =
