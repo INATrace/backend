@@ -81,7 +81,7 @@ public class BeycoOrderService extends BaseService {
     public ApiBeycoOrderFields getBeycoOrderFieldList(List<Long> stockOrderIds) throws ApiException {
         ApiBeycoOrderFields beycoOrderFields = new ApiBeycoOrderFields();
         StockOrder stockOrder = stockOrderService.fetchEntity(stockOrderIds.get(0), StockOrder.class);
-        beycoOrderFields.setPrivacy(BeycoPrivacy.PRIVATE);
+        beycoOrderFields.setPrivacy(BeycoPrivacy.Private);
         beycoOrderFields.setPortOfExport(new ApiBeycoPortOfExport());
         beycoOrderFields.setOfferCoffees(new ArrayList<>());
 
@@ -141,7 +141,7 @@ public class BeycoOrderService extends BaseService {
                     ApiBeycoCoffeeQuality coffeeQuality = new ApiBeycoCoffeeQuality();
                     coffeeQuality.setType(
                             cuppingScore >= 80 ?
-                                BeycoQualitySegmentType.SPECIALTY : BeycoQualitySegmentType.COMMODITY_CONVENTIONAL
+                                BeycoQualitySegmentType.Specialty : BeycoQualitySegmentType.CommodityConventional
                     );
                     coffee.setQualitySegments(List.of(coffeeQuality));
                 }
