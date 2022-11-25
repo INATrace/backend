@@ -9,12 +9,15 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ApiGroupStockOrder extends ApiBaseEntity {
 
     public ApiGroupStockOrder() {}
     public ApiGroupStockOrder(
-            Long id,
+            String groupedIds,
             Instant productionDate,
             String internalLotNumber,
             Long noOfSacs,
@@ -41,9 +44,12 @@ public class ApiGroupStockOrder extends ApiBaseEntity {
         setAvailable(isAvailable);
         setSemiProductName(semiProductName);
         setNoOfSacs(noOfSacs);
-        setId(id);
         setFinalProductName(finalProductName);
+        setGroupedIds(Arrays.stream(groupedIds.split(",")).map(Long::parseLong).collect(Collectors.toList()));
     }
+
+    @ApiModelProperty(value = "List of stock order ID's, belonging to this group")
+    private List<Long> groupedIds;
 
     @ApiModelProperty(value = "Production date")
     @JsonSerialize(converter = SimpleDateConverter.Serialize.class)
@@ -188,5 +194,13 @@ public class ApiGroupStockOrder extends ApiBaseEntity {
 
     public void setFinalProductName(String finalProductName) {
         this.finalProductName = finalProductName;
+    }
+
+    public List<Long> getGroupedIds() {
+        return groupedIds;
+    }
+
+    public void setGroupedIds(List<Long> groupedIds) {
+        this.groupedIds = groupedIds;
     }
 }
