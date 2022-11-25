@@ -193,11 +193,14 @@ public class BeycoOrderService extends BaseService {
                         ).findFirst().orElse(null);
 
                 if(field != null && field.getStringValue() != null) {
+                    ApiBeycoCoffeeGrade coffeeGrade = new ApiBeycoCoffeeGrade();
                     try {
-                        ApiBeycoCoffeeGrade coffeeGrade = new ApiBeycoCoffeeGrade();
                         coffeeGrade.setType(BeycoGradeType.valueOf(field.getStringValue()));
-                        coffee.setGrades(List.of(coffeeGrade));
-                    } catch (IllegalArgumentException e) {  }
+                    } catch (IllegalArgumentException e) {
+                        coffeeGrade.setType(BeycoGradeType.Other);
+                        coffee.setAdditionalQualityDescriptors(field.getStringValue());
+                    }
+                    coffee.setGrades(List.of(coffeeGrade));
                 }
             }
 

@@ -59,6 +59,9 @@ public class ApiBeycoCoffee {
     @ApiModelProperty(value = "Grades of coffee beans")
     private List<ApiBeycoCoffeeGrade> grades;
 
+    @ApiModelProperty(value = "Additional grade, if selected 'Other' in grades")
+    private String additionalQualityDescriptors;
+
     @ApiModelProperty(value = "Is bulk")
     private Boolean isBulk;
 
@@ -199,4 +202,11 @@ public class ApiBeycoCoffee {
         this.unit = unit;
     }
 
+    public String getAdditionalQualityDescriptors() {
+        return additionalQualityDescriptors;
+    }
+
+    public void setAdditionalQualityDescriptors(String additionalQualityDescriptors) {
+        this.additionalQualityDescriptors = additionalQualityDescriptors;
+    }
 }
