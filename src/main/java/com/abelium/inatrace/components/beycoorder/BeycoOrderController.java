@@ -4,12 +4,15 @@ import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.beycoorder.api.ApiBeycoOrderFields;
 import com.abelium.inatrace.components.beycoorder.api.ApiBeycoTokenResponse;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 import java.util.List;
 
 @RestController
@@ -25,37 +28,41 @@ public class BeycoOrderController {
         this.beycoOrderService = beycoOrderService;
     }
 
-    @GetMapping("/token")
+    @GetMapping("/company/{companyId}/token")
     @ApiOperation("Get OAuth2 token for Beyco integration")
     public ApiResponse<ApiBeycoTokenResponse> getToken(
-            @ApiParam(value = "Authorization code from Beyco OAuth2", required = true) @RequestParam(value = "authCode") String authCode
-    ) {
-        return new ApiResponse<>(beycoOrderService.getBeycoAuthToken(authCode));
+            @ApiParam(value = "Authorization code from Beyco OAuth2", required = true) @RequestParam(value = "authCode") String authCode,
+            @ApiParam(value = "ID of company", required = true) @PathVariable(value = "companyId") Long companyId
+    ) throws ApiException {
+        return new ApiResponse<>(beycoOrderService.getBeycoAuthToken(authCode, companyId));
     }
 
-    @GetMapping("/token/refresh")
+    @GetMapping("/company/{companyId}/token/refresh")
     @ApiOperation("Refresh expired token")
     public ApiResponse<ApiBeycoTokenResponse> refreshToken(
-            @ApiParam(value = "Refresh token", required = true) @RequestParam(value = "refreshToken") String refreshToken
-    ) {
-        return new ApiResponse<>(beycoOrderService.refreshBeycoAuthToken(refreshToken));
+            @ApiParam(value = "Refresh token", required = true) @RequestParam(value = "refreshToken") String refreshToken,
+            @ApiParam(value = "ID of company", required = true) @PathVariable(value = "companyId") Long companyId
+    ) throws ApiException {
+        return new ApiResponse<>(beycoOrderService.refreshBeycoAuthToken(refreshToken, companyId));
     }
 
-    @GetMapping("/fields")
+    @GetMapping("/company/{companyId}/fields")
     @ApiOperation("Get list of fields necessary for Beyco order for selected Stock Orders")
     public ApiResponse<ApiBeycoOrderFields> getBeycoOrderFieldsForSelectedStockOrders(
-            @ApiParam(value = "ID's of selected stock orders", required = true) @RequestParam(value = "id") List<Long> stockOrderIds
+            @ApiParam(value = "ID's of selected stock orders", required = true) @RequestParam(value = "id") List<Long> stockOrderIds,
+            @ApiParam(value = "ID of company", required = true) @PathVariable(value = "companyId") Long companyId
     ) throws ApiException {
-        return new ApiResponse<>(beycoOrderService.getBeycoOrderFieldList(stockOrderIds));
+        return new ApiResponse<>(beycoOrderService.getBeycoOrderFieldList(stockOrderIds, companyId));
     }
 
-    @PostMapping("/order")
+    @PostMapping("/company/{companyId}/order")
     @ApiOperation("Send order to Beyco")
     public ApiResponse<Object> sendBeycoOrder(
             @Valid @ApiParam(value = "Beyco offer", required = true) @RequestBody ApiBeycoOrderFields beycoOrder,
-            @ApiParam(value = "JWT token", required = true) @RequestParam(value = "token") String token
-    ) {
-        return new ApiResponse<>(this.beycoOrderService.sendBeycoOrder(beycoOrder, token));
+            @ApiParam(value = "JWT token", required = true) @RequestParam(value = "token") String token,
+            @ApiParam(value = "ID of company", required = true) @PathVariable(value = "companyId") Long companyId
+    ) throws ApiException {
+        return new ApiResponse<>(this.beycoOrderService.sendBeycoOrder(beycoOrder, token, companyId));
     }
 
 }

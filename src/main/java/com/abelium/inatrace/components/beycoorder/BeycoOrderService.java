@@ -1,9 +1,12 @@
 package com.abelium.inatrace.components.beycoorder;
 
+import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.beycoorder.api.*;
 import com.abelium.inatrace.components.common.BaseService;
+import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.stockorder.StockOrderService;
+import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCertification;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderPEFieldValue;
@@ -47,15 +50,23 @@ public class BeycoOrderService extends BaseService {
     private static final String BEYCO_ORDER_ENDPOINT = "/api/Offers";
 
     private final StockOrderService stockOrderService;
+    private final CompanyQueries companyQueries;
 
     @Autowired
     public BeycoOrderService(
-            StockOrderService stockOrderService
+            StockOrderService stockOrderService,
+            CompanyQueries companyQueries
     ) {
         this.stockOrderService = stockOrderService;
+        this.companyQueries = companyQueries;
     }
 
-    public ApiBeycoTokenResponse getBeycoAuthToken(String authCode) {
+    public ApiBeycoTokenResponse getBeycoAuthToken(String authCode, Long companyId) throws ApiException {
+        Company company = companyQueries.fetchCompany(companyId);
+        if (company.getAllowBeycoIntegration() == null || !company.getAllowBeycoIntegration()) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Company is not allowed to use Beyco platform");
+        }
+
         RestTemplate restTemplate = new RestTemplate();
         ApiBeycoTokenRequest tokenRequest = new ApiBeycoTokenRequest();
         tokenRequest.setCode(authCode);
@@ -68,7 +79,12 @@ public class BeycoOrderService extends BaseService {
         return response.getBody();
     }
 
-    public ApiBeycoTokenResponse refreshBeycoAuthToken(String refreshToken) {
+    public ApiBeycoTokenResponse refreshBeycoAuthToken(String refreshToken, Long companyId) throws ApiException {
+        Company company = companyQueries.fetchCompany(companyId);
+        if (company.getAllowBeycoIntegration() == null || !company.getAllowBeycoIntegration()) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Company is not allowed to use Beyco platform");
+        }
+
         RestTemplate restTemplate = new RestTemplate();
         ApiBeycoTokenRequest tokenRequest = new ApiBeycoTokenRequest();
         tokenRequest.setRefreshToken(refreshToken);
@@ -81,7 +97,12 @@ public class BeycoOrderService extends BaseService {
         return response.getBody();
     }
 
-    public Object sendBeycoOrder(ApiBeycoOrderFields beycoOrder, String token) {
+    public Object sendBeycoOrder(ApiBeycoOrderFields beycoOrder, String token, Long companyId) throws ApiException {
+        Company company = companyQueries.fetchCompany(companyId);
+        if (company.getAllowBeycoIntegration() == null || !company.getAllowBeycoIntegration()) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Company is not allowed to use Beyco platform");
+        }
+
         beycoOrder.setPrivacy(BeycoPrivacy.Private);
         for(ApiBeycoOrderCoffees beycoCoffees : beycoOrder.getOfferCoffees()) {
             beycoCoffees.setIsFixedPrice(true);
@@ -103,7 +124,12 @@ public class BeycoOrderService extends BaseService {
         return response.getBody();
     }
 
-    public ApiBeycoOrderFields getBeycoOrderFieldList(List<Long> stockOrderIds) throws ApiException {
+    public ApiBeycoOrderFields getBeycoOrderFieldList(List<Long> stockOrderIds, Long companyId) throws ApiException {
+        Company company = companyQueries.fetchCompany(companyId);
+        if (company.getAllowBeycoIntegration() == null || !company.getAllowBeycoIntegration()) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Company is not allowed to use Beyco platform");
+        }
+
         ApiBeycoOrderFields beycoOrderFields = new ApiBeycoOrderFields();
         StockOrder stockOrder = stockOrderService.fetchEntity(stockOrderIds.get(0), StockOrder.class);
         beycoOrderFields.setPrivacy(BeycoPrivacy.Private);
