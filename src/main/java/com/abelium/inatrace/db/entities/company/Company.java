@@ -163,6 +163,9 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	@ManyToOne()
 	private CurrencyType currency;
 
+	@Column
+	private Boolean allowBeycoIntegration;
+
 	public CompanyStatus getStatus() {
 		return status;
 	}
@@ -337,5 +340,13 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 
 	public void setCurrency(CurrencyType currency) {
 		this.currency = currency;
+	}
+
+	public Boolean getAllowBeycoIntegration() {
+		return allowBeycoIntegration;
+	}
+
+	public void setAllowBeycoIntegration(Boolean allowBeycoIntegration) {
+		this.allowBeycoIntegration = allowBeycoIntegration;
 	}
 }

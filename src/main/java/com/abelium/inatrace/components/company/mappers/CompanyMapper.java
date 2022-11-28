@@ -15,6 +15,7 @@ public class CompanyMapper {
         apiCompany.setEmail(entity.getEmail());
         apiCompany.setAbbreviation(entity.getAbbreviation());
         apiCompany.setCurrency(CurrencyTypeMapper.toApiCurrencyType(entity.getCurrency()));
+        apiCompany.setAllowBeycoIntegration(entity.getAllowBeycoIntegration());
 
         return apiCompany;
     }

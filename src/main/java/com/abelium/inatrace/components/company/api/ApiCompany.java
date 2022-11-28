@@ -31,6 +31,10 @@ public class ApiCompany extends ApiCompanyBase {
 	@ApiModelProperty(value = "Preferred currency of the company")
 	@Valid
 	public ApiCurrencyType currency;
+
+	@ApiModelProperty(value = "Is company allowed to export orders to Beyco platform")
+	@Valid
+	public Boolean allowBeycoIntegration;
 	
 	public ApiDocument getLogo() {
 		return logo;
@@ -70,5 +74,13 @@ public class ApiCompany extends ApiCompanyBase {
 
 	public void setCurrency(ApiCurrencyType currency) {
 		this.currency = currency;
+	}
+
+	public Boolean getAllowBeycoIntegration() {
+		return allowBeycoIntegration;
+	}
+
+	public void setAllowBeycoIntegration(Boolean allowBeycoIntegration) {
+		this.allowBeycoIntegration = allowBeycoIntegration;
 	}
 }

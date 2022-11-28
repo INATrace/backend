@@ -78,6 +78,7 @@ public class CompanyApiTools {
 		ac.currency = CommonApiTools.toApiCurrencyType(c.getCurrency());
 		ac.displayPrefferedWayOfPayment = c.getDisplayPrefferedWayOfPayment();
 		ac.purchaseProofDocumentMultipleFarmers = c.getPurchaseProofDocumentMultipleFarmers();
+		ac.allowBeycoIntegration = c.getAllowBeycoIntegration();
 	}
 	
 	public ApiCompanyGet toApiCompanyGet(Long userId, Company c, Language language, 
@@ -142,6 +143,7 @@ public class CompanyApiTools {
 		c.setCurrency(ac.getCurrency() == null ? null : currencyTypeService.getCurrencyType(ac.getCurrency().getId()));
 		c.setDisplayPrefferedWayOfPayment(ac.displayPrefferedWayOfPayment);
 		c.setPurchaseProofDocumentMultipleFarmers(ac.purchaseProofDocumentMultipleFarmers);
+		c.setAllowBeycoIntegration(ac.allowBeycoIntegration);
 	}
 	
 	
