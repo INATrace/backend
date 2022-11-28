@@ -32,7 +32,7 @@ public class StockOrderMapper {
         apiStockOrder.setId(entity.getId());
         apiStockOrder.setIdentifier(entity.getIdentifier());
         apiStockOrder.setLotPrefix(entity.getLotPrefix());
-        apiStockOrder.setInternalLotNumber(entity.getInternalLotNumber());
+        apiStockOrder.setInternalLotNumber(setupInternalLotNumberForSacked(entity.getInternalLotNumber(), entity.getSacNumber()));
         apiStockOrder.setCurrency(entity.getCurrency());
         apiStockOrder.setPreferredWayOfPayment(entity.getPreferredWayOfPayment());
         apiStockOrder.setTotalQuantity(entity.getTotalQuantity());
@@ -168,7 +168,7 @@ public class StockOrderMapper {
         // Set identifiers and type of the stock order
         apiStockOrder.setOrderType(entity.getOrderType());
         apiStockOrder.setLotPrefix(entity.getLotPrefix());
-        apiStockOrder.setInternalLotNumber(entity.getInternalLotNumber());
+        apiStockOrder.setInternalLotNumber(setupInternalLotNumberForSacked(entity.getInternalLotNumber(), entity.getSacNumber()));
         apiStockOrder.setSacNumber(entity.getSacNumber());
         apiStockOrder.setPurchaseOrder(entity.getPurchaseOrder());
 
@@ -210,7 +210,7 @@ public class StockOrderMapper {
         ApiStockOrder apiStockOrder = new ApiStockOrder();
         apiStockOrder.setId(entity.getId());
         apiStockOrder.setIdentifier(entity.getIdentifier());
-        apiStockOrder.setInternalLotNumber(entity.getInternalLotNumber());
+        apiStockOrder.setInternalLotNumber(setupInternalLotNumberForSacked(entity.getInternalLotNumber(), entity.getSacNumber()));
         apiStockOrder.setProductionDate(entity.getProductionDate());
         apiStockOrder.setCreationTimestamp(entity.getCreationTimestamp());
 
@@ -273,6 +273,13 @@ public class StockOrderMapper {
         apiStockOrder.setFinalProduct(ProductApiTools.toApiFinalProductBase(entity.getFinalProduct()));
 
         return apiStockOrder;
+    }
+
+    private static String setupInternalLotNumberForSacked(String internalLotNumber, Integer sacNumber) {
+        if(internalLotNumber == null || sacNumber == null || internalLotNumber.endsWith(String.format("/%d", sacNumber))) {
+            return internalLotNumber;
+        }
+        return String.format("%s/%d", internalLotNumber, sacNumber);
     }
 
 }
