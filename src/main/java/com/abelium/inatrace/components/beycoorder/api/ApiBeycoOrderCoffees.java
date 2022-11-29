@@ -18,6 +18,9 @@ public class ApiBeycoOrderCoffees {
     @ApiModelProperty(value = "Incoterms")
     private BeycoIncoterms incoterms;
 
+    @ApiModelProperty(value = "Custom incoterms")
+    private String customIncoterms;
+
     @ApiModelProperty(value = "Price of order")
     private BigDecimal price;
 
@@ -75,4 +78,11 @@ public class ApiBeycoOrderCoffees {
         this.isFixedPrice = isFixedPrice;
     }
 
+    public String getCustomIncoterms() {
+        return customIncoterms;
+    }
+
+    public void setCustomIncoterms(String customIncoterms) {
+        this.customIncoterms = customIncoterms;
+    }
 }
