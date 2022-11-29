@@ -5,6 +5,8 @@ import com.abelium.inatrace.types.BeycoCurrency;
 import com.abelium.inatrace.types.BeycoPriceUnit;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 
 public class ApiBeycoOrderCoffees {
@@ -21,6 +23,8 @@ public class ApiBeycoOrderCoffees {
     @ApiModelProperty(value = "Custom incoterms")
     private String customIncoterms;
 
+    @Min(0)
+    @Max(999999999999999999L)
     @ApiModelProperty(value = "Price of order")
     private BigDecimal price;
 

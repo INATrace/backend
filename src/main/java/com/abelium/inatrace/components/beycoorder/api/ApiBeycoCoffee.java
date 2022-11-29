@@ -68,6 +68,8 @@ public class ApiBeycoCoffee {
     @ApiModelProperty(value = "Certificates of coffee beans")
     private List<ApiBeycoCoffeeCertificate> certificates;
 
+    @Min(0)
+    @Max(999999999999999999L)
     @ApiModelProperty(value = "Quantity of beans")
     private BigDecimal quantity;
 
