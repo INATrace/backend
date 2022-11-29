@@ -157,8 +157,6 @@ public class BeycoOrderService extends BaseService {
             orderCoffees.setCoffee(new ApiBeycoCoffee());
 
             orderCoffees.getCoffee().setName(stockOrder.getInternalLotNumber());
-            orderCoffees.getCoffee().setRegion(stockOrder.getFacility().getFacilityLocation().getAddress().getState());
-            orderCoffees.getCoffee().setCountry(beycoOrderFields.getPortOfExport().getCountry());
             orderCoffees.getCoffee().setHarvestAt(stockOrder.getProductionDate());
 
             List<ApiBeycoCoffeeCertificate> apiCerts = new ArrayList<>();
@@ -239,6 +237,27 @@ public class BeycoOrderService extends BaseService {
                         .collect(Collectors.toList());
 
                 inputStockOrders.forEach(sourceOrder -> findRequiredFieldsInHistory(coffee, sourceOrder));
+            }
+            else if (stockOrder.getProcessingOrder() == null) {
+                // Region and country of source farmer
+                if (
+                        stockOrder.getProducerUserCustomer() != null &&
+                        stockOrder.getProducerUserCustomer().getUserCustomerLocation() != null &&
+                        stockOrder.getProducerUserCustomer().getUserCustomerLocation().getAddress() != null &&
+                        stockOrder.getProducerUserCustomer().getUserCustomerLocation().getAddress().getCountry() != null
+                ) {
+                    coffee.setCountry(stockOrder.getProducerUserCustomer().getUserCustomerLocation().getAddress().getCountry().getName());
+                    if (stockOrder.getProducerUserCustomer().getUserCustomerLocation().getAddress().getCountry().getId() == 184) {
+                        // If farmer is from Rwanda
+                        coffee.setRegion(stockOrder.getProducerUserCustomer().getUserCustomerLocation().getAddress().getSector());
+                    } else if (stockOrder.getProducerUserCustomer().getUserCustomerLocation().getAddress().getCountry().getId() == 99) {
+                        // If farmer is from Honduras
+                        coffee.setRegion(stockOrder.getProducerUserCustomer().getUserCustomerLocation().getAddress().getHondurasMunicipality());
+                    } else {
+                        // If farmer is from other countries
+                        coffee.setRegion(stockOrder.getProducerUserCustomer().getUserCustomerLocation().getAddress().getState());
+                    }
+                }
             }
         }
     }
