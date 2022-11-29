@@ -47,6 +47,12 @@ public class GroupStockOrderService extends BaseService {
         if(queryRequest.availableOnly != null && queryRequest.availableOnly) {
             whereClause.append(" AND SO.isAvailable = true");
         }
+        if(queryRequest.isPurchaseOrderOnly != null && queryRequest.isPurchaseOrderOnly) {
+            whereClause.append(" AND SO.isPurchaseOrder = true");
+        }
+        if(queryRequest.semiProducId != null) {
+            whereClause.append(" AND SP.id = :semiProductId");
+        }
         queryString.append(whereClause);
 
         // Add GROUP BY query string for grouping common columns
@@ -65,6 +71,9 @@ public class GroupStockOrderService extends BaseService {
         query.setParameter("language", language);
         if(queryRequest.facilityId != null) {
             query.setParameter("facilityId", queryRequest.facilityId);
+        }
+        if(queryRequest.semiProducId != null) {
+            query.setParameter("semiProductId", queryRequest.semiProducId);
         }
 
         long count = query.getResultList().size();  // Get count of all entities for pagination
