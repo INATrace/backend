@@ -23,7 +23,7 @@ public class GroupStockOrderService extends BaseService {
         // SELECT query string for which columns to get from database and put them into DTO ApiGroupStockOrder
         StringBuilder queryString = new StringBuilder(
             "SELECT new com.abelium.inatrace.components.groupstockorder.api.ApiGroupStockOrder(" +
-            "GROUP_CONCAT(SO.id), " +    // SELECT only one ID from grouped Stock Orders (one is needed for Beyco order)
+            "GROUP_CONCAT(SO.id), " +
             "SO.productionDate AS date, SO.internalLotNumber AS id, COUNT(SO.sacNumber) as noOfSacs, " +
             "SO.orderType, SPT.name, CONCAT(FP.name, ' (', P.name, ')'), " +
             "SUM(SO.totalQuantity), SUM(SO.fulfilledQuantity), SUM(SO.availableQuantity), " +
