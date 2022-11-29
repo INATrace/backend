@@ -149,7 +149,7 @@ public class BeycoOrderService extends BaseService {
         beycoOrderFields.getPortOfExport().setAddress(!cityAddress.isEmpty() ? cityAddress : villageAddress);
         beycoOrderFields.getPortOfExport().setCountry(stockOrder.getFacility().getFacilityLocation().getAddress().getCountry().getName());
         beycoOrderFields.getPortOfExport().setLatitude(stockOrder.getFacility().getFacilityLocation().getLatitude());
-        beycoOrderFields.getPortOfExport().setLatitude(stockOrder.getFacility().getFacilityLocation().getLongitude());
+        beycoOrderFields.getPortOfExport().setLongitude(stockOrder.getFacility().getFacilityLocation().getLongitude());
 
         for(Long stockOrderId : stockOrderIds) {
             stockOrder = stockOrderService.fetchEntity(stockOrderId, StockOrder.class);
