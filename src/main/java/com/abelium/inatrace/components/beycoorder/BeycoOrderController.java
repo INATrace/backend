@@ -4,15 +4,12 @@ import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.beycoorder.api.ApiBeycoOrderFields;
 import com.abelium.inatrace.components.beycoorder.api.ApiBeycoTokenResponse;
-import com.abelium.inatrace.security.service.CustomUserDetails;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.websocket.server.PathParam;
 import java.util.List;
 
 @RestController
@@ -40,7 +37,7 @@ public class BeycoOrderController {
     @GetMapping("/company/{companyId}/token/refresh")
     @ApiOperation("Refresh expired token")
     public ApiResponse<ApiBeycoTokenResponse> refreshToken(
-            @ApiParam(value = "Refresh token", required = true) @RequestParam(value = "refreshToken") String refreshToken,
+            @ApiParam(value = "Refresh token", required = true) @RequestHeader(value = "X-Beyco-Refresh-Token") String refreshToken,
             @ApiParam(value = "ID of company", required = true) @PathVariable(value = "companyId") Long companyId
     ) throws ApiException {
         return new ApiResponse<>(beycoOrderService.refreshBeycoAuthToken(refreshToken, companyId));
@@ -59,7 +56,7 @@ public class BeycoOrderController {
     @ApiOperation("Send order to Beyco")
     public ApiResponse<Object> sendBeycoOrder(
             @Valid @ApiParam(value = "Beyco offer", required = true) @RequestBody ApiBeycoOrderFields beycoOrder,
-            @ApiParam(value = "JWT token", required = true) @RequestParam(value = "token") String token,
+            @ApiParam(value = "JWT token", required = true) @RequestHeader(value = "X-Beyco-Token") String token,
             @ApiParam(value = "ID of company", required = true) @PathVariable(value = "companyId") Long companyId
     ) throws ApiException {
         return new ApiResponse<>(this.beycoOrderService.sendBeycoOrder(beycoOrder, token, companyId));
