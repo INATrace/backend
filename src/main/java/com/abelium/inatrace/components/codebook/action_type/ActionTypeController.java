@@ -6,6 +6,7 @@ import com.abelium.inatrace.components.codebook.action_type.api.ApiActionType;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -41,6 +42,7 @@ public class ActionTypeController {
 	}
 
 	@PutMapping
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Create or update action type. If ID is provided the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateActionType(@Valid @RequestBody ApiActionType apiActionType) throws ApiException {
 
@@ -48,6 +50,7 @@ public class ActionTypeController {
 	}
 
 	@DeleteMapping("{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Deletes an action type with the provided ID.")
 	public ApiDefaultResponse deleteActionType(@Valid @ApiParam(value = "Action type ID", required = true) @PathVariable("id") Long id) throws ApiException {
 

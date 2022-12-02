@@ -11,9 +11,12 @@ import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.productorder.api.ApiProductOrder;
 import com.abelium.inatrace.components.productorder.mappers.ProductOrderMapper;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
+import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.productorder.ProductOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
+import com.abelium.inatrace.types.UserRole;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -52,7 +55,7 @@ public class ProductOrderService extends BaseService {
 	}
 
 	@Transactional
-	public ApiBaseEntity createProductOrder(ApiProductOrder apiProductOrder, Long userId, Language language) throws ApiException {
+	public ApiBaseEntity createProductOrder(ApiProductOrder apiProductOrder, CustomUserDetails user, Language language) throws ApiException {
 
 		// Validate input data
 		if (StringUtils.isBlank(apiProductOrder.getOrderId())) {
@@ -71,13 +74,20 @@ public class ProductOrderService extends BaseService {
 			throw new ApiException(ApiStatus.VALIDATION_ERROR, "At least one Stock order is requried");
 		}
 
+		Facility facility = facilityService.fetchFacility(apiProductOrder.getFacility().getId());
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				facility.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in owner company");
+		}
+
 		// Prepare the Product order entity
 		ProductOrder productOrder = new ProductOrder();
 		productOrder.setOrderId(apiProductOrder.getOrderId());
 		productOrder.setDeliveryDeadline(apiProductOrder.getDeliveryDeadline());
 		productOrder.setRequiredOrganic(apiProductOrder.getRequiredOrganic());
 		productOrder.setRequiredWomensOnly(apiProductOrder.getRequiredWomensOnly());
-		productOrder.setFacility(facilityService.fetchFacility(apiProductOrder.getFacility().getId()));
+		productOrder.setFacility(facility);
 		productOrder.setCustomer(companyService.fetchCompanyCustomer(apiProductOrder.getCustomer().getId()));
 
 		em.persist(productOrder);
@@ -125,7 +135,7 @@ public class ProductOrderService extends BaseService {
 			targetProcessingOrder.getTargetStockOrders().add(targetStockOrder);
 
 			// Create the processing order
-			processingOrderService.createOrUpdateProcessingOrder(targetProcessingOrder, userId, language);
+			processingOrderService.createOrUpdateProcessingOrder(targetProcessingOrder, user, language);
 		}
 
 		return new ApiBaseEntity(productOrder);

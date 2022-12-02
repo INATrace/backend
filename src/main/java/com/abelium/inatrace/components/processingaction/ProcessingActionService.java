@@ -19,10 +19,12 @@ import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.processingaction.*;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
+import com.abelium.inatrace.types.UserRole;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -109,11 +111,19 @@ public class ProcessingActionService extends BaseService {
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdateProcessingAction(ApiProcessingAction apiProcessingAction) throws ApiException {
+	public ApiBaseEntity createOrUpdateProcessingAction(ApiProcessingAction apiProcessingAction, CustomUserDetails user) throws ApiException {
 
-		ProcessingAction entity = apiProcessingAction.getId() != null
-				? fetchProcessingAction(apiProcessingAction.getId())
-				: new ProcessingAction();
+		ProcessingAction entity = null;
+		if (apiProcessingAction.getId() != null) {
+			entity = fetchProcessingAction(apiProcessingAction.getId());
+			if (
+					user.getUserRole() != UserRole.ADMIN &&
+					entity.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+				throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in current company");
+			}
+		} else {
+			entity = new ProcessingAction();
+		}
 
 		// Validate Processing action data
 		validateProcessingAction(apiProcessingAction);
@@ -140,6 +150,13 @@ public class ProcessingActionService extends BaseService {
 		
 		Company company = companyQueries.fetchCompany(apiProcessingAction.getCompany().getId());
 		if (company != null) {
+			if(entity.getCompany() != null && !company.getId().equals(entity.getCompany().getId())) {
+				if(
+						user.getUserRole() != UserRole.ADMIN &&
+						company.getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+					throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in updated company!");
+				}
+			}
 			entity.setCompany(company);
 		}
 
@@ -175,9 +192,15 @@ public class ProcessingActionService extends BaseService {
 	}
 
 	@Transactional
-	public void deleteProcessingAction(Long id) throws ApiException {
+	public void deleteProcessingAction(Long id, CustomUserDetails user) throws ApiException {
 
 		ProcessingAction processingAction = fetchProcessingAction(id);
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				processingAction.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in company");
+		}
+
 		em.remove(processingAction);
 	}
 

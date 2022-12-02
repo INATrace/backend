@@ -45,7 +45,7 @@ public class TransactionController {
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-		transactionService.approveTransaction(id, authUser.getUserId(), language);
+		transactionService.approveTransaction(id, authUser, language);
 		return new ApiDefaultResponse();
 	}
 
@@ -61,7 +61,7 @@ public class TransactionController {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Data integrity violation!");
 		}
 
-		transactionService.rejectTransaction(apiTransaction, authUser.getUserId(), language);
+		transactionService.rejectTransaction(apiTransaction, authUser, language);
 		return new ApiDefaultResponse();
 	}
 

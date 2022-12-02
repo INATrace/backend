@@ -6,6 +6,7 @@ import com.abelium.inatrace.components.codebook.grade_abbreviation.api.ApiGradeA
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -42,6 +43,7 @@ public class GradeAbbreviationController {
 	}
 
 	@PutMapping
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Create or update grade abbreviation. If ID is provided, the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateGradeAbbreviation(
 			@Valid @RequestBody ApiGradeAbbreviation apiGradeAbbreviation) throws ApiException {
@@ -50,6 +52,7 @@ public class GradeAbbreviationController {
 	}
 
 	@DeleteMapping("{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Deletes a grade abbreviation with the provided ID.")
 	public ApiDefaultResponse deleteGradeAbbreviation(
 			@Valid @ApiParam(value = "Grade abbreviation ID", required = true) @PathVariable("id") Long id) throws ApiException {

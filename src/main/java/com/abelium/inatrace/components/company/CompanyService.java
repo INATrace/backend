@@ -238,9 +238,14 @@ public class CompanyService extends BaseService {
 	}
 
 	@Transactional
-	public ApiUserCustomer addUserCustomer(Long companyId, ApiUserCustomer apiUserCustomer, Long userId) throws ApiException {
+	public ApiUserCustomer addUserCustomer(Long companyId, ApiUserCustomer apiUserCustomer, CustomUserDetails user) throws ApiException {
 
 		Company company = em.find(Company.class, companyId);
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				company.getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in company");
+		}
 
 		UserCustomer userCustomer = new UserCustomer();
 		userCustomer.setCompany(company);
@@ -331,22 +336,27 @@ public class CompanyService extends BaseService {
 				certification.setDescription(apiCertification.getDescription());
 				certification.setType(apiCertification.getType());
 				certification.setValidity(apiCertification.getValidity());
-				certification.setCertificate(commonService.fetchDocument(userId, apiCertification.getCertificate()));
+				certification.setCertificate(commonService.fetchDocument(user.getUserId(), apiCertification.getCertificate()));
 				userCustomer.getCertifications().add(certification);
 			}
 		}
 
-		return companyApiTools.toApiUserCustomer(userCustomer, userId);
+		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId());
 	}
 
 	@Transactional
-	public ApiUserCustomer updateUserCustomer(ApiUserCustomer apiUserCustomer, Long userId) throws ApiException {
+	public ApiUserCustomer updateUserCustomer(ApiUserCustomer apiUserCustomer, CustomUserDetails user) throws ApiException {
 
 		if (apiUserCustomer == null) {
 			return null;
 		}
 
 		UserCustomer userCustomer = em.find(UserCustomer.class, apiUserCustomer.getId());
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				userCustomer.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in this company!");
+		}
 
 		userCustomer.setName(apiUserCustomer.getName());
 		userCustomer.setSurname(apiUserCustomer.getSurname());
@@ -442,18 +452,23 @@ public class CompanyService extends BaseService {
 						.filter(ucc -> ucc.getId().equals(apiCertification.getId())).findAny().orElseThrow();
 			}
 
-			certification.setCertificate(commonService.fetchDocument(userId, apiCertification.getCertificate()));
+			certification.setCertificate(commonService.fetchDocument(user.getUserId(), apiCertification.getCertificate()));
 			certification.setType(apiCertification.getType());
 			certification.setDescription(apiCertification.getDescription());
 			certification.setValidity(apiCertification.getValidity());
 		}
 
-		return companyApiTools.toApiUserCustomer(userCustomer, userId);
+		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId());
 	}
 
 	@Transactional
-	public void deleteUserCustomer(Long id) {
+	public void deleteUserCustomer(Long id, CustomUserDetails user) throws ApiException {
 		UserCustomer userCustomer = em.find(UserCustomer.class, id);
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				userCustomer.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled to belonging company");
+		}
 		em.remove(userCustomer);
 	}
 
@@ -555,9 +570,16 @@ public class CompanyService extends BaseService {
 	}
 
 	@Transactional
-	public ApiCompanyCustomer createCompanyCustomer(ApiCompanyCustomer apiCompanyCustomer) {
+	public ApiCompanyCustomer createCompanyCustomer(ApiCompanyCustomer apiCompanyCustomer, CustomUserDetails user) throws ApiException {
+		Company company = em.find(Company.class, apiCompanyCustomer.getCompanyId());
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				company.getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in company");
+		}
+
 		CompanyCustomer companyCustomer = new CompanyCustomer();
-		companyCustomer.setCompany(em.find(Company.class, apiCompanyCustomer.getCompanyId()));
+		companyCustomer.setCompany(company);
 		companyCustomer.setContact(apiCompanyCustomer.getContact());
 		companyCustomer.setEmail(apiCompanyCustomer.getEmail());
 		companyCustomer.setLocation(new GeoAddress());
@@ -572,12 +594,28 @@ public class CompanyService extends BaseService {
 	}
 
 	@Transactional
-	public ApiCompanyCustomer updateCompanyCustomer(ApiCompanyCustomer apiCompanyCustomer) {
+	public ApiCompanyCustomer updateCompanyCustomer(ApiCompanyCustomer apiCompanyCustomer, CustomUserDetails user) throws ApiException {
 		if (apiCompanyCustomer == null) {
 			return null;
 		}
+
+		Company newCompany = em.find(Company.class, apiCompanyCustomer.getCompanyId());
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				newCompany.getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in updated company");
+		}
+
 		CompanyCustomer companyCustomer = em.find(CompanyCustomer.class, apiCompanyCustomer.getId());
-		companyCustomer.setCompany(em.find(Company.class, apiCompanyCustomer.getCompanyId()));
+		if (!newCompany.getId().equals(companyCustomer.getCompany().getId())) {
+			if(
+					user.getUserRole() != UserRole.ADMIN &&
+					companyCustomer.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+				throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in current company");
+			}
+		}
+
+		companyCustomer.setCompany(newCompany);
 		companyCustomer.setContact(apiCompanyCustomer.getContact());
 		companyCustomer.setEmail(apiCompanyCustomer.getEmail());
 		if (companyCustomer.getLocation() == null) {
@@ -593,8 +631,14 @@ public class CompanyService extends BaseService {
 	}
 
 	@Transactional
-	public void deleteCompanyCustomer(Long id) {
+	public void deleteCompanyCustomer(Long id, CustomUserDetails user) throws ApiException {
 		CompanyCustomer companyCustomer = em.find(CompanyCustomer.class, id);
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				companyCustomer.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled to company");
+		}
+
 		em.remove(companyCustomer);
 	}
 
@@ -714,8 +758,8 @@ public class CompanyService extends BaseService {
 		return !companyUserList.isEmpty();
 	}
 
-	public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, Long userId) throws ApiException {
-		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId, userId);
+	public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, CustomUserDetails user) throws ApiException {
+		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId, user);
 	}
 
 }

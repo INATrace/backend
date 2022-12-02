@@ -30,6 +30,7 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCertification;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
+import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
@@ -40,12 +41,14 @@ import com.abelium.inatrace.db.entities.stockorder.*;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.ProductCompanyType;
+import com.abelium.inatrace.types.UserRole;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -713,7 +716,7 @@ public class StockOrderService extends BaseService {
     }
 
     @Transactional
-    public ApiPurchaseOrder createPurchaseBulkOrder(ApiPurchaseOrder apiPurchaseOrder, Long userId) throws ApiException {
+    public ApiPurchaseOrder createPurchaseBulkOrder(ApiPurchaseOrder apiPurchaseOrder, CustomUserDetails user) throws ApiException {
 
         // Validation
         if (apiPurchaseOrder == null) {
@@ -721,6 +724,15 @@ public class StockOrderService extends BaseService {
         }
         if (apiPurchaseOrder.getFarmers() == null || apiPurchaseOrder.getFarmers().isEmpty()){
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Farmers needs to be provided!");
+        }
+        if (apiPurchaseOrder.getFacility() == null) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Facility needs to be provided!");
+        }
+        Facility facility = facilityService.fetchFacility(apiPurchaseOrder.getFacility().id);
+        if (
+                user.getUserRole() != UserRole.ADMIN &&
+                facility.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+            throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in company");
         }
 
         // Update stocks of type Purchase, one by one
@@ -730,7 +742,7 @@ public class StockOrderService extends BaseService {
             ApiStockOrder apiStockOrder = convertPurchaseOrderFarmerToStockOrder(apiPurchaseOrder, farmer);
 
             // write to db
-            ApiBaseEntity apiBaseEntity = createOrUpdateStockOrder(apiStockOrder, userId, null);
+            ApiBaseEntity apiBaseEntity = createOrUpdateStockOrder(apiStockOrder, user, null);
 
             // set Id in response
             farmer.setId(apiBaseEntity.getId());
@@ -779,17 +791,17 @@ public class StockOrderService extends BaseService {
     }
 
     @Transactional
-    public ApiBaseEntity createOrUpdateStockOrder(ApiStockOrder apiStockOrder, Long userId, ProcessingOrder processingOrder) throws ApiException {
+    public ApiBaseEntity createOrUpdateStockOrder(ApiStockOrder apiStockOrder, CustomUserDetails user, ProcessingOrder processingOrder) throws ApiException {
 
         StockOrder entity;
 
         if (apiStockOrder.getId() != null) {
             entity = fetchEntity(apiStockOrder.getId(), StockOrder.class);
-            entity.setUpdatedBy(fetchEntity(userId, User.class));
+            entity.setUpdatedBy(fetchEntity(user.getUserId(), User.class));
 
         } else {
             entity = new StockOrder();
-            entity.setCreatedBy(fetchEntity(userId, User.class));
+            entity.setCreatedBy(fetchEntity(user.getUserId(), User.class));
             entity.setCreatorId(apiStockOrder.getCreatorId());
         }
 
@@ -803,8 +815,24 @@ public class StockOrderService extends BaseService {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Semi-product or Final product needs to be provided!");
         }
 
+        if (
+                user.getUserRole() != UserRole.ADMIN &&
+                entity.getFacility().getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+            throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled to current facility's company");
+        }
+
+        Facility newFacility = entity.getFacility();
+        if (!apiStockOrder.getFacility().getId().equals(entity.getFacility().getId())) {
+            newFacility = facilityService.fetchFacility(apiStockOrder.getFacility().getId());
+            if (
+                    user.getUserRole() != UserRole.ADMIN &&
+                    newFacility.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+                throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled to updated facility's company");
+            }
+        }
+
         entity.setOrderType(apiStockOrder.getOrderType());
-        entity.setFacility(facilityService.fetchFacility(apiStockOrder.getFacility().getId()));
+        entity.setFacility(newFacility);
         entity.setCompany(entity.getFacility().getCompany());
         entity.setIdentifier(apiStockOrder.getIdentifier());
         entity.setPreferredWayOfPayment(apiStockOrder.getPreferredWayOfPayment());
@@ -1138,8 +1166,14 @@ public class StockOrderService extends BaseService {
     }
 
     @Transactional
-    public void deleteStockOrder(Long id) throws ApiException{
+    public void deleteStockOrder(Long id, CustomUserDetails user) throws ApiException{
         StockOrder stockOrder = fetchEntity(id, StockOrder.class);
+        if (
+                user.getUserRole() != UserRole.ADMIN &&
+                stockOrder.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+            throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in company");
+        }
+
         em.remove(stockOrder);
     }
 

@@ -14,9 +14,11 @@ import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
 import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
+import com.abelium.inatrace.types.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -96,11 +98,11 @@ public class TransactionService extends BaseService {
     }
 
     @Transactional
-    public void deleteTransaction(Long id, Long userId, Language language) throws ApiException {
+    public void deleteTransaction(Long id, CustomUserDetails user, Language language) throws ApiException {
 
         Transaction transaction = fetchEntity(id, Transaction.class);
 
-        revertQuantities(transaction, userId, language);
+        revertQuantities(transaction, user, language);
 
         // Only PENDING transactions can be deleted within QUOTE order
         if (transaction.getStatus() != TransactionStatus.PENDING
@@ -114,8 +116,13 @@ public class TransactionService extends BaseService {
     }
 
     @Transactional
-    public void approveTransaction(Long id, Long userId, Language language) throws ApiException {
+    public void approveTransaction(Long id, CustomUserDetails user, Language language) throws ApiException {
         Transaction transaction = fetchEntity(id, Transaction.class);
+        if (
+                user.getUserRole() != UserRole.ADMIN &&
+                transaction.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+            throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in company");
+        }
 
         if (transaction.getStatus() != TransactionStatus.PENDING) {
             throw new ApiException(ApiStatus.VALIDATION_ERROR, "Only PENDING transactions can be approved.");
@@ -130,17 +137,22 @@ public class TransactionService extends BaseService {
             StockOrder quoteStockOrder = processingOrder.getTargetStockOrders().get(0);
             quoteStockOrder.setAvailableQuantity(quoteStockOrder.getAvailableQuantity().add(transaction.getInputQuantity()));
             stockOrderService.createOrUpdateStockOrder(
-                    StockOrderMapper.toApiStockOrder(quoteStockOrder, userId, language),
-                    userId,
+                    StockOrderMapper.toApiStockOrder(quoteStockOrder, user.getUserId(), language),
+                    user,
                     processingOrder
             );
         }
     }
 
     @Transactional
-    public void rejectTransaction(ApiTransaction apiTransaction, Long userId, Language language) throws ApiException {
+    public void rejectTransaction(ApiTransaction apiTransaction, CustomUserDetails user, Language language) throws ApiException {
 
         Transaction transaction = fetchEntity(apiTransaction.getId(), Transaction.class);
+        if (
+                user.getUserRole() != UserRole.ADMIN &&
+                transaction.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+            throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in company");
+        }
 
         if (transaction.getStatus() != TransactionStatus.PENDING) {
             throw new ApiException(ApiStatus.VALIDATION_ERROR, "Only PENDING transactions can be rejected.");
@@ -153,21 +165,21 @@ public class TransactionService extends BaseService {
         transaction.setRejectComment(apiTransaction.getRejectComment());
 
         // Revert quantities but do NOT delete the transaction!
-        revertQuantities(transaction, userId, language);
+        revertQuantities(transaction, user, language);
 
         // Balance fulfilled quantity in quote stock order
         if (transaction.getTargetProcessingOrder() != null && !transaction.getTargetProcessingOrder().getTargetStockOrders().isEmpty()) {
             ProcessingOrder processingOrder = transaction.getTargetProcessingOrder();
             StockOrder quoteStockOrder = processingOrder.getTargetStockOrders().get(0);
             stockOrderService.createOrUpdateStockOrder(
-                    StockOrderMapper.toApiStockOrder(quoteStockOrder, userId, language),
-                    userId,
+                    StockOrderMapper.toApiStockOrder(quoteStockOrder, user.getUserId(), language),
+                    user,
                     processingOrder
             );
         }
     }
 
-    private void revertQuantities(Transaction transaction, Long userId, Language language) throws ApiException {
+    private void revertQuantities(Transaction transaction, CustomUserDetails user, Language language) throws ApiException {
 
         StockOrder sourceStockOrder = transaction.getSourceStockOrder();
         StockOrder targetStockOrder = transaction.getTargetStockOrder();
@@ -176,8 +188,8 @@ public class TransactionService extends BaseService {
         if (sourceStockOrder != null) {
             sourceStockOrder.setAvailableQuantity(sourceStockOrder.getAvailableQuantity().add(transaction.getInputQuantity()));
             stockOrderService.createOrUpdateStockOrder(
-                    StockOrderMapper.toApiStockOrder(sourceStockOrder, userId, language),
-                    userId,
+                    StockOrderMapper.toApiStockOrder(sourceStockOrder, user.getUserId(), language),
+                    user,
                     null
             );
         }
@@ -186,8 +198,8 @@ public class TransactionService extends BaseService {
         if (!transaction.getIsProcessing() && targetStockOrder != null) {
             targetStockOrder.setFulfilledQuantity(targetStockOrder.getFulfilledQuantity().subtract(transaction.getOutputQuantity()));
             stockOrderService.createOrUpdateStockOrder(
-                    StockOrderMapper.toApiStockOrder(targetStockOrder, userId, language),
-                    userId,
+                    StockOrderMapper.toApiStockOrder(targetStockOrder, user.getUserId(), language),
+                    user,
                     null
             );
         }

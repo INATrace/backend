@@ -6,6 +6,7 @@ import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityTyp
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -42,6 +43,7 @@ public class FacilityTypeController {
 	}
 
 	@PutMapping
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Create or update facility type. If ID is provided, the entity entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateFacilityType(
 			@Valid @RequestBody ApiFacilityType apiFacilityType) throws ApiException {
@@ -50,6 +52,7 @@ public class FacilityTypeController {
 	}
 
 	@DeleteMapping("{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Deletes a facility type with the provided ID.")
 	public ApiDefaultResponse deleteFacilityType(
 			@Valid @ApiParam(value = "Facility type ID", required = true) @PathVariable("id") Long id) throws ApiException {

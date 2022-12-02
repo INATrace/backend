@@ -17,9 +17,11 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.payment.*;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+import com.abelium.inatrace.types.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -46,8 +48,15 @@ public class PaymentService extends BaseService {
 		this.userService = userService;
 	}
 
-	public ApiPayment getPayment(Long id, Long userId) throws ApiException {
-		return PaymentMapper.toApiPayment(fetchEntity(id, Payment.class), userId);
+	public ApiPayment getPayment(Long id, CustomUserDetails user) throws ApiException {
+		Payment payment = fetchEntity(id, Payment.class);
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				payment.getPayingCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in payment's company");
+		}
+
+		return PaymentMapper.toApiPayment(payment, user.getUserId());
 	}
 
 	public ApiBulkPayment getBulkPayment(Long id, Long userId) throws ApiException {
@@ -142,11 +151,11 @@ public class PaymentService extends BaseService {
 
 	@Transactional
 	public ApiBaseEntity createOrUpdatePayment(ApiPayment apiPayment,
-											   Long userId,
+											   CustomUserDetails user,
 											   boolean isPartOfBulkPayment) throws ApiException {
 
 		Payment entity = fetchEntityOrElse(apiPayment.getId(), Payment.class, new Payment());
-		User currentUser = userService.fetchUserById(userId);
+		User currentUser = userService.fetchUserById(user.getUserId());
 
 		if (entity.getId() != null) {
 
@@ -170,6 +179,11 @@ public class PaymentService extends BaseService {
 			}
 
 			StockOrder stockOrder = fetchEntity(apiPayment.getStockOrder().getId(), StockOrder.class);
+			if(
+					user.getUserRole() != UserRole.ADMIN &&
+					stockOrder.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+				throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in paying company");
+			}
 
 			if (stockOrder.getOrderType() != OrderType.PURCHASE_ORDER && stockOrder.getOrderType() != OrderType.GENERAL_ORDER) {
 				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Not a Purchase or Quote order");
@@ -251,7 +265,7 @@ public class PaymentService extends BaseService {
 
 
 	@Transactional
-	public ApiBaseEntity createBulkPayment(ApiBulkPayment apiBulkPayment, Long userId) throws ApiException {
+	public ApiBaseEntity createBulkPayment(ApiBulkPayment apiBulkPayment, CustomUserDetails user) throws ApiException {
 
 		// Currently bulk-payments cannot be updated...
 		if (apiBulkPayment.getId() != null) {
@@ -279,10 +293,17 @@ public class PaymentService extends BaseService {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Recipient number is required.");
 		}
 
+		Company payingCompany = fetchEntity(apiBulkPayment.getPayingCompany().getId(), Company.class);
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				payingCompany.getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in paying company");
+		}
+
 		BulkPayment entity = new BulkPayment();
 
-		entity.setCreatedBy(userService.fetchUserById(userId));
-		entity.setPayingCompany(fetchEntity(apiBulkPayment.getPayingCompany().getId(), Company.class));
+		entity.setCreatedBy(userService.fetchUserById(user.getUserId()));
+		entity.setPayingCompany(payingCompany);
 
 		entity.setPaymentDescription(apiBulkPayment.getPaymentDescription());
 		entity.setPaymentPurposeType(apiBulkPayment.getPaymentPurposeType());
@@ -298,7 +319,7 @@ public class PaymentService extends BaseService {
 		// Create payments
 		for (ApiPayment apiPayment: apiBulkPayment.getPayments()) {
 
-			Long insertedPaymentId = createOrUpdatePayment(apiPayment, userId, true).getId();
+			Long insertedPaymentId = createOrUpdatePayment(apiPayment, user, true).getId();
 			Payment payment = fetchEntity(insertedPaymentId, Payment.class);
 
 			// Bi-directional mapping
@@ -330,10 +351,15 @@ public class PaymentService extends BaseService {
 	}
 
 	@Transactional
-	public void deletePayment(Long id, Long userId) throws ApiException {
+	public void deletePayment(Long id, CustomUserDetails user) throws ApiException {
 		Payment payment = fetchEntity(id, Payment.class);
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				payment.getPayingCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in payment's company");
+		}
 
-		User currentUser = userService.fetchUserById(userId);
+		User currentUser = userService.fetchUserById(user.getUserId());
 		StockOrder stockOrder = payment.getStockOrder();
 		if (stockOrder.getOrderType() == OrderType.PURCHASE_ORDER && !Boolean.TRUE.equals(stockOrder.getPriceDeterminedLater())) {
 			BigDecimal sumTotalPaid = stockOrder.getPayments().stream()

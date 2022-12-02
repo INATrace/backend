@@ -215,7 +215,7 @@ public class StockOrderController {
             @Valid @RequestBody ApiPurchaseOrder apiPurchaseOrder,
             @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-        return new ApiResponse<>(stockOrderService.createPurchaseBulkOrder(apiPurchaseOrder, authUser.getUserId()));
+        return new ApiResponse<>(stockOrderService.createPurchaseBulkOrder(apiPurchaseOrder, authUser));
     }
 
     @PutMapping
@@ -224,15 +224,16 @@ public class StockOrderController {
             @Valid @RequestBody ApiStockOrder apiStockOrder,
             @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-        return new ApiResponse<>(stockOrderService.createOrUpdateStockOrder(apiStockOrder, authUser.getUserId(), null));
+        return new ApiResponse<>(stockOrderService.createOrUpdateStockOrder(apiStockOrder, authUser, null));
     }
 
     @DeleteMapping("{id}")
     @ApiOperation("Deletes a stock order with the provided ID.")
     public ApiDefaultResponse deleteStockOrder(
+            @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @ApiParam(value = "StockOrder ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
-        stockOrderService.deleteStockOrder(id);
+        stockOrderService.deleteStockOrder(id, authUser);
         return new ApiDefaultResponse();
     }
 

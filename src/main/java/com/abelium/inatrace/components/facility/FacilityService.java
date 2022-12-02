@@ -9,6 +9,7 @@ import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.company.CompanyQueries;
+import com.abelium.inatrace.components.company.CompanyService;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.product.api.ApiFinalProduct;
@@ -20,11 +21,13 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.facility.*;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProductCompanyType;
+import com.abelium.inatrace.types.UserRole;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -55,11 +58,15 @@ public class FacilityService extends BaseService {
 
 	private final FinalProductService finalProductService;
 
+	private final CompanyService companyService;
+
 	@Autowired
-	public FacilityService(SemiProductService semiProductService, CompanyQueries companyQueries, FinalProductService finalProductService) {
+	public FacilityService(SemiProductService semiProductService, CompanyQueries companyQueries, FinalProductService finalProductService,
+						   CompanyService companyService) {
 		this.semiProductService = semiProductService;
 		this.companyQueries = companyQueries;
 		this.finalProductService = finalProductService;
+		this.companyService = companyService;
 	}
 
 	public ApiPaginatedList<ApiFacility> getFacilityList(ApiPaginatedRequest request, Language language) {
@@ -97,7 +104,7 @@ public class FacilityService extends BaseService {
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdateFacility(ApiFacility apiFacility) throws ApiException {
+	public ApiBaseEntity createOrUpdateFacility(ApiFacility apiFacility, CustomUserDetails user) throws ApiException {
 
 		Facility entity;
 		FacilityLocation facilityLocation;
@@ -114,6 +121,12 @@ public class FacilityService extends BaseService {
 			facilityLocation = new FacilityLocation();
 			address = new Address();
 			company = companyQueries.fetchCompany(apiFacility.getCompany().getId());
+		}
+
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				company.getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in company");
 		}
 
 		entity.setIsCollectionFacility(apiFacility.getIsCollectionFacility());
@@ -183,15 +196,26 @@ public class FacilityService extends BaseService {
 	}
 
 	@Transactional
-	public void deactivateFacility(Long id, Boolean deactivated) {
+	public void deactivateFacility(Long id, Boolean deactivated, CustomUserDetails user) throws ApiException {
 		Facility facility = em.find(Facility.class, id);
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				facility.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled to facility's company");
+		}
+
 		facility.setIsDeactivated(deactivated);
 	}
 
 	@Transactional
-	public void deleteFacility(Long id) throws ApiException {
+	public void deleteFacility(Long id, CustomUserDetails user) throws ApiException {
 
 		Facility facility = fetchFacility(id);
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				facility.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled to facility's company");
+		}
 		em.remove(facility);
 	}
 
@@ -210,7 +234,14 @@ public class FacilityService extends BaseService {
 	 */
 	public ApiPaginatedList<ApiFacility> listAllFacilitiesByCompany(Long companyId,
 	                                                                ApiPaginatedRequest request,
-	                                                                Language language) {
+	                                                                Language language,
+																	CustomUserDetails user) throws ApiException {
+
+		if (
+				user.getUserRole() != UserRole.ADMIN &&
+				this.companyService.getCompanyUsers(companyId).stream().noneMatch(cu -> cu.getId().equals(user.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in company");
+		}
 
 		return PaginationTools.createPaginatedResponse(em, request, () ->
 						listFacilitiesByCompanyQuery(companyId, null, null, language, null),

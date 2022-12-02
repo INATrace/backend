@@ -14,6 +14,7 @@ import com.abelium.inatrace.components.product.api.ApiFarmInformation;
 import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Gender;
 import com.abelium.inatrace.types.UserCustomerType;
 import org.apache.poi.ss.usermodel.*;
@@ -42,7 +43,7 @@ public class UserCustomerImportService extends BaseService {
     @Autowired
     private StorageService storageService;
 
-    public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, Long userId) throws ApiException {
+    public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, CustomUserDetails user) throws ApiException {
         DocumentData documentData = storageService.downloadDocument(em.find(Document.class, documentId).getStorageKey());
         InputStream inputStream;
         XSSFWorkbook mainWorkbook;
@@ -136,7 +137,7 @@ public class UserCustomerImportService extends BaseService {
                 if (companyService.existsUserCustomer(apiUserCustomer)) {
                     duplicates.add(apiUserCustomer);
                 } else {
-                    companyService.addUserCustomer(companyId, apiUserCustomer, userId);
+                    companyService.addUserCustomer(companyId, apiUserCustomer, user);
                     successful++;
                 }
             }

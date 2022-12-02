@@ -12,6 +12,7 @@ import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,6 +60,7 @@ public class ValueChainController {
 	}
 
 	@PostMapping("{id}/enable")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Set the status of the value chain with the provided ID as 'ENABLED'.")
 	public ApiResponse<ApiBaseEntity> enableValueChain(
 			@Valid @ApiParam(value = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {
@@ -67,6 +69,7 @@ public class ValueChainController {
 	}
 
 	@PostMapping("{id}/disable")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Set the status of the value chain with the provided ID as 'DISABLED'.")
 	public ApiResponse<ApiBaseEntity> disableValueChain(
 			@Valid @ApiParam(value = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {
@@ -75,6 +78,7 @@ public class ValueChainController {
 	}
 
 	@DeleteMapping("{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Deletes a value chain with the provided ID.")
 	public ApiDefaultResponse deleteValueChain(
 			@Valid @ApiParam(value = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {

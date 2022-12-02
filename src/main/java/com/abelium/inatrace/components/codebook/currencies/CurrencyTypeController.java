@@ -6,6 +6,7 @@ import com.abelium.inatrace.components.codebook.currencies.api.ApiCurrencyType;
 import com.abelium.inatrace.components.currencies.api.ApiCurrencyTypeRequest;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,6 +37,7 @@ public class CurrencyTypeController {
     }
 
     @PutMapping("{id}/enable")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ApiOperation(value = "Enable currency with the specified ID")
     public ApiDefaultResponse enableCurrency(@PathVariable("id") Long id) {
         currencyTypeService.updateStatus(id, Boolean.TRUE);
@@ -43,6 +45,7 @@ public class CurrencyTypeController {
     }
 
     @PutMapping("{id}/disable")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ApiOperation(value = "Disable currency with the specified ID")
     public ApiDefaultResponse disableCurrency(@PathVariable("id") Long id) {
         currencyTypeService.updateStatus(id, Boolean.FALSE);

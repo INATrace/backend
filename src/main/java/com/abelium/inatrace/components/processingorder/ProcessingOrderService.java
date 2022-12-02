@@ -18,6 +18,7 @@ import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -69,12 +70,12 @@ public class ProcessingOrderService extends BaseService {
     /**
      * This is temporary method so that everything else stays backward compatible.
      * @param apiProcessingOrder - Processing order request
-     * @param userId - ID of the user that has requested this action
+     * @param user - ID of the user that has requested this action
      * @return Status
      * @throws ApiException - You know... when something goes wrong it's nice to have a feedback
      */
     @Transactional
-    public ApiBaseEntity createOrUpdateProcessingOrder(ApiProcessingOrder apiProcessingOrder, Long userId, Language language) throws ApiException {
+    public ApiBaseEntity createOrUpdateProcessingOrder(ApiProcessingOrder apiProcessingOrder, CustomUserDetails user, Language language) throws ApiException {
 
         ProcessingOrder entity = fetchEntityOrElse(apiProcessingOrder.getId(), ProcessingOrder.class, new ProcessingOrder());
 
@@ -105,7 +106,7 @@ public class ProcessingOrderService extends BaseService {
 
             // SHIPMENT is actually QUOTE
             case SHIPMENT:
-                return createOrUpdateQuoteOrder(entity, apiProcessingOrder, userId, language);
+                return createOrUpdateQuoteOrder(entity, apiProcessingOrder, user, language);
 
             case PROCESSING:
             case FINAL_PROCESSING:
@@ -205,7 +206,7 @@ public class ProcessingOrderService extends BaseService {
                     .collect(Collectors.toList());
 
             for (Transaction t : transactionsToBeDeleted) {
-                transactionService.deleteTransaction(t.getId(), userId, language);
+                transactionService.deleteTransaction(t.getId(), user, language);
             }
 
             // Find target StockOrders that are not present in request
@@ -291,7 +292,7 @@ public class ProcessingOrderService extends BaseService {
             // Set targetStockOrders for TRANSFER
             if (processingAction.getType() == ProcessingActionType.TRANSFER) {
 
-                Long targetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiProcessingOrder.getTargetStockOrders().get(i), userId, entity).getId();
+                Long targetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiProcessingOrder.getTargetStockOrders().get(i), user, entity).getId();
                 StockOrder targetStockOrder = fetchEntity(targetStockOrderId, StockOrder.class);
                 targetStockOrder.setProcessingOrder(entity);
 
@@ -311,7 +312,7 @@ public class ProcessingOrderService extends BaseService {
 
             for (ApiStockOrder apiTargetStockOrder: apiProcessingOrder.getTargetStockOrders()) {
 
-                Long insertedTargetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiTargetStockOrder, userId, entity).getId();
+                Long insertedTargetStockOrderId = stockOrderService.createOrUpdateStockOrder(apiTargetStockOrder, user, entity).getId();
                 StockOrder targetStockOrder = fetchEntity(insertedTargetStockOrderId, StockOrder.class);
                 targetStockOrder.setProcessingOrder(entity);
 
@@ -337,7 +338,7 @@ public class ProcessingOrderService extends BaseService {
         return new ApiBaseEntity(entity);
     }
 
-    private ApiBaseEntity createOrUpdateQuoteOrder(ProcessingOrder entity, ApiProcessingOrder apiProcessingOrder, Long userId, Language language) throws ApiException {
+    private ApiBaseEntity createOrUpdateQuoteOrder(ProcessingOrder entity, ApiProcessingOrder apiProcessingOrder, CustomUserDetails user, Language language) throws ApiException {
 
         // Validate that there is target Stock order provided
         if (apiProcessingOrder.getTargetStockOrders().size() != 1) {
@@ -364,7 +365,7 @@ public class ProcessingOrderService extends BaseService {
 
             entity.getInputTransactions().removeAll(transactionsToBeDeleted);
             for (Transaction t: transactionsToBeDeleted) {
-                transactionService.deleteTransaction(t.getId(), userId, language);
+                transactionService.deleteTransaction(t.getId(), user, language);
             }
         }
 
@@ -409,7 +410,7 @@ public class ProcessingOrderService extends BaseService {
             }
         }
 
-        Long insertedStockOrderId = stockOrderService.createOrUpdateStockOrder(apiQuoteStockOrder, userId, entity).getId();
+        Long insertedStockOrderId = stockOrderService.createOrUpdateStockOrder(apiQuoteStockOrder, user, entity).getId();
         StockOrder quoteStockOrder = fetchEntity(insertedStockOrderId, StockOrder.class);
 
         // Set the back reference for the Processing order

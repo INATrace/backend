@@ -3,11 +3,13 @@ package com.abelium.inatrace.components.facility;
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -41,9 +43,10 @@ public class FacilityController {
 	public ApiPaginatedResponse<ApiFacility> listAllFacilitiesByCompany(
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
-			@Valid ApiPaginatedRequest request) {
+			@Valid ApiPaginatedRequest request,
+			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		return new ApiPaginatedResponse<>(facilityService.listAllFacilitiesByCompany(companyId, request, language));
+		return new ApiPaginatedResponse<>(facilityService.listAllFacilitiesByCompany(companyId, request, language, authUser));
 	}
 	
 	@GetMapping("list/company/{id}")
@@ -100,31 +103,36 @@ public class FacilityController {
 
 	@PutMapping
 	@ApiOperation("Create or update facility. If ID is provided, then the entity with the provided ID is updated.")
-	public ApiResponse<ApiBaseEntity> createOrUpdateFacility(@Valid @RequestBody ApiFacility apiFacility) throws ApiException {
+	public ApiResponse<ApiBaseEntity> createOrUpdateFacility(
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid @RequestBody ApiFacility apiFacility) throws ApiException {
 
-		return new ApiResponse<>(facilityService.createOrUpdateFacility(apiFacility));
+		return new ApiResponse<>(facilityService.createOrUpdateFacility(apiFacility, authUser));
 
 	}
 
 	@PutMapping("{id}/activate")
 	@ApiOperation("Activate a facility")
-	public ApiDefaultResponse activateFacility(@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) {
-		facilityService.deactivateFacility(id, Boolean.FALSE);
+	public ApiDefaultResponse activateFacility(@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id,
+											   @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
+		facilityService.deactivateFacility(id, Boolean.FALSE, authUser);
 		return new ApiDefaultResponse();
 	}
 
 	@PutMapping("{id}/deactivate")
 	@ApiOperation("Deactivate a facility")
-	public ApiDefaultResponse deactivateFacility(@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) {
-		facilityService.deactivateFacility(id, Boolean.TRUE);
+	public ApiDefaultResponse deactivateFacility(@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id,
+												 @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
+		facilityService.deactivateFacility(id, Boolean.TRUE, authUser);
 		return new ApiDefaultResponse();
 	}
 
 	@DeleteMapping("{id}")
 	@ApiOperation("Deletes a facility with the provided ID.")
-	public ApiDefaultResponse deleteFacility(@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id) throws ApiException {
+	public ApiDefaultResponse deleteFacility(@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long id,
+											 @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		facilityService.deleteFacility(id);
+		facilityService.deleteFacility(id, authUser);
 		return new ApiDefaultResponse();
 
 	}

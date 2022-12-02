@@ -39,7 +39,7 @@ public class PaymentController {
 	public ApiResponse<ApiPayment> getPayment(
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id) throws ApiException {
-		return new ApiResponse<>(paymentService.getPayment(id, authUser.getUserId()));
+		return new ApiResponse<>(paymentService.getPayment(id, authUser));
 	}
 	
 	@GetMapping("bulk-payment/{id}")
@@ -138,7 +138,7 @@ public class PaymentController {
 			@Valid @RequestBody ApiPayment apiPayment,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		return new ApiResponse<>(paymentService.createOrUpdatePayment(apiPayment, authUser.getUserId(), false));
+		return new ApiResponse<>(paymentService.createOrUpdatePayment(apiPayment, authUser, false));
 	}
 	
 	@PostMapping("bulk-payment")
@@ -147,14 +147,16 @@ public class PaymentController {
 			@Valid @RequestBody ApiBulkPayment apiBulkPayment,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		return new ApiResponse<>(paymentService.createBulkPayment(apiBulkPayment, authUser.getUserId()));
+		return new ApiResponse<>(paymentService.createBulkPayment(apiBulkPayment, authUser));
 	}
 
 	@DeleteMapping("{id}")
 	@ApiOperation("Deletes a payment with the provided ID.")
-	public ApiDefaultResponse deletePayment(@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id, @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
+	public ApiDefaultResponse deletePayment(
+			@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id,
+			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		paymentService.deletePayment(id, authUser.getUserId());
+		paymentService.deletePayment(id, authUser);
 		return new ApiDefaultResponse();
 	}
 }

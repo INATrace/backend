@@ -3,11 +3,13 @@ package com.abelium.inatrace.components.processingaction;
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -69,16 +71,20 @@ public class ProcessingActionController {
 
 	@PutMapping
 	@ApiOperation("Create or update processing action. If ID is provided, then the entity with the provided ID is updated.")
-	public ApiResponse<ApiBaseEntity> createOrUpdateProcessingAction(@Valid @RequestBody ApiProcessingAction apiProcessingAction) throws ApiException {
+	public ApiResponse<ApiBaseEntity> createOrUpdateProcessingAction(
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid @RequestBody ApiProcessingAction apiProcessingAction) throws ApiException {
 
-		return new ApiResponse<>(processingActionService.createOrUpdateProcessingAction(apiProcessingAction));
+		return new ApiResponse<>(processingActionService.createOrUpdateProcessingAction(apiProcessingAction, authUser));
 	}
 
 	@DeleteMapping("{id}")
 	@ApiOperation("Deletes a processing action with the provided ID.")
-	public ApiDefaultResponse deleteProcessingAction(@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long id) throws ApiException {
+	public ApiDefaultResponse deleteProcessingAction(
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
-		processingActionService.deleteProcessingAction(id);
+		processingActionService.deleteProcessingAction(id, authUser);
 		return new ApiDefaultResponse();
 	}
 }

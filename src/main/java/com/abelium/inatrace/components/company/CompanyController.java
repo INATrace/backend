@@ -37,6 +37,7 @@ public class CompanyController {
 	}
 
 	@PostMapping(value = "/create")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ApiOperation(value = "Create a new company (with the logged-in user as company admin)")
     public ApiResponse<ApiBaseEntity> createCompany(@AuthenticationPrincipal CustomUserDetails authUser, @Valid @RequestBody ApiCompany request) throws ApiException {
 		return new ApiResponse<>(companyService.createCompany(authUser.getUserId(), request));
@@ -117,7 +118,7 @@ public class CompanyController {
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
             @Valid @RequestBody ApiUserCustomer request
     ) throws ApiException {
-        return new ApiResponse<>(companyService.addUserCustomer(companyId, request, authUser.getUserId()));
+        return new ApiResponse<>(companyService.addUserCustomer(companyId, request, authUser));
     }
 
     @PutMapping(value = "/userCustomers/edit")
@@ -126,14 +127,15 @@ public class CompanyController {
             @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @RequestBody ApiUserCustomer request
     ) throws ApiException {
-        return new ApiResponse<>(companyService.updateUserCustomer(request, authUser.getUserId()));
+        return new ApiResponse<>(companyService.updateUserCustomer(request, authUser));
     }
 
     @DeleteMapping(value = "/userCustomers/{id}")
     @ApiOperation(value = "Delete user customer with given id")
     public ApiDefaultResponse deleteUserCustomer(
-            @Valid @ApiParam(value = "User customer ID", required = true) @PathVariable("id") Long id) {
-        companyService.deleteUserCustomer(id);
+            @Valid @ApiParam(value = "User customer ID", required = true) @PathVariable("id") Long id,
+            @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
+        companyService.deleteUserCustomer(id, authUser);
         return new ApiDefaultResponse();
     }
 
@@ -157,22 +159,25 @@ public class CompanyController {
     @PostMapping(value = "/companyCustomers")
     @ApiOperation(value = "Create company customer")
     public ApiResponse<ApiCompanyCustomer> createCompanyCustomer(
-            @Valid @RequestBody ApiCompanyCustomer apiCompanyCustomer) {
-        return new ApiResponse<>(companyService.createCompanyCustomer(apiCompanyCustomer));
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @RequestBody ApiCompanyCustomer apiCompanyCustomer) throws ApiException {
+        return new ApiResponse<>(companyService.createCompanyCustomer(apiCompanyCustomer, authUser));
     }
 
     @PutMapping(value = "/companyCustomers")
     @ApiOperation(value = "Update company customer")
     public ApiResponse<ApiCompanyCustomer> updateCompanyCustomer(
-            @Valid @RequestBody ApiCompanyCustomer apiCompanyCustomer) {
-        return new ApiResponse<>(companyService.updateCompanyCustomer(apiCompanyCustomer));
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @RequestBody ApiCompanyCustomer apiCompanyCustomer) throws ApiException {
+        return new ApiResponse<>(companyService.updateCompanyCustomer(apiCompanyCustomer, authUser));
     }
 
     @DeleteMapping(value = "/companyCustomers/{id}")
     @ApiOperation(value = "Delete company customer with ID")
     public ApiDefaultResponse deleteCompanyCustomer(
-            @Valid @ApiParam(value = "Company customer ID", required = true) @PathVariable("id") Long id) {
-        companyService.deleteCompanyCustomer(id);
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "Company customer ID", required = true) @PathVariable("id") Long id) throws ApiException {
+        companyService.deleteCompanyCustomer(id, authUser);
         return new ApiDefaultResponse();
     }
 
@@ -199,7 +204,7 @@ public class CompanyController {
             @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
             @Valid @ApiParam(value = "Document ID", required = true) @PathVariable("documentId") Long documentId) throws ApiException {
-        return companyService.importFarmersSpreadsheet(companyId, documentId, authUser.getUserId());
+        return companyService.importFarmersSpreadsheet(companyId, documentId, authUser);
     }
 
 }

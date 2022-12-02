@@ -46,7 +46,7 @@ public class ProductOrderController {
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-		return new ApiResponse<>(productOrderService.createProductOrder(apiProductOrder, authUser.getUserId(), language));
+		return new ApiResponse<>(productOrderService.createProductOrder(apiProductOrder, authUser, language));
 	}
 
 }
