@@ -11,6 +11,7 @@ import com.abelium.inatrace.db.entities.company.CompanyCertification;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderPEFieldValue;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
+import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
 import com.abelium.inatrace.types.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -236,11 +237,19 @@ public class BeycoOrderService extends BaseService {
                         .map(Transaction::getSourceStockOrder)
                         .collect(Collectors.toList());
 
-                inputStockOrders.forEach(sourceOrder -> findRequiredFieldsInHistory(coffee, sourceOrder));
+                if(inputStockOrders.get(0).getSacNumber() != null)
+                    findRequiredFieldsInHistory(coffee, inputStockOrders.get(0));
+
+                else if (inputStockOrders.get(0).getOrderType() == OrderType.TRANSFER_ORDER)
+                    findRequiredFieldsInHistory(coffee, inputStockOrders.get(0));
+
+                else
+                    inputStockOrders.forEach(sourceOrder -> findRequiredFieldsInHistory(coffee, sourceOrder));
             }
             else if (stockOrder.getProcessingOrder() == null) {
                 // Region and country of source farmer
                 if (
+                        (coffee.getCountry() == null || coffee.getRegion() == null) &&
                         stockOrder.getProducerUserCustomer() != null &&
                         stockOrder.getProducerUserCustomer().getUserCustomerLocation() != null &&
                         stockOrder.getProducerUserCustomer().getUserCustomerLocation().getAddress() != null &&
