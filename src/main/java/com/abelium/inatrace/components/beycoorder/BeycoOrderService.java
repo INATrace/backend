@@ -133,7 +133,7 @@ public class BeycoOrderService extends BaseService {
 
         ApiBeycoOrderFields beycoOrderFields = new ApiBeycoOrderFields();
         StockOrder stockOrder = stockOrderService.fetchEntity(stockOrderIds.get(0), StockOrder.class);
-        beycoOrderFields.setPrivacy(BeycoPrivacy.Private);
+        beycoOrderFields.setPrivacy(BeycoPrivacy.Public);
         beycoOrderFields.setPortOfExport(new ApiBeycoPortOfExport());
         beycoOrderFields.setOfferCoffees(new ArrayList<>());
 
