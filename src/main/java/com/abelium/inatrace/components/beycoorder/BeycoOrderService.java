@@ -104,7 +104,7 @@ public class BeycoOrderService extends BaseService {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Company is not allowed to use Beyco platform");
         }
 
-        beycoOrder.setPrivacy(BeycoPrivacy.Private);
+        beycoOrder.setPrivacy(BeycoPrivacy.Public);
         for(ApiBeycoOrderCoffees beycoCoffees : beycoOrder.getOfferCoffees()) {
             beycoCoffees.setIsFixedPrice(true);
             beycoCoffees.getCoffee().setIsBulk(true);
