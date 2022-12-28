@@ -42,13 +42,13 @@ import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
 import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.ProductCompanyType;
-import com.abelium.inatrace.types.UserRole;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -728,12 +728,9 @@ public class StockOrderService extends BaseService {
         if (apiPurchaseOrder.getFacility() == null) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Facility needs to be provided!");
         }
+
         Facility facility = facilityService.fetchFacility(apiPurchaseOrder.getFacility().id);
-        if (
-                user.getUserRole() != UserRole.ADMIN &&
-                facility.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
-            throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in company");
-        }
+        PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
 
         // Update stocks of type Purchase, one by one
         for (ApiPurchaseOrderFarmer farmer : apiPurchaseOrder.getFarmers()) {
@@ -815,24 +812,12 @@ public class StockOrderService extends BaseService {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Semi-product or Final product needs to be provided!");
         }
 
-        if (
-                user.getUserRole() != UserRole.ADMIN &&
-                entity.getFacility().getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
-            throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled to current facility's company");
-        }
-
-        Facility newFacility = entity.getFacility();
-        if (!apiStockOrder.getFacility().getId().equals(entity.getFacility().getId())) {
-            newFacility = facilityService.fetchFacility(apiStockOrder.getFacility().getId());
-            if (
-                    user.getUserRole() != UserRole.ADMIN &&
-                    newFacility.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
-                throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled to updated facility's company");
-            }
-        }
+        // Fetch the facility and check that the request user is enrolled in the facility's company
+        Facility facility = facilityService.fetchFacility(apiStockOrder.getFacility().getId());
+        PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
 
         entity.setOrderType(apiStockOrder.getOrderType());
-        entity.setFacility(newFacility);
+        entity.setFacility(facility);
         entity.setCompany(entity.getFacility().getCompany());
         entity.setIdentifier(apiStockOrder.getIdentifier());
         entity.setPreferredWayOfPayment(apiStockOrder.getPreferredWayOfPayment());
@@ -1166,13 +1151,12 @@ public class StockOrderService extends BaseService {
     }
 
     @Transactional
-    public void deleteStockOrder(Long id, CustomUserDetails user) throws ApiException{
+    public void deleteStockOrder(Long id, CustomUserDetails user) throws ApiException {
+
         StockOrder stockOrder = fetchEntity(id, StockOrder.class);
-        if (
-                user.getUserRole() != UserRole.ADMIN &&
-                stockOrder.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
-            throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in company");
-        }
+
+        PermissionsUtil.checkUserIfCompanyEnrolled(stockOrder.getCompany().getUsers(), user);
+        PermissionsUtil.checkUserIfCompanyOrSystemAdmin(stockOrder.getCompany().getUsers(), user);
 
         em.remove(stockOrder);
     }
