@@ -410,7 +410,7 @@ public class ProcessingOrderService extends BaseService {
             }
         }
 
-        Long insertedStockOrderId = stockOrderService.createOrUpdateStockOrder(apiQuoteStockOrder, user, entity).getId();
+        Long insertedStockOrderId = stockOrderService.createOrUpdateQuoteStockOrder(apiQuoteStockOrder, user, entity).getId();
         StockOrder quoteStockOrder = fetchEntity(insertedStockOrderId, StockOrder.class);
 
         // Set the back reference for the Processing order

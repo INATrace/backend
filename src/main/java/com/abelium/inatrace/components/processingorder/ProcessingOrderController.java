@@ -35,7 +35,7 @@ public class ProcessingOrderController {
 
     @GetMapping("/list")
     @ApiOperation("Get a paginated list of processing orders.")
-    public ApiPaginatedResponse<ApiProcessingOrder> getProcessingOrder(
+    public ApiPaginatedResponse<ApiProcessingOrder> getProcessingOrders(
             @Valid ApiPaginatedRequest request,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
         return new ApiPaginatedResponse<>(processingOrderService.getProcessingOrderList(request, language));
