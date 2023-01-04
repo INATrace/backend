@@ -31,11 +31,13 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCertification;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
+import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
+import com.abelium.inatrace.db.entities.product.Product;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.db.entities.productorder.ProductOrder;
 import com.abelium.inatrace.db.entities.stockorder.*;
@@ -827,7 +829,30 @@ public class StockOrderService extends BaseService {
                                                        CustomUserDetails user,
                                                        ProcessingOrder processingOrder) throws ApiException {
 
-        // TODO: check quote company enrolment for user
+        Company company = companyQueries.fetchCompany(apiStockOrder.getCompany().getId());
+
+        TypedQuery<Product> companyProductsQuery = em.createNamedQuery("ProductCompany.getCompanyProductsWithAnyRole", Product.class);
+        companyProductsQuery.setParameter("companyId", company.getId());
+
+        List<Product> companyProducts = companyProductsQuery.getResultList();
+
+        boolean userIsAssociatedWithCompany;
+        for (Product companyProduct : companyProducts) {
+
+            userIsAssociatedWithCompany = companyProduct.getAssociatedCompanies()
+                    .stream()
+                    .map(ProductCompany::getCompany)
+                    .distinct()
+                    .map(Company::getUsers)
+                    .anyMatch(companyUsers -> companyUsers
+                            .stream()
+                            .map(CompanyUser::getUser)
+                            .anyMatch(u -> u.getId().equals(user.getUserId())));
+
+            if (userIsAssociatedWithCompany) {
+                break;
+            }
+        }
 
         return createOrUpdateStockOrder(apiStockOrder, user, processingOrder, false);
     }
