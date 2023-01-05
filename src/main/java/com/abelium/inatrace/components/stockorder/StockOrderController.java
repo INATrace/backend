@@ -40,7 +40,7 @@ public class StockOrderController {
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-        return new ApiResponse<>(stockOrderService.getStockOrder(id, authUser.getUserId(), language, withProcessingOrder));
+        return new ApiResponse<>(stockOrderService.getStockOrder(id, authUser, language, withProcessingOrder));
     }
 
     @GetMapping("/list")
