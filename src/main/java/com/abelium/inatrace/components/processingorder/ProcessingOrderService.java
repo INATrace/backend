@@ -1,8 +1,6 @@
 package com.abelium.inatrace.components.processingorder;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiPaginatedList;
-import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
@@ -19,16 +17,14 @@ import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.security.service.CustomUserDetails;
-import com.abelium.inatrace.tools.PaginationTools;
+import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.Queries;
-import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
@@ -50,21 +46,15 @@ public class ProcessingOrderService extends BaseService {
         this.transactionService = transactionService;
     }
 
-    public ApiProcessingOrder getProcessingOrder(Long id, Language language) throws ApiException {
-        return ProcessingOrderMapper.toApiProcessingOrder(fetchEntity(id, ProcessingOrder.class), language);
-    }
+    public ApiProcessingOrder getProcessingOrder(Long id, CustomUserDetails authUser, Language language) throws ApiException {
 
-    public ApiPaginatedList<ApiProcessingOrder> getProcessingOrderList(ApiPaginatedRequest request, Language language) {
-        return PaginationTools.createPaginatedResponse(em, request,
-                () -> processingOrderQueryObject(request), processingOrder -> ProcessingOrderMapper.toApiProcessingOrder(processingOrder, language));
-    }
+        ProcessingOrder processingOrder = fetchEntity(id, ProcessingOrder.class);
 
-    private ProcessingOrder processingOrderQueryObject(ApiPaginatedRequest request) {
+        // Check if request user is enrolled in processing order owner company
+        PermissionsUtil.checkUserIfCompanyEnrolled(processingOrder.getProcessingAction().getCompany().getUsers(),
+                authUser);
 
-        ProcessingOrder processingOrderProxy = Torpedo.from(ProcessingOrder.class);
-        QueryTools.orderBy(request.sort, processingOrderProxy.getId());
-
-        return processingOrderProxy;
+        return ProcessingOrderMapper.toApiProcessingOrder(processingOrder, language);
     }
 
     /**
@@ -433,11 +423,14 @@ public class ProcessingOrderService extends BaseService {
     }
 
     @Transactional
-    public void deleteProcessingOrder(Long id) throws ApiException {
+    public void deleteProcessingOrder(Long id, CustomUserDetails user) throws ApiException {
 
         // Transactions should not be deleted -> May result in inappropriate quantities
 
         ProcessingOrder entity = fetchEntity(id, ProcessingOrder.class);
+
+        // Check if req. user is enrolled in owner company for this processing order
+        PermissionsUtil.checkUserIfCompanyOrSystemAdmin(entity.getProcessingAction().getCompany().getUsers(), user);
 
         // Remove connected transactions
         for (Transaction t: entity.getInputTransactions()) {
