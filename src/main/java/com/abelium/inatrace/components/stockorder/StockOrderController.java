@@ -14,7 +14,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,17 +42,6 @@ public class StockOrderController {
         return new ApiResponse<>(stockOrderService.getStockOrder(id, authUser, language, withProcessingOrder));
     }
 
-    @GetMapping("/list")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @ApiOperation("Get a paginated list of stock orders.")
-    public ApiPaginatedResponse<ApiStockOrder> getStockOrderList(
-            @Valid ApiPaginatedRequest request,
-            @AuthenticationPrincipal CustomUserDetails authUser,
-            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
-        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
-                request, new StockOrderQueryRequest(), authUser.getUserId(), language));
-    }
-
     @GetMapping("/list/facility/{facilityId}/available")
     @ApiOperation("Get a paginated list of stock orders for provided facility ID and semi-product or final product ID.")
     public ApiPaginatedResponse<ApiStockOrder> getAvailableStockForStockUnitInFacility(
@@ -67,9 +55,9 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
+        return new ApiPaginatedResponse<>(stockOrderService.getAvailableStockOrderListForFacility(
                 request,
                 new StockOrderQueryRequest(
                         facilityId,
@@ -82,7 +70,7 @@ public class StockOrderController {
                         productionDateStart != null ? productionDateStart.toInstant() : null,
                         productionDateEnd != null ? productionDateEnd.toInstant() : null
                 ),
-                authUser.getUserId(),
+                authUser,
                 language));
     }
 

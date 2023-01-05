@@ -115,15 +115,25 @@ public class StockOrderService extends BaseService {
         return StockOrderMapper.toApiStockOrder(stockOrder, user.getUserId(), language, withProcessingOrder);
     }
 
-    public ApiPaginatedList<ApiStockOrder> getStockOrderList(ApiPaginatedRequest request,
-                                                             StockOrderQueryRequest queryRequest,
-                                                             Long userId,
-                                                             Language language) {
+    public ApiPaginatedList<ApiStockOrder> getAvailableStockOrderListForFacility(ApiPaginatedRequest request,
+                                                                                 StockOrderQueryRequest queryRequest,
+                                                                                 CustomUserDetails user,
+                                                                                 Language language) throws ApiException {
+
+        if (queryRequest.facilityId == null) {
+            throw new ApiException(ApiStatus.UNAUTHORIZED, "Facility ID should be provided!");
+        }
+
+        // Get the owner company of the facility
+        // Using this, we can get the company products and check if the user is enrolled in any of the connected companies
+        Facility facility = facilityService.fetchFacility(queryRequest.facilityId);
+        PermissionsUtil.checkUserIfConnectedWithProducts(fetchCompanyProducts(facility.getCompany().getId()), user);
+
         return PaginationTools.createPaginatedResponse(em, request,
                 () -> stockOrderQueryObject(
                         request,
                         queryRequest
-                ), stockOrder -> StockOrderMapper.toApiStockOrder(stockOrder, userId, language));
+                ), stockOrder -> StockOrderMapper.toApiStockOrder(stockOrder, user.getUserId(), language));
     }
 
     public ApiPaginatedList<ApiStockOrder> getStockOrderListForCompany(ApiPaginatedRequest request,
