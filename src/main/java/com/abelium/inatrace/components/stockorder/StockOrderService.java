@@ -342,7 +342,7 @@ public class StockOrderService extends BaseService {
                 Set<Long> participatingCompaniesIds = new HashSet<>();
 
                 // Get the history for the selected Stock order
-                ApiStockOrderHistory stockOrderHistory = getStockOrderAggregatedHistoryList(topLevelStockOrder.getId(), language, false);
+                ApiStockOrderHistory stockOrderHistory = getStockOrderAggregatedHistoryList(topLevelStockOrder.getId(), language, null, false);
 
                 // Map the Stock order history timeline to the public QR code tag data
                 historyTimeline.setItems(stockOrderHistory.getTimelineItems()
@@ -618,9 +618,22 @@ public class StockOrderService extends BaseService {
      * @param language User selected language.
      * @param withDetails Should the response contain Stock and Processing order details.
      */
-    public ApiStockOrderHistory getStockOrderAggregatedHistoryList(Long id, Language language, boolean withDetails) throws ApiException {
+    public ApiStockOrderHistory getStockOrderAggregatedHistoryList(Long id,
+                                                                   Language language,
+                                                                   CustomUserDetails user,
+                                                                   boolean withDetails) throws ApiException {
 
         StockOrder stockOrder = fetchEntity(id, StockOrder.class);
+
+        // If requested details, we have to check if request user is enrolled in one of the connected companies
+        if (withDetails) {
+
+            if (user == null) {
+                throw new ApiException(ApiStatus.UNAUTHORIZED, "Request user is required!");
+            }
+
+            PermissionsUtil.checkUserIfConnectedWithProducts(fetchCompanyProducts(stockOrder.getCompany().getId()), user);
+        }
 
         ApiStockOrderHistory stockOrderHistory = new ApiStockOrderHistory();
 

@@ -234,7 +234,7 @@ public class StockOrderController {
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
     ) throws ApiException {
-        return new ApiResponse<>(stockOrderService.getStockOrderAggregatedHistoryList(id, language, true));
+        return new ApiResponse<>(stockOrderService.getStockOrderAggregatedHistoryList(id, language, authUser, true));
     }
 
 }

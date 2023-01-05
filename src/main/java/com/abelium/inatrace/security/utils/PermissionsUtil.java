@@ -20,14 +20,14 @@ public final class PermissionsUtil {
 
 	public static void checkUserIfCompanyEnrolled(List<CompanyUser> companyUsers, CustomUserDetails userToCheck) throws ApiException {
 		if (companyUsers.stream().noneMatch(cu -> cu.getUser().getId().equals(userToCheck.getUserId()))) {
-			throw new ApiException(ApiStatus.AUTH_ERROR, "Unknown user company!");
+			throw new ApiException(ApiStatus.UNAUTHORIZED, "Unknown user company!");
 		}
 	}
 
 	public static void checkUserIfCompanyOrSystemAdmin(List<CompanyUser> companyUsers, CustomUserDetails userToCheck) throws ApiException {
 		CompanyUser companyUser = companyUsers.stream()
 				.filter(cu -> cu.getUser().getId().equals(userToCheck.getUserId())).findAny()
-				.orElseThrow(() -> new ApiException(ApiStatus.AUTH_ERROR, "Unknown user company!"));
+				.orElseThrow(() -> new ApiException(ApiStatus.UNAUTHORIZED, "Unknown user company!"));
 
 		if (!UserRole.ADMIN.equals(userToCheck.getUserRole()) && !CompanyUserRole.ADMIN.equals(companyUser.getRole())) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "User doesn't have required permission!");
