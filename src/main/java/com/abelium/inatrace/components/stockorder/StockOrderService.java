@@ -1245,8 +1245,7 @@ public class StockOrderService extends BaseService {
 
         StockOrder stockOrder = fetchEntity(id, StockOrder.class);
 
-        PermissionsUtil.checkUserIfCompanyEnrolled(stockOrder.getCompany().getUsers(), user);
-        PermissionsUtil.checkUserIfCompanyOrSystemAdmin(stockOrder.getCompany().getUsers(), user);
+        PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(stockOrder.getCompany().getUsers(), user);
 
         em.remove(stockOrder);
     }

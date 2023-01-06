@@ -68,9 +68,10 @@ public class CompanyController {
 	@GetMapping("/profile/{id}/users")
 	@ApiOperation("Get all user for the company with the provided ID")
 	public ApiResponse<List<ApiCompanyUser>> getCompanyUsers(
-			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long id,
+            @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		return new ApiResponse<>(companyService.getCompanyUsers(id));
+		return new ApiResponse<>(companyService.getCompanyUsers(id, authUser));
 	}
 
     @PutMapping(value = "/profile")
@@ -96,8 +97,9 @@ public class CompanyController {
     @ApiOperation(value = "Get user customer by id")
     public ApiResponse<ApiUserCustomer> getUserCustomer(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @ApiParam(value = "User customer ID", required = true) @PathVariable("id") Long id) {
-        return new ApiResponse<>(companyService.getUserCustomer(id, authUser.getUserId()));
+            @Valid @ApiParam(value = "User customer ID", required = true) @PathVariable("id") Long id) throws ApiException {
+
+        return new ApiResponse<>(companyService.getUserCustomer(id, authUser));
     }
 
     @GetMapping(value = "/userCustomers/{companyId}/{type}")
@@ -106,9 +108,10 @@ public class CompanyController {
             @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
             @Valid @ApiParam(value = "Type of user customer (collector, farmer)") @PathVariable("type") UserCustomerType type,
-            @Valid ApiListFarmersRequest request) {
+            @Valid ApiListFarmersRequest request) throws ApiException {
+
         return new ApiPaginatedResponse<>(companyService.getUserCustomersForCompanyAndType(companyId, type, request,
-                authUser.getUserId()));
+                authUser));
     }
 
     @PostMapping(value = "/userCustomers/add/{companyId}")
@@ -151,9 +154,10 @@ public class CompanyController {
     @GetMapping(value = "/companyCustomers/{id}")
     @ApiOperation(value = "Get company customer by ID")
     public ApiResponse<ApiCompanyCustomer> getCompanyCustomer(
+            @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @ApiParam(value = "Company customer ID", required = true) @PathVariable("id") Long companyCustomerId
     ) throws ApiException {
-        return new ApiResponse<>(companyService.getCompanyCustomer(companyCustomerId));
+        return new ApiResponse<>(companyService.getCompanyCustomer(companyCustomerId, authUser));
     }
 
     @PostMapping(value = "/companyCustomers")
@@ -184,17 +188,19 @@ public class CompanyController {
     @GetMapping(value = "/associations/{id}")
     @ApiOperation(value = "Get list of associations for the selected company with given ID")
     public ApiPaginatedResponse<ApiCompanyListResponse> getAssociations(
+            @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long id,
-            @Valid ApiPaginatedRequest request) {
-        return new ApiPaginatedResponse<>(companyService.getAssociations(id, request));
+            @Valid ApiPaginatedRequest request) throws ApiException {
+        return new ApiPaginatedResponse<>(companyService.getAssociations(id, request, authUser));
     }
 
     @GetMapping(value = "/{id}/connected-companies")
-    @ApiOperation(value = "Get list of conneccted companies for the company with the given ID")
+    @ApiOperation(value = "Get list of connected companies for the company with the given ID")
     public ApiPaginatedResponse<ApiCompanyListResponse> getConnectedCompanies(
+            @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long id,
-            @Valid ApiPaginatedRequest request) {
-        return new ApiPaginatedResponse<>(companyService.getConnectedCompanies(id, request));
+            @Valid ApiPaginatedRequest request) throws ApiException {
+        return new ApiPaginatedResponse<>(companyService.getConnectedCompanies(id, request, authUser));
     }
 
     @PostMapping(value = "/userCustomers/import/farmers/{companyId}/{documentId}")

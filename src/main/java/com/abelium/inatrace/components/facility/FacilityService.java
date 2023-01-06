@@ -104,7 +104,7 @@ public class FacilityService extends BaseService {
 		}
 
 		// Create or update can be done only by company admin or system admin
-		PermissionsUtil.checkUserIfCompanyOrSystemAdmin(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(company.getUsers(), user);
 
 		entity.setIsCollectionFacility(apiFacility.getIsCollectionFacility());
 		entity.setIsPublic(apiFacility.getIsPublic());
@@ -178,7 +178,7 @@ public class FacilityService extends BaseService {
 		Facility facility = em.find(Facility.class, id);
 
 		// Deactivate/Activate can be done only by company admin or system admin
-		PermissionsUtil.checkUserIfCompanyOrSystemAdmin(facility.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(facility.getCompany().getUsers(), user);
 
 		facility.setIsDeactivated(deactivated);
 	}
@@ -189,7 +189,7 @@ public class FacilityService extends BaseService {
 		Facility facility = fetchFacility(id);
 
 		// Remove can be done only by company admin or system admin
-		PermissionsUtil.checkUserIfCompanyOrSystemAdmin(facility.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(facility.getCompany().getUsers(), user);
 
 		em.remove(facility);
 	}

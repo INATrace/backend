@@ -24,10 +24,27 @@ public final class PermissionsUtil {
 		}
 	}
 
-	public static void checkUserIfCompanyOrSystemAdmin(List<CompanyUser> companyUsers, CustomUserDetails userToCheck) throws ApiException {
-		CompanyUser companyUser = companyUsers.stream()
-				.filter(cu -> cu.getUser().getId().equals(userToCheck.getUserId())).findAny()
-				.orElseThrow(() -> new ApiException(ApiStatus.UNAUTHORIZED, "Unknown user company!"));
+	public static void checkUserIfCompanyEnrolledOrSystemAdmin(List<CompanyUser> companyUsers, CustomUserDetails userToCheck) throws ApiException {
+		if (!UserRole.ADMIN.equals(userToCheck.getUserRole()) && companyUsers.stream().noneMatch(cu -> cu.getUser().getId().equals(userToCheck.getUserId()))) {
+			throw new ApiException(ApiStatus.UNAUTHORIZED, "Unknown user company or not system admin!");
+		}
+	}
+
+	public static void checkUserIfCompanyAdminOrSystemAdmin(List<CompanyUser> companyUsers, CustomUserDetails userToCheck) throws ApiException {
+
+		if (UserRole.ADMIN.equals(userToCheck.getUserRole())) {
+			return;
+		}
+
+		CompanyUser companyUser = findCompanyUser(userToCheck.getUserId(), companyUsers);
+		if (!CompanyUserRole.ADMIN.equals(companyUser.getRole())) {
+			throw new ApiException(ApiStatus.UNAUTHORIZED, "User doesn't have required permission!");
+		}
+	}
+
+	public static void checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(List<CompanyUser> companyUsers, CustomUserDetails userToCheck) throws ApiException {
+
+		CompanyUser companyUser = findCompanyUser(userToCheck.getUserId(), companyUsers);
 
 		if (!UserRole.ADMIN.equals(userToCheck.getUserRole()) && !CompanyUserRole.ADMIN.equals(companyUser.getRole())) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "User doesn't have required permission!");
@@ -57,6 +74,12 @@ public final class PermissionsUtil {
 		if (!userIsAssociatedWithOneOfTheProducts) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "User doesn't have required permission!");
 		}
+	}
+
+	private static CompanyUser findCompanyUser(Long userId, List<CompanyUser> companyUsers) throws ApiException {
+		return companyUsers.stream()
+				.filter(cu -> cu.getUser().getId().equals(userId)).findAny()
+				.orElseThrow(() -> new ApiException(ApiStatus.UNAUTHORIZED, "Unknown user company!"));
 	}
 
 }

@@ -109,7 +109,7 @@ public class ProcessingActionService extends BaseService {
 		Company company = companyQueries.fetchCompany(apiProcessingAction.getCompany().getId());
 
 		// Check that request user is enrolled in owner company
-		PermissionsUtil.checkUserIfCompanyOrSystemAdmin(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(company.getUsers(), user);
 
 		// Set processing action owner company
 		entity.setCompany(company);
@@ -170,7 +170,7 @@ public class ProcessingActionService extends BaseService {
 
 		ProcessingAction processingAction = fetchProcessingAction(id);
 
-		PermissionsUtil.checkUserIfCompanyOrSystemAdmin(processingAction.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(processingAction.getCompany().getUsers(), user);
 
 		em.remove(processingAction);
 	}

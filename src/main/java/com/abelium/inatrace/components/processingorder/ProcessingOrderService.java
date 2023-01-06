@@ -437,7 +437,7 @@ public class ProcessingOrderService extends BaseService {
         ProcessingOrder entity = fetchEntity(id, ProcessingOrder.class);
 
         // Check if req. user is enrolled in owner company for this processing order
-        PermissionsUtil.checkUserIfCompanyOrSystemAdmin(entity.getProcessingAction().getCompany().getUsers(), user);
+        PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(entity.getProcessingAction().getCompany().getUsers(), user);
 
         // Remove connected transactions
         for (Transaction t: entity.getInputTransactions()) {
