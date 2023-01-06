@@ -51,6 +51,7 @@ public class ValueChainController {
 	}
 
 	@PutMapping
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Create or update value chain. If ID is provided, the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateValueChain(
 			@AuthenticationPrincipal CustomUserDetails authUser,
