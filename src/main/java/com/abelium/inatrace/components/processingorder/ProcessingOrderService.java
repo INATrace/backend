@@ -4,6 +4,7 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
+import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
 import com.abelium.inatrace.components.stockorder.StockOrderService;
@@ -40,18 +41,24 @@ public class ProcessingOrderService extends BaseService {
 
     private final TransactionService transactionService;
 
+    private final CompanyQueries companyQueries;
+
     @Autowired
-    public ProcessingOrderService(StockOrderService stockOrderService, TransactionService transactionService) {
+    public ProcessingOrderService(StockOrderService stockOrderService,
+                                  TransactionService transactionService,
+                                  CompanyQueries companyQueries) {
         this.stockOrderService = stockOrderService;
         this.transactionService = transactionService;
+        this.companyQueries = companyQueries;
     }
 
     public ApiProcessingOrder getProcessingOrder(Long id, CustomUserDetails authUser, Language language) throws ApiException {
 
         ProcessingOrder processingOrder = fetchEntity(id, ProcessingOrder.class);
 
-        // Check if request user is enrolled in processing order owner company
-        PermissionsUtil.checkUserIfCompanyEnrolled(processingOrder.getProcessingAction().getCompany().getUsers(),
+        // Check if request user is enrolled in one of the connected companies with the processing order owner company
+        PermissionsUtil.checkUserIfConnectedWithProducts(
+                companyQueries.fetchCompanyProducts(processingOrder.getProcessingAction().getCompany().getId()),
                 authUser);
 
         return ProcessingOrderMapper.toApiProcessingOrder(processingOrder, language);

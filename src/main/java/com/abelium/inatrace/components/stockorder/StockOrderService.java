@@ -36,7 +36,6 @@ import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
-import com.abelium.inatrace.db.entities.product.Product;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.db.entities.productorder.ProductOrder;
 import com.abelium.inatrace.db.entities.stockorder.*;
@@ -110,7 +109,7 @@ public class StockOrderService extends BaseService {
         StockOrder stockOrder = fetchEntity(id, StockOrder.class);
 
         // Check that the request user is form a company which is connected to the company that owns the quote order (or is a user of that company)
-        PermissionsUtil.checkUserIfConnectedWithProducts(fetchCompanyProducts(stockOrder.getCompany().getId()), user);
+        PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(stockOrder.getCompany().getId()), user);
 
         return StockOrderMapper.toApiStockOrder(stockOrder, user.getUserId(), language, withProcessingOrder);
     }
@@ -127,7 +126,7 @@ public class StockOrderService extends BaseService {
         // Get the owner company of the facility
         // Using this, we can get the company products and check if the user is enrolled in any of the connected companies
         Facility facility = facilityService.fetchFacility(queryRequest.facilityId);
-        PermissionsUtil.checkUserIfConnectedWithProducts(fetchCompanyProducts(facility.getCompany().getId()), user);
+        PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(facility.getCompany().getId()), user);
 
         return PaginationTools.createPaginatedResponse(em, request,
                 () -> stockOrderQueryObject(
@@ -632,7 +631,7 @@ public class StockOrderService extends BaseService {
                 throw new ApiException(ApiStatus.UNAUTHORIZED, "Request user is required!");
             }
 
-            PermissionsUtil.checkUserIfConnectedWithProducts(fetchCompanyProducts(stockOrder.getCompany().getId()), user);
+            PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(stockOrder.getCompany().getId()), user);
         }
 
         ApiStockOrderHistory stockOrderHistory = new ApiStockOrderHistory();
@@ -858,7 +857,7 @@ public class StockOrderService extends BaseService {
                                                        ProcessingOrder processingOrder) throws ApiException {
 
         // Check that the request user is form a company which is connected to the company that owns the quote order (or is a user of that company)
-        PermissionsUtil.checkUserIfConnectedWithProducts(fetchCompanyProducts(apiStockOrder.getCompany().getId()), user);
+        PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(apiStockOrder.getCompany().getId()), user);
 
         return createOrUpdateStockOrder(apiStockOrder, user, processingOrder, false);
     }
@@ -1356,16 +1355,6 @@ public class StockOrderService extends BaseService {
             entity.setQrCodeTag(UUID.randomUUID().toString());
             entity.setQrCodeTagFinalProduct(processingOrder.getProcessingAction().getQrCodeForFinalProduct());
         }
-    }
-
-    private List<Product> fetchCompanyProducts(Long companyId) throws ApiException {
-
-        Company company = companyQueries.fetchCompany(companyId);
-
-        TypedQuery<Product> companyProductsQuery = em.createNamedQuery("ProductCompany.getCompanyProductsWithAnyRole", Product.class);
-        companyProductsQuery.setParameter("companyId", company.getId());
-
-        return companyProductsQuery.getResultList();
     }
 
 }

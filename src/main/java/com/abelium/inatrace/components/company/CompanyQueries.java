@@ -7,6 +7,7 @@ import com.abelium.inatrace.components.company.api.ApiCompanyUser;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyTranslation;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
+import com.abelium.inatrace.db.entities.product.Product;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.CompanyStatus;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.torpedoquery.jpa.Torpedo;
 
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
@@ -98,6 +100,16 @@ public class CompanyQueries extends BaseService {
 		Torpedo.where(companyUser.getUser().getId()).eq(userId).
 				and(companyUser.getRole()).eq(CompanyUserRole.ADMIN);
 		return Torpedo.select(companyUser.getCompany().getId()).list(em);
+	}
+
+	public List<Product> fetchCompanyProducts(Long companyId) throws ApiException {
+
+		Company company = fetchCompany(companyId);
+
+		TypedQuery<Product> companyProductsQuery = em.createNamedQuery("ProductCompany.getCompanyProductsWithAnyRole", Product.class);
+		companyProductsQuery.setParameter("companyId", company.getId());
+
+		return companyProductsQuery.getResultList();
 	}
 
 }

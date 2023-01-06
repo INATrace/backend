@@ -40,18 +40,21 @@ public class TransactionService extends BaseService {
     /**
      * Return a ist of input transactions for provided stock order ID. Used in Quote orders.
      * @param stockOrderId Stock order ID.
-     * @return List of transacitons.
+     * @return List of transactions.
      */
-    public ApiPaginatedList<ApiTransaction> getStockOrderInputTransactions(Long stockOrderId) throws ApiException {
+    public ApiPaginatedList<ApiTransaction> getStockOrderInputTransactions(Long stockOrderId, CustomUserDetails user) throws ApiException {
 
         // Fetch the stock order
         StockOrder stockOrder = stockOrderService.fetchEntity(stockOrderId, StockOrder.class);
 
-        // Validate that stock order has processing order (if not proccessing order, there are no transactions)
+        // Validate that stock order has processing order (if not processing order, there are no transactions)
         ProcessingOrder processingOrder = stockOrder.getProcessingOrder();
         if (processingOrder == null) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "The Stock order with the provided ID has no Processing order");
         }
+
+        // Check that the request user is enrolled in the stock order owner company
+        PermissionsUtil.checkUserIfCompanyEnrolled(stockOrder.getCompany().getUsers(), user);
 
         return new ApiPaginatedList<>(
                 processingOrder.getInputTransactions().stream().map(TransactionMapper::toApiTransactionBase)

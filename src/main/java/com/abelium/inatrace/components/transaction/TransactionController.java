@@ -1,8 +1,9 @@
 package com.abelium.inatrace.components.transaction;
 
-import com.abelium.inatrace.api.*;
+import com.abelium.inatrace.api.ApiDefaultResponse;
+import com.abelium.inatrace.api.ApiPaginatedResponse;
+import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.transaction.api.ApiTransaction;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
@@ -33,9 +34,10 @@ public class TransactionController {
 	@GetMapping("list/input/stock-order/{stockOrderId}")
 	@ApiOperation("Get a paginated list of input transactions for provided stock order ID.")
 	public ApiPaginatedResponse<ApiTransaction> getStockOrderInputTransactions(
-			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("stockOrderId") Long stockOrderId) throws ApiException {
+			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("stockOrderId") Long stockOrderId,
+			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		return new ApiPaginatedResponse<>(transactionService.getStockOrderInputTransactions(stockOrderId));
+		return new ApiPaginatedResponse<>(transactionService.getStockOrderInputTransactions(stockOrderId, authUser));
 	}
 
 	@PutMapping("/{id}/approve")
