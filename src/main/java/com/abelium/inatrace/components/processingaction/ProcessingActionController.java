@@ -29,44 +29,39 @@ public class ProcessingActionController {
 	public ProcessingActionController(ProcessingActionService processingActionService) {
 		this.processingActionService = processingActionService;
 	}
-
-	@GetMapping("list")
-	@ApiOperation("Get a paginated list of processing actions.")
-	public ApiPaginatedResponse<ApiProcessingAction> getProcessingActionList(
-			@Valid ApiPaginatedRequest request,
-			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
-
-		return new ApiPaginatedResponse<>(processingActionService.listProcessingActions(request, language));
-	}
 	
 	@GetMapping("list/company/{id}")
 	@ApiOperation("Get a list of processing actions by company ID.")
 	public ApiPaginatedResponse<ApiProcessingAction> listProcessingActionsByCompany(
-		@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
-		@Valid @ApiParam(value = "Processing action type") @RequestParam(value = "actionType", required = false)
-				ProcessingActionType actionType,
-		@Valid @ApiParam(value = "Only final product actions") @RequestParam(value = "onlyFinalProducts", required = false) Boolean onlyFinalProducts,
-		@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
-		@Valid ApiPaginatedRequest request) {
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @ApiParam(value = "Processing action type") @RequestParam(value = "actionType", required = false) ProcessingActionType actionType,
+			@Valid @ApiParam(value = "Only final product actions") @RequestParam(value = "onlyFinalProducts", required = false) Boolean onlyFinalProducts,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
+			@Valid ApiPaginatedRequest request) throws ApiException {
 
-		return new ApiPaginatedResponse<>(processingActionService.listProcessingActionsByCompany(companyId, language, request, actionType, onlyFinalProducts));
+		return new ApiPaginatedResponse<>(
+				processingActionService.listProcessingActionsByCompany(companyId, authUser, language, request, actionType,
+						onlyFinalProducts));
 	}
 	
 	@GetMapping("{id}")
 	@ApiOperation("Get a single processing action with the provided ID.")
 	public ApiResponse<ApiProcessingAction> getProcessingAction(
+			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long id,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-		return new ApiResponse<>(processingActionService.getProcessingAction(id, language));
+		return new ApiResponse<>(processingActionService.getProcessingAction(id, authUser, language));
 	}
 
 	@GetMapping("{id}/detail")
 	@ApiOperation("Get a single processing action by the provided ID with all translations.")
 	public ApiResponse<ApiProcessingAction> getProcessingActionDetail(
+			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long id,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
-		return new ApiResponse<>(processingActionService.getProcessingActionDetail(id, language));
+		return new ApiResponse<>(processingActionService.getProcessingActionDetail(id, authUser, language));
 	}
 
 	@PutMapping
@@ -87,4 +82,5 @@ public class ProcessingActionController {
 		processingActionService.deleteProcessingAction(id, authUser);
 		return new ApiDefaultResponse();
 	}
+
 }
