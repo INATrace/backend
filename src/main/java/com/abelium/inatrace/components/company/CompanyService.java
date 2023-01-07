@@ -181,7 +181,7 @@ public class CompanyService extends BaseService {
 
 		// Validate that company exists with the provided ID and that request user is enrolled in this company
 		Company company = companyQueries.fetchCompany(id);
-		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(company.getUsers(), user);
 
 		return companyQueries.fetchUsersForCompany(id);
 	}
