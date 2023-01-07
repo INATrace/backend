@@ -67,8 +67,16 @@ public class FacilityService extends BaseService {
 
 		Facility facility = fetchFacility(id);
 
-		// Check if req. user is enrolled in facility's company
-		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(facility.getCompany().getUsers(), user);
+		// If facility is public (facility that sells semi-products or final products) check that user is enrolled in one of the connected companies
+		if (facility.getIsPublic()) {
+
+			PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(facility.getCompany().getId()), user);
+
+		} else {
+
+			// Check if req. user is enrolled in facility's company
+			PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(facility.getCompany().getUsers(), user);
+		}
 
 		return FacilityMapper.toApiFacility(facility, language);
 	}
