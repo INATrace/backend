@@ -24,7 +24,6 @@ import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
-import com.abelium.inatrace.types.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -152,10 +151,17 @@ public class PaymentService extends BaseService {
 
 	public ApiPaginatedList<ApiBulkPayment> listBulkPayments(ApiPaginatedRequest request,
 															 PaymentQueryRequest queryRequest,
-															 Long userId) {
+															 CustomUserDetails user) throws ApiException {
+
+		if (queryRequest.companyId == null) {
+			throw new ApiException(ApiStatus.UNAUTHORIZED, "Company ID is required");
+		}
+
+		Company company = companyQueries.fetchCompany(queryRequest.companyId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> bulkPaymentQueryObject(
-				request, queryRequest), bulkPayment -> BulkPaymentMapper.toApiBulkPaymentBase(bulkPayment, userId));
+				request, queryRequest), bulkPayment -> BulkPaymentMapper.toApiBulkPaymentBase(bulkPayment, user.getUserId()));
 	}
 
 	private BulkPayment bulkPaymentQueryObject(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
@@ -189,6 +195,9 @@ public class PaymentService extends BaseService {
 
 		if (entity.getId() != null) {
 
+			// Check if the request user is enrolled in the owner company
+			PermissionsUtil.checkUserIfCompanyEnrolled(entity.getPayingCompany().getUsers(), user);
+
 			// Do not allow update of fields other than the payment status
 			// Also it is not allowed to set back the value to UNCONFIRMED
 			if (apiPayment.getPaymentStatus() == PaymentStatus.CONFIRMED) {
@@ -209,11 +218,9 @@ public class PaymentService extends BaseService {
 			}
 
 			StockOrder stockOrder = fetchEntity(apiPayment.getStockOrder().getId(), StockOrder.class);
-			if(
-					user.getUserRole() != UserRole.ADMIN &&
-					stockOrder.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
-				throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in paying company");
-			}
+
+			// Check that the request user is enrolled in the stock order owner company (the company that initiates the payment)
+			PermissionsUtil.checkUserIfCompanyEnrolled(stockOrder.getCompany().getUsers(), user);
 
 			if (stockOrder.getOrderType() != OrderType.PURCHASE_ORDER && stockOrder.getOrderType() != OrderType.GENERAL_ORDER) {
 				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Not a Purchase or Quote order");
@@ -297,7 +304,7 @@ public class PaymentService extends BaseService {
 	@Transactional
 	public ApiBaseEntity createBulkPayment(ApiBulkPayment apiBulkPayment, CustomUserDetails user) throws ApiException {
 
-		// Currently bulk-payments cannot be updated...
+		// Bulk-payments cannot be updated
 		if (apiBulkPayment.getId() != null) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Bulk payment cannot be updated!");
 		}
@@ -324,11 +331,9 @@ public class PaymentService extends BaseService {
 		}
 
 		Company payingCompany = fetchEntity(apiBulkPayment.getPayingCompany().getId(), Company.class);
-		if (
-				user.getUserRole() != UserRole.ADMIN &&
-				payingCompany.getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
-			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in paying company");
-		}
+
+		// Check that the request user is enrolled in the paying company (the company that initiates the payment)
+		PermissionsUtil.checkUserIfCompanyEnrolled(payingCompany.getUsers(), user);
 
 		BulkPayment entity = new BulkPayment();
 
@@ -382,12 +387,11 @@ public class PaymentService extends BaseService {
 
 	@Transactional
 	public void deletePayment(Long id, CustomUserDetails user) throws ApiException {
+
 		Payment payment = fetchEntity(id, Payment.class);
-		if (
-				user.getUserRole() != UserRole.ADMIN &&
-				payment.getPayingCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
-			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in payment's company");
-		}
+
+		// Check that the request user is enrolled in the paying company (the company that initiated the payment)
+		PermissionsUtil.checkUserIfCompanyEnrolled(payment.getPayingCompany().getUsers(), user);
 
 		User currentUser = userService.fetchUserById(user.getUserId());
 		StockOrder stockOrder = payment.getStockOrder();

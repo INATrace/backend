@@ -115,12 +115,12 @@ public class PaymentController {
 	public ApiPaginatedResponse<ApiBulkPayment> listBulkPaymentsByCompany(
 		@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
 		@AuthenticationPrincipal CustomUserDetails authUser,
-		@Valid ApiPaginatedRequest request) {
+		@Valid ApiPaginatedRequest request) throws ApiException {
 
 		return new ApiPaginatedResponse<>(paymentService.listBulkPayments(
 				request,
 				new PaymentQueryRequest(companyId),
-				authUser.getUserId())
+				authUser)
 		);
 	}
 
