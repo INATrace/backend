@@ -57,7 +57,7 @@ public class CommonCsvController {
 			@Valid @ApiParam(value = "Payment status") @RequestParam(value = "paymentStatus", required = false) PaymentStatus paymentStatus,
 			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
 			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
-			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws IOException {
+			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws IOException, ApiException {
 
 		request.limit = 500;
 		
@@ -75,7 +75,7 @@ public class CommonCsvController {
 					null,
 					null
 				), 
-				authUser.getUserId()
+				authUser
 			);
 		
 		List<ApiPayment> apiPayments = paginatedPayments.getItems();

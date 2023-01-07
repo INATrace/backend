@@ -7,8 +7,10 @@ import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
+import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.payment.api.ApiBulkPayment;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
+import com.abelium.inatrace.components.stockorder.StockOrderService;
 import com.abelium.inatrace.components.user.UserService;
 import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.Document;
@@ -18,6 +20,7 @@ import com.abelium.inatrace.db.entities.payment.*;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -43,29 +46,56 @@ public class PaymentService extends BaseService {
 
 	private final UserService userService;
 
+	private final CompanyQueries companyQueries;
+
+	private final StockOrderService stockOrderService;
+
 	@Autowired
-	public PaymentService(UserService userService) {
+	public PaymentService(UserService userService,
+						  CompanyQueries companyQueries,
+						  StockOrderService stockOrderService) {
 		this.userService = userService;
+		this.companyQueries = companyQueries;
+		this.stockOrderService = stockOrderService;
 	}
 
 	public ApiPayment getPayment(Long id, CustomUserDetails user) throws ApiException {
+
 		Payment payment = fetchEntity(id, Payment.class);
-		if (
-				user.getUserRole() != UserRole.ADMIN &&
-				payment.getPayingCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
-			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in payment's company");
-		}
+
+		// Check that the request user is enrolled in the paying company (owner company)
+		PermissionsUtil.checkUserIfCompanyEnrolled(payment.getPayingCompany().getUsers(), user);
 
 		return PaymentMapper.toApiPayment(payment, user.getUserId());
 	}
 
-	public ApiBulkPayment getBulkPayment(Long id, Long userId) throws ApiException {
-		return BulkPaymentMapper.toApiBulkPayment(fetchEntity(id, BulkPayment.class), userId);
+	public ApiBulkPayment getBulkPayment(Long id, CustomUserDetails user) throws ApiException {
+
+		BulkPayment bulkPayment = fetchEntity(id, BulkPayment.class);
+
+		// Check that the request user is enrolled in the paying company (bulk payment owner company)
+		PermissionsUtil.checkUserIfCompanyEnrolled(bulkPayment.getPayingCompany().getUsers(), user);
+
+		return BulkPaymentMapper.toApiBulkPayment(bulkPayment, user.getUserId());
 	}
 
-	public ApiPaginatedList<ApiPayment> getPaymentList(ApiPaginatedRequest request, PaymentQueryRequest queryRequest, Long userId) {
+	public ApiPaginatedList<ApiPayment> getPaymentList(ApiPaginatedRequest request, PaymentQueryRequest queryRequest, CustomUserDetails user) throws ApiException {
+
+		if (queryRequest.companyId == null && queryRequest.purchaseId == null) {
+			throw new ApiException(ApiStatus.UNAUTHORIZED, "Company ID or Purchase ID is required!");
+		}
+
+		if (queryRequest.companyId != null) {
+			Company company = companyQueries.fetchCompany(queryRequest.companyId);
+			PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+		} else {
+			// Check that the stock order exists and also validate that request user is enrolled in stock order owner company
+			StockOrder stockOrder = stockOrderService.fetchEntity(queryRequest.purchaseId, StockOrder.class);
+			PermissionsUtil.checkUserIfCompanyEnrolled(stockOrder.getCompany().getUsers(), user);
+		}
+
 		return PaginationTools.createPaginatedResponse(em, request, () -> paymentQueryObject(
-				request, queryRequest), payment -> PaymentMapper.toApiPayment(payment, userId));
+				request, queryRequest), payment -> PaymentMapper.toApiPayment(payment, user.getUserId()));
 	}
 
 	private Payment paymentQueryObject(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
