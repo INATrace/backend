@@ -6,6 +6,7 @@ import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasure
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -42,6 +43,7 @@ public class MeasureUnitTypeController {
 	}
 
 	@PutMapping
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Create or update measurement unit type. If ID is provided, the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateMeasurementUnitType(@Valid @RequestBody ApiMeasureUnitType apiMeasureUnitType) throws ApiException {
 
@@ -49,6 +51,7 @@ public class MeasureUnitTypeController {
 	}
 
 	@DeleteMapping("{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Deletes a measurement with the provided ID.")
 	public ApiDefaultResponse deleteMeasurementUnitType(
 			@Valid @ApiParam(value = "Measurement unit type ID", required = true) @PathVariable("id") Long id) throws ApiException {

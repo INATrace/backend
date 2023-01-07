@@ -14,6 +14,8 @@ import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
 import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
+import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
@@ -38,18 +40,21 @@ public class TransactionService extends BaseService {
     /**
      * Return a ist of input transactions for provided stock order ID. Used in Quote orders.
      * @param stockOrderId Stock order ID.
-     * @return List of transacitons.
+     * @return List of transactions.
      */
-    public ApiPaginatedList<ApiTransaction> getStockOrderInputTransactions(Long stockOrderId) throws ApiException {
+    public ApiPaginatedList<ApiTransaction> getStockOrderInputTransactions(Long stockOrderId, CustomUserDetails user) throws ApiException {
 
         // Fetch the stock order
         StockOrder stockOrder = stockOrderService.fetchEntity(stockOrderId, StockOrder.class);
 
-        // Validate that stock order has processing order (if not proccessing order, there are no transactions)
+        // Validate that stock order has processing order (if not processing order, there are no transactions)
         ProcessingOrder processingOrder = stockOrder.getProcessingOrder();
         if (processingOrder == null) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "The Stock order with the provided ID has no Processing order");
         }
+
+        // Check that the request user is enrolled in the stock order owner company
+        PermissionsUtil.checkUserIfCompanyEnrolled(stockOrder.getCompany().getUsers(), user);
 
         return new ApiPaginatedList<>(
                 processingOrder.getInputTransactions().stream().map(TransactionMapper::toApiTransactionBase)
@@ -96,11 +101,13 @@ public class TransactionService extends BaseService {
     }
 
     @Transactional
-    public void deleteTransaction(Long id, Long userId, Language language) throws ApiException {
+    public void deleteTransaction(Long id, CustomUserDetails user, Language language) throws ApiException {
 
         Transaction transaction = fetchEntity(id, Transaction.class);
 
-        revertQuantities(transaction, userId, language);
+        PermissionsUtil.checkUserIfCompanyEnrolled(transaction.getCompany().getUsers(), user);
+
+        revertQuantities(transaction, user, language);
 
         // Only PENDING transactions can be deleted within QUOTE order
         if (transaction.getStatus() != TransactionStatus.PENDING
@@ -114,8 +121,17 @@ public class TransactionService extends BaseService {
     }
 
     @Transactional
-    public void approveTransaction(Long id, Long userId, Language language) throws ApiException {
+    public void approveTransaction(Long id, CustomUserDetails user, Language language) throws ApiException {
+
         Transaction transaction = fetchEntity(id, Transaction.class);
+
+        if (transaction.getTargetProcessingOrder() == null || transaction.getTargetProcessingOrder().getTargetStockOrders().isEmpty()) {
+            return;
+        }
+
+        // Approve transaction can ben called by quote order owner company (check that request user is enrolled in quote order owner company)
+        PermissionsUtil.checkUserIfCompanyEnrolled(
+                transaction.getTargetProcessingOrder().getTargetStockOrders().get(0).getCompany().getUsers(), user);
 
         if (transaction.getStatus() != TransactionStatus.PENDING) {
             throw new ApiException(ApiStatus.VALIDATION_ERROR, "Only PENDING transactions can be approved.");
@@ -124,23 +140,26 @@ public class TransactionService extends BaseService {
         transaction.setStatus(TransactionStatus.EXECUTED);
 
         // Update quote order (to refresh quantities)
-        if (transaction.getTargetProcessingOrder() != null && !transaction.getTargetProcessingOrder().getTargetStockOrders().isEmpty()) {
-
-            ProcessingOrder processingOrder = transaction.getTargetProcessingOrder();
-            StockOrder quoteStockOrder = processingOrder.getTargetStockOrders().get(0);
-            quoteStockOrder.setAvailableQuantity(quoteStockOrder.getAvailableQuantity().add(transaction.getInputQuantity()));
-            stockOrderService.createOrUpdateStockOrder(
-                    StockOrderMapper.toApiStockOrder(quoteStockOrder, userId, language),
-                    userId,
-                    processingOrder
-            );
-        }
+        ProcessingOrder processingOrder = transaction.getTargetProcessingOrder();
+        StockOrder quoteStockOrder = processingOrder.getTargetStockOrders().get(0);
+        quoteStockOrder.setAvailableQuantity(
+                quoteStockOrder.getAvailableQuantity().add(transaction.getInputQuantity()));
+        stockOrderService.createOrUpdateStockOrder(
+                StockOrderMapper.toApiStockOrder(quoteStockOrder, user.getUserId(), language), user, processingOrder);
     }
 
     @Transactional
-    public void rejectTransaction(ApiTransaction apiTransaction, Long userId, Language language) throws ApiException {
+    public void rejectTransaction(ApiTransaction apiTransaction, CustomUserDetails user, Language language) throws ApiException {
 
         Transaction transaction = fetchEntity(apiTransaction.getId(), Transaction.class);
+
+        if (transaction.getTargetProcessingOrder() == null || transaction.getTargetProcessingOrder().getTargetStockOrders().isEmpty()) {
+            return;
+        }
+
+        // Reject transaction can ben called by quote order owner company (check that request user is enrolled in quote order owner company)
+        PermissionsUtil.checkUserIfCompanyEnrolled(
+                transaction.getTargetProcessingOrder().getTargetStockOrders().get(0).getCompany().getUsers(), user);
 
         if (transaction.getStatus() != TransactionStatus.PENDING) {
             throw new ApiException(ApiStatus.VALIDATION_ERROR, "Only PENDING transactions can be rejected.");
@@ -153,21 +172,20 @@ public class TransactionService extends BaseService {
         transaction.setRejectComment(apiTransaction.getRejectComment());
 
         // Revert quantities but do NOT delete the transaction!
-        revertQuantities(transaction, userId, language);
+        revertQuantities(transaction, user, language, false);
 
         // Balance fulfilled quantity in quote stock order
-        if (transaction.getTargetProcessingOrder() != null && !transaction.getTargetProcessingOrder().getTargetStockOrders().isEmpty()) {
-            ProcessingOrder processingOrder = transaction.getTargetProcessingOrder();
-            StockOrder quoteStockOrder = processingOrder.getTargetStockOrders().get(0);
-            stockOrderService.createOrUpdateStockOrder(
-                    StockOrderMapper.toApiStockOrder(quoteStockOrder, userId, language),
-                    userId,
-                    processingOrder
-            );
-        }
+        ProcessingOrder processingOrder = transaction.getTargetProcessingOrder();
+        StockOrder quoteStockOrder = processingOrder.getTargetStockOrders().get(0);
+        stockOrderService.createOrUpdateStockOrder(
+                StockOrderMapper.toApiStockOrder(quoteStockOrder, user.getUserId(), language), user, processingOrder);
     }
 
-    private void revertQuantities(Transaction transaction, Long userId, Language language) throws ApiException {
+    private void revertQuantities(Transaction transaction, CustomUserDetails user, Language language) throws ApiException {
+        revertQuantities(transaction, user, language, true);
+    }
+
+    private void revertQuantities(Transaction transaction, CustomUserDetails user, Language language, boolean checkCompanyEnrolment) throws ApiException {
 
         StockOrder sourceStockOrder = transaction.getSourceStockOrder();
         StockOrder targetStockOrder = transaction.getTargetStockOrder();
@@ -176,9 +194,10 @@ public class TransactionService extends BaseService {
         if (sourceStockOrder != null) {
             sourceStockOrder.setAvailableQuantity(sourceStockOrder.getAvailableQuantity().add(transaction.getInputQuantity()));
             stockOrderService.createOrUpdateStockOrder(
-                    StockOrderMapper.toApiStockOrder(sourceStockOrder, userId, language),
-                    userId,
-                    null
+                    StockOrderMapper.toApiStockOrder(sourceStockOrder, user.getUserId(), language),
+                    user,
+                    null,
+                    checkCompanyEnrolment
             );
         }
 
@@ -186,8 +205,8 @@ public class TransactionService extends BaseService {
         if (!transaction.getIsProcessing() && targetStockOrder != null) {
             targetStockOrder.setFulfilledQuantity(targetStockOrder.getFulfilledQuantity().subtract(transaction.getOutputQuantity()));
             stockOrderService.createOrUpdateStockOrder(
-                    StockOrderMapper.toApiStockOrder(targetStockOrder, userId, language),
-                    userId,
+                    StockOrderMapper.toApiStockOrder(targetStockOrder, user.getUserId(), language),
+                    user,
                     null
             );
         }

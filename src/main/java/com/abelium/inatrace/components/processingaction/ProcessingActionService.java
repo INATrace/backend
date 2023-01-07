@@ -19,6 +19,8 @@ import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.processingaction.*;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
+import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
@@ -30,9 +32,7 @@ import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
-import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -75,41 +75,28 @@ public class ProcessingActionService extends BaseService {
 		this.facilityService = facilityService;
 	}
 
-	public ApiPaginatedList<ApiProcessingAction> listProcessingActions(ApiPaginatedRequest request, Language language) {
-
-		TypedQuery<ProcessingAction> processingActionsQuery = 
-				em.createNamedQuery("ProcessingAction.listProcessingActions", ProcessingAction.class)
-					.setParameter("language", language)
-					.setFirstResult(request.getOffset())
-					.setMaxResults(request.getLimit());
-
-		List<ProcessingAction> processingActions = processingActionsQuery.getResultList();
-
-		Long count = em.createNamedQuery("ProcessingAction.countProcessingActions", Long.class)
-			.setParameter("language", language)
-			.getSingleResult();
-
-		return new ApiPaginatedList<>(
-			processingActions
-				.stream()
-				.map(processingAction -> ProcessingActionMapper.toApiProcessingAction(processingAction, language))
-				.collect(Collectors.toList()), count);
-	}
-
-	public ApiProcessingAction getProcessingAction(Long id, Language language) throws ApiException {
+	public ApiProcessingAction getProcessingAction(Long id, CustomUserDetails user, Language language) throws ApiException {
 		
 		ProcessingAction processingAction = fetchProcessingAction(id);
+
+		// The request user should be enrolled in the processing action owner company
+		PermissionsUtil.checkUserIfCompanyEnrolled(processingAction.getCompany().getUsers(), user);
+
 		return ProcessingActionMapper.toApiProcessingAction(processingAction, language);
 	}
 
-	public ApiProcessingAction getProcessingActionDetail(Long id, Language language) throws ApiException {
+	public ApiProcessingAction getProcessingActionDetail(Long id, CustomUserDetails user, Language language) throws ApiException {
 
 		ProcessingAction processingAction = fetchProcessingAction(id);
+
+		// The request user should be enrolled in the processing action owner company
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(processingAction.getCompany().getUsers(), user);
+
 		return ProcessingActionMapper.toApiProcessingActionDetail(processingAction, language);
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdateProcessingAction(ApiProcessingAction apiProcessingAction) throws ApiException {
+	public ApiBaseEntity createOrUpdateProcessingAction(ApiProcessingAction apiProcessingAction, CustomUserDetails user) throws ApiException {
 
 		ProcessingAction entity = apiProcessingAction.getId() != null
 				? fetchProcessingAction(apiProcessingAction.getId())
@@ -117,6 +104,15 @@ public class ProcessingActionService extends BaseService {
 
 		// Validate Processing action data
 		validateProcessingAction(apiProcessingAction);
+
+		// Fetch owner company
+		Company company = companyQueries.fetchCompany(apiProcessingAction.getCompany().getId());
+
+		// Check that request user is enrolled in owner company
+		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(company.getUsers(), user);
+
+		// Set processing action owner company
+		entity.setCompany(company);
 
 		// Set the value chain
 		entity.setValueChain(valueChainService.fetchValueChain(apiProcessingAction.getValueChain().getId()));
@@ -136,11 +132,6 @@ public class ProcessingActionService extends BaseService {
 			entity.setFinalProductAction(BooleanUtils.toBooleanDefaultIfNull(apiProcessingAction.getFinalProductAction(), false));
 		} else {
 			entity.setFinalProductAction(Boolean.FALSE);
-		}
-		
-		Company company = companyQueries.fetchCompany(apiProcessingAction.getCompany().getId());
-		if (company != null) {
-			entity.setCompany(company);
 		}
 
 		// Set semi-products and final products (depending on the Processing action type)
@@ -175,9 +166,12 @@ public class ProcessingActionService extends BaseService {
 	}
 
 	@Transactional
-	public void deleteProcessingAction(Long id) throws ApiException {
+	public void deleteProcessingAction(Long id, CustomUserDetails user) throws ApiException {
 
 		ProcessingAction processingAction = fetchProcessingAction(id);
+
+		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(processingAction.getCompany().getUsers(), user);
+
 		em.remove(processingAction);
 	}
 
@@ -190,10 +184,16 @@ public class ProcessingActionService extends BaseService {
 		return processingAction;
 	}
 	
-	public ApiPaginatedList<ApiProcessingAction> listProcessingActionsByCompany(Long companyId, Language language,
+	public ApiPaginatedList<ApiProcessingAction> listProcessingActionsByCompany(Long companyId,
+																				CustomUserDetails user,
+	                                                                            Language language,
 	                                                                            ApiPaginatedRequest request,
 	                                                                            ProcessingActionType actionType,
-	                                                                            Boolean onlyFinalProducts) {
+	                                                                            Boolean onlyFinalProducts) throws ApiException {
+
+		// Check that request user is company enrolled
+		Company company = companyQueries.fetchCompany(companyId);
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(company.getUsers(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request, () ->
 						listProcessingActionsByCompanyQuery(companyId, language, actionType, onlyFinalProducts),
@@ -240,6 +240,11 @@ public class ProcessingActionService extends BaseService {
 		// Validate action type
 		if (apiProcessingAction.getType() == null) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Action type is required");
+		}
+
+		// Validate company
+		if (apiProcessingAction.getCompany() == null || apiProcessingAction.getCompany().getId() == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Company is required");
 		}
 
 		// Validate that estimated quantity is not provided if we don't have processing action type 'PROCESSING'

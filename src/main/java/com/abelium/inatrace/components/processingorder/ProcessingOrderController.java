@@ -28,17 +28,10 @@ public class ProcessingOrderController {
     @ApiOperation("Get a single processing order with the provided ID.")
     public ApiResponse<ApiProcessingOrder> getProcessingOrder(
             @Valid @ApiParam(value = "ProcessingOrder ID", required = true) @PathVariable("id") Long id,
+            @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-        return new ApiResponse<>(processingOrderService.getProcessingOrder(id, language));
-    }
-
-    @GetMapping("/list")
-    @ApiOperation("Get a paginated list of processing orders.")
-    public ApiPaginatedResponse<ApiProcessingOrder> getProcessingOrder(
-            @Valid ApiPaginatedRequest request,
-            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
-        return new ApiPaginatedResponse<>(processingOrderService.getProcessingOrderList(request, language));
+        return new ApiResponse<>(processingOrderService.getProcessingOrder(id, authUser, language));
     }
 
     @PutMapping
@@ -48,15 +41,17 @@ public class ProcessingOrderController {
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-        return new ApiResponse<>(processingOrderService.createOrUpdateProcessingOrder(apiProcessingOrder, authUser.getUserId(), language));
+        return new ApiResponse<>(processingOrderService.createOrUpdateProcessingOrder(apiProcessingOrder, authUser, language));
     }
 
     @DeleteMapping("{id}")
     @ApiOperation("Deletes a processing order with the provided ID.")
     public ApiDefaultResponse deleteProcessingOrder(
-            @Valid @ApiParam(value = "ProcessingOrder ID", required = true) @PathVariable("id") Long id) throws ApiException {
+            @Valid @ApiParam(value = "ProcessingOrder ID", required = true) @PathVariable("id") Long id,
+            @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-        processingOrderService.deleteProcessingOrder(id);
+        processingOrderService.deleteProcessingOrder(id, authUser);
         return new ApiDefaultResponse();
     }
+
 }

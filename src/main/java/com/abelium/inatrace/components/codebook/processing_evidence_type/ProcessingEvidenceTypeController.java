@@ -7,6 +7,7 @@ import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -56,6 +57,7 @@ public class ProcessingEvidenceTypeController {
 	}
 
 	@PutMapping
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Create or update processing evidence type. If ID is provided, the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateProcessingEvidenceType(
 			@Valid @RequestBody ApiProcessingEvidenceType apiProcessingEvidenceType) throws ApiException {
@@ -65,6 +67,7 @@ public class ProcessingEvidenceTypeController {
 	}
 
 	@DeleteMapping("{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Deletes a processing evidence type with the provided ID.")
 	public ApiDefaultResponse deleteProcessingEvidenceType(
 			@Valid @ApiParam(value = "Processing evidence type ID", required = true) @PathVariable("id") Long id) throws ApiException {

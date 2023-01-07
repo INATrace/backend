@@ -13,6 +13,7 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
 import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.company.CompanyApiTools;
+import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.currencies.CurrencyService;
 import com.abelium.inatrace.components.facility.FacilityService;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
@@ -30,6 +31,7 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCertification;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
+import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.payment.Payment;
 import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
@@ -40,6 +42,8 @@ import com.abelium.inatrace.db.entities.stockorder.*;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
+import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -81,34 +85,84 @@ public class StockOrderService extends BaseService {
 
     private final CurrencyService currencyService;
 
+    private final CompanyQueries companyQueries;
+
     @Autowired
     public StockOrderService(FacilityService facilityService,
                              ProcessingEvidenceFieldService procEvidenceFieldService,
                              ProcessingEvidenceTypeService procEvidenceTypeService,
                              SemiProductService semiProductService,
                              FinalProductService finalProductService,
-                             CurrencyService currencyService) {
+                             CurrencyService currencyService,
+                             CompanyQueries companyQueries) {
         this.facilityService = facilityService;
         this.procEvidenceFieldService = procEvidenceFieldService;
         this.procEvidenceTypeService = procEvidenceTypeService;
         this.semiProductService = semiProductService;
         this.finalProductService = finalProductService;
         this.currencyService = currencyService;
+        this.companyQueries = companyQueries;
     }
 
-    public ApiStockOrder getStockOrder(long id, Long userId, Language language, Boolean withProcessingOrder) throws ApiException {
-        return StockOrderMapper.toApiStockOrder(fetchEntity(id, StockOrder.class), userId, language, withProcessingOrder);
+    public ApiStockOrder getStockOrder(long id, CustomUserDetails user, Language language, Boolean withProcessingOrder) throws ApiException {
+
+        StockOrder stockOrder = fetchEntity(id, StockOrder.class);
+
+        // Check that the request user is form a company which is connected to the company that owns the quote order (or is a user of that company)
+        PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(stockOrder.getCompany().getId()), user);
+
+        return StockOrderMapper.toApiStockOrder(stockOrder, user.getUserId(), language, withProcessingOrder);
     }
 
-    public ApiPaginatedList<ApiStockOrder> getStockOrderList(ApiPaginatedRequest request,
-                                                             StockOrderQueryRequest queryRequest,
-                                                             Long userId,
-                                                             Language language) {
+    public ApiPaginatedList<ApiStockOrder> getAvailableStockOrderListForFacility(ApiPaginatedRequest request,
+                                                                                 StockOrderQueryRequest queryRequest,
+                                                                                 CustomUserDetails user,
+                                                                                 Language language) throws ApiException {
+
+        if (queryRequest.facilityId == null) {
+            throw new ApiException(ApiStatus.UNAUTHORIZED, "Facility ID should be provided!");
+        }
+
+        // Get the owner company of the facility
+        // Using this, we can get the company products and check if the user is enrolled in any of the connected companies
+        Facility facility = facilityService.fetchFacility(queryRequest.facilityId);
+        PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(facility.getCompany().getId()), user);
+
         return PaginationTools.createPaginatedResponse(em, request,
                 () -> stockOrderQueryObject(
                         request,
                         queryRequest
-                ), stockOrder -> StockOrderMapper.toApiStockOrder(stockOrder, userId, language));
+                ), stockOrder -> StockOrderMapper.toApiStockOrder(stockOrder, user.getUserId(), language));
+    }
+
+    public ApiPaginatedList<ApiStockOrder> getStockOrderListForCompany(ApiPaginatedRequest request,
+                                                             StockOrderQueryRequest queryRequest,
+                                                             CustomUserDetails user,
+                                                             Language language) throws ApiException {
+
+        if (queryRequest.companyId == null && queryRequest.quoteCompanyId == null && queryRequest.facilityId == null) {
+            throw new ApiException(ApiStatus.UNAUTHORIZED, "Company ID or Facility ID should be provided!");
+        }
+
+        // If company or quote company ID is provided, validate that the request user is enrolled in this company
+        if (queryRequest.companyId != null) {
+            Company company = companyQueries.fetchCompany(queryRequest.companyId);
+            PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+        } else if (queryRequest.quoteCompanyId != null) {
+            Company company = companyQueries.fetchCompany(queryRequest.quoteCompanyId);
+            PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+        } else {
+
+            // If company ID is not provided, fetch the facility's company and validate user company enrollment
+            Facility facility = facilityService.fetchFacility(queryRequest.facilityId);
+            PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
+        }
+
+        return PaginationTools.createPaginatedResponse(em, request,
+                () -> stockOrderQueryObject(
+                        request,
+                        queryRequest
+                ), stockOrder -> StockOrderMapper.toApiStockOrder(stockOrder, user.getUserId(), language));
     }
 
     private StockOrder stockOrderQueryObject(ApiPaginatedRequest request,
@@ -287,7 +341,7 @@ public class StockOrderService extends BaseService {
                 Set<Long> participatingCompaniesIds = new HashSet<>();
 
                 // Get the history for the selected Stock order
-                ApiStockOrderHistory stockOrderHistory = getStockOrderAggregatedHistoryList(topLevelStockOrder.getId(), language, false);
+                ApiStockOrderHistory stockOrderHistory = getStockOrderAggregatedHistoryList(topLevelStockOrder.getId(), language, null, false);
 
                 // Map the Stock order history timeline to the public QR code tag data
                 historyTimeline.setItems(stockOrderHistory.getTimelineItems()
@@ -563,9 +617,22 @@ public class StockOrderService extends BaseService {
      * @param language User selected language.
      * @param withDetails Should the response contain Stock and Processing order details.
      */
-    public ApiStockOrderHistory getStockOrderAggregatedHistoryList(Long id, Language language, boolean withDetails) throws ApiException {
+    public ApiStockOrderHistory getStockOrderAggregatedHistoryList(Long id,
+                                                                   Language language,
+                                                                   CustomUserDetails user,
+                                                                   boolean withDetails) throws ApiException {
 
         StockOrder stockOrder = fetchEntity(id, StockOrder.class);
+
+        // If requested details, we have to check if request user is enrolled in one of the connected companies
+        if (withDetails) {
+
+            if (user == null) {
+                throw new ApiException(ApiStatus.UNAUTHORIZED, "Request user is required!");
+            }
+
+            PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(stockOrder.getCompany().getId()), user);
+        }
 
         ApiStockOrderHistory stockOrderHistory = new ApiStockOrderHistory();
 
@@ -713,7 +780,7 @@ public class StockOrderService extends BaseService {
     }
 
     @Transactional
-    public ApiPurchaseOrder createPurchaseBulkOrder(ApiPurchaseOrder apiPurchaseOrder, Long userId) throws ApiException {
+    public ApiPurchaseOrder createPurchaseBulkOrder(ApiPurchaseOrder apiPurchaseOrder, CustomUserDetails user) throws ApiException {
 
         // Validation
         if (apiPurchaseOrder == null) {
@@ -722,6 +789,12 @@ public class StockOrderService extends BaseService {
         if (apiPurchaseOrder.getFarmers() == null || apiPurchaseOrder.getFarmers().isEmpty()){
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Farmers needs to be provided!");
         }
+        if (apiPurchaseOrder.getFacility() == null) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "Facility needs to be provided!");
+        }
+
+        Facility facility = facilityService.fetchFacility(apiPurchaseOrder.getFacility().id);
+        PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
 
         // Update stocks of type Purchase, one by one
         for (ApiPurchaseOrderFarmer farmer : apiPurchaseOrder.getFarmers()) {
@@ -730,7 +803,7 @@ public class StockOrderService extends BaseService {
             ApiStockOrder apiStockOrder = convertPurchaseOrderFarmerToStockOrder(apiPurchaseOrder, farmer);
 
             // write to db
-            ApiBaseEntity apiBaseEntity = createOrUpdateStockOrder(apiStockOrder, userId, null);
+            ApiBaseEntity apiBaseEntity = createOrUpdateStockOrder(apiStockOrder, user, null);
 
             // set Id in response
             farmer.setId(apiBaseEntity.getId());
@@ -779,17 +852,38 @@ public class StockOrderService extends BaseService {
     }
 
     @Transactional
-    public ApiBaseEntity createOrUpdateStockOrder(ApiStockOrder apiStockOrder, Long userId, ProcessingOrder processingOrder) throws ApiException {
+    public ApiBaseEntity createOrUpdateQuoteStockOrder(ApiStockOrder apiStockOrder,
+                                                       CustomUserDetails user,
+                                                       ProcessingOrder processingOrder) throws ApiException {
+
+        // Check that the request user is form a company which is connected to the company that owns the quote order (or is a user of that company)
+        PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(apiStockOrder.getCompany().getId()), user);
+
+        return createOrUpdateStockOrder(apiStockOrder, user, processingOrder, false);
+    }
+
+    @Transactional
+    public ApiBaseEntity createOrUpdateStockOrder(ApiStockOrder apiStockOrder,
+                                                  CustomUserDetails user,
+                                                  ProcessingOrder processingOrder) throws ApiException {
+        return createOrUpdateStockOrder(apiStockOrder, user, processingOrder, true);
+    }
+
+    @Transactional
+    public ApiBaseEntity createOrUpdateStockOrder(ApiStockOrder apiStockOrder,
+                                                   CustomUserDetails user,
+                                                   ProcessingOrder processingOrder,
+                                                   boolean checkCompanyEnrolment) throws ApiException {
 
         StockOrder entity;
 
         if (apiStockOrder.getId() != null) {
             entity = fetchEntity(apiStockOrder.getId(), StockOrder.class);
-            entity.setUpdatedBy(fetchEntity(userId, User.class));
+            entity.setUpdatedBy(fetchEntity(user.getUserId(), User.class));
 
         } else {
             entity = new StockOrder();
-            entity.setCreatedBy(fetchEntity(userId, User.class));
+            entity.setCreatedBy(fetchEntity(user.getUserId(), User.class));
             entity.setCreatorId(apiStockOrder.getCreatorId());
         }
 
@@ -803,8 +897,17 @@ public class StockOrderService extends BaseService {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Semi-product or Final product needs to be provided!");
         }
 
+        // Fetch the facility and check that the request user is enrolled in the facility's company
+        Facility facility = facilityService.fetchFacility(apiStockOrder.getFacility().getId());
+
+        // In some cases we don't need to check if request user is enrolled in company due to already
+        // executed checks (approve/reject quote order transaction, etc.)
+        if (checkCompanyEnrolment) {
+            PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
+        }
+
         entity.setOrderType(apiStockOrder.getOrderType());
-        entity.setFacility(facilityService.fetchFacility(apiStockOrder.getFacility().getId()));
+        entity.setFacility(facility);
         entity.setCompany(entity.getFacility().getCompany());
         entity.setIdentifier(apiStockOrder.getIdentifier());
         entity.setPreferredWayOfPayment(apiStockOrder.getPreferredWayOfPayment());
@@ -1138,8 +1241,12 @@ public class StockOrderService extends BaseService {
     }
 
     @Transactional
-    public void deleteStockOrder(Long id) throws ApiException{
+    public void deleteStockOrder(Long id, CustomUserDetails user) throws ApiException {
+
         StockOrder stockOrder = fetchEntity(id, StockOrder.class);
+
+        PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(stockOrder.getCompany().getUsers(), user);
+
         em.remove(stockOrder);
     }
 

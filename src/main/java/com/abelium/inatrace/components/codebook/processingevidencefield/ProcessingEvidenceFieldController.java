@@ -3,6 +3,7 @@ package com.abelium.inatrace.components.codebook.processingevidencefield;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -69,6 +70,7 @@ public class ProcessingEvidenceFieldController {
 	}
 
 	@PutMapping
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Create or update processing evidence field. If ID is provided, then the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateProcessingEvidenceField(@Valid @RequestBody ApiProcessingEvidenceField apiProcessingEvidenceField) throws ApiException {
 
@@ -76,6 +78,7 @@ public class ProcessingEvidenceFieldController {
 	}
 
 	@DeleteMapping("{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@ApiOperation("Deletes a processing evidence field with the provided ID.")
 	public ApiDefaultResponse deleteProcessingEvidenceField(@Valid @ApiParam(value = "ProcessingEvidenceField ID", required = true) @PathVariable("id") Long id) throws ApiException {
 

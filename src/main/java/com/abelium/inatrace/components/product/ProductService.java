@@ -8,6 +8,7 @@ import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTyp
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.company.CompanyApiTools;
+import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.product.types.ProductLabelAction;
@@ -54,6 +55,9 @@ public class ProductService extends BaseService {
 
 	@Autowired
 	private ProductQueries productQueries;
+
+	@Autowired
+	private CompanyQueries companyQueries;
 	
 	@Autowired
 	private RequestLogService requestLogEngine;
@@ -122,6 +126,13 @@ public class ProductService extends BaseService {
 
     @Transactional
 	public ApiBaseEntity createProduct(CustomUserDetails authUser, ApiProduct request) throws ApiException {
+		Company company = em.find(Company.class, request.getCompany().getId());
+		if (
+				authUser.getUserRole() != UserRole.ADMIN &&
+				company.getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(authUser.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in owner company");
+		}
+
 		Product product = new Product();
 		
 		productApiTools.updateProduct(authUser, product, request);
@@ -131,7 +142,7 @@ public class ProductService extends BaseService {
 				throw new ApiException(ApiStatus.INVALID_REQUEST, "Company ID is required");
 			}
 			ProductCompany productCompany = new ProductCompany();
-			productCompany.setCompany(em.find(Company.class, request.getCompany().getId()));
+			productCompany.setCompany(company);
 			productCompany.setProduct(product);
 			productCompany.setType(ProductCompanyType.OWNER);
 			product.getAssociatedCompanies().add(productCompany);
@@ -413,7 +424,7 @@ public class ProductService extends BaseService {
 
 		if (!userCompanyIds.contains(companyId)) 
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid company id");
-		
+
 		CompanyCustomer pc = new CompanyCustomer();
 		pc.setProduct(p);
 		pc.setCompany(Queries.get(em, Company.class, companyId));
@@ -776,8 +787,15 @@ public class ProductService extends BaseService {
 	}
 
 	@Transactional
-	public void deleteFinalProduct(Long productId, Long finalProductId) throws ApiException {
-    	em.remove(fetchFinalProduct(productId, finalProductId));
+	public void deleteFinalProduct(Long productId, Long finalProductId, CustomUserDetails authUser) throws ApiException {
+		FinalProduct fp = fetchFinalProduct(productId, finalProductId);
+		if (
+				authUser.getUserRole() != UserRole.ADMIN &&
+				fp.getProduct().getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(authUser.getUserId()))) {
+			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in owner company");
+		}
+
+    	em.remove(fp);
 	}
 
     private void checkProductPermission(CustomUserDetails authUser, Long productId) throws ApiException {

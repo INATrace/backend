@@ -7,8 +7,10 @@ import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.api.ApiActivityProof;
+import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.payment.api.ApiBulkPayment;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
+import com.abelium.inatrace.components.stockorder.StockOrderService;
 import com.abelium.inatrace.components.user.UserService;
 import com.abelium.inatrace.db.entities.common.ActivityProof;
 import com.abelium.inatrace.db.entities.common.Document;
@@ -17,6 +19,8 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.payment.*;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
+import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -41,22 +45,56 @@ public class PaymentService extends BaseService {
 
 	private final UserService userService;
 
+	private final CompanyQueries companyQueries;
+
+	private final StockOrderService stockOrderService;
+
 	@Autowired
-	public PaymentService(UserService userService) {
+	public PaymentService(UserService userService,
+						  CompanyQueries companyQueries,
+						  StockOrderService stockOrderService) {
 		this.userService = userService;
+		this.companyQueries = companyQueries;
+		this.stockOrderService = stockOrderService;
 	}
 
-	public ApiPayment getPayment(Long id, Long userId) throws ApiException {
-		return PaymentMapper.toApiPayment(fetchEntity(id, Payment.class), userId);
+	public ApiPayment getPayment(Long id, CustomUserDetails user) throws ApiException {
+
+		Payment payment = fetchEntity(id, Payment.class);
+
+		// Check that the request user is enrolled in the paying company (owner company)
+		PermissionsUtil.checkUserIfCompanyEnrolled(payment.getPayingCompany().getUsers(), user);
+
+		return PaymentMapper.toApiPayment(payment, user.getUserId());
 	}
 
-	public ApiBulkPayment getBulkPayment(Long id, Long userId) throws ApiException {
-		return BulkPaymentMapper.toApiBulkPayment(fetchEntity(id, BulkPayment.class), userId);
+	public ApiBulkPayment getBulkPayment(Long id, CustomUserDetails user) throws ApiException {
+
+		BulkPayment bulkPayment = fetchEntity(id, BulkPayment.class);
+
+		// Check that the request user is enrolled in the paying company (bulk payment owner company)
+		PermissionsUtil.checkUserIfCompanyEnrolled(bulkPayment.getPayingCompany().getUsers(), user);
+
+		return BulkPaymentMapper.toApiBulkPayment(bulkPayment, user.getUserId());
 	}
 
-	public ApiPaginatedList<ApiPayment> getPaymentList(ApiPaginatedRequest request, PaymentQueryRequest queryRequest, Long userId) {
+	public ApiPaginatedList<ApiPayment> getPaymentList(ApiPaginatedRequest request, PaymentQueryRequest queryRequest, CustomUserDetails user) throws ApiException {
+
+		if (queryRequest.companyId == null && queryRequest.purchaseId == null) {
+			throw new ApiException(ApiStatus.UNAUTHORIZED, "Company ID or Purchase ID is required!");
+		}
+
+		if (queryRequest.companyId != null) {
+			Company company = companyQueries.fetchCompany(queryRequest.companyId);
+			PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+		} else {
+			// Check that the stock order exists and also validate that request user is enrolled in stock order owner company
+			StockOrder stockOrder = stockOrderService.fetchEntity(queryRequest.purchaseId, StockOrder.class);
+			PermissionsUtil.checkUserIfCompanyEnrolled(stockOrder.getCompany().getUsers(), user);
+		}
+
 		return PaginationTools.createPaginatedResponse(em, request, () -> paymentQueryObject(
-				request, queryRequest), payment -> PaymentMapper.toApiPayment(payment, userId));
+				request, queryRequest), payment -> PaymentMapper.toApiPayment(payment, user.getUserId()));
 	}
 
 	private Payment paymentQueryObject(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
@@ -113,10 +151,17 @@ public class PaymentService extends BaseService {
 
 	public ApiPaginatedList<ApiBulkPayment> listBulkPayments(ApiPaginatedRequest request,
 															 PaymentQueryRequest queryRequest,
-															 Long userId) {
+															 CustomUserDetails user) throws ApiException {
+
+		if (queryRequest.companyId == null) {
+			throw new ApiException(ApiStatus.UNAUTHORIZED, "Company ID is required");
+		}
+
+		Company company = companyQueries.fetchCompany(queryRequest.companyId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> bulkPaymentQueryObject(
-				request, queryRequest), bulkPayment -> BulkPaymentMapper.toApiBulkPaymentBase(bulkPayment, userId));
+				request, queryRequest), bulkPayment -> BulkPaymentMapper.toApiBulkPaymentBase(bulkPayment, user.getUserId()));
 	}
 
 	private BulkPayment bulkPaymentQueryObject(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
@@ -142,13 +187,16 @@ public class PaymentService extends BaseService {
 
 	@Transactional
 	public ApiBaseEntity createOrUpdatePayment(ApiPayment apiPayment,
-											   Long userId,
+											   CustomUserDetails user,
 											   boolean isPartOfBulkPayment) throws ApiException {
 
 		Payment entity = fetchEntityOrElse(apiPayment.getId(), Payment.class, new Payment());
-		User currentUser = userService.fetchUserById(userId);
+		User currentUser = userService.fetchUserById(user.getUserId());
 
 		if (entity.getId() != null) {
+
+			// Check if the request user is enrolled in the owner company
+			PermissionsUtil.checkUserIfCompanyEnrolled(entity.getPayingCompany().getUsers(), user);
 
 			// Do not allow update of fields other than the payment status
 			// Also it is not allowed to set back the value to UNCONFIRMED
@@ -170,6 +218,9 @@ public class PaymentService extends BaseService {
 			}
 
 			StockOrder stockOrder = fetchEntity(apiPayment.getStockOrder().getId(), StockOrder.class);
+
+			// Check that the request user is enrolled in the stock order owner company (the company that initiates the payment)
+			PermissionsUtil.checkUserIfCompanyEnrolled(stockOrder.getCompany().getUsers(), user);
 
 			if (stockOrder.getOrderType() != OrderType.PURCHASE_ORDER && stockOrder.getOrderType() != OrderType.GENERAL_ORDER) {
 				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Not a Purchase or Quote order");
@@ -251,9 +302,9 @@ public class PaymentService extends BaseService {
 
 
 	@Transactional
-	public ApiBaseEntity createBulkPayment(ApiBulkPayment apiBulkPayment, Long userId) throws ApiException {
+	public ApiBaseEntity createBulkPayment(ApiBulkPayment apiBulkPayment, CustomUserDetails user) throws ApiException {
 
-		// Currently bulk-payments cannot be updated...
+		// Bulk-payments cannot be updated
 		if (apiBulkPayment.getId() != null) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Bulk payment cannot be updated!");
 		}
@@ -279,10 +330,15 @@ public class PaymentService extends BaseService {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Recipient number is required.");
 		}
 
+		Company payingCompany = fetchEntity(apiBulkPayment.getPayingCompany().getId(), Company.class);
+
+		// Check that the request user is enrolled in the paying company (the company that initiates the payment)
+		PermissionsUtil.checkUserIfCompanyEnrolled(payingCompany.getUsers(), user);
+
 		BulkPayment entity = new BulkPayment();
 
-		entity.setCreatedBy(userService.fetchUserById(userId));
-		entity.setPayingCompany(fetchEntity(apiBulkPayment.getPayingCompany().getId(), Company.class));
+		entity.setCreatedBy(userService.fetchUserById(user.getUserId()));
+		entity.setPayingCompany(payingCompany);
 
 		entity.setPaymentDescription(apiBulkPayment.getPaymentDescription());
 		entity.setPaymentPurposeType(apiBulkPayment.getPaymentPurposeType());
@@ -298,7 +354,7 @@ public class PaymentService extends BaseService {
 		// Create payments
 		for (ApiPayment apiPayment: apiBulkPayment.getPayments()) {
 
-			Long insertedPaymentId = createOrUpdatePayment(apiPayment, userId, true).getId();
+			Long insertedPaymentId = createOrUpdatePayment(apiPayment, user, true).getId();
 			Payment payment = fetchEntity(insertedPaymentId, Payment.class);
 
 			// Bi-directional mapping
@@ -330,10 +386,14 @@ public class PaymentService extends BaseService {
 	}
 
 	@Transactional
-	public void deletePayment(Long id, Long userId) throws ApiException {
+	public void deletePayment(Long id, CustomUserDetails user) throws ApiException {
+
 		Payment payment = fetchEntity(id, Payment.class);
 
-		User currentUser = userService.fetchUserById(userId);
+		// Check that the request user is enrolled in the paying company (the company that initiated the payment)
+		PermissionsUtil.checkUserIfCompanyEnrolled(payment.getPayingCompany().getUsers(), user);
+
+		User currentUser = userService.fetchUserById(user.getUserId());
 		StockOrder stockOrder = payment.getStockOrder();
 		if (stockOrder.getOrderType() == OrderType.PURCHASE_ORDER && !Boolean.TRUE.equals(stockOrder.getPriceDeterminedLater())) {
 			BigDecimal sumTotalPaid = stockOrder.getPayments().stream()

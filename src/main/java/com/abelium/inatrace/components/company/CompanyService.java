@@ -22,6 +22,7 @@ import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -147,10 +148,7 @@ public class CompanyService extends BaseService {
 		Company c = companyQueries.fetchCompany(id);
 		List<ApiCompanyUser> users = companyQueries.fetchUsersForCompany(id);
 
-		if (authUser.getUserRole() != UserRole.ADMIN
-				&& users.stream().noneMatch(u -> u.getId().equals(authUser.getUserId()))) {
-			throw new ApiException(ApiStatus.UNAUTHORIZED, "Not authorized");
-		}
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(c.getUsers(), authUser);
 
 		List<CompanyAction> actions = new ArrayList<>();
 		actions.add(CompanyAction.VIEW_COMPANY_PROFILE);
@@ -179,10 +177,11 @@ public class CompanyService extends BaseService {
 		return companyApiTools.toApiCompanyGet(authUser.getUserId(), c, language, actions, users);
 	}
 
-	public List<ApiCompanyUser> getCompanyUsers(Long id) throws ApiException {
+	public List<ApiCompanyUser> getCompanyUsers(Long id, CustomUserDetails user) throws ApiException {
 
-		// Validate that company exists with the provided ID
-		companyQueries.fetchCompany(id);
+		// Validate that company exists with the provided ID and that request user is enrolled in this company
+		Company company = companyQueries.fetchCompany(id);
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(company.getUsers(), user);
 
 		return companyQueries.fetchUsersForCompany(id);
 	}
@@ -220,8 +219,12 @@ public class CompanyService extends BaseService {
 		}
 	}
 
-	public ApiUserCustomer getUserCustomer(Long id, Long userId) {
-		return companyApiTools.toApiUserCustomer(em.find(UserCustomer.class, id), userId);
+	public ApiUserCustomer getUserCustomer(Long id, CustomUserDetails user) throws ApiException {
+
+		UserCustomer userCustomer = fetchUserCustomer(id);
+		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), user);
+
+		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId());
 	}
 
 	public boolean existsUserCustomer(ApiUserCustomer apiUserCustomer) {
@@ -233,14 +236,24 @@ public class CompanyService extends BaseService {
 		return !userCustomerList.isEmpty();
 	}
 
-	public ApiPaginatedList<ApiUserCustomer> getUserCustomersForCompanyAndType(Long companyId, UserCustomerType type, ApiListFarmersRequest request, Long userId) {
-		return PaginationTools.createPaginatedResponse(em, request, () -> userCustomerListQueryObject(companyId, type, request), uc -> companyApiTools.toApiUserCustomer(uc, userId));
+	public ApiPaginatedList<ApiUserCustomer> getUserCustomersForCompanyAndType(Long companyId,
+	                                                                           UserCustomerType type,
+	                                                                           ApiListFarmersRequest request,
+	                                                                           CustomUserDetails user) throws ApiException {
+
+		Company company = companyQueries.fetchCompany(companyId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+
+		return PaginationTools.createPaginatedResponse(em, request,
+				() -> userCustomerListQueryObject(companyId, type, request),
+				uc -> companyApiTools.toApiUserCustomer(uc, user.getUserId()));
 	}
 
 	@Transactional
-	public ApiUserCustomer addUserCustomer(Long companyId, ApiUserCustomer apiUserCustomer, Long userId) throws ApiException {
+	public ApiUserCustomer addUserCustomer(Long companyId, ApiUserCustomer apiUserCustomer, CustomUserDetails user) throws ApiException {
 
-		Company company = em.find(Company.class, companyId);
+		Company company = companyQueries.fetchCompany(companyId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
 
 		UserCustomer userCustomer = new UserCustomer();
 		userCustomer.setCompany(company);
@@ -331,22 +344,23 @@ public class CompanyService extends BaseService {
 				certification.setDescription(apiCertification.getDescription());
 				certification.setType(apiCertification.getType());
 				certification.setValidity(apiCertification.getValidity());
-				certification.setCertificate(commonService.fetchDocument(userId, apiCertification.getCertificate()));
+				certification.setCertificate(commonService.fetchDocument(user.getUserId(), apiCertification.getCertificate()));
 				userCustomer.getCertifications().add(certification);
 			}
 		}
 
-		return companyApiTools.toApiUserCustomer(userCustomer, userId);
+		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId());
 	}
 
 	@Transactional
-	public ApiUserCustomer updateUserCustomer(ApiUserCustomer apiUserCustomer, Long userId) throws ApiException {
+	public ApiUserCustomer updateUserCustomer(ApiUserCustomer apiUserCustomer, CustomUserDetails user) throws ApiException {
 
 		if (apiUserCustomer == null) {
 			return null;
 		}
 
-		UserCustomer userCustomer = em.find(UserCustomer.class, apiUserCustomer.getId());
+		UserCustomer userCustomer = fetchUserCustomer(apiUserCustomer.getId());
+		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), user);
 
 		userCustomer.setName(apiUserCustomer.getName());
 		userCustomer.setSurname(apiUserCustomer.getSurname());
@@ -442,18 +456,21 @@ public class CompanyService extends BaseService {
 						.filter(ucc -> ucc.getId().equals(apiCertification.getId())).findAny().orElseThrow();
 			}
 
-			certification.setCertificate(commonService.fetchDocument(userId, apiCertification.getCertificate()));
+			certification.setCertificate(commonService.fetchDocument(user.getUserId(), apiCertification.getCertificate()));
 			certification.setType(apiCertification.getType());
 			certification.setDescription(apiCertification.getDescription());
 			certification.setValidity(apiCertification.getValidity());
 		}
 
-		return companyApiTools.toApiUserCustomer(userCustomer, userId);
+		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId());
 	}
 
 	@Transactional
-	public void deleteUserCustomer(Long id) {
-		UserCustomer userCustomer = em.find(UserCustomer.class, id);
+	public void deleteUserCustomer(Long id, CustomUserDetails user) throws ApiException {
+
+		UserCustomer userCustomer = fetchUserCustomer(id);
+		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), user);
+
 		em.remove(userCustomer);
 	}
 
@@ -470,7 +487,12 @@ public class CompanyService extends BaseService {
 	}
 
 	public ApiPaginatedList<ApiCompanyCustomer> listCompanyCustomers(CustomUserDetails authUser, Long companyId, ApiListCustomersRequest request) throws ApiException {
-		return PaginationTools.createPaginatedResponse(em, request, () -> customerListQueryObject(companyId, request), CompanyCustomerMapper::toApiCompanyCustomer);
+
+		Company company = companyQueries.fetchCompany(companyId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
+
+		return PaginationTools.createPaginatedResponse(em, request, () -> customerListQueryObject(companyId, request),
+				CompanyCustomerMapper::toApiCompanyCustomer);
 	}
 
 	private TorpedoProjector<ProductCompany, ApiCompanyListResponse> associationsCompanyListQueryObject(Long companyId) {
@@ -492,7 +514,11 @@ public class CompanyService extends BaseService {
 				.add(productCompanyProduct.getCompany().getStatus(), ApiCompanyListResponse::setStatus);
 	}
 
-	public ApiPaginatedList<ApiCompanyListResponse> getAssociations(Long id, ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiCompanyListResponse> getAssociations(Long id, ApiPaginatedRequest request, CustomUserDetails user) throws ApiException {
+
+		Company company = companyQueries.fetchCompany(id);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+
 		return PaginationTools.createPaginatedResponse(em, request, () -> associationsCompanyListQueryObject(id));
 	}
 
@@ -514,7 +540,11 @@ public class CompanyService extends BaseService {
 		return Torpedo.distinct(companiesProxy.getCompany());
 	}
 
-	public ApiPaginatedList<ApiCompanyListResponse> getConnectedCompanies(Long id, ApiPaginatedRequest request) {
+	public ApiPaginatedList<ApiCompanyListResponse> getConnectedCompanies(Long id, ApiPaginatedRequest request, CustomUserDetails user) throws ApiException {
+
+		Company company = companyQueries.fetchCompany(id);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+
 		return PaginationTools.createPaginatedResponse1(em, request, () -> connectedCompanyListQueryObject(id),
 				CompanyApiTools::toApiCompanyListResponse);
 	}
@@ -541,8 +571,12 @@ public class CompanyService extends BaseService {
 		return companyCustomer;
 	}
 
-	public ApiCompanyCustomer getCompanyCustomer(Long companyCustomerId) throws ApiException {
-		return CompanyCustomerMapper.toApiCompanyCustomer(fetchCompanyCustomer(companyCustomerId));
+	public ApiCompanyCustomer getCompanyCustomer(Long companyCustomerId, CustomUserDetails user) throws ApiException {
+
+		CompanyCustomer companyCustomer = fetchCompanyCustomer(companyCustomerId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(companyCustomer.getCompany().getUsers(), user);
+
+		return CompanyCustomerMapper.toApiCompanyCustomer(companyCustomer);
 	}
 
 	public CompanyCustomer fetchCompanyCustomer(Long id) throws ApiException {
@@ -554,10 +588,23 @@ public class CompanyService extends BaseService {
 		return companyCustomer;
 	}
 
+	private UserCustomer fetchUserCustomer(Long id) throws ApiException {
+		UserCustomer userCustomer = em.find(UserCustomer.class, id);
+		if (userCustomer == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid Company user customer ID");
+		}
+
+		return userCustomer;
+	}
+
 	@Transactional
-	public ApiCompanyCustomer createCompanyCustomer(ApiCompanyCustomer apiCompanyCustomer) {
+	public ApiCompanyCustomer createCompanyCustomer(ApiCompanyCustomer apiCompanyCustomer, CustomUserDetails user) throws ApiException {
+
+		Company company = em.find(Company.class, apiCompanyCustomer.getCompanyId());
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+
 		CompanyCustomer companyCustomer = new CompanyCustomer();
-		companyCustomer.setCompany(em.find(Company.class, apiCompanyCustomer.getCompanyId()));
+		companyCustomer.setCompany(company);
 		companyCustomer.setContact(apiCompanyCustomer.getContact());
 		companyCustomer.setEmail(apiCompanyCustomer.getEmail());
 		companyCustomer.setLocation(new GeoAddress());
@@ -572,12 +619,15 @@ public class CompanyService extends BaseService {
 	}
 
 	@Transactional
-	public ApiCompanyCustomer updateCompanyCustomer(ApiCompanyCustomer apiCompanyCustomer) {
+	public ApiCompanyCustomer updateCompanyCustomer(ApiCompanyCustomer apiCompanyCustomer, CustomUserDetails user) throws ApiException {
+
 		if (apiCompanyCustomer == null) {
 			return null;
 		}
-		CompanyCustomer companyCustomer = em.find(CompanyCustomer.class, apiCompanyCustomer.getId());
-		companyCustomer.setCompany(em.find(Company.class, apiCompanyCustomer.getCompanyId()));
+
+		CompanyCustomer companyCustomer = fetchCompanyCustomer(apiCompanyCustomer.getId());
+		PermissionsUtil.checkUserIfCompanyEnrolled(companyCustomer.getCompany().getUsers(), user);
+
 		companyCustomer.setContact(apiCompanyCustomer.getContact());
 		companyCustomer.setEmail(apiCompanyCustomer.getEmail());
 		if (companyCustomer.getLocation() == null) {
@@ -593,8 +643,11 @@ public class CompanyService extends BaseService {
 	}
 
 	@Transactional
-	public void deleteCompanyCustomer(Long id) {
+	public void deleteCompanyCustomer(Long id, CustomUserDetails user) throws ApiException {
+
 		CompanyCustomer companyCustomer = em.find(CompanyCustomer.class, id);
+		PermissionsUtil.checkUserIfCompanyEnrolled(companyCustomer.getCompany().getUsers(), user);
+
 		em.remove(companyCustomer);
 	}
 
@@ -714,8 +767,8 @@ public class CompanyService extends BaseService {
 		return !companyUserList.isEmpty();
 	}
 
-	public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, Long userId) throws ApiException {
-		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId, userId);
+	public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, CustomUserDetails user) throws ApiException {
+		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId, user);
 	}
 
 }

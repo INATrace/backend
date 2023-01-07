@@ -39,17 +39,7 @@ public class StockOrderController {
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-        return new ApiResponse<>(stockOrderService.getStockOrder(id, authUser.getUserId(), language, withProcessingOrder));
-    }
-
-    @GetMapping("/list")
-    @ApiOperation("Get a paginated list of stock orders.")
-    public ApiPaginatedResponse<ApiStockOrder> getStockOrderList(
-            @Valid ApiPaginatedRequest request,
-            @AuthenticationPrincipal CustomUserDetails authUser,
-            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
-        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
-                request, new StockOrderQueryRequest(), authUser.getUserId(), language));
+        return new ApiResponse<>(stockOrderService.getStockOrder(id, authUser, language, withProcessingOrder));
     }
 
     @GetMapping("/list/facility/{facilityId}/available")
@@ -65,9 +55,9 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
+        return new ApiPaginatedResponse<>(stockOrderService.getAvailableStockOrderListForFacility(
                 request,
                 new StockOrderQueryRequest(
                         facilityId,
@@ -80,7 +70,7 @@ public class StockOrderController {
                         productionDateStart != null ? productionDateStart.toInstant() : null,
                         productionDateEnd != null ? productionDateEnd.toInstant() : null
                 ),
-                authUser.getUserId(),
+                authUser,
                 language));
     }
 
@@ -99,9 +89,9 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
             @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName,
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderListForCompany(
                 request,
                 new StockOrderQueryRequest(
                         null,
@@ -119,7 +109,7 @@ public class StockOrderController {
                         productionDateEnd != null ? productionDateEnd.toInstant() : null,
                         producerUserCustomerName
                 ),
-                authUser.getUserId(),
+                authUser,
                 language));
     }
 
@@ -132,9 +122,9 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Company customer ID") @RequestParam(value = "companyCustomerId", required = false) Long companyCustomerId,
             @Valid @ApiParam(value = "Return only open stock orders") @RequestParam(value = "openOnly", required = false) Boolean openOnly,
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request,
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderListForCompany(request,
                 new StockOrderQueryRequest(
                         companyId,
                         facilityId,
@@ -143,7 +133,7 @@ public class StockOrderController {
                         null,
                         companyCustomerId,
                         openOnly
-                ), authUser.getUserId(), language));
+                ), authUser, language));
     }
 
     @GetMapping("list/company/{companyId}/quote-orders")
@@ -154,9 +144,9 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
             @Valid @ApiParam(value = "Return only open stock orders") @RequestParam(value = "openOnly", required = false) Boolean openOnly,
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(request,
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderListForCompany(request,
                 new StockOrderQueryRequest(
                         null,
                         null,
@@ -165,7 +155,7 @@ public class StockOrderController {
                         semiProductId,
                         null,
                         openOnly
-                ), authUser.getUserId(), language));
+                ), authUser, language));
     }
 
     @GetMapping("list/company/{companyId}")
@@ -186,8 +176,9 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
             @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName,
             @AuthenticationPrincipal CustomUserDetails authUser,
-        @RequestHeader(value = "language" ,defaultValue = "EN", required = false) Language language) {
-        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderList(
+        @RequestHeader(value = "language" ,defaultValue = "EN", required = false) Language language) throws ApiException {
+
+        return new ApiPaginatedResponse<>(stockOrderService.getStockOrderListForCompany(
                 request,
                 new StockOrderQueryRequest(
                         companyId,
@@ -205,7 +196,7 @@ public class StockOrderController {
                         productionDateEnd != null ? productionDateEnd.toInstant() : null,
                         producerUserCustomerName
                 ),
-                authUser.getUserId(),
+                authUser,
                 language));
     }
 
@@ -215,7 +206,7 @@ public class StockOrderController {
             @Valid @RequestBody ApiPurchaseOrder apiPurchaseOrder,
             @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-        return new ApiResponse<>(stockOrderService.createPurchaseBulkOrder(apiPurchaseOrder, authUser.getUserId()));
+        return new ApiResponse<>(stockOrderService.createPurchaseBulkOrder(apiPurchaseOrder, authUser));
     }
 
     @PutMapping
@@ -224,15 +215,16 @@ public class StockOrderController {
             @Valid @RequestBody ApiStockOrder apiStockOrder,
             @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-        return new ApiResponse<>(stockOrderService.createOrUpdateStockOrder(apiStockOrder, authUser.getUserId(), null));
+        return new ApiResponse<>(stockOrderService.createOrUpdateStockOrder(apiStockOrder, authUser, null));
     }
 
     @DeleteMapping("{id}")
     @ApiOperation("Deletes a stock order with the provided ID.")
     public ApiDefaultResponse deleteStockOrder(
+            @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @ApiParam(value = "StockOrder ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
-        stockOrderService.deleteStockOrder(id);
+        stockOrderService.deleteStockOrder(id, authUser);
         return new ApiDefaultResponse();
     }
 
@@ -242,7 +234,7 @@ public class StockOrderController {
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
     ) throws ApiException {
-        return new ApiResponse<>(stockOrderService.getStockOrderAggregatedHistoryList(id, language, true));
+        return new ApiResponse<>(stockOrderService.getStockOrderAggregatedHistoryList(id, language, authUser, true));
     }
 
 }

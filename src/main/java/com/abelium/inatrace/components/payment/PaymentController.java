@@ -39,7 +39,7 @@ public class PaymentController {
 	public ApiResponse<ApiPayment> getPayment(
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id) throws ApiException {
-		return new ApiResponse<>(paymentService.getPayment(id, authUser.getUserId()));
+		return new ApiResponse<>(paymentService.getPayment(id, authUser));
 	}
 	
 	@GetMapping("bulk-payment/{id}")
@@ -48,15 +48,7 @@ public class PaymentController {
 			@Valid @ApiParam(value = "Bulk payment ID", required = true) @PathVariable("id") Long id,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		return new ApiResponse<>(paymentService.getBulkPayment(id, authUser.getUserId()));
-	}
-
-	@GetMapping("list")
-	@ApiOperation("Get a paginated list of payments.")
-	public ApiPaginatedResponse<ApiPayment> getPaymentList(
-			@AuthenticationPrincipal CustomUserDetails authUser,
-			@Valid ApiPaginatedRequest request) {
-		return new ApiPaginatedResponse<>(paymentService.getPaymentList(request, new PaymentQueryRequest(), authUser.getUserId()));
+		return new ApiResponse<>(paymentService.getBulkPayment(id, authUser));
 	}
 
 	@GetMapping("list/purchase/{id}")
@@ -69,7 +61,7 @@ public class PaymentController {
 			@Valid @ApiParam(value = "Payment status") @RequestParam(value = "paymentStatus", required = false) PaymentStatus paymentStatus,
 			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
 			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
-			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) {
+			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws ApiException {
 
 		return new ApiPaginatedResponse<>(paymentService.getPaymentList(
 				request,
@@ -84,7 +76,7 @@ public class PaymentController {
 						null,
 						null
 				),
-				authUser.getUserId()
+				authUser
 		));
 	}
 
@@ -100,7 +92,7 @@ public class PaymentController {
 			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
 			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName,
 			@Valid @ApiParam(value = "Search by farmer id") @RequestParam(value = "farmerId", required = false) Long farmerId,
-			@Valid @ApiParam(value = "Search by representative of farmer id") @RequestParam(value = "representativeOfRecepientUserCustomerId", required = false) Long representativeOfRecepientUserCustomerId) {
+			@Valid @ApiParam(value = "Search by representative of farmer id") @RequestParam(value = "representativeOfRecepientUserCustomerId", required = false) Long representativeOfRecepientUserCustomerId) throws ApiException {
 
 		return new ApiPaginatedResponse<>(paymentService.getPaymentList(
 				request,
@@ -114,7 +106,7 @@ public class PaymentController {
 						farmerName,
 						farmerId,
 						representativeOfRecepientUserCustomerId
-				), authUser.getUserId()
+				), authUser
 		));
 	}
 
@@ -123,12 +115,12 @@ public class PaymentController {
 	public ApiPaginatedResponse<ApiBulkPayment> listBulkPaymentsByCompany(
 		@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
 		@AuthenticationPrincipal CustomUserDetails authUser,
-		@Valid ApiPaginatedRequest request) {
+		@Valid ApiPaginatedRequest request) throws ApiException {
 
 		return new ApiPaginatedResponse<>(paymentService.listBulkPayments(
 				request,
 				new PaymentQueryRequest(companyId),
-				authUser.getUserId())
+				authUser)
 		);
 	}
 
@@ -138,7 +130,7 @@ public class PaymentController {
 			@Valid @RequestBody ApiPayment apiPayment,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		return new ApiResponse<>(paymentService.createOrUpdatePayment(apiPayment, authUser.getUserId(), false));
+		return new ApiResponse<>(paymentService.createOrUpdatePayment(apiPayment, authUser, false));
 	}
 	
 	@PostMapping("bulk-payment")
@@ -147,14 +139,17 @@ public class PaymentController {
 			@Valid @RequestBody ApiBulkPayment apiBulkPayment,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		return new ApiResponse<>(paymentService.createBulkPayment(apiBulkPayment, authUser.getUserId()));
+		return new ApiResponse<>(paymentService.createBulkPayment(apiBulkPayment, authUser));
 	}
 
 	@DeleteMapping("{id}")
 	@ApiOperation("Deletes a payment with the provided ID.")
-	public ApiDefaultResponse deletePayment(@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id, @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
+	public ApiDefaultResponse deletePayment(
+			@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id,
+			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
-		paymentService.deletePayment(id, authUser.getUserId());
+		paymentService.deletePayment(id, authUser);
 		return new ApiDefaultResponse();
 	}
+
 }

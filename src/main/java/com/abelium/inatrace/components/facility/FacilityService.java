@@ -20,9 +20,10 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.facility.*;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
+import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
-import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProductCompanyType;
 import org.apache.commons.lang3.BooleanUtils;
@@ -62,42 +63,36 @@ public class FacilityService extends BaseService {
 		this.finalProductService = finalProductService;
 	}
 
-	public ApiPaginatedList<ApiFacility> getFacilityList(ApiPaginatedRequest request, Language language) {
+	public ApiFacility getFacility(Long id, CustomUserDetails user, Language language) throws ApiException {
 
-		return PaginationTools.createPaginatedResponse(em, request, () -> facilityQueryObject(request, language),
-				facility -> FacilityMapper.toApiFacility(facility, language));
-	}
+		Facility facility = fetchFacility(id);
 
-	private Facility facilityQueryObject(ApiPaginatedRequest request, Language language) {
+		// If facility is public (facility that sells semi-products or final products) check that user is enrolled in one of the connected companies
+		if (facility.getIsPublic()) {
 
-		Facility facilityProxy = Torpedo.from(Facility.class);
+			PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(facility.getCompany().getId()), user);
 
-		FacilityTranslation ft = Torpedo.innerJoin(facilityProxy.getFacilityTranslations());
-
-		OnGoingLogicalCondition condition = Torpedo.condition();
-		condition = condition.and(ft.getLanguage()).eq(language);
-		condition = condition.and(facilityProxy.getIsDeactivated()).neq(Boolean.TRUE);
-		Torpedo.where(condition);
-
-		if ("name".equals(request.sortBy)) {
-			QueryTools.orderBy(request.sort, facilityProxy.getName());
 		} else {
-			QueryTools.orderBy(request.sort, facilityProxy.getId());
+
+			// Check if req. user is enrolled in facility's company
+			PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(facility.getCompany().getUsers(), user);
 		}
 
-		return facilityProxy;
+		return FacilityMapper.toApiFacility(facility, language);
 	}
 
-	public ApiFacility getFacility(Long id, Language language) throws ApiException {
-		return FacilityMapper.toApiFacility(fetchFacility(id), language);
-	}
+	public ApiFacility getFacilityDetail(Long id, CustomUserDetails user, Language language) throws ApiException {
 
-	public ApiFacility getFacilityDetail(Long id, Language language) throws ApiException {
-		return FacilityMapper.toApiFacilityDetail(fetchFacility(id), language);
+		Facility facility = fetchFacility(id);
+
+		// Check if req. user is enrolled in facility's company
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(facility.getCompany().getUsers(), user);
+
+		return FacilityMapper.toApiFacilityDetail(facility, language);
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdateFacility(ApiFacility apiFacility) throws ApiException {
+	public ApiBaseEntity createOrUpdateFacility(ApiFacility apiFacility, CustomUserDetails user) throws ApiException {
 
 		Facility entity;
 		FacilityLocation facilityLocation;
@@ -115,6 +110,9 @@ public class FacilityService extends BaseService {
 			address = new Address();
 			company = companyQueries.fetchCompany(apiFacility.getCompany().getId());
 		}
+
+		// Create or update can be done only by company admin or system admin
+		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(company.getUsers(), user);
 
 		entity.setIsCollectionFacility(apiFacility.getIsCollectionFacility());
 		entity.setIsPublic(apiFacility.getIsPublic());
@@ -183,15 +181,24 @@ public class FacilityService extends BaseService {
 	}
 
 	@Transactional
-	public void deactivateFacility(Long id, Boolean deactivated) {
+	public void setFacilityDeactivatedStatus(Long id, Boolean deactivated, CustomUserDetails user) throws ApiException {
+
 		Facility facility = em.find(Facility.class, id);
+
+		// Deactivate/Activate can be done only by company admin or system admin
+		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(facility.getCompany().getUsers(), user);
+
 		facility.setIsDeactivated(deactivated);
 	}
 
 	@Transactional
-	public void deleteFacility(Long id) throws ApiException {
+	public void deleteFacility(Long id, CustomUserDetails user) throws ApiException {
 
 		Facility facility = fetchFacility(id);
+
+		// Remove can be done only by company admin or system admin
+		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(facility.getCompany().getUsers(), user);
+
 		em.remove(facility);
 	}
 
@@ -210,7 +217,11 @@ public class FacilityService extends BaseService {
 	 */
 	public ApiPaginatedList<ApiFacility> listAllFacilitiesByCompany(Long companyId,
 	                                                                ApiPaginatedRequest request,
-	                                                                Language language) {
+	                                                                Language language,
+																	CustomUserDetails user) throws ApiException {
+
+		Company company = companyQueries.fetchCompany(companyId);
+		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(company.getUsers(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request, () ->
 						listFacilitiesByCompanyQuery(companyId, null, null, language, null),
@@ -224,7 +235,11 @@ public class FacilityService extends BaseService {
 	                                                             Long semiProductId,
 	                                                             Long finalProductId,
 	                                                             ApiPaginatedRequest request,
-	                                                             Language language) {
+																 CustomUserDetails user,
+	                                                             Language language) throws ApiException {
+
+		Company company = companyQueries.fetchCompany(companyId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request, () ->
 						listFacilitiesByCompanyQuery(companyId, semiProductId, finalProductId, language, true),
@@ -258,7 +273,11 @@ public class FacilityService extends BaseService {
 		return facilityProxy;
 	}
 	
-	public ApiPaginatedList<ApiFacility> listCollectingFacilitiesByCompany(Long companyId, ApiPaginatedRequest request, Language language) {
+	public ApiPaginatedList<ApiFacility> listCollectingFacilitiesByCompany(Long companyId, ApiPaginatedRequest request, CustomUserDetails user, Language language) throws ApiException {
+
+		// Check request user if enrolled in company
+		Company company = companyQueries.fetchCompany(companyId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
 
 		TypedQuery<Facility> collectingFacilitiesQuery = em.createNamedQuery("Facility.listCollectingFacilitiesByCompany",
 						Facility.class)
@@ -282,7 +301,12 @@ public class FacilityService extends BaseService {
 	                                                                              Long semiProductId,
 	                                                                              Long finalProductId,
 	                                                                              ApiPaginatedRequest request,
-	                                                                              Language language) {
+																				  CustomUserDetails user,
+	                                                                              Language language) throws ApiException {
+
+		// Check that the request user is enrolled in the company for which we are fetching connected selling facilities
+		Company company = companyQueries.fetchCompany(companyId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
 
 		// First get all the products where the company is participating in role BUYER OR EXPORTER
 		TypedQuery<ProductCompany> productsAssociationsQuery = em.createNamedQuery(
