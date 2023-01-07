@@ -90,7 +90,7 @@ public class ProcessingActionService extends BaseService {
 		ProcessingAction processingAction = fetchProcessingAction(id);
 
 		// The request user should be enrolled in the processing action owner company
-		PermissionsUtil.checkUserIfCompanyEnrolled(processingAction.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(processingAction.getCompany().getUsers(), user);
 
 		return ProcessingActionMapper.toApiProcessingActionDetail(processingAction, language);
 	}
@@ -109,7 +109,7 @@ public class ProcessingActionService extends BaseService {
 		Company company = companyQueries.fetchCompany(apiProcessingAction.getCompany().getId());
 
 		// Check that request user is enrolled in owner company
-		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(company.getUsers(), user);
 
 		// Set processing action owner company
 		entity.setCompany(company);
@@ -170,7 +170,7 @@ public class ProcessingActionService extends BaseService {
 
 		ProcessingAction processingAction = fetchProcessingAction(id);
 
-		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(processingAction.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(processingAction.getCompany().getUsers(), user);
 
 		em.remove(processingAction);
 	}
@@ -193,7 +193,7 @@ public class ProcessingActionService extends BaseService {
 
 		// Check that request user is company enrolled
 		Company company = companyQueries.fetchCompany(companyId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(company.getUsers(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request, () ->
 						listProcessingActionsByCompanyQuery(companyId, language, actionType, onlyFinalProducts),
