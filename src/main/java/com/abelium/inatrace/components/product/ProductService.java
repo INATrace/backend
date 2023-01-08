@@ -19,6 +19,7 @@ import com.abelium.inatrace.db.entities.company.CompanyDocument;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.product.*;
 import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -126,12 +127,9 @@ public class ProductService extends BaseService {
 
     @Transactional
 	public ApiBaseEntity createProduct(CustomUserDetails authUser, ApiProduct request) throws ApiException {
+
 		Company company = em.find(Company.class, request.getCompany().getId());
-		if (
-				authUser.getUserRole() != UserRole.ADMIN &&
-				company.getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(authUser.getUserId()))) {
-			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in owner company");
-		}
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
 
 		Product product = new Product();
 		
@@ -216,7 +214,7 @@ public class ProductService extends BaseService {
 
 	public List<ApiProductLabelCompanyDocument> getCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id) throws ApiException {
 
-		productQueries.checkProductLabelPermission(authUser, id);
+		productQueries.checkProductLabelPermissionAssoc(authUser, id);
 
 		List<CompanyDocument> availableDocuments = availableCompanyDocumentsForProductLabel(id);
 		List<ProductLabelCompanyDocument> selectedDocuments = selectedCompanyDocumentsForProductLabel(id);
@@ -691,11 +689,21 @@ public class ProductService extends BaseService {
     	em.persist(fb);
 	}
 
-	public ApiFinalProduct getFinalProduct(Long productId, Long finalProductId) throws ApiException {
+	public ApiFinalProduct getFinalProduct(Long productId, Long finalProductId, CustomUserDetails user) throws ApiException {
+
+		// Check that the request user is enrolled in one of the connected companies
+		checkProductPermissionAssoc(user, productId);
+
     	return ProductApiTools.toApiFinalProductWithLabels(fetchFinalProduct(productId, finalProductId));
 	}
 
-	public List<ApiProductLabelBase> getFinalProductLabels(Long productId, Long finalProductId, Boolean returnUnpublished) throws ApiException {
+	public List<ApiProductLabelBase> getFinalProductLabels(Long productId,
+														   Long finalProductId,
+														   Boolean returnUnpublished,
+														   CustomUserDetails user) throws ApiException {
+
+		// Check that the request user is enrolled in one of the connected companies
+		checkProductPermissionAssoc(user, productId);
 
 		FinalProduct finalProduct = fetchFinalProduct(productId, finalProductId);
 
@@ -712,7 +720,15 @@ public class ProductService extends BaseService {
 	}
 
 	public ApiPaginatedList<ApiFinalProduct> getFinalProductList(ApiPaginatedRequest request,
-																 FinalProductQueryRequest queryRequest) {
+																 FinalProductQueryRequest queryRequest,
+																 CustomUserDetails user) throws ApiException {
+
+		if (queryRequest.productId == null) {
+			throw new ApiException(ApiStatus.UNAUTHORIZED, "Product ID is required");
+		}
+
+		// Check that the request user is enrolled in one of the product's connected companies
+		checkProductPermissionAssoc(user, queryRequest.productId);
 
 		return PaginationTools.createPaginatedResponse(em, request,
 				() -> finalProductQueryObject(
@@ -788,12 +804,11 @@ public class ProductService extends BaseService {
 
 	@Transactional
 	public void deleteFinalProduct(Long productId, Long finalProductId, CustomUserDetails authUser) throws ApiException {
+
+		// Check if request user has product permissions
+		checkProductPermission(authUser, productId);
+
 		FinalProduct fp = fetchFinalProduct(productId, finalProductId);
-		if (
-				authUser.getUserRole() != UserRole.ADMIN &&
-				fp.getProduct().getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(authUser.getUserId()))) {
-			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in owner company");
-		}
 
     	em.remove(fp);
 	}

@@ -41,7 +41,8 @@ public class ProductController {
     
     @GetMapping(value = "/list")
     @ApiOperation(value = "Lists all products. Sorting: name or default")
-    public ApiPaginatedResponse<ApiProductListResponse> listProducts(@AuthenticationPrincipal CustomUserDetails authUser, 
+    public ApiPaginatedResponse<ApiProductListResponse> listProducts(
+            @AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid ApiListProductsRequest request,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
     	return new ApiPaginatedResponse<>(productService.listUserProducts1(authUser.getUserId(), request));
@@ -304,29 +305,33 @@ public class ProductController {
     @GetMapping(value = "/{productId}/finalProduct/{finalProductId}")
     @ApiOperation(value = "Get final product by ID.")
     public ApiResponse<ApiFinalProduct> getFinalProduct(
+            @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @ApiParam(value = "Product ID", required = true) @PathVariable("productId") Long productId,
             @Valid @ApiParam(value = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId) throws ApiException {
-        return new ApiResponse<>(productService.getFinalProduct(productId, finalProductId));
+        return new ApiResponse<>(productService.getFinalProduct(productId, finalProductId, authUser));
     }
 
 	@GetMapping(value = "/{productId}/finalProduct/{finalProductId}/labels")
 	@ApiOperation(value = "Get final product labels.")
 	public ApiResponse<List<ApiProductLabelBase>> getFinalProductLabels(
+            @AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid @ApiParam(value = "Product ID", required = true) @PathVariable("productId") Long productId,
 			@Valid @ApiParam(value = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId,
 			@Valid @ApiParam(value = "Also return the unpublished labels") @RequestParam(value = "returnUnpublished", required = false) Boolean returnUnpublished) throws ApiException {
-		return new ApiResponse<>(productService.getFinalProductLabels(productId, finalProductId, returnUnpublished));
+		return new ApiResponse<>(productService.getFinalProductLabels(productId, finalProductId, returnUnpublished, authUser));
 	}
 
     @GetMapping(value = "/{productId}/finalProduct/list")
     @ApiOperation(value = "Get final product list by product ID.")
     public ApiPaginatedResponse<ApiFinalProduct> getFinalProductList(
+            @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @ApiParam(value = "Product ID", required = true) @PathVariable("productId") Long productId,
-            @Valid ApiPaginatedRequest request) {
+            @Valid ApiPaginatedRequest request) throws ApiException {
 
         return new ApiPaginatedResponse<>(productService.getFinalProductList(
                 request,
-                new FinalProductQueryRequest(productId)
+                new FinalProductQueryRequest(productId),
+                authUser
         ));
     }
 
