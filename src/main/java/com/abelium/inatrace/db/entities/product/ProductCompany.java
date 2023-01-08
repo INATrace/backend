@@ -14,7 +14,9 @@ import javax.persistence.*;
 		@NamedQuery(name = "ProductCompany.getProductCompaniesByAssociationType",
 		            query = "SELECT DISTINCT pc.company FROM ProductCompany pc WHERE pc.product.id IN :productIds AND pc.type = :associationType AND pc.company.id <> :companyId"),
 		@NamedQuery(name = "ProductCompany.getCompanyProductsWithAnyRole",
-		            query = "SELECT DISTINCT pc.product FROM ProductCompany pc WHERE pc.company.id = :companyId")
+				    query = "SELECT DISTINCT pc.product FROM ProductCompany pc WHERE pc.company.id = :companyId"),
+		@NamedQuery(name = "ProductCompany.getProductOwnerCompanies",
+				    query = "SELECT pc.company FROM ProductCompany pc where pc.product.id = :productId AND pc.type = com.abelium.inatrace.types.ProductCompanyType.OWNER")
 })
 public class ProductCompany extends BaseEntity {
 

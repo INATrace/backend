@@ -8,13 +8,10 @@ import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTyp
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.company.CompanyApiTools;
-import com.abelium.inatrace.components.company.CompanyQueries;
-import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.product.types.ProductLabelAction;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.company.CompanyDocument;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.product.*;
@@ -56,18 +53,12 @@ public class ProductService extends BaseService {
 
 	@Autowired
 	private ProductQueries productQueries;
-
-	@Autowired
-	private CompanyQueries companyQueries;
 	
 	@Autowired
 	private RequestLogService requestLogEngine;
 	
 	@Autowired
 	private AnalyticsEngine analyticsEngine;
-
-	@Autowired
-	private ProductMapper productMapper;
 
 	@Autowired
 	private MeasureUnitTypeService measureUnitTypeService;
@@ -599,30 +590,6 @@ public class ProductService extends BaseService {
     	em.persist(kb);
 	}
     
-    private CompanyCustomer customerListQueryObject(Long userId, Long productId, ApiListCustomersRequest request) {
-    	CompanyCustomer pcProxy = Torpedo.from(CompanyCustomer.class);
-        
-        OnGoingLogicalCondition condition = Torpedo.condition(); // .Torpedo conditions = new ArrayList<>();
-        condition = condition.and(pcProxy.getProduct().getId()).eq(productId); 
-        if (StringUtils.isNotBlank(request.query)) {
-        	OnGoingLogicalCondition queryCondition = 
-    				Torpedo.condition(pcProxy.getName()).like().any(request.query).
-        				   or(pcProxy.getOfficialCompanyName()).like().any(request.query);
-        	condition = condition.and(queryCondition);
-        }
-        if (request.phone != null) {
-            condition = condition.and(Torpedo.condition(pcProxy.getPhone()).like().startsWith(request.phone));
-        }
-        Torpedo.where(condition);
-        switch (request.sortBy) {
-	        case "name": QueryTools.orderBy(request.sort, pcProxy.getName()); break;
-	        case "officialCompanyName": QueryTools.orderBy(request.sort, pcProxy.getOfficialCompanyName()); break;
-	        case "phone": QueryTools.orderBy(request.sort, pcProxy.getPhone()); break;
-	        default: QueryTools.orderBy(request.sort, pcProxy.getName());
-        }
-        return pcProxy;
-    }
-    
     private ProductLabelFeedback feedbackListQueryObject(String labelUid, ApiListProductLabelFeedbackRequest request) {
     	ProductLabelFeedback plfProxy = Torpedo.from(ProductLabelFeedback.class);
         
@@ -779,28 +746,29 @@ public class ProductService extends BaseService {
 	}
 
     private void checkProductPermission(CustomUserDetails authUser, Long productId) throws ApiException {
+
 		if (authUser.getUserRole() == UserRole.ADMIN) return;
-    
-    	Number count = em.createQuery("SELECT count(p) FROM Product p INNER JOIN CompanyUser cu ON cu.company.id = p.company.id "
-    			+ "WHERE cu.user.id = :userId AND p.id = :productId", Number.class).
-    		setParameter("userId", authUser.getUserId()).
-    		setParameter("productId", productId).
-    		getSingleResult();
-    	if (count.longValue() == 0L) {
+
+		// Get all the companies that are product admins (owner companies)
+		List<Company> productOwnerCompanies = em.createNamedQuery("ProductCompany.getProductOwnerCompanies", Company.class)
+				.setParameter("productId", productId).getResultList();
+
+		// Check that the requesting user is enrolled in one of this companies
+		boolean userEnrolledInOwnerCompany = false;
+		for (Company productOwnerCompany : productOwnerCompanies) {
+			userEnrolledInOwnerCompany = productOwnerCompany.getUsers()
+					.stream()
+					.map(CompanyUser::getUser)
+					.anyMatch(u -> u.getId().equals(authUser.getUserId()));
+			if (userEnrolledInOwnerCompany) {
+				break;
+			}
+		}
+
+		if (!userEnrolledInOwnerCompany) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "Invalid product id or forbidden");
-		}		
+		}
     }
-    
-	@SuppressWarnings("unchecked")
-    public List<Long> userCompanies(CustomUserDetails authUser, Long productId) {
-    
-		List<Long> companyIds = (List<Long>) em.createQuery("SELECT cu.company.id FROM Product p INNER JOIN CompanyUser cu ON cu.company.id = p.company.id "
-    			+ "WHERE cu.user.id = :userId AND p.id = :productId").
-    		setParameter("userId", authUser.getUserId()).
-    		setParameter("productId", productId).
-    		getResultList();
-		return companyIds;
-    }    
     
     private void checkProductPermissionAssoc(CustomUserDetails authUser, Long productId) throws ApiException {
 		if (authUser.getUserRole() == UserRole.ADMIN) return; 
@@ -819,19 +787,6 @@ public class ProductService extends BaseService {
     		getSingleResult();
     	if (countAssoc.longValue() == 0L) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "Invalid product id or forbidden");
-		}		
-    }
-    
-    private void checkProductLabelBatchPermission(CustomUserDetails authUser, Long batchId) throws ApiException {
-		if (authUser.getUserRole() == UserRole.ADMIN) return; 
-    
-    	Number count = em.createQuery("SELECT count(plb) FROM ProductLabelBatch plb INNER JOIN CompanyUser cu ON cu.company.id = plb.label.product.company.id "
-    			+ "WHERE cu.user.id = :userId AND plb.id = :batchId", Number.class).
-    		setParameter("userId", authUser.getUserId()).
-    		setParameter("batchId", batchId).
-    		getSingleResult();
-    	if (count.longValue() == 0L) {
-			throw new ApiException(ApiStatus.UNAUTHORIZED, "Invalid batch id or forbidden");
 		}		
     }
     
@@ -884,28 +839,11 @@ public class ProductService extends BaseService {
 		}		
 		return p;
 	}
-
-	private CompanyCustomer fetchCompanyCustomer(CustomUserDetails authUser, Long id) throws ApiException {
-		CompanyCustomer pc = Queries.get(em, CompanyCustomer.class, id);
-		if (pc == null) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid id");
-		}		
-		checkProductPermission(authUser, pc.getProduct().getId());
-		return pc;
-	}
 	
 	private ProductLabel fetchProductLabelPublic(String uid) throws ApiException {
 		ProductLabel pl = Queries.getUniqueBy(em, ProductLabel.class, ProductLabel::getUuid, uid);
 		if (pl == null || pl.getStatus() == ProductLabelStatus.UNPUBLISHED) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid label uid");
-		}		
-		return pl;
-	}
-	
-	private ProductLabel fetchProductLabelPublic(Long id) throws ApiException {
-		ProductLabel pl = Queries.get(em, ProductLabel.class, id);
-		if (pl == null || pl.getStatus() == ProductLabelStatus.UNPUBLISHED) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid label id");
 		}		
 		return pl;
 	}

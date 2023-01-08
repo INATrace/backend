@@ -2,7 +2,6 @@ package com.abelium.inatrace.components.product;
 
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.product.api.*;
 import com.abelium.inatrace.components.product.types.ProductLabelAction;
 import com.abelium.inatrace.security.service.CustomUserDetails;
