@@ -5,10 +5,14 @@ import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
+import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.product.api.ApiFinalProduct;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.product.Product;
+import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.security.utils.PermissionsUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -24,14 +28,24 @@ import java.util.stream.Collectors;
 @Service
 public class FinalProductService extends BaseService {
 
+	private final CompanyQueries companyQueries;
+
+	@Autowired
+	public FinalProductService(CompanyQueries companyQueries) {
+		this.companyQueries = companyQueries;
+	}
+
 	/**
-	 * Get a paginated list of Final prooducts for a provided company (the Final products that this company has access to).
+	 * Get a paginated list of Final products for a provided company (the Final products that this company has access to).
 	 *
-	 * @param request Pagination requets.
+	 * @param request Pagination requests.
 	 * @param companyId Company ID.
 	 * @return List of Final products.
 	 */
-	public ApiPaginatedList<ApiFinalProduct> getFinalProductsForCompany(ApiPaginatedRequest request, Long companyId) {
+	public ApiPaginatedList<ApiFinalProduct> getFinalProductsForCompany(ApiPaginatedRequest request, Long companyId, CustomUserDetails user) throws ApiException {
+
+		// Check that the request user is enrolled in the company for which we are requesting list of final products
+		PermissionsUtil.checkUserIfCompanyEnrolled(companyQueries.fetchCompany(companyId).getUsers(), user);
 
 		// Fetch the products that the company with the provided ID is in any role in the value chain
 		TypedQuery<Product> companyProductsQuery = em.createNamedQuery("ProductCompany.getCompanyProductsWithAnyRole",
