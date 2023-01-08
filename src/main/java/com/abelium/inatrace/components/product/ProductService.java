@@ -408,34 +408,6 @@ public class ProductService extends BaseService {
 		em.remove(pl.getContent());
 		em.remove(pl);
 	}
-
-    @Transactional
-	public void updateCompanyCustomer(CustomUserDetails authUser, ApiCompanyCustomer request) throws ApiException {
-		CompanyCustomer pc = fetchCompanyCustomer(authUser, request.id);
-		productApiTools.updateCompanyCustomer(pc, request);
-	}
-
-    @Transactional
-	public ApiBaseEntity addCompanyCustomer(CustomUserDetails authUser, Long productId, Long companyId, ApiCompanyCustomer request) throws ApiException {
-		Product p = fetchProduct(authUser, productId);
-		List<Long> userCompanyIds = userCompanies(authUser, productId);
-
-		if (!userCompanyIds.contains(companyId)) 
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid company id");
-
-		CompanyCustomer pc = new CompanyCustomer();
-		pc.setProduct(p);
-		pc.setCompany(Queries.get(em, Company.class, companyId));
-		productApiTools.updateCompanyCustomer(pc, request);
-		em.persist(pc);
-		return new ApiBaseEntity(pc);
-	}
-
-    @Transactional
-	public void deleteCompanyCustomer(CustomUserDetails authUser, Long id) throws ApiException {
-		CompanyCustomer pc = fetchCompanyCustomer(authUser, id);
-		em.remove(pc);
-	}
     
     @Transactional
 	public void deleteProductLabelFeedback(CustomUserDetails authUser, Long id) throws ApiException {
@@ -650,13 +622,6 @@ public class ProductService extends BaseService {
         }
         return pcProxy;
     }
-
-    @Transactional
-	public ApiPaginatedList<ApiCompanyCustomer> listCompanyCustomers(CustomUserDetails authUser, Long productId, ApiListCustomersRequest request) throws ApiException {
-    	checkProductPermission(authUser, productId);
-    	return PaginationTools.createPaginatedResponse(em, request, () -> customerListQueryObject(authUser.getUserId(), productId, request), 
-    			ProductApiTools::toApiCompanyCustomer); 
-	}        
     
     private ProductLabelFeedback feedbackListQueryObject(String labelUid, ApiListProductLabelFeedbackRequest request) {
     	ProductLabelFeedback plfProxy = Torpedo.from(ProductLabelFeedback.class);
@@ -890,17 +855,7 @@ public class ProductService extends BaseService {
     	if (countAssoc.longValue() == 0L) {    	
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "Invalid batch id or forbidden");
 		}		
-    }    
-
-	private KnowledgeBlog fetchKnowledgeBlog(CustomUserDetails authUser, Long id) throws ApiException {
-    	KnowledgeBlog kb = Queries.get(em, KnowledgeBlog.class, id);
-    	
-		if (kb == null) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid id");
-		}		
-		checkProductPermission(authUser, kb.getProduct().getId());
-		return kb;
-	}
+    }
 	
 	private KnowledgeBlog fetchKnowledgeBlogAssoc(CustomUserDetails authUser, Long id) throws ApiException {
     	KnowledgeBlog kb = Queries.get(em, KnowledgeBlog.class, id);

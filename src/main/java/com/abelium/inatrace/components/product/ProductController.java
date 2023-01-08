@@ -219,43 +219,6 @@ public class ProductController {
     		@Valid @ApiParam(value = "Label id", required = true) @PathVariable("id") Long id) throws ApiException {
         return productDocumentEngine.createLabelsAndHowToUseInstructions(authUser, id).toResponseEntity();
     }
-
-    @GetMapping(value = "/companyCustomers/list/{productId}")
-    @ApiOperation(value = "List company customers for a product")
-    public ApiPaginatedResponse<ApiCompanyCustomer> getCompanyCustomersList(
-    		@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @ApiParam(value = "Product id", required = true) @PathVariable("productId") Long productId,
-    		@Valid ApiListCustomersRequest request) throws ApiException {
-    	return new ApiPaginatedResponse<>(productService.listCompanyCustomers(authUser, productId, request));
-    }
-    
-    @PutMapping(value = "/companyCustomers")
-    @ApiOperation(value = "Update company customer")
-    public ApiDefaultResponse updateCompanyCustomer(
-    		@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @RequestBody ApiCompanyCustomer request) throws ApiException {
-    	productService.updateCompanyCustomer(authUser, request);
-    	return new ApiDefaultResponse();
-    }
-    
-    @PostMapping(value = "/companyCustomers/add/{productId}/{companyId}")
-    @ApiOperation(value = "Add company customer customer")
-    public ApiResponse<ApiBaseEntity> addCompanyCustomer(
-    		@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @ApiParam(value = "Product id", required = true) @PathVariable("productId") Long productId,
-    		@Valid @ApiParam(value = "Company id", required = true) @PathVariable("companyId") Long companyId,
-    		@Valid @RequestBody ApiCompanyCustomer request) throws ApiException {
-    	return new ApiResponse<>(productService.addCompanyCustomer(authUser, productId, companyId, request));
-    }
-    
-    @DeleteMapping(value = "/companyCustomers/{id}")
-    @ApiOperation(value = "Deletes a company customer")
-    public ApiDefaultResponse deleteCompanyCustomer(
-    		@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @ApiParam(value = "Customer id", required = true) @PathVariable("id") Long id) throws ApiException {
-    	productService.deleteCompanyCustomer(authUser, id);
-    	return new ApiDefaultResponse();
-    }    
     
     @GetMapping(value = "/knowledgeBlog/list/{productId}")
     @ApiOperation(value = "Get knowledge blogs for a product")
