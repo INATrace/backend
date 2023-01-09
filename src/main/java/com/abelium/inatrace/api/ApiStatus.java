@@ -67,7 +67,12 @@ public enum ApiStatus {
     /**
      * not implemented error
      */
-    NOT_IMPLEMENTED(HttpStatus.NOT_IMPLEMENTED), 
+    NOT_IMPLEMENTED(HttpStatus.NOT_IMPLEMENTED),
+
+    /**
+     * Not found,
+     */
+    NOT_FOUND(HttpStatus.NOT_FOUND),
     ;
     
     private final HttpStatus httpStatus;
