@@ -9,7 +9,7 @@ public class ProductTypeMapper {
         throw new IllegalStateException("Utility class");
     }
 
-    static ProductType toProductType(ApiProductType apiProductType) {
+    public static ProductType toProductType(ApiProductType apiProductType) {
         ProductType productType = new ProductType();
 
         productType.setName(apiProductType.getName());
@@ -18,7 +18,7 @@ public class ProductTypeMapper {
         return productType;
     }
 
-    static ApiProductType toApiProductType(ProductType productType) {
+    public static ApiProductType toApiProductType(ProductType productType) {
         ApiProductType apiProductType = new ApiProductType();
 
         apiProductType.setId(productType.getId());

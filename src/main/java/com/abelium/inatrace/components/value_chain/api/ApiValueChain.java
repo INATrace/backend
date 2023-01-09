@@ -7,6 +7,7 @@ import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasure
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
 import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
+import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.db.entities.value_chain.enums.ValueChainStatus;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
@@ -47,6 +48,9 @@ public class ApiValueChain extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "list of supported semi-products", position = 10)
 	private List<ApiSemiProduct> semiProducts;
+
+	@ApiModelProperty(value = "Selected product type", position = 11)
+	private ApiProductType productType;
 
 	public String getName() {
 		return name;
@@ -120,4 +124,11 @@ public class ApiValueChain extends ApiBaseEntity {
 		this.semiProducts = semiProducts;
 	}
 
+	public ApiProductType getProductType() {
+		return productType;
+	}
+
+	public void setProductType(ApiProductType productType) {
+		this.productType = productType;
+	}
 }

@@ -17,11 +17,13 @@ import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiP
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.BaseService;
+import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.user.UserService;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChainListRequest;
 import com.abelium.inatrace.db.entities.codebook.*;
 import com.abelium.inatrace.db.entities.common.User;
+import com.abelium.inatrace.db.entities.product.ProductType;
 import com.abelium.inatrace.db.entities.value_chain.*;
 import com.abelium.inatrace.db.entities.value_chain.enums.ValueChainStatus;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -156,6 +158,9 @@ public class ValueChainService extends BaseService {
 
 		// Update semi-products
 		updateVCSemiProducts(entity, apiValueChain);
+
+		// Update product type
+		updateProductType(entity, apiValueChain);
 
 		if (entity.getId() == null) {
 			em.persist(entity);
@@ -297,6 +302,18 @@ public class ValueChainService extends BaseService {
 			}
 		}
 		currentVCSemiProducts.values().forEach(vcSP -> entity.getSemiProducts().remove(vcSP));
+	}
+
+	private void updateProductType(ValueChain entity, ApiValueChain apiValueChain) throws ApiException {
+		if (apiValueChain.getProductType() == null || apiValueChain.getProductType().getId() == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Product type id must be specified");
+		}
+		ProductType productType = em.find(ProductType.class, apiValueChain.getProductType().getId());
+		if (productType == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Product type with given id does not exist");
+		}
+
+		entity.setProductType(ProductTypeMapper.toProductType(apiValueChain.getProductType()));
 	}
 
 }
