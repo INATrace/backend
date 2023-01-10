@@ -93,6 +93,9 @@ public class ValueChainService extends BaseService {
 		if (request.getValueChainStatus() != null) {
 			condition = condition.and(valueChainProxy.getValueChainStatus()).eq(request.getValueChainStatus());
 		}
+		if (request.getProductTypeId() != null) {
+			condition = condition.and(valueChainProxy.getProductType().getId()).eq(request.getProductTypeId());
+		}
 
 		Torpedo.where(condition);
 
