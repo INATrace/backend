@@ -62,6 +62,7 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -411,7 +412,7 @@ public class StockOrderService extends BaseService {
                             } else {
 
                                 processing.getPurchaseOrders().stream().findFirst().ifPresent(po -> {
-                                    historyTimelineItem.setDate(po.getProductionDate());
+                                    historyTimelineItem.setDate(po.getProductionDate().atStartOfDay().toInstant(ZoneOffset.UTC));
                                     historyTimelineItem.setLocation(po.getFacility().getName());
 
                                     apiQRTagPublic.setProducerName(po.getFacility().getCompany().getName());
@@ -826,7 +827,7 @@ public class StockOrderService extends BaseService {
             apiStockOrder.setFacility(apiPurchaseOrder.getFacility());
             apiStockOrder.setPreferredWayOfPayment(apiPurchaseOrder.getPreferredWayOfPayment());
             apiStockOrder.setRepresentativeOfProducerUserCustomer(apiPurchaseOrder.getRepresentativeOfProducerUserCustomer());
-            apiStockOrder.setProductionDate(apiPurchaseOrder.getProductionDate());
+            apiStockOrder.setProductionDate(apiPurchaseOrder.getProductionDate().atOffset(ZoneOffset.UTC).toLocalDate());
             apiStockOrder.setCurrency(apiPurchaseOrder.getCurrency());
             apiStockOrder.setActivityProofs(apiPurchaseOrder.getActivityProofs());
 

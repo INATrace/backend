@@ -19,6 +19,7 @@ import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -145,7 +146,7 @@ public class StockOrder extends TimestampEntity {
 	private BigDecimal availableQuantity;
 	
 	@Column
-	private Instant productionDate;
+	private LocalDate productionDate;
 	
 	@Column
 	private Instant deliveryTime;
@@ -421,11 +422,11 @@ public class StockOrder extends TimestampEntity {
 		this.outQuantityNotInRange = outQuantityNotInRange;
 	}
 
-	public Instant getProductionDate() {
+	public LocalDate getProductionDate() {
 		return productionDate;
 	}
 
-	public void setProductionDate(Instant productionDate) {
+	public void setProductionDate(LocalDate productionDate) {
 		this.productionDate = productionDate;
 	}
 

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -92,8 +93,8 @@ public class CommonCsvController {
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
 			@Valid @ApiParam(value = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
 			@Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
-			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
-			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
+			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
 			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws IOException, ApiException {
 
 		request.limit = 500;
@@ -113,8 +114,8 @@ public class CommonCsvController {
 					isWomenShare,
 					preferredWayOfPayment,
 					null,
-					productionDateStart != null ? productionDateStart.toInstant() : null,
-					productionDateEnd != null ? productionDateEnd.toInstant() : null,
+					productionDateStart,
+					productionDateEnd,
 					farmerName
 				), 
 				authUser,

@@ -33,6 +33,7 @@ import org.torpedoquery.jpa.Torpedo;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.ZoneOffset;
 
 /**
  * Service for payment entity.
@@ -254,7 +255,7 @@ public class PaymentService extends BaseService {
 			// Values from StockOrder
 			entity.setStockOrder(stockOrder);
 			entity.setOrderReference(stockOrder.getIdentifier());
-			entity.setProductionDate(stockOrder.getProductionDate());
+			entity.setProductionDate(stockOrder.getProductionDate().atStartOfDay().toInstant(ZoneOffset.UTC));
 			entity.setPayingCompany(stockOrder.getCompany()); // The company that is paying
 			entity.setPurchased(stockOrder.getTotalQuantity());
 			entity.setPreferredWayOfPayment(stockOrder.getPreferredWayOfPayment());

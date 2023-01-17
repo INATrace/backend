@@ -23,6 +23,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,9 +113,7 @@ public class ApiStockOrder extends ApiBaseEntity {
     public Boolean outQuantityNotInRange;
 
     @ApiModelProperty(value = "Production date", position = 16)
-    @JsonSerialize(converter = SimpleDateConverter.Serialize.class)
-    @JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
-    private Instant productionDate;
+    private LocalDate productionDate;
 
     @ApiModelProperty(value = "Delivery time", position = 18)
     private Instant deliveryTime;
@@ -421,11 +420,11 @@ public class ApiStockOrder extends ApiBaseEntity {
         this.outQuantityNotInRange = outQuantityNotInRange;
     }
 
-    public Instant getProductionDate() {
+    public LocalDate getProductionDate() {
         return productionDate;
     }
 
-    public void setProductionDate(Instant productionDate) {
+    public void setProductionDate(LocalDate productionDate) {
         this.productionDate = productionDate;
     }
 
