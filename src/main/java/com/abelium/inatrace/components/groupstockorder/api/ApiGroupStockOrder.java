@@ -6,20 +6,54 @@ import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.tomcat.jni.Local;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ApiGroupStockOrder extends ApiBaseEntity {
+
+    public ApiGroupStockOrder() {}
+    public ApiGroupStockOrder(
+            String groupedIds,
+            LocalDate productionDate,
+            String internalLotNumber,
+            Long noOfSacs,
+            OrderType orderType,
+            String semiProductName,
+            String finalProductName,
+            BigDecimal totalQuantity,
+            BigDecimal fulfilledQuantity,
+            BigDecimal availableQuantity,
+            String unitLabel,
+            LocalDate deliveryTime,
+            Instant updateTimestamp,
+            Boolean isAvailable
+    ) {
+        setProductionDate(productionDate);
+        setInternalLotNumber(internalLotNumber);
+        setOrderType(orderType);
+        setTotalQuantity(totalQuantity);
+        setFulfilledQuantity(fulfilledQuantity);
+        setAvailableQuantity(availableQuantity);
+        setUnitLabel(unitLabel);
+        setDeliveryTime(deliveryTime);
+        setUpdateTimestamp(updateTimestamp);
+        setAvailable(isAvailable);
+        setSemiProductName(semiProductName);
+        setNoOfSacs(noOfSacs);
+        setFinalProductName(finalProductName);
+        setGroupedIds(Arrays.stream(groupedIds.split(",")).map(Long::parseLong).collect(Collectors.toList()));
+    }
 
     @ApiModelProperty(value = "List of stock order ID's, belonging to this group")
     private List<Long> groupedIds;
 
     @ApiModelProperty(value = "Production date")
-    @JsonSerialize(converter = SimpleDateConverter.Serialize.class)
-    @JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
     private LocalDate productionDate;
 
     @ApiModelProperty(value = "Timestamp indicates when process order have been updated")
