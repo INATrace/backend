@@ -33,7 +33,6 @@ import org.torpedoquery.jpa.Torpedo;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.ZoneOffset;
 
 /**
  * Service for payment entity.
@@ -133,10 +132,10 @@ public class PaymentService extends BaseService {
 			condition = condition.and(paymentProxy.getRecipientUserCustomer()).isNotNull();
 			condition = condition.and(paymentProxy.getRecipientUserCustomer().getId()).eq(queryRequest.farmerId);
 		}
-		if (queryRequest.representativeOfRecepientUserCustomerId != null) {
+		if (queryRequest.representativeOfRecipientUserCustomerId != null) {
 			condition = condition.and(paymentProxy.getRepresentativeOfRecipientUserCustomer()).isNotNull();
 			condition = condition.and(paymentProxy.getRepresentativeOfRecipientUserCustomer().getId())
-					.eq(queryRequest.representativeOfRecepientUserCustomerId);
+					.eq(queryRequest.representativeOfRecipientUserCustomerId);
 		}
 
 		Torpedo.where(condition);
@@ -255,7 +254,7 @@ public class PaymentService extends BaseService {
 			// Values from StockOrder
 			entity.setStockOrder(stockOrder);
 			entity.setOrderReference(stockOrder.getIdentifier());
-			entity.setProductionDate(stockOrder.getProductionDate().atStartOfDay().toInstant(ZoneOffset.UTC));
+			entity.setProductionDate(stockOrder.getProductionDate());
 			entity.setPayingCompany(stockOrder.getCompany()); // The company that is paying
 			entity.setPurchased(stockOrder.getTotalQuantity());
 			entity.setPreferredWayOfPayment(stockOrder.getPreferredWayOfPayment());

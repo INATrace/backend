@@ -447,7 +447,7 @@ public class StockOrderService extends BaseService {
                             apiPayment.getCurrency(),
                             "USD",
                             apiPayment.getAmount(),
-                            Date.from(apiPayment.getFormalCreationTime())
+                            Date.from(apiPayment.getFormalCreationTime().atStartOfDay().toInstant(ZoneOffset.UTC))
                     );
 
                     // Accumulate payments
@@ -537,7 +537,7 @@ public class StockOrderService extends BaseService {
                                     apiPayment.getCurrency(),
                                     "USD",
                                     apiPayment.getAmount(),
-                                    Date.from(apiPayment.getFormalCreationTime())
+                                    Date.from(apiPayment.getFormalCreationTime().atStartOfDay().toInstant(ZoneOffset.UTC))
                             )
                     );
                 }
