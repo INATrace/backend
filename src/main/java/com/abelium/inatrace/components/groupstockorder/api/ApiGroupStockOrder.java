@@ -9,44 +9,10 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Arrays;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ApiGroupStockOrder extends ApiBaseEntity {
-
-    public ApiGroupStockOrder() {}
-    public ApiGroupStockOrder(
-            String groupedIds,
-            Instant productionDate,
-            String internalLotNumber,
-            Long noOfSacs,
-            OrderType orderType,
-            String semiProductName,
-            String finalProductName,
-            BigDecimal totalQuantity,
-            BigDecimal fulfilledQuantity,
-            BigDecimal availableQuantity,
-            String unitLabel,
-            Instant deliveryTime,
-            Instant updateTimestamp,
-            Boolean isAvailable
-    ) {
-        setProductionDate(productionDate);
-        setInternalLotNumber(internalLotNumber);
-        setOrderType(orderType);
-        setTotalQuantity(totalQuantity);
-        setFulfilledQuantity(fulfilledQuantity);
-        setAvailableQuantity(availableQuantity);
-        setUnitLabel(unitLabel);
-        setDeliveryTime(deliveryTime);
-        setUpdateTimestamp(updateTimestamp);
-        setAvailable(isAvailable);
-        setSemiProductName(semiProductName);
-        setNoOfSacs(noOfSacs);
-        setFinalProductName(finalProductName);
-        setGroupedIds(Arrays.stream(groupedIds.split(",")).map(Long::parseLong).collect(Collectors.toList()));
-    }
 
     @ApiModelProperty(value = "List of stock order ID's, belonging to this group")
     private List<Long> groupedIds;
@@ -54,7 +20,7 @@ public class ApiGroupStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Production date")
     @JsonSerialize(converter = SimpleDateConverter.Serialize.class)
     @JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
-    private Instant productionDate;
+    private LocalDate productionDate;
 
     @ApiModelProperty(value = "Timestamp indicates when process order have been updated")
     private Instant updateTimestamp;
@@ -87,7 +53,7 @@ public class ApiGroupStockOrder extends ApiBaseEntity {
     private String unitLabel;
 
     @ApiModelProperty(value = "Delivery time")
-    private Instant deliveryTime;
+    private LocalDate deliveryTime;
 
     @ApiModelProperty(value = "Is stock available")
     private Boolean isAvailable;
@@ -156,11 +122,11 @@ public class ApiGroupStockOrder extends ApiBaseEntity {
         this.unitLabel = unitLabel;
     }
 
-    public Instant getDeliveryTime() {
+    public LocalDate getDeliveryTime() {
         return deliveryTime;
     }
 
-    public void setDeliveryTime(Instant deliveryTime) {
+    public void setDeliveryTime(LocalDate deliveryTime) {
         this.deliveryTime = deliveryTime;
     }
 
@@ -172,11 +138,11 @@ public class ApiGroupStockOrder extends ApiBaseEntity {
         isAvailable = available;
     }
 
-    public Instant getProductionDate() {
+    public LocalDate getProductionDate() {
         return productionDate;
     }
 
-    public void setProductionDate(Instant productionDate) {
+    public void setProductionDate(LocalDate productionDate) {
         this.productionDate = productionDate;
     }
 
