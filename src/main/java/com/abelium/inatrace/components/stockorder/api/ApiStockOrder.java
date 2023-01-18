@@ -15,9 +15,6 @@ import com.abelium.inatrace.components.productorder.api.ApiProductOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
-import com.abelium.inatrace.tools.converters.SimpleDateConverter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
@@ -59,10 +56,6 @@ public class ApiStockOrder extends ApiBaseEntity {
     // Relevant only for order type: PURCHASE_ORDER
     @ApiModelProperty(value = "Production location", position = 6)
     private ApiStockOrderLocation productionLocation;
-
-//    @ApiModelProperty(value = "Certification", position = 6)
-//    @Valid
-//    public List<ApiCertification> certifications;
 
     @ApiModelProperty(value = "Activity proofs", position = 7)
     private List<ApiActivityProof> activityProofs;
@@ -116,7 +109,7 @@ public class ApiStockOrder extends ApiBaseEntity {
     private LocalDate productionDate;
 
     @ApiModelProperty(value = "Delivery time", position = 18)
-    private Instant deliveryTime;
+    private LocalDate deliveryTime;
 
     @ApiModelProperty(value = "The produrct order that triggered creation of this stock order")
     private ApiProductOrder productOrder;
@@ -428,11 +421,11 @@ public class ApiStockOrder extends ApiBaseEntity {
         this.productionDate = productionDate;
     }
 
-    public Instant getDeliveryTime() {
+    public LocalDate getDeliveryTime() {
         return deliveryTime;
     }
 
-    public void setDeliveryTime(Instant deliveryTime) {
+    public void setDeliveryTime(LocalDate deliveryTime) {
         this.deliveryTime = deliveryTime;
     }
 

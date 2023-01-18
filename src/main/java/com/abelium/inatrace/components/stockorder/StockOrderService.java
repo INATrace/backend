@@ -827,7 +827,7 @@ public class StockOrderService extends BaseService {
             apiStockOrder.setFacility(apiPurchaseOrder.getFacility());
             apiStockOrder.setPreferredWayOfPayment(apiPurchaseOrder.getPreferredWayOfPayment());
             apiStockOrder.setRepresentativeOfProducerUserCustomer(apiPurchaseOrder.getRepresentativeOfProducerUserCustomer());
-            apiStockOrder.setProductionDate(apiPurchaseOrder.getProductionDate().atOffset(ZoneOffset.UTC).toLocalDate());
+            apiStockOrder.setProductionDate(apiPurchaseOrder.getProductionDate());
             apiStockOrder.setCurrency(apiPurchaseOrder.getCurrency());
             apiStockOrder.setActivityProofs(apiPurchaseOrder.getActivityProofs());
 

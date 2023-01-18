@@ -18,7 +18,6 @@ import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -124,7 +123,6 @@ public class StockOrder extends TimestampEntity {
 
 	/**
 	 * User entered Order ID - relevant for Quote orders.
-	 *
 	 * Can be set only when productOrder is not provided. If productOrder is set, then
 	 * the user entered Order ID in the ProductOrder should be used.
  	 */
@@ -144,12 +142,18 @@ public class StockOrder extends TimestampEntity {
 
 	@Column
 	private BigDecimal availableQuantity;
-	
+
+	/**
+	 * This should be saved as dated, without any time, so we don't have issues with different client timezones.
+	 */
 	@Column
 	private LocalDate productionDate;
-	
+
+	/**
+	 * This should be saved as dated, without any time, so we don't have issues with different client timezones.
+	 */
 	@Column
-	private Instant deliveryTime;
+	private LocalDate deliveryTime;
 	
 	@Column
 	private BigDecimal pricePerUnit;
@@ -430,11 +434,11 @@ public class StockOrder extends TimestampEntity {
 		this.productionDate = productionDate;
 	}
 
-	public Instant getDeliveryTime() {
+	public LocalDate getDeliveryTime() {
 		return deliveryTime;
 	}
 
-	public void setDeliveryTime(Instant deliveryTime) {
+	public void setDeliveryTime(LocalDate deliveryTime) {
 		this.deliveryTime = deliveryTime;
 	}
 
