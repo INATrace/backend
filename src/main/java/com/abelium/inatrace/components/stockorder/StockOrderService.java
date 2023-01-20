@@ -412,7 +412,7 @@ public class StockOrderService extends BaseService {
                             } else {
 
                                 processing.getPurchaseOrders().stream().findFirst().ifPresent(po -> {
-                                    historyTimelineItem.setDate(po.getProductionDate().atStartOfDay().toInstant(ZoneOffset.UTC));
+                                    historyTimelineItem.setDate(po.getProductionDate());
                                     historyTimelineItem.setLocation(po.getFacility().getName());
 
                                     apiQRTagPublic.setProducerName(po.getFacility().getCompany().getName());

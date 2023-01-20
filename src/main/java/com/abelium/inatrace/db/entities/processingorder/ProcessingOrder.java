@@ -7,6 +7,7 @@ import com.abelium.inatrace.db.entities.stockorder.Transaction;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class ProcessingOrder extends TimestampEntity {
     private Long initiatorUserId;
 
     @Column
-    private Instant processingDate;
+    private LocalDate processingDate;
 
     @ManyToOne
     private ProcessingAction processingAction;
@@ -39,11 +40,11 @@ public class ProcessingOrder extends TimestampEntity {
         this.initiatorUserId = initiatorUserId;
     }
 
-    public Instant getProcessingDate() {
+    public LocalDate getProcessingDate() {
         return processingDate;
     }
 
-    public void setProcessingDate(Instant processingDate) {
+    public void setProcessingDate(LocalDate processingDate) {
         this.processingDate = processingDate;
     }
 

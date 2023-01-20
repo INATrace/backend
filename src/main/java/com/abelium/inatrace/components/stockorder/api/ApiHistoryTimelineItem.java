@@ -1,11 +1,8 @@
 package com.abelium.inatrace.components.stockorder.api;
 
-import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import com.abelium.inatrace.types.PublicTimelineIconType;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 /**
  * API model representing single item (processing) in the QR tag history timeline.
@@ -18,9 +15,7 @@ public class ApiHistoryTimelineItem {
 
 	private String name;
 
-	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
-	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
-	private Instant date;
+	private LocalDate date;
 
 	private String location;
     
@@ -50,11 +45,11 @@ public class ApiHistoryTimelineItem {
 		this.name = name;
 	}
 
-	public Instant getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
-	public void setDate(Instant date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 

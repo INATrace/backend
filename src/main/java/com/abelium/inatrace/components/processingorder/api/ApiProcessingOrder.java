@@ -4,12 +4,10 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.transaction.api.ApiTransaction;
-import com.abelium.inatrace.tools.converters.SimpleDateConverter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +23,7 @@ public class ApiProcessingOrder extends ApiBaseEntity {
     public ApiProcessingAction processingAction;
 
     @ApiModelProperty(value = "Processing date")
-    @JsonSerialize(converter = SimpleDateConverter.Serialize.class)
-    @JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
-    public Instant processingDate;
+    public LocalDate processingDate;
 
     @ApiModelProperty(value = "Input transactions")
     public List<ApiTransaction> inputTransactions;
@@ -65,11 +61,11 @@ public class ApiProcessingOrder extends ApiBaseEntity {
         this.processingAction = processingAction;
     }
 
-    public Instant getProcessingDate() {
+    public LocalDate getProcessingDate() {
         return processingDate;
     }
 
-    public void setProcessingDate(Instant processingDate) {
+    public void setProcessingDate(LocalDate processingDate) {
         this.processingDate = processingDate;
     }
 
