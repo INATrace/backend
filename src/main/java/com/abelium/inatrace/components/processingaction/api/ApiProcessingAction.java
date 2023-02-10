@@ -60,9 +60,9 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Processing action input semi product")
 	private ApiSemiProduct inputSemiProduct;
-	
-	@ApiModelProperty(value = "Processing action input semi product")
-	private ApiSemiProduct outputSemiProduct;
+
+	@ApiModelProperty(value = "List of supported output semi-products")
+	private List<ApiSemiProduct> outputSemiProducts;
 
 	@ApiModelProperty(value = "The input Final product")
 	private ApiFinalProduct inputFinalProduct;
@@ -197,12 +197,12 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		this.inputSemiProduct = inputSemiProduct;
 	}
 
-	public ApiSemiProduct getOutputSemiProduct() {
-		return outputSemiProduct;
+	public List<ApiSemiProduct> getOutputSemiProducts() {
+		return outputSemiProducts;
 	}
 
-	public void setOutputSemiProduct(ApiSemiProduct outputSemiProduct) {
-		this.outputSemiProduct = outputSemiProduct;
+	public void setOutputSemiProducts(List<ApiSemiProduct> outputSemiProducts) {
+		this.outputSemiProducts = outputSemiProducts;
 	}
 
 	public ApiFinalProduct getInputFinalProduct() {

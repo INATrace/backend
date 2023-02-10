@@ -1195,7 +1195,10 @@ public class StockOrderService extends BaseService {
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 BigDecimal inputUnitWeight = procAction.getInputSemiProduct().getMeasurementUnitType().getWeight();
-                BigDecimal outputUnitWeight = procAction.getOutputSemiProduct().getMeasurementUnitType().getWeight();
+
+                // TODO: check this if correct after added multiple outputs support
+                BigDecimal outputUnitWeight = stockOrder.getSemiProduct().getMeasurementUnitType().getWeight();
+                // BigDecimal outputUnitWeight = procAction.getOutputSemiProduct().getMeasurementUnitType().getWeight();
 
                 // Calculate the input quantity normalized in the output measuring unit (important when we have different input and output measure units)
                 BigDecimal totalInputQuantityNormalized = totalInputQuantity.divide(inputUnitWeight,

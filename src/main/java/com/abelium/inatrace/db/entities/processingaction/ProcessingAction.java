@@ -51,11 +51,16 @@ public class ProcessingAction extends TimestampEntity {
 	@ManyToOne
 	private SemiProduct inputSemiProduct;
 
-	/**
-	 * Used when we have action types: PROCESSING, QUOTE, TRANSFER, GENERATE_QR_CODE
-	 */
+	// FIXME: this field should be removed once we have migrated to the new DB schema in all environments
 	@ManyToOne
 	private SemiProduct outputSemiProduct;
+
+	/**
+	 * Used when we have action types: PROCESSING, QUOTE, TRANSFER, GENERATE_QR_CODE.
+	 * If type is PROCESSING, we can have one or more output semi-products. In the other case only one output semi-product is allowed.
+	 */
+	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProcessingActionOutputSemiProduct> outputSemiProducts = new ArrayList<>();
 
 	/**
 	 * Used when we have action types QUOTE or TRANSFER and finalProductAction value to true
@@ -178,8 +183,12 @@ public class ProcessingAction extends TimestampEntity {
 		return outputSemiProduct;
 	}
 
-	public void setOutputSemiProduct(SemiProduct outputSemiProduct) {
-		this.outputSemiProduct = outputSemiProduct;
+	public List<ProcessingActionOutputSemiProduct> getOutputSemiProducts() {
+		return outputSemiProducts;
+	}
+
+	public void setOutputSemiProducts(List<ProcessingActionOutputSemiProduct> outputSemiProducts) {
+		this.outputSemiProducts = outputSemiProducts;
 	}
 
 	public FinalProduct getInputFinalProduct() {
@@ -285,5 +294,5 @@ public class ProcessingAction extends TimestampEntity {
 	public void setProcessingActionTranslations(List<ProcessingActionTranslation> processingActionTranslations) {
 		this.processingActionTranslations = processingActionTranslations;
 	}
-	
+
 }

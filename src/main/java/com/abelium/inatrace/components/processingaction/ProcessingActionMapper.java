@@ -67,9 +67,15 @@ public final class ProcessingActionMapper {
 		apiCompany.setName(entity.getCompany().getName());
 		apiProcessingAction.setCompany(apiCompany);
 
-		// Map the input and output semi-products
+		// Map the input semi-product
 		apiProcessingAction.setInputSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct(), language));
-		apiProcessingAction.setOutputSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getOutputSemiProduct(), language));
+
+		// Map the output semi-products
+		apiProcessingAction.setOutputSemiProducts(entity.getOutputSemiProducts()
+				.stream()
+				.map(paOSM -> SemiProductMapper.toApiSemiProduct(paOSM.getOutputSemiProduct(), language))
+				.collect(Collectors.toList())
+		);
 
 		// Map the input and output final products
 		apiProcessingAction.setInputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getInputFinalProduct()));
@@ -189,9 +195,15 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setPublicTimelineIconType(entity.getPublicTimelineIconType());
 		apiProcessingAction.setType(entity.getType());
 
-		// Map the input and output semi-products
+		// Map the input semi-product
 		apiProcessingAction.setInputSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct(), language));
-		apiProcessingAction.setOutputSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getOutputSemiProduct(), language));
+
+		// Map the output semi-products
+		apiProcessingAction.setOutputSemiProducts(entity.getOutputSemiProducts()
+				.stream()
+				.map(paOSM -> SemiProductMapper.toApiSemiProduct(paOSM.getOutputSemiProduct(), language))
+				.collect(Collectors.toList())
+		);
 
 		// Map the input and output final products
 		apiProcessingAction.setInputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getInputFinalProduct()));
