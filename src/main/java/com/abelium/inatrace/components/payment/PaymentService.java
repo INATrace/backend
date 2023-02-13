@@ -132,10 +132,10 @@ public class PaymentService extends BaseService {
 			condition = condition.and(paymentProxy.getRecipientUserCustomer()).isNotNull();
 			condition = condition.and(paymentProxy.getRecipientUserCustomer().getId()).eq(queryRequest.farmerId);
 		}
-		if (queryRequest.representativeOfRecepientUserCustomerId != null) {
+		if (queryRequest.representativeOfRecipientUserCustomerId != null) {
 			condition = condition.and(paymentProxy.getRepresentativeOfRecipientUserCustomer()).isNotNull();
 			condition = condition.and(paymentProxy.getRepresentativeOfRecipientUserCustomer().getId())
-					.eq(queryRequest.representativeOfRecepientUserCustomerId);
+					.eq(queryRequest.representativeOfRecipientUserCustomerId);
 		}
 
 		Torpedo.where(condition);

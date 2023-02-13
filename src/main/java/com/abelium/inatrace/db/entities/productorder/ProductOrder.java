@@ -9,7 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class ProductOrder extends TimestampEntity {
 	private Facility facility;
 
 	@Column(nullable = false)
-	private Instant deliveryDeadline;
+	private LocalDate deliveryDeadline;
 
 	@ManyToOne
 	private CompanyCustomer customer;
@@ -53,11 +53,11 @@ public class ProductOrder extends TimestampEntity {
 		this.facility = facility;
 	}
 
-	public Instant getDeliveryDeadline() {
+	public LocalDate getDeliveryDeadline() {
 		return deliveryDeadline;
 	}
 
-	public void setDeliveryDeadline(Instant deliveryDeadline) {
+	public void setDeliveryDeadline(LocalDate deliveryDeadline) {
 		this.deliveryDeadline = deliveryDeadline;
 	}
 

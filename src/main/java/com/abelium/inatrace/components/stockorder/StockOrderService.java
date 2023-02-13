@@ -62,6 +62,7 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -446,7 +447,7 @@ public class StockOrderService extends BaseService {
                             apiPayment.getCurrency(),
                             "USD",
                             apiPayment.getAmount(),
-                            Date.from(apiPayment.getFormalCreationTime())
+                            Date.from(apiPayment.getFormalCreationTime().atStartOfDay().toInstant(ZoneOffset.UTC))
                     );
 
                     // Accumulate payments
@@ -536,7 +537,7 @@ public class StockOrderService extends BaseService {
                                     apiPayment.getCurrency(),
                                     "USD",
                                     apiPayment.getAmount(),
-                                    Date.from(apiPayment.getFormalCreationTime())
+                                    Date.from(apiPayment.getFormalCreationTime().atStartOfDay().toInstant(ZoneOffset.UTC))
                             )
                     );
                 }
@@ -857,7 +858,12 @@ public class StockOrderService extends BaseService {
                                                        ProcessingOrder processingOrder) throws ApiException {
 
         // Check that the request user is form a company which is connected to the company that owns the quote order (or is a user of that company)
-        PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(apiStockOrder.getCompany().getId()), user);
+        if (apiStockOrder.getCompany() != null && apiStockOrder.getCompany().getId() != null) {
+            PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(apiStockOrder.getCompany().getId()), user);
+        } else {
+            // When creating a new Quote order, the underlying stock order has not yet set company
+            PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(processingOrder.getProcessingAction().getCompany().getId()), user);
+        }
 
         return createOrUpdateStockOrder(apiStockOrder, user, processingOrder, false);
     }
@@ -871,9 +877,9 @@ public class StockOrderService extends BaseService {
 
     @Transactional
     public ApiBaseEntity createOrUpdateStockOrder(ApiStockOrder apiStockOrder,
-                                                   CustomUserDetails user,
-                                                   ProcessingOrder processingOrder,
-                                                   boolean checkCompanyEnrolment) throws ApiException {
+                                                  CustomUserDetails user,
+                                                  ProcessingOrder processingOrder,
+                                                  boolean checkCompanyEnrolment) throws ApiException {
 
         StockOrder entity;
 

@@ -24,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -158,7 +159,7 @@ public class BeycoOrderService extends BaseService {
             orderCoffees.setCoffee(new ApiBeycoCoffee());
 
             orderCoffees.getCoffee().setName(stockOrder.getInternalLotNumber());
-            orderCoffees.getCoffee().setHarvestAt(stockOrder.getProductionDate());
+            orderCoffees.getCoffee().setHarvestAt(stockOrder.getProductionDate().atStartOfDay().toInstant(ZoneOffset.UTC));
 
             List<ApiBeycoCoffeeCertificate> apiCerts = new ArrayList<>();
             for (CompanyCertification cert : stockOrder.getCompany().getCertifications()) {
