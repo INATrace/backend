@@ -76,7 +76,7 @@ public class ProcessingAction extends TimestampEntity {
 
 	/**
 	 * Used when we have action type GENERATE_QR_CODE. It holds the reference to the Final product
-	 * that will be tagged by the generated QR code tag. This is used to to connect the QR code tag with the Final product QR labels.
+	 * that will be tagged by the generated QR code tag. This is used to connect the QR code tag with the Final product QR labels.
 	 */
 	@ManyToOne
 	private FinalProduct qrCodeForFinalProduct;
