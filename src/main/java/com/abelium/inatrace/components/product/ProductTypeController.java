@@ -33,7 +33,7 @@ public class ProductTypeController {
 
     @GetMapping("/{id}")
     public ApiResponse<ApiProductType> getProductType(
-            @RequestParam(value = "id") Integer id
+            @RequestParam(value = "id") Long id
     ) throws ApiException {
         return productTypeService.getProductType(id);
     }
@@ -49,7 +49,7 @@ public class ProductTypeController {
     @DeleteMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ApiDefaultResponse deleteProductType(
-            @RequestParam(value = "id") Integer id
+            @RequestParam(value = "id") Long id
     ) throws ApiException {
         return productTypeService.deleteProductType(id);
     }
