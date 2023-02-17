@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -298,9 +297,6 @@ public class ProcessingOrderService extends BaseService {
                 targetStockOrder.setQrCodeTag(presentQrCodeTag);
                 targetStockOrder.setQrCodeTagFinalProduct(qrCodeFinalProduct);
 
-                insertedTransaction.setOutputMeasureUnitType(targetStockOrder.getMeasurementUnitType());
-                insertedTransaction.setTargetFacility(targetStockOrder.getFacility());
-                insertedTransaction.setTargetStockOrder(targetStockOrder);
                 entity.getTargetStockOrders().add(targetStockOrder);
             }
         }
@@ -321,11 +317,6 @@ public class ProcessingOrderService extends BaseService {
                 }
 
                 entity.getTargetStockOrders().add(targetStockOrder);
-            }
-
-            // Set target facility to transactions
-            for (Transaction t : entity.getInputTransactions()) {
-                t.setTargetFacility(entity.getTargetStockOrders().get(0).getFacility());
             }
         }
 

@@ -1,7 +1,6 @@
 package com.abelium.inatrace.components.transaction.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.components.codebook.grade_abbreviation.api.ApiGradeAbbreviation;
 import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompany;
@@ -24,6 +23,7 @@ public class ApiTransaction extends ApiBaseEntity {
     @ApiModelProperty(value = "Source stock order", position = 3)
     private ApiStockOrder sourceStockOrder;
 
+    // Used when retrieving Stock order history - using this we can navigate to the next processing
     @ApiModelProperty(value = "Target stock order", position = 4)
     private ApiStockOrder targetStockOrder;
 
@@ -35,9 +35,6 @@ public class ApiTransaction extends ApiBaseEntity {
 
     @ApiModelProperty(value = "Source facility", position = 6)
     private ApiFacility sourceFacility;
-
-    @ApiModelProperty(value = "Target facility", position = 7)
-    private ApiFacility targetFacility;
 
     @ApiModelProperty(value = "Is order of type processing", position = 8)
     private Boolean isProcessing;
@@ -51,9 +48,6 @@ public class ApiTransaction extends ApiBaseEntity {
     @ApiModelProperty(value = "Input measurement unit type", position = 12)
     private ApiMeasureUnitType inputMeasureUnitType;
 
-    @ApiModelProperty(value = "Output measurement unit type", position = 13)
-    private ApiMeasureUnitType outputMeasureUnitType;
-
     @ApiModelProperty(value = "Input quantity", position = 14)
     private BigDecimal inputQuantity;
 
@@ -65,9 +59,6 @@ public class ApiTransaction extends ApiBaseEntity {
 
     @ApiModelProperty(value = "Currency", position = 17)
     private String currency;
-
-    @ApiModelProperty(value = "Grade abbreviation", position = 18)
-    private ApiGradeAbbreviation gradeAbbreviation;
 
     @ApiModelProperty(value = "Reject comment", position = 19)
     private String rejectComment;
@@ -128,14 +119,6 @@ public class ApiTransaction extends ApiBaseEntity {
         this.sourceFacility = sourceFacility;
     }
 
-    public ApiFacility getTargetFacility() {
-        return targetFacility;
-    }
-
-    public void setTargetFacility(ApiFacility targetFacility) {
-        this.targetFacility = targetFacility;
-    }
-
     public Boolean getIsProcessing() {
         return isProcessing;
     }
@@ -166,14 +149,6 @@ public class ApiTransaction extends ApiBaseEntity {
 
     public void setInputMeasureUnitType(ApiMeasureUnitType inputMeasureUnitType) {
         this.inputMeasureUnitType = inputMeasureUnitType;
-    }
-
-    public ApiMeasureUnitType getOutputMeasureUnitType() {
-        return outputMeasureUnitType;
-    }
-
-    public void setOutputMeasureUnitType(ApiMeasureUnitType outputMeasureUnitType) {
-        this.outputMeasureUnitType = outputMeasureUnitType;
     }
 
     public BigDecimal getInputQuantity() {
@@ -208,14 +183,6 @@ public class ApiTransaction extends ApiBaseEntity {
         this.currency = currency;
     }
 
-    public ApiGradeAbbreviation getGradeAbbreviation() {
-        return gradeAbbreviation;
-    }
-
-    public void setGradeAbbreviation(ApiGradeAbbreviation gradeAbbreviation) {
-        this.gradeAbbreviation = gradeAbbreviation;
-    }
-
     public String getRejectComment() {
         return rejectComment;
     }
@@ -223,4 +190,5 @@ public class ApiTransaction extends ApiBaseEntity {
     public void setRejectComment(String rejectComment) {
         this.rejectComment = rejectComment;
     }
+
 }
