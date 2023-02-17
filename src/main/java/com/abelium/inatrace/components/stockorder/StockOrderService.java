@@ -18,6 +18,7 @@ import com.abelium.inatrace.components.currencies.CurrencyService;
 import com.abelium.inatrace.components.facility.FacilityService;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
+import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
 import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.stockorder.api.*;
@@ -113,6 +114,21 @@ public class StockOrderService extends BaseService {
         PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(stockOrder.getCompany().getId()), user);
 
         return StockOrderMapper.toApiStockOrder(stockOrder, user.getUserId(), language, withProcessingOrder);
+    }
+
+    public ApiProcessingOrder getStockOrderProcessingOrder(long id, CustomUserDetails user, Language language) throws ApiException {
+
+        StockOrder stockOrder = fetchEntity(id, StockOrder.class);
+
+        // Check that the request user is form a company which is connected to the company that owns the quote order (or is a user of that company)
+        PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(stockOrder.getCompany().getId()), user);
+
+        // If Stock order has no Processing order set, exit with exception
+        if (stockOrder.getProcessingOrder() == null) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "The Stock order with ID: " + id + " doesn't have Processing order.");
+        }
+
+        return ProcessingOrderMapper.toApiProcessingOrder(stockOrder.getProcessingOrder(), language);
     }
 
     public ApiPaginatedList<ApiStockOrder> getAvailableStockOrderListForFacility(ApiPaginatedRequest request,
