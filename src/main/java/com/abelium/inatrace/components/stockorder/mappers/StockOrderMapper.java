@@ -41,7 +41,12 @@ public class StockOrderMapper {
         apiStockOrder.setOrderType(entity.getOrderType());
         apiStockOrder.setMeasureUnitType(
                 MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getMeasurementUnitType()));
-        apiStockOrder.setQrCodeTag(entity.getQrCodeTag());
+
+        // If present map the QR code tag and the Final product for which the QR code tag was generated
+        if (entity.getQrCodeTag() != null) {
+            apiStockOrder.setQrCodeTag(entity.getQrCodeTag());
+            apiStockOrder.setQrCodeTagFinalProduct(ProductApiTools.toApiFinalProductBase(entity.getQrCodeTagFinalProduct()));
+        }
 
         // Map women share and organic only
         apiStockOrder.setWomenShare(entity.getWomenShare());
