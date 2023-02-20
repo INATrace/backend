@@ -10,6 +10,7 @@ import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.payment.BulkPayment;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+import com.abelium.inatrace.db.entities.value_chain.ValueChainCompany;
 import com.abelium.inatrace.types.CompanyStatus;
 
 import javax.persistence.*;
@@ -159,6 +160,12 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	 */
 	@OneToMany(mappedBy = "payingCompany")
 	private List<BulkPayment> bulkPayments = new ArrayList<>();
+
+	/**
+	 * A list of supported value chains for the company (filter). If empty, all value chains are available.
+	 */
+	@OneToMany(mappedBy = "company")
+	private List<ValueChainCompany> valueChains;
 	
 	@ManyToOne()
 	private CurrencyType currency;
@@ -348,5 +355,16 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 
 	public void setAllowBeycoIntegration(Boolean allowBeycoIntegration) {
 		this.allowBeycoIntegration = allowBeycoIntegration;
+	}
+
+	public List<ValueChainCompany> getValueChains() {
+		if (valueChains == null) {
+			valueChains = new ArrayList<>();
+		}
+		return valueChains;
+	}
+
+	public void setValueChains(List<ValueChainCompany> valueChains) {
+		this.valueChains = valueChains;
 	}
 }

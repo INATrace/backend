@@ -1,6 +1,7 @@
 package com.abelium.inatrace.components.company;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
+import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.currencies.CurrencyTypeService;
 import com.abelium.inatrace.components.common.CommonApiTools;
@@ -14,9 +15,13 @@ import com.abelium.inatrace.components.product.api.ApiBankInformation;
 import com.abelium.inatrace.components.product.api.ApiFarmInformation;
 import com.abelium.inatrace.components.user.UserApiTools;
 import com.abelium.inatrace.components.user.UserQueries;
+import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.*;
+import com.abelium.inatrace.db.entities.value_chain.ValueChain;
+import com.abelium.inatrace.db.entities.value_chain.ValueChainCompany;
 import com.abelium.inatrace.tools.ListTools;
+import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -24,10 +29,7 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -144,6 +146,54 @@ public class CompanyApiTools {
 		c.setDisplayPrefferedWayOfPayment(ac.displayPrefferedWayOfPayment);
 		c.setPurchaseProofDocumentMultipleFarmers(ac.purchaseProofDocumentMultipleFarmers);
 		c.setAllowBeycoIntegration(ac.allowBeycoIntegration);
+
+		if (ac.valueChains != null) {
+			// update value chains
+			updateCompanyValueChains(ac, c);
+		}
+	}
+
+	private void updateCompanyValueChains(ApiCompany apiCompany, Company company) throws ApiException {
+		if (apiCompany == null || apiCompany.valueChains == null) {
+			return;
+		}
+
+		Set<Long> newValueChainsList = apiCompany.getValueChains().stream().map(ApiValueChain::getId).collect(Collectors.toSet());
+		Set<Long> remainingOldValueChains = new HashSet<>();
+		// updates company value-chains
+		// first remove old, that were deleted
+		company.getValueChains().forEach(valueChainCompany -> {
+			if (!newValueChainsList.contains(valueChainCompany.getValueChain().getId())) {
+				em.remove(valueChainCompany);
+			} else {
+				remainingOldValueChains.add(valueChainCompany.getValueChain().getId());
+			}
+		});
+
+		// then add all new
+		for (ApiValueChain newApiValueChain: apiCompany.getValueChains()) {
+			if (!remainingOldValueChains.contains(newApiValueChain.getId())) {
+				// add new if not added
+				ValueChainCompany valueChainCompany = new ValueChainCompany();
+				ValueChain valueChain = fetchValueChain(newApiValueChain.getId());
+
+				valueChainCompany.setCompany(company);
+				valueChainCompany.setValueChain(valueChain);
+
+				em.persist(valueChainCompany);
+			}
+		}
+	}
+
+
+	private ValueChain fetchValueChain(Long id) throws ApiException {
+		// find value chain
+		ValueChain valueChain = Queries.get(em, ValueChain.class, id);
+		if (valueChain == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid value chain ID");
+		}
+
+		return valueChain;
 	}
 	
 	
@@ -212,7 +262,7 @@ public class CompanyApiTools {
 		ac.documents = c.getDocuments().stream().map(cd -> toApiCompanyDocument(userId, cd)).collect(Collectors.toList());
 		ac.certifications = c.getCertifications().stream().map(cd -> toApiCertification(userId, cd)).collect(Collectors.toList());
 	}
-	
+
 	public void updateCompanyWithUsers(Long userId, Company c, ApiCompanyUpdate ac) throws ApiException {
 		updateCompany(userId, c, ac, ac.language);
 		if (ac.users != null) {

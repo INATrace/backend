@@ -16,11 +16,15 @@ import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
 import com.abelium.inatrace.components.user.UserQueries;
+import com.abelium.inatrace.components.value_chain.ValueChainMapper;
+import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
+import com.abelium.inatrace.db.entities.value_chain.ValueChain;
+import com.abelium.inatrace.db.entities.value_chain.ValueChainCompany;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -771,4 +775,33 @@ public class CompanyService extends BaseService {
 		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId, user);
 	}
 
+	public ApiPaginatedList<ApiValueChain> getCompanyValueChainList(Long companyId, ApiPaginatedRequest request, CustomUserDetails authUser) throws ApiException {
+
+		return PaginationTools.createPaginatedResponse(em, request, () -> getCompanyValueChains(companyId, request),
+				ValueChainMapper::toApiValueChainBase);
+	}
+	public ValueChain getCompanyValueChains(Long companyId, ApiPaginatedRequest request) {
+
+		ValueChainCompany valuechainCompanyProxy = Torpedo.from(ValueChainCompany.class);
+		OnGoingLogicalCondition companyCondition = Torpedo.condition(valuechainCompanyProxy.getCompany().getId()).eq(companyId);
+		Torpedo.where(companyCondition);
+		List<Long> valueChainIds = Torpedo.select(valuechainCompanyProxy.getValueChain().getId()).list(em);
+
+		ValueChain valueChainProxy = Torpedo.from(ValueChain.class);
+		OnGoingLogicalCondition valueChainCondition = Torpedo.condition().and(valueChainProxy.getId()).in(valueChainIds);
+		Torpedo.where(valueChainCondition);
+
+		switch (request.sortBy) {
+			case "name":
+				QueryTools.orderBy(request.sort, valueChainProxy.getName());
+				break;
+			case "description":
+				QueryTools.orderBy(request.sort, valueChainProxy.getDescription());
+				break;
+			default:
+				QueryTools.orderBy(request.sort, valueChainProxy.getId());
+		}
+
+		return valueChainProxy;
+	}
 }

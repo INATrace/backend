@@ -3,6 +3,7 @@ package com.abelium.inatrace.components.company.api;
 import com.abelium.inatrace.components.codebook.currencies.api.ApiCurrencyType;
 import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.common.api.ApiDocument;
+import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
@@ -27,6 +28,10 @@ public class ApiCompany extends ApiCompanyBase {
 	@ApiModelProperty(value = "company certifications", position = 13)
 	@Valid
 	public List<ApiCertification> certifications;
+
+	@ApiModelProperty(value = "company value chains", position = 14)
+	@Valid
+	public List<ApiValueChain> valueChains;
 
 	@ApiModelProperty(value = "Preferred currency of the company")
 	@Valid
@@ -66,6 +71,14 @@ public class ApiCompany extends ApiCompanyBase {
 
 	public void setCertifications(List<ApiCertification> certifications) {
 		this.certifications = certifications;
+	}
+
+	public List<ApiValueChain> getValueChains() {
+		return valueChains;
+	}
+
+	public void setValueChains(List<ApiValueChain> valueChains) {
+		this.valueChains = valueChains;
 	}
 
 	public ApiCurrencyType getCurrency() {
