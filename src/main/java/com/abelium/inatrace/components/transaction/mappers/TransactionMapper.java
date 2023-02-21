@@ -21,6 +21,7 @@ public class TransactionMapper {
 
         ApiTransaction apiTransaction = new ApiTransaction();
         apiTransaction.setId(entity.getId());
+        apiTransaction.setCompany(CompanyMapper.toApiCompanyId(entity.getCompany()));
         apiTransaction.setInitiationUserId(entity.getInitiationUserId());
         apiTransaction.setIsProcessing(entity.getIsProcessing());
         apiTransaction.setInputQuantity(entity.getInputQuantity());

@@ -20,4 +20,13 @@ public class CompanyMapper {
         return apiCompany;
     }
 
+    public static ApiCompany toApiCompanyId(Company entity) {
+        if (entity == null) return null;
+
+        ApiCompany apiCompany = new ApiCompany();
+        apiCompany.setId(entity.getId());
+
+        return apiCompany;
+    }
+
 }
