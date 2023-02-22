@@ -106,7 +106,7 @@ public class StockOrderMapper {
         entity.getDocumentRequirements().forEach(stockOrderPETypeValue -> {
 
             ApiStockOrderEvidenceTypeValue apiEvidenceTypeValue = StockOrderEvidenceTypeValueMapper.toApiStockOrderEvidenceTypeValue(
-                    stockOrderPETypeValue, userId);
+                    stockOrderPETypeValue, userId, language);
 
             if (BooleanUtils.isTrue(stockOrderPETypeValue.getOtherEvidence())) {
                 apiStockOrder.getOtherEvidenceDocuments().add(apiEvidenceTypeValue);
