@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * REST controller for processing evidence type entity.
@@ -37,6 +38,7 @@ public class ProcessingEvidenceTypeController {
 		return new ApiPaginatedResponse<>(processingEvidenceTypeService.getProcEvidenceTypeList(request, language));
 	}
 
+	@Deprecated
 	@GetMapping("list/value-chain/{id}")
 	@ApiOperation("Get a list of processing evidence types by value chain ID.")
 	public ApiPaginatedResponse<ApiProcessingEvidenceType> listProcessingEvidenceTypesByValueChain(
@@ -45,6 +47,16 @@ public class ProcessingEvidenceTypeController {
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
 
 		return new ApiPaginatedResponse<>(processingEvidenceTypeService.listProcessingEvidenceTypesByValueChain(valueChainId, request, language));
+	}
+
+	@GetMapping("list/value-chain")
+	@ApiOperation("Get a list of processing evidence types by value chain ID list.")
+	public ApiPaginatedResponse<ApiProcessingEvidenceType> listProcessingEvidenceTypesByValueChains(
+			@ApiParam(value = "Value chain IDs", required = true) @RequestParam(value = "valueChainIds") List<Long> valueChainIds,
+			@Valid ApiPaginatedRequest request,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
+
+		return new ApiPaginatedResponse<>(processingEvidenceTypeService.listProcessingEvidenceTypesByValueChainList(valueChainIds, request, language));
 	}
 
 	@GetMapping("{id}")
