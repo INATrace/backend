@@ -1,9 +1,6 @@
 package com.abelium.inatrace.components.value_chain;
 
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiDefaultResponse;
-import com.abelium.inatrace.api.ApiPaginatedResponse;
-import com.abelium.inatrace.api.ApiResponse;
+import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChainListRequest;
@@ -39,6 +36,28 @@ public class ValueChainController {
 	public ApiPaginatedResponse<ApiValueChain> getValueChainList(@Valid ApiValueChainListRequest request) {
 
 		return new ApiPaginatedResponse<>(valueChainService.getValueChainList(request));
+	}
+
+	@GetMapping("list/facility/{id}/selected")
+	@ApiOperation("Get a list of value chains that are selected for a facility")
+	public ApiPaginatedResponse<ApiValueChain> listSelectedValueChainsForFacility(
+			@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long facilityId,
+			@Valid ApiPaginatedRequest request,
+			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
+
+		return new ApiPaginatedResponse<>(
+				valueChainService.listSelectedValueChainsForFacility(facilityId, request, authUser));
+	}
+
+	@GetMapping("list/processingAction/{id}/selected")
+	@ApiOperation("Get a list of value chains that are selected for a processing action")
+	public ApiPaginatedResponse<ApiValueChain> listSelectedValueChainsForProcessingAction(
+			@Valid @ApiParam(value = "Processing action ID", required = true) @PathVariable("id") Long processingActionId,
+			@Valid ApiPaginatedRequest request,
+			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
+
+		return new ApiPaginatedResponse<>(
+				valueChainService.listSelectedValueChainsForProcessingAction(processingActionId, request, authUser));
 	}
 
 	@GetMapping("{id}")

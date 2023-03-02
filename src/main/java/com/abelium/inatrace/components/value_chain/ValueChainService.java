@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.value_chain;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.ApiPaginatedList;
+import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.facility_type.FacilityTypeService;
@@ -26,6 +27,7 @@ import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.product.ProductType;
 import com.abelium.inatrace.db.entities.value_chain.*;
 import com.abelium.inatrace.db.entities.value_chain.enums.ValueChainStatus;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
@@ -38,6 +40,7 @@ import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -319,4 +322,43 @@ public class ValueChainService extends BaseService {
 		entity.setProductType(ProductTypeMapper.toProductType(apiValueChain.getProductType()));
 	}
 
+	public ApiPaginatedList<ApiValueChain> listSelectedValueChainsForFacility(Long facilityId, ApiPaginatedRequest request, CustomUserDetails authUser) {
+
+		return PaginationTools.createPaginatedResponse(em, request, () -> getSelectedValueChainsForFacility(facilityId, request),
+				ValueChainMapper::toApiValueChainBase);
+	}
+
+	private ValueChain getSelectedValueChainsForFacility(Long facilityId, ApiPaginatedRequest request) {
+
+		ValueChainFacility valueChainFacilityProxy = Torpedo.from(ValueChainFacility.class);
+		OnGoingLogicalCondition facilityCondition = Torpedo.condition(valueChainFacilityProxy.getFacility().getId()).eq(facilityId);
+		Torpedo.where(facilityCondition);
+		List<Long> valueChainIds = Torpedo.select(valueChainFacilityProxy.getValueChain().getId()).list(em);
+
+		ValueChain valueChainProxy = Torpedo.from(ValueChain.class);
+		OnGoingLogicalCondition valueChainCondition = Torpedo.condition().and(valueChainProxy.getId()).in(valueChainIds);
+		Torpedo.where(valueChainCondition);
+
+		return valueChainProxy;
+	}
+
+	public ApiPaginatedList<ApiValueChain> listSelectedValueChainsForProcessingAction(Long processingActionId, ApiPaginatedRequest request, CustomUserDetails authUser) {
+
+		return PaginationTools.createPaginatedResponse(em, request, () -> getSelectedValueChainsForProcessingAction(processingActionId, request),
+				ValueChainMapper::toApiValueChainBase);
+	}
+
+	private ValueChain getSelectedValueChainsForProcessingAction(Long processingActionId, ApiPaginatedRequest request) {
+
+		ValueChainProcessingAction valueChainProcessingActionProxy = Torpedo.from(ValueChainProcessingAction.class);
+		OnGoingLogicalCondition processingActionCondition = Torpedo.condition(valueChainProcessingActionProxy.getProcessingAction().getId()).eq(processingActionId);
+		Torpedo.where(processingActionCondition);
+		List<Long> valueChainIds = Torpedo.select(valueChainProcessingActionProxy.getValueChain().getId()).list(em);
+
+		ValueChain valueChainProxy = Torpedo.from(ValueChain.class);
+		OnGoingLogicalCondition valueChainCondition = Torpedo.condition().and(valueChainProxy.getId()).in(valueChainIds);
+		Torpedo.where(valueChainCondition);
+
+		return valueChainProxy;
+	}
 }

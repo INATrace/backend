@@ -6,6 +6,7 @@ import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
+import com.abelium.inatrace.db.entities.value_chain.ValueChainProcessingAction;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
 
@@ -101,6 +102,9 @@ public class ProcessingAction extends TimestampEntity {
 	 */
 	@ManyToOne
 	private ValueChain valueChain;
+
+	@OneToMany(mappedBy = "processingAction")
+	private List<ValueChainProcessingAction> processingActionsValueChains = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionPET> requiredDocumentTypes = new ArrayList<>();
@@ -252,6 +256,14 @@ public class ProcessingAction extends TimestampEntity {
 
 	public void setValueChain(ValueChain valueChain) {
 		this.valueChain = valueChain;
+	}
+
+	public List<ValueChainProcessingAction> getProcessingActionsValueChains() {
+		return processingActionsValueChains;
+	}
+
+	public void setProcessingActionsValueChains(List<ValueChainProcessingAction> processingActionsValueChains) {
+		this.processingActionsValueChains = processingActionsValueChains;
 	}
 
 	public List<ProcessingActionPET> getRequiredDocumentTypes() {

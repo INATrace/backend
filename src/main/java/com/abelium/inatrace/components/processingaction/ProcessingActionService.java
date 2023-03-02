@@ -19,6 +19,8 @@ import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.processingaction.*;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
+import com.abelium.inatrace.db.entities.value_chain.ValueChain;
+import com.abelium.inatrace.db.entities.value_chain.ValueChainProcessingAction;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -33,6 +35,7 @@ import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -114,8 +117,8 @@ public class ProcessingActionService extends BaseService {
 		// Set processing action owner company
 		entity.setCompany(company);
 
-		// Set the value chain
-		entity.setValueChain(valueChainService.fetchValueChain(apiProcessingAction.getValueChain().getId()));
+//		// Set the value chain
+//		entity.setValueChain(valueChainService.fetchValueChain(apiProcessingAction.getValueChain().getId()));
 
 		entity.setSortOrder(apiProcessingAction.getSortOrder());
 		entity.setPrefix(apiProcessingAction.getPrefix());
@@ -233,8 +236,10 @@ public class ProcessingActionService extends BaseService {
 	private void validateProcessingAction(ApiProcessingAction apiProcessingAction) throws ApiException {
 
 		// Validate value chain
-		if (apiProcessingAction.getValueChain() == null || apiProcessingAction.getValueChain().getId() == null) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Value chain is required");
+		if (apiProcessingAction.getValueChains() == null || apiProcessingAction.getValueChains().isEmpty() ||
+				apiProcessingAction.getValueChains().get(0) == null ||
+				apiProcessingAction.getValueChains().get(0).getId() == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "At least one value chain is required");
 		}
 
 		// Validate action type
@@ -380,6 +385,32 @@ public class ProcessingActionService extends BaseService {
 				entity.setInputSemiProduct(inputSemiProduct);
 				entity.setOutputSemiProduct(inputSemiProduct);
 		}
+	}
+
+	private void updateValueChains(ApiProcessingAction apiProcessingAction, ProcessingAction entity) throws ApiException {
+
+		Set<Long> newValueChainIds = apiProcessingAction.getValueChains().stream().map(ApiBaseEntity::getId).collect(Collectors.toSet());
+		Set<Long> existingValueChainIds = entity.getProcessingActionsValueChains().stream().map(valueChainProcessingAction -> valueChainProcessingAction.getValueChain().getId()).collect(
+				Collectors.toSet());
+
+		entity.getProcessingActionsValueChains().forEach(pavc -> {
+			if (!newValueChainIds.contains(pavc.getValueChain().getId())) {
+				em.remove(pavc);
+			}
+		});
+
+		for (Long valueChainId: newValueChainIds) {
+			if (!existingValueChainIds.contains(valueChainId)) {
+				ValueChain valueChain = valueChainService.fetchValueChain(valueChainId);
+
+				ValueChainProcessingAction valueChainProcessingAction = new ValueChainProcessingAction();
+				valueChainProcessingAction.setValueChain(valueChain);
+				valueChainProcessingAction.setProcessingAction(entity);
+
+				em.persist(valueChainProcessingAction);
+			}
+		}
+
 	}
 
 	private void updateRequiredEvidenceFields(ApiProcessingAction apiProcessingAction, ProcessingAction entity) {
