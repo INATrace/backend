@@ -127,7 +127,7 @@ public class ProcessingActionService extends BaseService {
 		entity.setPublicTimelineIconType(apiProcessingAction.getPublicTimelineIconType());
 		entity.setType(apiProcessingAction.getType());
 
-		// If we have shipment or transfer, set the the field denoting if we are dealing with final products
+		// If we have shipment or transfer, set the field denoting if we are dealing with final products
 		if (ProcessingActionType.TRANSFER.equals(apiProcessingAction.getType()) ||
 				ProcessingActionType.SHIPMENT.equals(apiProcessingAction.getType())) {
 			entity.setFinalProductAction(BooleanUtils.toBooleanDefaultIfNull(apiProcessingAction.getFinalProductAction(), false));
@@ -253,6 +253,13 @@ public class ProcessingActionService extends BaseService {
 				apiProcessingAction.getEstimatedOutputQuantityPerUnit() != null) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST,
 					"Estimated output quantity cannot be provided when action is not 'PROCESSING'");
+		}
+
+		// If repacked output is selected, validate that there is no more than one output semi-product defined
+		if (BooleanUtils.isTrue(apiProcessingAction.getRepackedOutputs()) &&
+				apiProcessingAction.getOutputSemiProducts() != null &&
+				apiProcessingAction.getOutputSemiProducts().size() > 1) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Only one output semi-product is allowed when repacked output is selected");
 		}
 
 		switch (apiProcessingAction.getType()) {
