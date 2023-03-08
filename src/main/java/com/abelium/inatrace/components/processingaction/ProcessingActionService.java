@@ -8,6 +8,7 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.ProcessingEvidenceTypeService;
 import com.abelium.inatrace.components.codebook.processingevidencefield.ProcessingEvidenceFieldService;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
+import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.facility.FacilityService;
@@ -129,7 +130,7 @@ public class ProcessingActionService extends BaseService {
 		entity.setPublicTimelineIconType(apiProcessingAction.getPublicTimelineIconType());
 		entity.setType(apiProcessingAction.getType());
 
-		// If we have shipment or transfer, set the the field denoting if we are dealing with final products
+		// If we have shipment or transfer, set the field denoting if we are dealing with final products
 		if (ProcessingActionType.TRANSFER.equals(apiProcessingAction.getType()) ||
 				ProcessingActionType.SHIPMENT.equals(apiProcessingAction.getType())) {
 			entity.setFinalProductAction(BooleanUtils.toBooleanDefaultIfNull(apiProcessingAction.getFinalProductAction(), false));
@@ -262,6 +263,13 @@ public class ProcessingActionService extends BaseService {
 					"Estimated output quantity cannot be provided when action is not 'PROCESSING'");
 		}
 
+		// If repacked output is selected, validate that there is no more than one output semi-product defined
+		if (BooleanUtils.isTrue(apiProcessingAction.getRepackedOutputs()) &&
+				apiProcessingAction.getOutputSemiProducts() != null &&
+				apiProcessingAction.getOutputSemiProducts().size() > 1) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Only one output semi-product is allowed when repacked output is selected");
+		}
+
 		switch (apiProcessingAction.getType()) {
 			case PROCESSING:
 
@@ -270,9 +278,9 @@ public class ProcessingActionService extends BaseService {
 					throw new ApiException(ApiStatus.INVALID_REQUEST, "Input semi-product is required");
 				}
 
-				// Validate output semi-product
-				if (apiProcessingAction.getOutputSemiProduct() == null || apiProcessingAction.getOutputSemiProduct().getId() == null) {
-					throw new ApiException(ApiStatus.INVALID_REQUEST, "Output semi-product is required");
+				// Validate that at least one output semi-product is present
+				if (apiProcessingAction.getOutputSemiProducts() == null || apiProcessingAction.getOutputSemiProducts().isEmpty()) {
+					throw new ApiException(ApiStatus.INVALID_REQUEST, "At least one output semi-product is required");
 				}
 				break;
 
@@ -334,7 +342,6 @@ public class ProcessingActionService extends BaseService {
 	private void setSemiAndFinalProducts(ApiProcessingAction apiProcessingAction, ProcessingAction entity) throws ApiException {
 
 		SemiProduct inputSemiProduct;
-		SemiProduct outputSemiProduct;
 
 		FinalProduct inputFinalProduct;
 		FinalProduct outputFinalProduct;
@@ -342,12 +349,18 @@ public class ProcessingActionService extends BaseService {
 		switch (apiProcessingAction.getType()) {
 			case PROCESSING:
 
-				// Set the input and output semi-product
+				// Set the input semi-product
 				inputSemiProduct = semiProductService.fetchSemiProduct(apiProcessingAction.getInputSemiProduct().getId());
 				entity.setInputSemiProduct(inputSemiProduct);
 
-				outputSemiProduct = semiProductService.fetchSemiProduct(apiProcessingAction.getOutputSemiProduct().getId());
-				entity.setOutputSemiProduct(outputSemiProduct);
+				// Set the output semi-products
+				entity.getOutputSemiProducts().clear();
+				for (ApiSemiProduct apiSemiProduct : apiProcessingAction.getOutputSemiProducts()) {
+					ProcessingActionOutputSemiProduct paOSM = new ProcessingActionOutputSemiProduct();
+					paOSM.setProcessingAction(entity);
+					paOSM.setOutputSemiProduct(semiProductService.fetchSemiProduct(apiSemiProduct.getId()));
+					entity.getOutputSemiProducts().add(paOSM);
+				}
 
 				break;
 
@@ -377,7 +390,12 @@ public class ProcessingActionService extends BaseService {
 					// Set the input semi-product and set the output to be the same as the input
 					inputSemiProduct = semiProductService.fetchSemiProduct(apiProcessingAction.getInputSemiProduct().getId());
 					entity.setInputSemiProduct(inputSemiProduct);
-					entity.setOutputSemiProduct(inputSemiProduct);
+
+					entity.getOutputSemiProducts().clear();
+					ProcessingActionOutputSemiProduct paOSM = new ProcessingActionOutputSemiProduct();
+					paOSM.setProcessingAction(entity);
+					paOSM.setOutputSemiProduct(inputSemiProduct);
+					entity.getOutputSemiProducts().add(paOSM);
 				}
 				break;
 
@@ -386,7 +404,12 @@ public class ProcessingActionService extends BaseService {
 				// Set the input and output semi-product (the output is the same with the input)
 				inputSemiProduct = semiProductService.fetchSemiProduct(apiProcessingAction.getInputSemiProduct().getId());
 				entity.setInputSemiProduct(inputSemiProduct);
-				entity.setOutputSemiProduct(inputSemiProduct);
+
+				entity.getOutputSemiProducts().clear();
+				ProcessingActionOutputSemiProduct paOSM = new ProcessingActionOutputSemiProduct();
+				paOSM.setProcessingAction(entity);
+				paOSM.setOutputSemiProduct(inputSemiProduct);
+				entity.getOutputSemiProducts().add(paOSM);
 		}
 	}
 

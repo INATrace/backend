@@ -2,24 +2,22 @@ package com.abelium.inatrace.components.stockorder;
 
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiPurchaseOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrderHistory;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
-import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.Date;
 
 @RestController
 @RequestMapping("/chain/stock-order")
@@ -41,6 +39,17 @@ public class StockOrderController {
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
         return new ApiResponse<>(stockOrderService.getStockOrder(id, authUser, language, withProcessingOrder));
+    }
+
+    @GetMapping("{id}/processing-order")
+    @ApiOperation("Get the Processing order that contains the Stock order with the provided ID.")
+    public ApiResponse<ApiProcessingOrder> getStockOrderProcessingOrder(
+            @Valid @ApiParam(value = "StockOrder ID", required = true) @PathVariable("id") Long id,
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
+    ) throws ApiException {
+
+        return new ApiResponse<>(stockOrderService.getStockOrderProcessingOrder(id, authUser, language));
     }
 
     @GetMapping("/list/facility/{facilityId}/available")

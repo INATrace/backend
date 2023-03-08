@@ -52,11 +52,16 @@ public class ProcessingAction extends TimestampEntity {
 	@ManyToOne
 	private SemiProduct inputSemiProduct;
 
-	/**
-	 * Used when we have action types: PROCESSING, QUOTE, TRANSFER, GENERATE_QR_CODE
-	 */
+	// FIXME: this field should be removed once we have migrated to the new DB schema in all environments
 	@ManyToOne
 	private SemiProduct outputSemiProduct;
+
+	/**
+	 * Used when we have action types: PROCESSING, QUOTE, TRANSFER, GENERATE_QR_CODE.
+	 * If type is PROCESSING, we can have one or more output semi-products. In the other case only one output semi-product is allowed.
+	 */
+	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProcessingActionOutputSemiProduct> outputSemiProducts = new ArrayList<>();
 
 	/**
 	 * Used when we have action types QUOTE or TRANSFER and finalProductAction value to true
@@ -72,7 +77,7 @@ public class ProcessingAction extends TimestampEntity {
 
 	/**
 	 * Used when we have action type GENERATE_QR_CODE. It holds the reference to the Final product
-	 * that will be tagged by the generated QR code tag. This is used to to connect the QR code tag with the Final product QR labels.
+	 * that will be tagged by the generated QR code tag. This is used to connect the QR code tag with the Final product QR labels.
 	 */
 	@ManyToOne
 	private FinalProduct qrCodeForFinalProduct;
@@ -182,8 +187,12 @@ public class ProcessingAction extends TimestampEntity {
 		return outputSemiProduct;
 	}
 
-	public void setOutputSemiProduct(SemiProduct outputSemiProduct) {
-		this.outputSemiProduct = outputSemiProduct;
+	public List<ProcessingActionOutputSemiProduct> getOutputSemiProducts() {
+		return outputSemiProducts;
+	}
+
+	public void setOutputSemiProducts(List<ProcessingActionOutputSemiProduct> outputSemiProducts) {
+		this.outputSemiProducts = outputSemiProducts;
 	}
 
 	public FinalProduct getInputFinalProduct() {
@@ -300,5 +309,5 @@ public class ProcessingAction extends TimestampEntity {
 	public void setProcessingActionTranslations(List<ProcessingActionTranslation> processingActionTranslations) {
 		this.processingActionTranslations = processingActionTranslations;
 	}
-	
+
 }
