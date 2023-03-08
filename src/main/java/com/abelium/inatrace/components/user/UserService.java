@@ -9,13 +9,17 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.TokenService;
 import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.mail.MailEngine;
+import com.abelium.inatrace.components.product.ProductTypeMapper;
+import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.components.user.api.*;
 import com.abelium.inatrace.components.user.types.UserAction;
 import com.abelium.inatrace.db.entities.auth.AuthenticationToken;
 import com.abelium.inatrace.db.entities.auth.ConfirmationToken;
 import com.abelium.inatrace.db.entities.common.User;
+import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
+import com.abelium.inatrace.db.entities.product.ProductType;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.PasswordTools;
@@ -42,10 +46,7 @@ import javax.persistence.criteria.Root;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Lazy
 @Service
@@ -90,6 +91,15 @@ public class UserService extends BaseService {
 		}
 
 		return user;
+	}
+
+	private UserCustomer fetchUserCustomerById(Long id) throws ApiException {
+		UserCustomer userCustomer = Queries.get(em, UserCustomer.class, id);
+		if (userCustomer == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user customer ID");
+		}
+
+		return userCustomer;
 	}
 
 	@Transactional
@@ -517,5 +527,20 @@ public class UserService extends BaseService {
 		}
 	}
 
+	public ApiPaginatedList<ApiProductType> getProductTypesForUser(Long userCustomerId) throws ApiException {
 
+		List<ApiProductType> result = new ArrayList<>();
+
+		UserCustomer userCustomer = fetchUserCustomerById(userCustomerId);
+
+		Set<Long> alreadyAddedIds = new HashSet<>();
+		userCustomer.getCompany().getValueChains().forEach(valueChainCompany -> {
+			ProductType productType = valueChainCompany.getValueChain().getProductType();
+			if (alreadyAddedIds.add(productType.getId())){
+				result.add(ProductTypeMapper.toApiProductType(productType));
+			}
+		});
+
+		return new ApiPaginatedList<>(result, result.size());
+	}
 }

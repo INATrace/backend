@@ -14,7 +14,9 @@ import com.abelium.inatrace.components.common.api.ApiUserCustomerImportResponse;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.company.types.CompanyAction;
+import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
+import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.components.user.UserQueries;
 import com.abelium.inatrace.components.value_chain.ValueChainMapper;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
@@ -23,6 +25,7 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
+import com.abelium.inatrace.db.entities.product.ProductType;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.db.entities.value_chain.ValueChainCompany;
 import com.abelium.inatrace.security.service.CustomUserDetails;
@@ -40,6 +43,7 @@ import org.springframework.util.CollectionUtils;
 import org.torpedoquery.jpa.Function;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
+import org.torpedoquery.jpa.TorpedoFunction;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -154,6 +158,8 @@ public class CompanyService extends BaseService {
 
 		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(c.getUsers(), authUser);
 
+		List<ApiValueChain> valueChains = companyQueries.fetchCompanyValueChains(id);
+
 		List<CompanyAction> actions = new ArrayList<>();
 		actions.add(CompanyAction.VIEW_COMPANY_PROFILE);
 		actions.add(CompanyAction.UPDATE_COMPANY_PROFILE);
@@ -178,7 +184,7 @@ public class CompanyService extends BaseService {
 			actions.add(CompanyAction.MERGE_TO_COMPANY);
 		}
 
-		return companyApiTools.toApiCompanyGet(authUser.getUserId(), c, language, actions, users);
+		return companyApiTools.toApiCompanyGet(authUser.getUserId(), c, language, actions, users, valueChains);
 	}
 
 	public List<ApiCompanyUser> getCompanyUsers(Long id, CustomUserDetails user) throws ApiException {
@@ -315,6 +321,16 @@ public class CompanyService extends BaseService {
 		userCustomer.setUserCustomerLocation(userCustomerLocation);
 		em.persist(userCustomer);
 
+		// Set product types
+		if (apiUserCustomer.getProductTypes() != null) {
+			for(ApiProductType apiProductType: apiUserCustomer.getProductTypes()){
+				UserCustomerProductType userCustomerProductType = new UserCustomerProductType();
+				userCustomerProductType.setProductType(fetchProductType(apiProductType.getId()));
+				userCustomerProductType.setUserCustomer(userCustomer);
+				em.persist(userCustomerProductType);
+			}
+		}
+
 		// Set associations
 		userCustomer.setAssociations(new ArrayList<>());
 		if (apiUserCustomer.getAssociations() != null) {
@@ -413,6 +429,11 @@ public class CompanyService extends BaseService {
 		userCustomer.getUserCustomerLocation().setLongitude(apiUserCustomer.getLocation().getLongitude());
 		userCustomer.getUserCustomerLocation().setPubliclyVisible(apiUserCustomer.getLocation().getPubliclyVisible());
 
+		// Set product types
+		if (apiUserCustomer.getProductTypes() != null) {
+			updateUserCustomerProductTypes(apiUserCustomer, userCustomer);
+		}
+
 		if (userCustomer.getAssociations() == null) {
 			userCustomer.setAssociations(new ArrayList<>());
 		}
@@ -467,6 +488,32 @@ public class CompanyService extends BaseService {
 		}
 
 		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId());
+	}
+
+	private void updateUserCustomerProductTypes(ApiUserCustomer apiUserCustomer, UserCustomer userCustomer) throws ApiException {
+
+		Set<Long> newProductTypesList = apiUserCustomer.getProductTypes().stream().map(ApiProductType::getId).collect(
+				Collectors.toSet());
+		Set<Long> remainingOldProductTypes = new HashSet<>();
+
+		// remove old, that were deleted
+		userCustomer.getProductTypes().forEach(userCustomerProductType -> {
+			if (!newProductTypesList.contains(userCustomerProductType.getProductType().getId())) {
+				em.remove(userCustomerProductType);
+			} else {
+				remainingOldProductTypes.add(userCustomerProductType.getProductType().getId());
+			}
+		});
+
+		// add all new, not added previously
+		for (ApiProductType apiProductType : apiUserCustomer.getProductTypes()) {
+			if (!remainingOldProductTypes.contains(apiProductType.getId())){
+				UserCustomerProductType userCustomerProductType = new UserCustomerProductType();
+				userCustomerProductType.setProductType(fetchProductType(apiProductType.getId()));
+				userCustomerProductType.setUserCustomer(userCustomer);
+				em.persist(userCustomerProductType);
+			}
+		}
 	}
 
 	@Transactional
@@ -599,6 +646,15 @@ public class CompanyService extends BaseService {
 		}
 
 		return userCustomer;
+	}
+
+	private ProductType fetchProductType(Long id) throws ApiException {
+		ProductType productType = em.find(ProductType.class, id);
+		if (productType == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid product type ID");
+		}
+
+		return productType;
 	}
 
 	@Transactional
@@ -804,4 +860,42 @@ public class CompanyService extends BaseService {
 
 		return valueChainProxy;
 	}
+
+	public ApiPaginatedList<ApiProductType> getCompanyProductTypesList(Long companyId, ApiPaginatedRequest request, CustomUserDetails authUser) throws ApiException {
+
+		return PaginationTools.createPaginatedResponse(em, request, () -> getCompanyProductTypes(companyId, request),
+				ProductTypeMapper::toApiProductType);
+	}
+
+	public ProductType getCompanyProductTypes(Long companyId, ApiPaginatedRequest request) {
+
+		ValueChainCompany valuechainCompanyProxy = Torpedo.from(ValueChainCompany.class);
+		OnGoingLogicalCondition companyCondition = Torpedo.condition(valuechainCompanyProxy.getCompany().getId()).eq(companyId);
+		Torpedo.where(companyCondition);
+		List<Long> valueChainIds = Torpedo.select(valuechainCompanyProxy.getValueChain().getId()).list(em);
+
+		ValueChain valueChainProxy = Torpedo.from(ValueChain.class);
+		OnGoingLogicalCondition valueChainCondition = Torpedo.condition().and(valueChainProxy.getId()).in(valueChainIds);
+		Torpedo.where(valueChainCondition);
+
+		ProductType productTypeProxy = Torpedo.innerJoin(valueChainProxy.getProductType());
+		TorpedoFunction.distinct(productTypeProxy);
+
+		if (request != null) {
+			switch (request.sortBy) {
+				case "name":
+					QueryTools.orderBy(request.sort, productTypeProxy.getName());
+					break;
+				case "description":
+					QueryTools.orderBy(request.sort, productTypeProxy.getDescription());
+					break;
+				default:
+					QueryTools.orderBy(request.sort, productTypeProxy.getId());
+			}
+		}
+
+		return productTypeProxy;
+	}
+
+
 }

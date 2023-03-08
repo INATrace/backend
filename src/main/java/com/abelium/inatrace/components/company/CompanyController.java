@@ -12,6 +12,7 @@ import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
 import com.abelium.inatrace.components.company.api.ApiUserCustomer;
+import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
@@ -221,6 +222,15 @@ public class CompanyController {
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long id,
             @Valid ApiPaginatedRequest request) throws ApiException {
         return new ApiPaginatedResponse<>(companyService.getCompanyValueChainList(id, request, authUser));
+    }
+
+    @GetMapping(value = "/{id}/product-types")
+    @ApiOperation(value = "Get list of value chains for the company with the given ID")
+    public ApiPaginatedResponse<ApiProductType> getCompanyProductTypes(
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long id,
+            @Valid ApiPaginatedRequest request) throws ApiException {
+        return new ApiPaginatedResponse<>(companyService.getCompanyProductTypesList(id, request, authUser));
     }
 
 }

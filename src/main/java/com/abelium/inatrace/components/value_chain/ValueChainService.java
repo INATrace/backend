@@ -18,7 +18,6 @@ import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiP
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.BaseService;
-import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.user.UserService;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChainListRequest;
@@ -319,7 +318,7 @@ public class ValueChainService extends BaseService {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Product type with given id does not exist");
 		}
 
-		entity.setProductType(ProductTypeMapper.toProductType(apiValueChain.getProductType()));
+		entity.setProductType(productType);
 	}
 
 	public ApiPaginatedList<ApiValueChain> listSelectedValueChainsForFacility(Long facilityId, ApiPaginatedRequest request, CustomUserDetails authUser) {

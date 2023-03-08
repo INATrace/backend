@@ -11,6 +11,7 @@ import com.abelium.inatrace.components.common.mappers.CountryMapper;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.company.types.CompanyTranslatables;
+import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.product.api.ApiBankInformation;
 import com.abelium.inatrace.components.product.api.ApiFarmInformation;
 import com.abelium.inatrace.components.user.UserApiTools;
@@ -23,13 +24,17 @@ import com.abelium.inatrace.db.entities.value_chain.ValueChainCompany;
 import com.abelium.inatrace.tools.ListTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
+import com.abelium.inatrace.types.UserCustomerType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -85,13 +90,16 @@ public class CompanyApiTools {
 	
 	public ApiCompanyGet toApiCompanyGet(Long userId, Company c, Language language, 
 			List<CompanyAction> actions,
-			List<ApiCompanyUser> users) {
+			List<ApiCompanyUser> users,
+			List<ApiValueChain> valueChains
+	) {
 		if (c == null) return null;
 		
 		ApiCompanyGet ac = new ApiCompanyGet();
 		updateApiCompany(userId, ac, c, language);
 		ac.actions = actions;
 		ac.users = users;
+		ac.valueChains = valueChains;
 		return ac;
 	}
 	
@@ -387,6 +395,13 @@ public class CompanyApiTools {
 			return apiCertification;
 
 		}).collect(Collectors.toList()));
+
+		// Product types if Farmer
+		if (UserCustomerType.FARMER.equals(apiUserCustomer.getType())) {
+			apiUserCustomer.setProductTypes(userCustomer.getProductTypes().stream()
+					.map(ucpt -> ProductTypeMapper.toApiProductType(ucpt.getProductType()))
+					.collect(Collectors.toList()));
+		}
 
 		return apiUserCustomer;
 	}

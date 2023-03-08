@@ -100,6 +100,9 @@ public class UserCustomer extends BaseEntity {
 
 	@OneToMany(mappedBy = "userCustomer", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<UserCustomerCertification> certifications;
+
+	@OneToMany(mappedBy = "userCustomer")
+	private List<UserCustomerProductType> productTypes;
 	
 	public UserCustomerType getType() {
 		return type;
@@ -230,6 +233,17 @@ public class UserCustomer extends BaseEntity {
 
 	public void setCertifications(List<UserCustomerCertification> certifications) {
 		this.certifications = certifications;
+	}
+
+	public List<UserCustomerProductType> getProductTypes() {
+		if (productTypes == null) {
+			productTypes = new ArrayList<>();
+		}
+		return productTypes;
+	}
+
+	public void setProductTypes(List<UserCustomerProductType> productTypes) {
+		this.productTypes = productTypes;
 	}
 
 	public String getLocation() {
