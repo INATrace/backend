@@ -4,6 +4,7 @@ import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+import com.abelium.inatrace.db.entities.value_chain.ValueChainFacility;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -68,6 +69,9 @@ public class Facility extends TimestampEntity {
 
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<FacilityFinalProduct> facilityFinalProducts;
+
+	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ValueChainFacility> facilityValueChains;
 	
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL)
 	private List<StockOrder> stockOrders;
@@ -203,6 +207,17 @@ public class Facility extends TimestampEntity {
 
 	public List<StockOrder> getStockOrders() {
 		return stockOrders;
+	}
+
+	public List<ValueChainFacility> getFacilityValueChains() {
+		if (facilityValueChains == null) {
+			facilityValueChains = new ArrayList<>();
+		}
+		return facilityValueChains;
+	}
+
+	public void setFacilityValueChains(List<ValueChainFacility> facilityValueChains) {
+		this.facilityValueChains = facilityValueChains;
 	}
 
 	public void setStockOrders(List<StockOrder> stockOrders) {

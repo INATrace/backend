@@ -103,7 +103,7 @@ public class ProcessingAction extends TimestampEntity {
 	@ManyToOne
 	private ValueChain valueChain;
 
-	@OneToMany(mappedBy = "processingAction")
+	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ValueChainProcessingAction> processingActionsValueChains = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -259,6 +259,9 @@ public class ProcessingAction extends TimestampEntity {
 	}
 
 	public List<ValueChainProcessingAction> getProcessingActionsValueChains() {
+		if (processingActionsValueChains == null) {
+			processingActionsValueChains = new ArrayList<>();
+		}
 		return processingActionsValueChains;
 	}
 

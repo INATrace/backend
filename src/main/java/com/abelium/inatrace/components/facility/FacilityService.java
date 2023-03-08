@@ -12,6 +12,8 @@ import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.product.api.ApiFinalProduct;
+import com.abelium.inatrace.components.value_chain.ValueChainService;
+import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.Address;
@@ -20,6 +22,8 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.facility.*;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
+import com.abelium.inatrace.db.entities.value_chain.ValueChain;
+import com.abelium.inatrace.db.entities.value_chain.ValueChainFacility;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -56,11 +60,14 @@ public class FacilityService extends BaseService {
 
 	private final FinalProductService finalProductService;
 
+	private final ValueChainService valueChainService;
+
 	@Autowired
-	public FacilityService(SemiProductService semiProductService, CompanyQueries companyQueries, FinalProductService finalProductService) {
+	public FacilityService(SemiProductService semiProductService, CompanyQueries companyQueries, FinalProductService finalProductService, ValueChainService valueChainService) {
 		this.semiProductService = semiProductService;
 		this.companyQueries = companyQueries;
 		this.finalProductService = finalProductService;
+		this.valueChainService = valueChainService;
 	}
 
 	public ApiFacility getFacility(Long id, CustomUserDetails user, Language language) throws ApiException {
@@ -159,6 +166,9 @@ public class FacilityService extends BaseService {
 
 		// Update the Facility final products
 		updateFacilityFinalProducts(apiFacility, entity);
+
+		// Update the Facility value chains
+		updateFacilityValueChains(apiFacility, entity);
 
 		// Remove translations not in request
 		entity.getFacilityTranslations().removeIf(facilityTranslation -> apiFacility
@@ -399,6 +409,19 @@ public class FacilityService extends BaseService {
 			facilityFinalProduct.setFacility(entity);
 			facilityFinalProduct.setFinalProduct(finalProduct);
 			entity.getFacilityFinalProducts().add(facilityFinalProduct);
+		}
+	}
+
+	private void updateFacilityValueChains(ApiFacility apiFacility, Facility entity) throws ApiException {
+
+		entity.getFacilityValueChains().clear();
+
+		for (ApiValueChain apiValueChain : apiFacility.getFacilityValueChains()) {
+			ValueChainFacility valueChainFacility = new ValueChainFacility();
+			ValueChain valueChain = valueChainService.fetchValueChain(apiValueChain.getId());
+			valueChainFacility.setFacility(entity);
+			valueChainFacility.setValueChain(valueChain);
+			entity.getFacilityValueChains().add(valueChainFacility);
 		}
 	}
 

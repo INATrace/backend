@@ -15,6 +15,7 @@ import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.value_chain.ValueChainService;
+import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.processingaction.*;
@@ -35,7 +36,6 @@ import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -154,6 +154,9 @@ public class ProcessingActionService extends BaseService {
 
 		// Create or update the supported facilities for this processing action (the facilities where this processing starts)
 		updateSupportedFacilities(apiProcessingAction, entity);
+
+		// Create or update the value-chains
+		updateValueChains(apiProcessingAction, entity);
 
 		// If action type is GENERATE_QR_CODE, set Final product for QR code
 		if (ProcessingActionType.GENERATE_QR_CODE.equals(apiProcessingAction.getType())) {
@@ -389,26 +392,14 @@ public class ProcessingActionService extends BaseService {
 
 	private void updateValueChains(ApiProcessingAction apiProcessingAction, ProcessingAction entity) throws ApiException {
 
-		Set<Long> newValueChainIds = apiProcessingAction.getValueChains().stream().map(ApiBaseEntity::getId).collect(Collectors.toSet());
-		Set<Long> existingValueChainIds = entity.getProcessingActionsValueChains().stream().map(valueChainProcessingAction -> valueChainProcessingAction.getValueChain().getId()).collect(
-				Collectors.toSet());
+		entity.getProcessingActionsValueChains().clear();
 
-		entity.getProcessingActionsValueChains().forEach(pavc -> {
-			if (!newValueChainIds.contains(pavc.getValueChain().getId())) {
-				em.remove(pavc);
-			}
-		});
-
-		for (Long valueChainId: newValueChainIds) {
-			if (!existingValueChainIds.contains(valueChainId)) {
-				ValueChain valueChain = valueChainService.fetchValueChain(valueChainId);
-
-				ValueChainProcessingAction valueChainProcessingAction = new ValueChainProcessingAction();
-				valueChainProcessingAction.setValueChain(valueChain);
-				valueChainProcessingAction.setProcessingAction(entity);
-
-				em.persist(valueChainProcessingAction);
-			}
+		for (ApiValueChain apiValueChain : apiProcessingAction.getValueChains()) {
+			ValueChainProcessingAction valueChainProcessingAction = new ValueChainProcessingAction();
+			ValueChain valueChain = valueChainService.fetchValueChain(apiValueChain.getId());
+			valueChainProcessingAction.setProcessingAction(entity);
+			valueChainProcessingAction.setValueChain(valueChain);
+			entity.getProcessingActionsValueChains().add(valueChainProcessingAction);
 		}
 
 	}
