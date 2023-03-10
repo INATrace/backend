@@ -43,7 +43,6 @@ import org.springframework.util.CollectionUtils;
 import org.torpedoquery.jpa.Function;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
-import org.torpedoquery.jpa.TorpedoFunction;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -882,14 +881,16 @@ public class CompanyService extends BaseService {
 		ValueChainCompany valuechainCompanyProxy = Torpedo.from(ValueChainCompany.class);
 		OnGoingLogicalCondition companyCondition = Torpedo.condition(valuechainCompanyProxy.getCompany().getId()).eq(companyId);
 		Torpedo.where(companyCondition);
-		List<Long> valueChainIds = Torpedo.select(valuechainCompanyProxy.getValueChain().getId()).list(em);
+		List<Long> productTypeIds = Torpedo.select(valuechainCompanyProxy.getValueChain().getProductType().getId()).list(em);
 
-		ValueChain valueChainProxy = Torpedo.from(ValueChain.class);
-		OnGoingLogicalCondition valueChainCondition = Torpedo.condition().and(valueChainProxy.getId()).in(valueChainIds);
-		Torpedo.where(valueChainCondition);
+		if (productTypeIds != null) {
+			// calc distinct ids
+			productTypeIds = productTypeIds.stream().distinct().collect(Collectors.toList());
+		}
 
-		ProductType productTypeProxy = Torpedo.innerJoin(valueChainProxy.getProductType());
-		TorpedoFunction.distinct(productTypeProxy);
+		ProductType productTypeProxy = Torpedo.from(ProductType.class);
+		OnGoingLogicalCondition productTypeCondition = Torpedo.condition().and(productTypeProxy.getId()).in(productTypeIds);
+		Torpedo.where(productTypeCondition);
 
 		if (request != null) {
 			switch (request.sortBy) {
