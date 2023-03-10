@@ -147,6 +147,11 @@ public class CompanyService extends BaseService {
 		companyUser.setCompany(company);
 		em.persist(companyUser);
 
+		if (request.valueChains != null) {
+			// update value chains
+			companyApiTools.updateCompanyValueChains(request, company);
+		}
+
 		return new ApiBaseEntity(company);
 	}
 
@@ -200,6 +205,11 @@ public class CompanyService extends BaseService {
 	public void updateCompany(CustomUserDetails authUser, ApiCompanyUpdate ac) throws ApiException {
 		Company c = companyQueries.fetchCompany(authUser, ac.id);
 		companyApiTools.updateCompanyWithUsers(authUser.getUserId(), c, ac);
+
+		if (ac.valueChains != null) {
+			// update value chains
+			companyApiTools.updateCompanyValueChains(ac, c);
+		}
 	}
 
 	@Transactional

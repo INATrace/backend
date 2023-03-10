@@ -154,14 +154,9 @@ public class CompanyApiTools {
 		c.setDisplayPrefferedWayOfPayment(ac.displayPrefferedWayOfPayment);
 		c.setPurchaseProofDocumentMultipleFarmers(ac.purchaseProofDocumentMultipleFarmers);
 		c.setAllowBeycoIntegration(ac.allowBeycoIntegration);
-
-		if (ac.valueChains != null) {
-			// update value chains
-			updateCompanyValueChains(ac, c);
-		}
 	}
 
-	private void updateCompanyValueChains(ApiCompany apiCompany, Company company) throws ApiException {
+	public void updateCompanyValueChains(ApiCompany apiCompany, Company company) throws ApiException {
 		if (apiCompany == null || apiCompany.valueChains == null) {
 			return;
 		}
