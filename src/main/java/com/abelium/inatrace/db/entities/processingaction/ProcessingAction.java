@@ -102,6 +102,8 @@ public class ProcessingAction extends TimestampEntity {
 	@Column
 	private Boolean finalProductAction;
 
+	// FIXME: this attribute is not used anymore, it should be removed after product-type migrations
+	@Deprecated
 	/**
 	 * The value chain that this Processing action supports - used to source semi-products, proc. evidence types and proc. evidence fields
 	 */
