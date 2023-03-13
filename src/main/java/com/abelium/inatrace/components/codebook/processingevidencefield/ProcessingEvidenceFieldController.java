@@ -49,7 +49,7 @@ public class ProcessingEvidenceFieldController {
 		return new ApiPaginatedResponse<>(processingEvidenceFieldService.listProcessingEvidenceFieldsByValueChain(valueChainId, request, language));
 	}
 
-	@GetMapping("list/value-chain")
+	@GetMapping("list/by-value-chains")
 	@ApiOperation("Get a list of processing evidence fields by value chain ID list.")
 	public ApiPaginatedResponse<ApiProcessingEvidenceField> listProcessingEvidenceFieldsByValueChains(
 			@ApiParam(value = "Value chain IDs", required = true) @RequestParam(value = "valueChainIds")

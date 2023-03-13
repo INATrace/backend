@@ -38,28 +38,6 @@ public class ValueChainController {
 		return new ApiPaginatedResponse<>(valueChainService.getValueChainList(request));
 	}
 
-	@GetMapping("list/facility/{id}/selected")
-	@ApiOperation("Get a list of value chains that are selected for a facility")
-	public ApiPaginatedResponse<ApiValueChain> listSelectedValueChainsForFacility(
-			@Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("id") Long facilityId,
-			@Valid ApiPaginatedRequest request,
-			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
-
-		return new ApiPaginatedResponse<>(
-				valueChainService.listSelectedValueChainsForFacility(facilityId, request, authUser));
-	}
-
-	@GetMapping("list/processingAction/{id}/selected")
-	@ApiOperation("Get a list of value chains that are selected for a processing action")
-	public ApiPaginatedResponse<ApiValueChain> listSelectedValueChainsForProcessingAction(
-			@Valid @ApiParam(value = "Processing action ID", required = true) @PathVariable("id") Long processingActionId,
-			@Valid ApiPaginatedRequest request,
-			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
-
-		return new ApiPaginatedResponse<>(
-				valueChainService.listSelectedValueChainsForProcessingAction(processingActionId, request, authUser));
-	}
-
 	@GetMapping("{id}")
 	@ApiOperation("Get a single value chain with the provided ID.")
 	public ApiResponse<ApiValueChain> getValueChain(

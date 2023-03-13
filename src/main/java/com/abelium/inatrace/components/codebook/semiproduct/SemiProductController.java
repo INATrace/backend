@@ -38,7 +38,7 @@ public class SemiProductController {
 		return new ApiPaginatedResponse<>(semiProductService.getSemiProductList(request, language));
 	}
 
-	@GetMapping("list/value-chains")
+	@GetMapping("list/by-value-chains")
 	@ApiOperation("Get a paginated list of semi products for given value-chain list")
 	public ApiPaginatedResponse<ApiSemiProduct> getSemiProductListByValueChains(
 			@ApiParam(value = "Value chain IDs", required = true) @RequestParam(value = "valueChainIds") List<Long> valueChainIds,

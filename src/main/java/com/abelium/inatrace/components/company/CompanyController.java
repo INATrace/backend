@@ -225,7 +225,7 @@ public class CompanyController {
     }
 
     @GetMapping(value = "/{id}/product-types")
-    @ApiOperation(value = "Get list of value chains for the company with the given ID")
+    @ApiOperation(value = "Get list of product types for the company with the given ID")
     public ApiPaginatedResponse<ApiProductType> getCompanyProductTypes(
             @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long id,
