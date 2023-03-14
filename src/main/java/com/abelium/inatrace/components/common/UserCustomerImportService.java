@@ -9,15 +9,20 @@ import com.abelium.inatrace.components.company.api.ApiUserCustomer;
 import com.abelium.inatrace.components.company.api.ApiUserCustomerAssociation;
 import com.abelium.inatrace.components.company.api.ApiUserCustomerLocation;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
+import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.product.api.ApiBankInformation;
 import com.abelium.inatrace.components.product.api.ApiFarmInformation;
+import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.product.ProductType;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Gender;
 import com.abelium.inatrace.types.UserCustomerType;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +65,9 @@ public class UserCustomerImportService extends BaseService {
         int rowIndex = 5;
         int successful = 0;
         List<ApiUserCustomer> duplicates = new ArrayList<>();
+
+        // first product type of the company
+        ApiProductType apiProductType = readFirstProductType(companyId);
 
         while (true) {
             Row row = mainSheet.getRow(rowIndex);
@@ -115,6 +123,9 @@ public class UserCustomerImportService extends BaseService {
                 apiUserCustomer.setSurname(getString(row.getCell(1)));
                 apiUserCustomer.setType(UserCustomerType.FARMER);
 
+                apiUserCustomer.setProductTypes(new ArrayList<>());
+                apiUserCustomer.getProductTypes().add(apiProductType);
+
                 // Member of associations
                 if (!emptyCell(row.getCell(20))) {
                     String content = getString(row.getCell(20));
@@ -150,6 +161,13 @@ public class UserCustomerImportService extends BaseService {
         response.setDuplicates(duplicates);
 
         return response;
+    }
+
+    private ApiProductType readFirstProductType(Long companyId) {
+
+        ProductType productTypeProxy = companyService.getCompanyProductTypes(companyId, null);
+        ProductType firstProductType = Torpedo.select(productTypeProxy).list(em).get(0);
+        return ProductTypeMapper.toApiProductType(firstProductType);
     }
 
     private boolean emptyRow(Row row) {
