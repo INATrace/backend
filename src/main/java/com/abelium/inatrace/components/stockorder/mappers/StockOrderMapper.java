@@ -281,7 +281,7 @@ public class StockOrderMapper {
     }
 
     private static String setupInternalLotNumberForSacked(String internalLotNumber, Integer sacNumber) {
-        if(internalLotNumber == null || sacNumber == null || internalLotNumber.endsWith(String.format("/%d", sacNumber))) {
+        if(internalLotNumber == null || sacNumber == null) {
             return internalLotNumber;
         }
         return String.format("%s/%d", internalLotNumber, sacNumber);
