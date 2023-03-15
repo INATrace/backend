@@ -842,6 +842,10 @@ public class CompanyService extends BaseService {
 
 	public ApiPaginatedList<ApiValueChain> getCompanyValueChainList(Long companyId, ApiPaginatedRequest request, CustomUserDetails authUser) throws ApiException {
 
+		// user permissions check
+		Company company = companyQueries.fetchCompany(companyId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
+
 		return PaginationTools.createPaginatedResponse(em, request, () -> getCompanyValueChains(companyId, request),
 				ValueChainMapper::toApiValueChainBase);
 	}
@@ -871,6 +875,10 @@ public class CompanyService extends BaseService {
 	}
 
 	public ApiPaginatedList<ApiProductType> getCompanyProductTypesList(Long companyId, ApiPaginatedRequest request, CustomUserDetails authUser) throws ApiException {
+
+		// user permissions check
+		Company company = companyQueries.fetchCompany(companyId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> getCompanyProductTypes(companyId, request),
 				ProductTypeMapper::toApiProductType);
