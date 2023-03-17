@@ -6,7 +6,7 @@ import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
-import com.abelium.inatrace.db.entities.value_chain.ValueChainProcessingAction;
+import com.abelium.inatrace.db.entities.value_chain.ProcessingActionValueChain;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
 
@@ -111,7 +111,7 @@ public class ProcessingAction extends TimestampEntity {
 	private ValueChain valueChain;
 
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ValueChainProcessingAction> processingActionsValueChains = new ArrayList<>();
+	private List<ProcessingActionValueChain> processingActionsValueChains = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionPET> requiredDocumentTypes = new ArrayList<>();
@@ -269,14 +269,14 @@ public class ProcessingAction extends TimestampEntity {
 		this.valueChain = valueChain;
 	}
 
-	public List<ValueChainProcessingAction> getProcessingActionsValueChains() {
+	public List<ProcessingActionValueChain> getProcessingActionsValueChains() {
 		if (processingActionsValueChains == null) {
 			processingActionsValueChains = new ArrayList<>();
 		}
 		return processingActionsValueChains;
 	}
 
-	public void setProcessingActionsValueChains(List<ValueChainProcessingAction> processingActionsValueChains) {
+	public void setProcessingActionsValueChains(List<ProcessingActionValueChain> processingActionsValueChains) {
 		this.processingActionsValueChains = processingActionsValueChains;
 	}
 

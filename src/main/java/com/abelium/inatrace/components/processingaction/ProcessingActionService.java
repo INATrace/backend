@@ -21,8 +21,8 @@ import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.processingaction.*;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
+import com.abelium.inatrace.db.entities.value_chain.ProcessingActionValueChain;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
-import com.abelium.inatrace.db.entities.value_chain.ValueChainProcessingAction;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -416,11 +416,11 @@ public class ProcessingActionService extends BaseService {
 		entity.getProcessingActionsValueChains().clear();
 
 		for (ApiValueChain apiValueChain : apiProcessingAction.getValueChains()) {
-			ValueChainProcessingAction valueChainProcessingAction = new ValueChainProcessingAction();
+			ProcessingActionValueChain processingActionValueChain = new ProcessingActionValueChain();
 			ValueChain valueChain = valueChainService.fetchValueChain(apiValueChain.getId());
-			valueChainProcessingAction.setProcessingAction(entity);
-			valueChainProcessingAction.setValueChain(valueChain);
-			entity.getProcessingActionsValueChains().add(valueChainProcessingAction);
+			processingActionValueChain.setProcessingAction(entity);
+			processingActionValueChain.setValueChain(valueChain);
+			entity.getProcessingActionsValueChains().add(processingActionValueChain);
 		}
 
 	}

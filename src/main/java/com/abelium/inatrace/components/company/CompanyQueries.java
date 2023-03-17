@@ -10,8 +10,8 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyTranslation;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.product.Product;
+import com.abelium.inatrace.db.entities.value_chain.CompanyValueChain;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
-import com.abelium.inatrace.db.entities.value_chain.ValueChainCompany;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.CompanyStatus;
@@ -72,10 +72,10 @@ public class CompanyQueries extends BaseService {
 
 	public List<ApiValueChain> fetchCompanyValueChains(Long companyId) {
 
-		ValueChainCompany valuechainCompanyProxy = Torpedo.from(ValueChainCompany.class);
-		OnGoingLogicalCondition companyCondition = Torpedo.condition(valuechainCompanyProxy.getCompany().getId()).eq(companyId);
+		CompanyValueChain companyValueChainProxy = Torpedo.from(CompanyValueChain.class);
+		OnGoingLogicalCondition companyCondition = Torpedo.condition(companyValueChainProxy.getCompany().getId()).eq(companyId);
 		Torpedo.where(companyCondition);
-		List<Long> valueChainIds = Torpedo.select(valuechainCompanyProxy.getValueChain().getId()).list(em);
+		List<Long> valueChainIds = Torpedo.select(companyValueChainProxy.getValueChain().getId()).list(em);
 
 		ValueChain valueChainProxy = Torpedo.from(ValueChain.class);
 		OnGoingLogicalCondition valueChainCondition = Torpedo.condition().and(valueChainProxy.getId()).in(valueChainIds);

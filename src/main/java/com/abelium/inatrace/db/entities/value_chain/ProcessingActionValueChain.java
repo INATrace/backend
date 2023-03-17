@@ -6,14 +6,27 @@ import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
+/**
+ * Intermediate entity between value chain and company.
+ *
+ * @author Borche Paspalovski, Sunesis d.o.o.
+ */
 @Entity
-public class ValueChainProcessingAction extends BaseEntity {
+public class ProcessingActionValueChain extends BaseEntity {
+
+	@ManyToOne(optional = false)
+	private ProcessingAction processingAction;
 
 	@ManyToOne(optional = false)
 	private ValueChain valueChain;
 
-	@ManyToOne(optional = false)
-	private ProcessingAction processingAction;
+	public ProcessingAction getProcessingAction() {
+		return processingAction;
+	}
+
+	public void setProcessingAction(ProcessingAction processingAction) {
+		this.processingAction = processingAction;
+	}
 
 	public ValueChain getValueChain() {
 		return valueChain;
@@ -23,11 +36,4 @@ public class ValueChainProcessingAction extends BaseEntity {
 		this.valueChain = valueChain;
 	}
 
-	public ProcessingAction getProcessingAction() {
-		return processingAction;
-	}
-
-	public void setProcessingAction(ProcessingAction processingAction) {
-		this.processingAction = processingAction;
-	}
 }

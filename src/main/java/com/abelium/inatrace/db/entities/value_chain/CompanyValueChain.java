@@ -15,16 +15,24 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(indexes = {@Index(columnList = "valueChain_id, company_id", unique = true) })
-public class ValueChainCompany extends BaseEntity {
-
-	@ManyToOne(optional = false)
-	private ValueChain valueChain;
+public class CompanyValueChain extends BaseEntity {
 
 	@ManyToOne(optional = false)
 	private Company company;
 
-	public ValueChainCompany() {
+	@ManyToOne(optional = false)
+	private ValueChain valueChain;
+
+	public CompanyValueChain() {
 		super();
+	}
+
+	public Company getCompany() {
+		return company;
+	}
+
+	public void setCompany(Company company) {
+		this.company = company;
 	}
 
 	public ValueChain getValueChain() {
@@ -35,11 +43,4 @@ public class ValueChainCompany extends BaseEntity {
 		this.valueChain = valueChain;
 	}
 
-	public Company getCompany() {
-		return company;
-	}
-
-	public void setCompany(Company company) {
-		this.company = company;
-	}
 }

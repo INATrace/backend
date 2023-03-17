@@ -26,8 +26,8 @@ import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.db.entities.product.ProductType;
+import com.abelium.inatrace.db.entities.value_chain.CompanyValueChain;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
-import com.abelium.inatrace.db.entities.value_chain.ValueChainCompany;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -853,10 +853,10 @@ public class CompanyService extends BaseService {
 
 	public ValueChain getCompanyValueChains(Long companyId, ApiPaginatedRequest request) {
 
-		ValueChainCompany valuechainCompanyProxy = Torpedo.from(ValueChainCompany.class);
-		OnGoingLogicalCondition companyCondition = Torpedo.condition(valuechainCompanyProxy.getCompany().getId()).eq(companyId);
+		CompanyValueChain companyValueChainProxy = Torpedo.from(CompanyValueChain.class);
+		OnGoingLogicalCondition companyCondition = Torpedo.condition(companyValueChainProxy.getCompany().getId()).eq(companyId);
 		Torpedo.where(companyCondition);
-		List<Long> valueChainIds = Torpedo.select(valuechainCompanyProxy.getValueChain().getId()).list(em);
+		List<Long> valueChainIds = Torpedo.select(companyValueChainProxy.getValueChain().getId()).list(em);
 
 		ValueChain valueChainProxy = Torpedo.from(ValueChain.class);
 		OnGoingLogicalCondition valueChainCondition = Torpedo.condition().and(valueChainProxy.getId()).in(valueChainIds);
@@ -888,10 +888,10 @@ public class CompanyService extends BaseService {
 
 	public ProductType getCompanyProductTypes(Long companyId, ApiPaginatedRequest request) {
 
-		ValueChainCompany valuechainCompanyProxy = Torpedo.from(ValueChainCompany.class);
-		OnGoingLogicalCondition companyCondition = Torpedo.condition(valuechainCompanyProxy.getCompany().getId()).eq(companyId);
+		CompanyValueChain companyValueChainProxy = Torpedo.from(CompanyValueChain.class);
+		OnGoingLogicalCondition companyCondition = Torpedo.condition(companyValueChainProxy.getCompany().getId()).eq(companyId);
 		Torpedo.where(companyCondition);
-		List<Long> productTypeIds = Torpedo.select(valuechainCompanyProxy.getValueChain().getProductType().getId()).list(em);
+		List<Long> productTypeIds = Torpedo.select(companyValueChainProxy.getValueChain().getProductType().getId()).list(em);
 
 		if (productTypeIds != null) {
 			// calc distinct ids

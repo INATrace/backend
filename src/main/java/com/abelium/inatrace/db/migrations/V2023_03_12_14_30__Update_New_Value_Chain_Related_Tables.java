@@ -5,9 +5,9 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionFacility;
-import com.abelium.inatrace.db.entities.value_chain.ValueChainCompany;
-import com.abelium.inatrace.db.entities.value_chain.ValueChainFacility;
-import com.abelium.inatrace.db.entities.value_chain.ValueChainProcessingAction;
+import com.abelium.inatrace.db.entities.value_chain.CompanyValueChain;
+import com.abelium.inatrace.db.entities.value_chain.FacilityValueChain;
+import com.abelium.inatrace.db.entities.value_chain.ProcessingActionValueChain;
 import com.abelium.inatrace.tools.Queries;
 import org.springframework.core.env.Environment;
 
@@ -42,11 +42,11 @@ public class V2023_03_12_14_30__Update_New_Value_Chain_Related_Tables implements
 						String toBeAddedVcPa =
 								processingAction.getValueChain().getId() + "-" + processingAction.getId();
 						if (addedPairValueChainProcessingAction.add(toBeAddedVcPa)) {
-							// ValueChainProcessingAction table
-							ValueChainProcessingAction valueChainProcessingAction = new ValueChainProcessingAction();
-							valueChainProcessingAction.setProcessingAction(processingAction);
-							valueChainProcessingAction.setValueChain(processingAction.getValueChain());
-							em.persist(valueChainProcessingAction);
+							// ProcessingActionValueChain table
+							ProcessingActionValueChain processingActionValueChain = new ProcessingActionValueChain();
+							processingActionValueChain.setProcessingAction(processingAction);
+							processingActionValueChain.setValueChain(processingAction.getValueChain());
+							em.persist(processingActionValueChain);
 						}
 					}
 
@@ -63,11 +63,11 @@ public class V2023_03_12_14_30__Update_New_Value_Chain_Related_Tables implements
 										processingAction.getValueChain().getId() + "-" + company.getId();
 								// Set the default value chain for the company
 								if (addedPairValueChainCompany.add(toBeAddedValueChainCompany)) {
-									// ValueChainCompany table
-									ValueChainCompany valueChainCompany = new ValueChainCompany();
-									valueChainCompany.setValueChain(processingAction.getValueChain());
-									valueChainCompany.setCompany(company);
-									em.persist(valueChainCompany);
+									// CompanyValueChain table
+									CompanyValueChain companyValueChain = new CompanyValueChain();
+									companyValueChain.setValueChain(processingAction.getValueChain());
+									companyValueChain.setCompany(company);
+									em.persist(companyValueChain);
 								}
 
 								// For every facility in the company, set the value chain - facility relation
@@ -78,11 +78,11 @@ public class V2023_03_12_14_30__Update_New_Value_Chain_Related_Tables implements
 										String toBeAddedVcF =
 												processingAction.getValueChain().getId() + "-" + facility.getId();
 										if (addedPairValueChainFacility.add(toBeAddedVcF)) {
-											// ValueChainFacility table
-											ValueChainFacility valueChainFacility = new ValueChainFacility();
-											valueChainFacility.setValueChain(processingAction.getValueChain());
-											valueChainFacility.setFacility(facility);
-											em.persist(valueChainFacility);
+											// FacilityValueChain table
+											FacilityValueChain facilityValueChain = new FacilityValueChain();
+											facilityValueChain.setValueChain(processingAction.getValueChain());
+											facilityValueChain.setFacility(facility);
+											em.persist(facilityValueChain);
 										}
 									}
 								}

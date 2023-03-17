@@ -6,14 +6,27 @@ import com.abelium.inatrace.db.entities.facility.Facility;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
+/**
+ * Intermediate entity between value chain and company.
+ *
+ * @author Borche Paspalovski, Sunesis d.o.o.
+ */
 @Entity
-public class ValueChainFacility extends BaseEntity {
+public class FacilityValueChain extends BaseEntity {
+
+	@ManyToOne(optional = false)
+	private Facility facility;
 
 	@ManyToOne(optional = false)
 	private ValueChain valueChain;
 
-	@ManyToOne(optional = false)
-	private Facility facility;
+	public Facility getFacility() {
+		return facility;
+	}
+
+	public void setFacility(Facility facility) {
+		this.facility = facility;
+	}
 
 	public ValueChain getValueChain() {
 		return valueChain;
@@ -23,11 +36,4 @@ public class ValueChainFacility extends BaseEntity {
 		this.valueChain = valueChain;
 	}
 
-	public Facility getFacility() {
-		return facility;
-	}
-
-	public void setFacility(Facility facility) {
-		this.facility = facility;
-	}
 }

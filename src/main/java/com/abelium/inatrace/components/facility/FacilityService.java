@@ -22,8 +22,8 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.facility.*;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
+import com.abelium.inatrace.db.entities.value_chain.FacilityValueChain;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
-import com.abelium.inatrace.db.entities.value_chain.ValueChainFacility;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -417,11 +417,11 @@ public class FacilityService extends BaseService {
 		entity.getFacilityValueChains().clear();
 
 		for (ApiValueChain apiValueChain : apiFacility.getFacilityValueChains()) {
-			ValueChainFacility valueChainFacility = new ValueChainFacility();
+			FacilityValueChain facilityValueChain = new FacilityValueChain();
 			ValueChain valueChain = valueChainService.fetchValueChain(apiValueChain.getId());
-			valueChainFacility.setFacility(entity);
-			valueChainFacility.setValueChain(valueChain);
-			entity.getFacilityValueChains().add(valueChainFacility);
+			facilityValueChain.setFacility(entity);
+			facilityValueChain.setValueChain(valueChain);
+			entity.getFacilityValueChains().add(facilityValueChain);
 		}
 	}
 

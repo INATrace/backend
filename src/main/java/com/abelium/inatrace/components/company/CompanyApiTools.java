@@ -19,8 +19,8 @@ import com.abelium.inatrace.components.user.UserQueries;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.*;
+import com.abelium.inatrace.db.entities.value_chain.CompanyValueChain;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
-import com.abelium.inatrace.db.entities.value_chain.ValueChainCompany;
 import com.abelium.inatrace.tools.ListTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
@@ -177,13 +177,13 @@ public class CompanyApiTools {
 		for (ApiValueChain newApiValueChain: apiCompany.getValueChains()) {
 			if (!remainingOldValueChains.contains(newApiValueChain.getId())) {
 				// add new if not added
-				ValueChainCompany valueChainCompany = new ValueChainCompany();
+				CompanyValueChain companyValueChain = new CompanyValueChain();
 				ValueChain valueChain = fetchValueChain(newApiValueChain.getId());
 
-				valueChainCompany.setCompany(company);
-				valueChainCompany.setValueChain(valueChain);
+				companyValueChain.setCompany(company);
+				companyValueChain.setValueChain(valueChain);
 
-				em.persist(valueChainCompany);
+				em.persist(companyValueChain);
 			}
 		}
 	}

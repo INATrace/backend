@@ -330,10 +330,10 @@ public class ValueChainService extends BaseService {
 
 	private ValueChain getSelectedValueChainsForFacility(Long facilityId, ApiPaginatedRequest request) {
 
-		ValueChainFacility valueChainFacilityProxy = Torpedo.from(ValueChainFacility.class);
-		OnGoingLogicalCondition facilityCondition = Torpedo.condition(valueChainFacilityProxy.getFacility().getId()).eq(facilityId);
+		FacilityValueChain facilityValueChainProxy = Torpedo.from(FacilityValueChain.class);
+		OnGoingLogicalCondition facilityCondition = Torpedo.condition(facilityValueChainProxy.getFacility().getId()).eq(facilityId);
 		Torpedo.where(facilityCondition);
-		List<Long> valueChainIds = Torpedo.select(valueChainFacilityProxy.getValueChain().getId()).list(em);
+		List<Long> valueChainIds = Torpedo.select(facilityValueChainProxy.getValueChain().getId()).list(em);
 
 		ValueChain valueChainProxy = Torpedo.from(ValueChain.class);
 		OnGoingLogicalCondition valueChainCondition = Torpedo.condition().and(valueChainProxy.getId()).in(valueChainIds);
@@ -350,10 +350,11 @@ public class ValueChainService extends BaseService {
 
 	private ValueChain getSelectedValueChainsForProcessingAction(Long processingActionId, ApiPaginatedRequest request) {
 
-		ValueChainProcessingAction valueChainProcessingActionProxy = Torpedo.from(ValueChainProcessingAction.class);
-		OnGoingLogicalCondition processingActionCondition = Torpedo.condition(valueChainProcessingActionProxy.getProcessingAction().getId()).eq(processingActionId);
+		ProcessingActionValueChain processingActionValueChainProxy = Torpedo.from(ProcessingActionValueChain.class);
+		OnGoingLogicalCondition processingActionCondition = Torpedo.condition(
+				processingActionValueChainProxy.getProcessingAction().getId()).eq(processingActionId);
 		Torpedo.where(processingActionCondition);
-		List<Long> valueChainIds = Torpedo.select(valueChainProcessingActionProxy.getValueChain().getId()).list(em);
+		List<Long> valueChainIds = Torpedo.select(processingActionValueChainProxy.getValueChain().getId()).list(em);
 
 		ValueChain valueChainProxy = Torpedo.from(ValueChain.class);
 		OnGoingLogicalCondition valueChainCondition = Torpedo.condition().and(valueChainProxy.getId()).in(valueChainIds);
