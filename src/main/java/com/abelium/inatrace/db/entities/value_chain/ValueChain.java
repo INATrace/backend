@@ -3,7 +3,7 @@ package com.abelium.inatrace.db.entities.value_chain;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.common.User;
-import com.abelium.inatrace.db.entities.product.ProductType;
+import com.abelium.inatrace.db.entities.codebook.ProductType;
 import com.abelium.inatrace.db.entities.value_chain.enums.ValueChainStatus;
 
 import javax.persistence.*;
@@ -20,7 +20,7 @@ import java.util.List;
 @Entity
 public class ValueChain extends TimestampEntity {
 
-	@Column(nullable = false, length = Lengths.DEFAULT)
+	@Column(nullable = false)
 	private String name;
 
 	@Column(nullable = false)
@@ -73,6 +73,9 @@ public class ValueChain extends TimestampEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private User updatedBy;
 
+	/**
+	 * Reference to the product type that this Value chain is based on.
+	 */
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	private ProductType productType;
 

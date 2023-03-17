@@ -16,7 +16,7 @@ import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.company.Company;
-import com.abelium.inatrace.db.entities.product.ProductType;
+import com.abelium.inatrace.db.entities.codebook.ProductType;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Gender;
 import com.abelium.inatrace.types.UserCustomerType;

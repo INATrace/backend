@@ -1,4 +1,4 @@
-package com.abelium.inatrace.db.entities.product;
+package com.abelium.inatrace.db.entities.codebook;
 
 import com.abelium.inatrace.db.base.TimestampEntity;
 

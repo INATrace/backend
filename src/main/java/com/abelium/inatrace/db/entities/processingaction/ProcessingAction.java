@@ -19,9 +19,7 @@ import java.util.List;
 @Table
 @NamedQueries({
 	@NamedQuery(name = "ProcessingAction.countProcessingActions",
-			query = "SELECT COUNT(pa) FROM ProcessingAction pa "
-					+ "INNER JOIN pa.processingActionTranslations t "
-					+ "WHERE t.language = :language")
+				query = "SELECT COUNT(pa) FROM ProcessingAction pa INNER JOIN pa.processingActionTranslations t WHERE t.language = :language")
 })
 public class ProcessingAction extends TimestampEntity {
 
@@ -103,13 +101,13 @@ public class ProcessingAction extends TimestampEntity {
 	private Boolean finalProductAction;
 
 	// FIXME: this attribute is not used anymore, it should be removed after product-type migrations
-	@Deprecated
-	/**
-	 * The value chain that this Processing action supports - used to source semi-products, proc. evidence types and proc. evidence fields
-	 */
 	@ManyToOne
+	@Deprecated
 	private ValueChain valueChain;
 
+	/**
+	 * The value chains that this Processing action supports - used to source semi-products, proc. evidence types and proc. evidence fields
+	 */
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionValueChain> processingActionsValueChains = new ArrayList<>();
 	

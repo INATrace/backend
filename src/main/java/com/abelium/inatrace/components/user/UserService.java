@@ -19,7 +19,7 @@ import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
-import com.abelium.inatrace.db.entities.product.ProductType;
+import com.abelium.inatrace.db.entities.codebook.ProductType;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.PasswordTools;

@@ -7,7 +7,6 @@ import com.abelium.inatrace.db.entities.codebook.CurrencyType;
 import com.abelium.inatrace.db.entities.common.Address;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.facility.Facility;
-import com.abelium.inatrace.db.entities.payment.BulkPayment;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.value_chain.CompanyValueChain;
@@ -36,13 +35,11 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	/**
 	 * company name
 	 */
-	@Column(length = Lengths.DEFAULT)
 	private String name;
 	
 	/**
 	 * company abbreviation
 	 */
-	@Column(length = Lengths.DEFAULT)
 	private String abbreviation;
 
 	/**
@@ -71,7 +68,7 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	/**
 	 * name of manager / CEO
 	 */
-	@Column(length = Lengths.DEFAULT)
+	@Column
 	private String manager;
 
 	/**
@@ -154,12 +151,6 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	 */
 	@OneToMany(mappedBy = "company")
 	private List<StockOrder> stockOrders = new ArrayList<>();
-	
-	/**
-	 * bulk payments
-	 */
-	@OneToMany(mappedBy = "payingCompany")
-	private List<BulkPayment> bulkPayments = new ArrayList<>();
 
 	/**
 	 * A list of supported value chains for the company (filter)

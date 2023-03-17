@@ -1,7 +1,7 @@
 package com.abelium.inatrace.db.entities.common;
 
 import com.abelium.inatrace.db.base.BaseEntity;
-import com.abelium.inatrace.db.entities.product.ProductType;
+import com.abelium.inatrace.db.entities.codebook.ProductType;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;

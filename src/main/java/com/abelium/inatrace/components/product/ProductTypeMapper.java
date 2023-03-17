@@ -1,7 +1,7 @@
 package com.abelium.inatrace.components.product;
 
 import com.abelium.inatrace.components.product.api.ApiProductType;
-import com.abelium.inatrace.db.entities.product.ProductType;
+import com.abelium.inatrace.db.entities.codebook.ProductType;
 
 public class ProductTypeMapper {
 

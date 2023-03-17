@@ -23,7 +23,7 @@ import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChainListRequest;
 import com.abelium.inatrace.db.entities.codebook.*;
 import com.abelium.inatrace.db.entities.common.User;
-import com.abelium.inatrace.db.entities.product.ProductType;
+import com.abelium.inatrace.db.entities.codebook.ProductType;
 import com.abelium.inatrace.db.entities.value_chain.*;
 import com.abelium.inatrace.db.entities.value_chain.enums.ValueChainStatus;
 import com.abelium.inatrace.security.service.CustomUserDetails;

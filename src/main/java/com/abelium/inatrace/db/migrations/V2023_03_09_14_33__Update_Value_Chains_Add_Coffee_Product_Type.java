@@ -3,7 +3,7 @@ package com.abelium.inatrace.db.migrations;
 import com.abelium.inatrace.components.flyway.JpaMigration;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.common.UserCustomerProductType;
-import com.abelium.inatrace.db.entities.product.ProductType;
+import com.abelium.inatrace.db.entities.codebook.ProductType;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.tools.Queries;
 import org.springframework.core.env.Environment;

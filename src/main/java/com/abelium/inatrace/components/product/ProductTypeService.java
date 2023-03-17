@@ -4,7 +4,7 @@ import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.product.api.ApiProductType;
-import com.abelium.inatrace.db.entities.product.ProductType;
+import com.abelium.inatrace.db.entities.codebook.ProductType;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
