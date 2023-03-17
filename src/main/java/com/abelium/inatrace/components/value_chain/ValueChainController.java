@@ -1,9 +1,6 @@
 package com.abelium.inatrace.components.value_chain;
 
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiDefaultResponse;
-import com.abelium.inatrace.api.ApiPaginatedResponse;
-import com.abelium.inatrace.api.ApiResponse;
+import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChainListRequest;

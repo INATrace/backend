@@ -6,6 +6,7 @@ import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
+import com.abelium.inatrace.db.entities.value_chain.ValueChainProcessingAction;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
 
@@ -101,11 +102,16 @@ public class ProcessingAction extends TimestampEntity {
 	@Column
 	private Boolean finalProductAction;
 
+	// FIXME: this attribute is not used anymore, it should be removed after product-type migrations
+	@Deprecated
 	/**
 	 * The value chain that this Processing action supports - used to source semi-products, proc. evidence types and proc. evidence fields
 	 */
 	@ManyToOne
 	private ValueChain valueChain;
+
+	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ValueChainProcessingAction> processingActionsValueChains = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionPET> requiredDocumentTypes = new ArrayList<>();
@@ -261,6 +267,17 @@ public class ProcessingAction extends TimestampEntity {
 
 	public void setValueChain(ValueChain valueChain) {
 		this.valueChain = valueChain;
+	}
+
+	public List<ValueChainProcessingAction> getProcessingActionsValueChains() {
+		if (processingActionsValueChains == null) {
+			processingActionsValueChains = new ArrayList<>();
+		}
+		return processingActionsValueChains;
+	}
+
+	public void setProcessingActionsValueChains(List<ValueChainProcessingAction> processingActionsValueChains) {
+		this.processingActionsValueChains = processingActionsValueChains;
 	}
 
 	public List<ProcessingActionPET> getRequiredDocumentTypes() {

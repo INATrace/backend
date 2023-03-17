@@ -1,29 +1,17 @@
 package com.abelium.inatrace.components.codebook.processingevidencefield;
 
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiDefaultResponse;
-import com.abelium.inatrace.api.ApiPaginatedRequest;
-import com.abelium.inatrace.api.ApiPaginatedResponse;
-import com.abelium.inatrace.api.ApiResponse;
+import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.types.Language;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * REST controller for processing evidence field entity.
@@ -49,7 +37,8 @@ public class ProcessingEvidenceFieldController {
 
 		return new ApiPaginatedResponse<>(processingEvidenceFieldService.getProcessingEvidenceFieldList(request, language));
 	}
-	
+
+	@Deprecated
 	@GetMapping("list/value-chain/{id}")
 	@ApiOperation("Get a list of processing evidence fields by value chain ID.")
 	public ApiPaginatedResponse<ApiProcessingEvidenceField> listProcessingEvidenceFieldsByValueChain(
@@ -58,6 +47,17 @@ public class ProcessingEvidenceFieldController {
 		@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
 
 		return new ApiPaginatedResponse<>(processingEvidenceFieldService.listProcessingEvidenceFieldsByValueChain(valueChainId, request, language));
+	}
+
+	@GetMapping("list/by-value-chains")
+	@ApiOperation("Get a list of processing evidence fields by value chain ID list.")
+	public ApiPaginatedResponse<ApiProcessingEvidenceField> listProcessingEvidenceFieldsByValueChains(
+			@ApiParam(value = "Value chain IDs", required = true) @RequestParam(value = "valueChainIds")
+			List<Long> valueChainIds,
+			@Valid ApiPaginatedRequest request,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
+
+		return new ApiPaginatedResponse<>(processingEvidenceFieldService.listProcessingEvidenceFieldsByValueChainList(valueChainIds, request, language));
 	}
 	
 	@GetMapping("{id}")

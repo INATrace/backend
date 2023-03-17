@@ -3,6 +3,7 @@ package com.abelium.inatrace.db.entities.value_chain;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.common.User;
+import com.abelium.inatrace.db.entities.product.ProductType;
 import com.abelium.inatrace.db.entities.value_chain.enums.ValueChainStatus;
 
 import javax.persistence.*;
@@ -71,6 +72,9 @@ public class ValueChain extends TimestampEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	private User updatedBy;
+
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	private ProductType productType;
 
 	@Version
 	private long entityVersion;
@@ -179,6 +183,14 @@ public class ValueChain extends TimestampEntity {
 
 	public void setUpdatedBy(User updatedBy) {
 		this.updatedBy = updatedBy;
+	}
+
+	public ProductType getProductType() {
+		return productType;
+	}
+
+	public void setProductType(ProductType productType) {
+		this.productType = productType;
 	}
 
 	public long getEntityVersion() {

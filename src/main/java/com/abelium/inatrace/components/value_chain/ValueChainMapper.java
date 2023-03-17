@@ -6,6 +6,7 @@ import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTyp
 import com.abelium.inatrace.components.codebook.processing_evidence_type.ProcessingEvidenceTypeMapper;
 import com.abelium.inatrace.components.codebook.processingevidencefield.ProcessingEvidenceFieldMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
+import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.types.Language;
@@ -96,6 +97,11 @@ public final class ValueChainMapper {
 			apiValueChain.setSemiProducts(entity.getSemiProducts().stream()
 					.map(vcSemiProduct -> SemiProductMapper.toApiSemiProductBase(vcSemiProduct.getSemiProduct(), language))
 					.collect(Collectors.toList()));
+		}
+
+		// Map product type
+		if (entity.getProductType() != null) {
+			apiValueChain.setProductType(ProductTypeMapper.toApiProductType(entity.getProductType()));
 		}
 
 		return apiValueChain;

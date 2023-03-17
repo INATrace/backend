@@ -5,8 +5,8 @@ import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
+import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceField;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceFieldTranslation;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -132,6 +132,28 @@ public class ProcessingEvidenceFieldService extends BaseService {
 				.stream()
 				.map(processingEvidenceField -> ProcessingEvidenceFieldMapper.toApiProcessingEvidenceFieldDetails(processingEvidenceField, language))
 				.collect(Collectors.toList()), count);
+	}
+
+	public ApiPaginatedList<ApiProcessingEvidenceField> listProcessingEvidenceFieldsByValueChainList(
+			List<Long> valueChainIds, ApiPaginatedRequest request, Language language) {
+
+		TypedQuery<ProcessingEvidenceField> processingEvidenceFieldsQuery = em.createNamedQuery(
+						"ProcessingEvidenceField.getProcessingEvidenceFieldsForValueChainIds", ProcessingEvidenceField.class)
+				.setParameter("valueChainIds", valueChainIds)
+				.setFirstResult(request.getOffset())
+				.setMaxResults(request.getLimit());
+
+		List<ProcessingEvidenceField> processingEvidenceFields = processingEvidenceFieldsQuery.getResultList();
+
+		Long count = em.createNamedQuery("ProcessingEvidenceField.countProcessingEvidenceFieldsForValueChainIds", Long.class)
+				.setParameter("valueChainIds", valueChainIds)
+				.getSingleResult();
+
+		return new ApiPaginatedList<>(
+				processingEvidenceFields
+						.stream()
+						.map(processingEvidenceField -> ProcessingEvidenceFieldMapper.toApiProcessingEvidenceFieldDetails(processingEvidenceField, language))
+						.collect(Collectors.toList()), count);
 	}
 	
 }

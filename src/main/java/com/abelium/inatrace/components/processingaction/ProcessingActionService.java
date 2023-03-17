@@ -16,10 +16,13 @@ import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.value_chain.ValueChainService;
+import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.processingaction.*;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
+import com.abelium.inatrace.db.entities.value_chain.ValueChain;
+import com.abelium.inatrace.db.entities.value_chain.ValueChainProcessingAction;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -115,8 +118,8 @@ public class ProcessingActionService extends BaseService {
 		// Set processing action owner company
 		entity.setCompany(company);
 
-		// Set the value chain
-		entity.setValueChain(valueChainService.fetchValueChain(apiProcessingAction.getValueChain().getId()));
+//		// Set the value chain
+//		entity.setValueChain(valueChainService.fetchValueChain(apiProcessingAction.getValueChain().getId()));
 
 		entity.setSortOrder(apiProcessingAction.getSortOrder());
 		entity.setPrefix(apiProcessingAction.getPrefix());
@@ -152,6 +155,9 @@ public class ProcessingActionService extends BaseService {
 
 		// Create or update the supported facilities for this processing action (the facilities where this processing starts)
 		updateSupportedFacilities(apiProcessingAction, entity);
+
+		// Create or update the value-chains
+		updateValueChains(apiProcessingAction, entity);
 
 		// If action type is GENERATE_QR_CODE, set Final product for QR code
 		if (ProcessingActionType.GENERATE_QR_CODE.equals(apiProcessingAction.getType())) {
@@ -234,8 +240,10 @@ public class ProcessingActionService extends BaseService {
 	private void validateProcessingAction(ApiProcessingAction apiProcessingAction) throws ApiException {
 
 		// Validate value chain
-		if (apiProcessingAction.getValueChain() == null || apiProcessingAction.getValueChain().getId() == null) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Value chain is required");
+		if (apiProcessingAction.getValueChains() == null || apiProcessingAction.getValueChains().isEmpty() ||
+				apiProcessingAction.getValueChains().get(0) == null ||
+				apiProcessingAction.getValueChains().get(0).getId() == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "At least one value chain is required");
 		}
 
 		// Validate action type
@@ -403,6 +411,20 @@ public class ProcessingActionService extends BaseService {
 				paOSM.setOutputSemiProduct(inputSemiProduct);
 				entity.getOutputSemiProducts().add(paOSM);
 		}
+	}
+
+	private void updateValueChains(ApiProcessingAction apiProcessingAction, ProcessingAction entity) throws ApiException {
+
+		entity.getProcessingActionsValueChains().clear();
+
+		for (ApiValueChain apiValueChain : apiProcessingAction.getValueChains()) {
+			ValueChainProcessingAction valueChainProcessingAction = new ValueChainProcessingAction();
+			ValueChain valueChain = valueChainService.fetchValueChain(apiValueChain.getId());
+			valueChainProcessingAction.setProcessingAction(entity);
+			valueChainProcessingAction.setValueChain(valueChain);
+			entity.getProcessingActionsValueChains().add(valueChainProcessingAction);
+		}
+
 	}
 
 	private void updateRequiredEvidenceFields(ApiProcessingAction apiProcessingAction, ProcessingAction entity) {

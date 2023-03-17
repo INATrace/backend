@@ -8,7 +8,7 @@ import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.components.processingactiontranslation.ProcessingActionTranslationMapper;
 import com.abelium.inatrace.components.product.ProductApiTools;
-import com.abelium.inatrace.components.value_chain.ValueChainMapper;
+import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceField;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceFieldTranslation;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceType;
@@ -19,6 +19,7 @@ import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionFacility;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
+import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.types.Language;
 
 import java.util.ArrayList;
@@ -41,8 +42,23 @@ public final class ProcessingActionMapper {
 		ApiProcessingAction apiProcessingAction = new ApiProcessingAction();
 		apiProcessingAction.setId(entity.getId());
 
-		// Map the value chain
-		apiProcessingAction.setValueChain(ValueChainMapper.toApiValueChainBase(entity.getValueChain()));
+		// Map the value chains
+//		apiProcessingAction.setValueChain(ValueChainMapper.toApiValueChainBase(entity.getValueChain()));
+
+		List<ApiValueChain> apiValueChains = new ArrayList<>();
+		entity.getProcessingActionsValueChains().forEach(vcpa -> {
+
+			ValueChain valueChain = vcpa.getValueChain();
+
+			// only return some basic data
+			ApiValueChain apiValueChain = new ApiValueChain();
+			apiValueChain.setId(valueChain.getId());
+			apiValueChain.setName(valueChain.getName());
+			apiValueChain.setDescription(valueChain.getDescription());
+
+			apiValueChains.add(apiValueChain);
+		});
+		apiProcessingAction.setValueChains(apiValueChains);
 
 		// Set the translated name and description
 		entity.getProcessingActionTranslations().stream()

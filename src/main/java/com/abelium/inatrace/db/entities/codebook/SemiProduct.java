@@ -12,6 +12,12 @@ import java.util.List;
  * @author Pece Adjievski, Sunesis d.o.o.
  */
 @Entity
+@NamedQueries({
+		@NamedQuery(name = "SemiProduct.getSemiProductsForValueChainIds",
+		            query = "SELECT DISTINCT vcpet.semiProduct From ValueChainSemiProduct vcpet WHERE vcpet.valueChain.id IN :valueChainIds"),
+		@NamedQuery(name = "SemiProduct.countSemiProductsForValueChainIds",
+		            query = "SELECT COUNT(DISTINCT vcpet.semiProduct) From ValueChainSemiProduct vcpet WHERE vcpet.valueChain.id IN :valueChainIds")
+})
 public class SemiProduct extends TimestampEntity {
 
 	/**

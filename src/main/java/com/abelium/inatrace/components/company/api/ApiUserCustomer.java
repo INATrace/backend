@@ -5,6 +5,7 @@ import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.product.api.ApiBankInformation;
 import com.abelium.inatrace.components.product.api.ApiFarmInformation;
+import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.types.Gender;
 import com.abelium.inatrace.types.UserCustomerType;
 import io.swagger.annotations.ApiModelProperty;
@@ -66,6 +67,10 @@ public class ApiUserCustomer extends ApiBaseEntity {
 	@ApiModelProperty(value = "User customer certifications", position = 14)
 	@Valid
 	public List<ApiCertification> certifications;
+
+	@ApiModelProperty(value = "User customer product types", position = 15)
+	@Valid
+	public List<ApiProductType> productTypes;
 
 	public Long getCompanyId() {
 		return companyId;
@@ -187,4 +192,11 @@ public class ApiUserCustomer extends ApiBaseEntity {
 		this.certifications = certifications;
 	}
 
+	public List<ApiProductType> getProductTypes() {
+		return productTypes;
+	}
+
+	public void setProductTypes(List<ApiProductType> productTypes) {
+		this.productTypes = productTypes;
+	}
 }

@@ -2,11 +2,11 @@ package com.abelium.inatrace.components.processingaction.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
+import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.processingactiontranslation.api.ApiProcessingActionTranslation;
-import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.components.product.api.ApiFinalProduct;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.types.Language;
@@ -82,9 +82,9 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	@ApiModelProperty(value = "Denoting if this processing action is Transfer or Quote of a Final product")
 	private Boolean finalProductAction;
 
-	@ApiModelProperty(value = "The value chain that this Processing action supports")
-	private ApiValueChain valueChain;
-	
+	@ApiModelProperty(value = "List of value chains for this processing action")
+	private List<ApiValueChain> valueChains;
+
 	@ApiModelProperty(value = "Processing action required document types")
 	private List<ApiProcessingEvidenceType> requiredDocumentTypes = new ArrayList<>();
 	
@@ -253,12 +253,12 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		this.finalProductAction = finalProductAction;
 	}
 
-	public ApiValueChain getValueChain() {
-		return valueChain;
+	public List<ApiValueChain> getValueChains() {
+		return valueChains;
 	}
 
-	public void setValueChain(ApiValueChain valueChain) {
-		this.valueChain = valueChain;
+	public void setValueChains(List<ApiValueChain> valueChains) {
+		this.valueChains = valueChains;
 	}
 
 	public List<ApiProcessingEvidenceType> getRequiredDocumentTypes() {

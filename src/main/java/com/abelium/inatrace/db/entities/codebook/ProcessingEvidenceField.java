@@ -21,7 +21,13 @@ import java.util.List;
 	            query = "SELECT COUNT(pef) FROM ProcessingEvidenceField pef "
 						+ "INNER JOIN pef.valueChains vcs "
 						+ "INNER JOIN vcs.valueChain vc "
-						+ "WHERE vc.id = :valueChainId")
+						+ "WHERE vc.id = :valueChainId"),
+	@NamedQuery(name = "ProcessingEvidenceField.getProcessingEvidenceFieldsForValueChainIds",
+	            query = "SELECT DISTINCT vcpef.processingEvidenceField From ValueChainProcessingEvidenceField vcpef "
+			            + "WHERE vcpef.valueChain.id IN :valueChainIds"),
+	@NamedQuery(name = "ProcessingEvidenceField.countProcessingEvidenceFieldsForValueChainIds",
+	            query = "SELECT COUNT(DISTINCT vcpef.processingEvidenceField) From ValueChainProcessingEvidenceField vcpef "
+			            + "WHERE vcpef.valueChain.id IN :valueChainIds")
 })
 public class ProcessingEvidenceField extends TimestampEntity {
 

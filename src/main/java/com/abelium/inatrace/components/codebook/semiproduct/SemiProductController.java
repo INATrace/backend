@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * REST controller for semi products.
@@ -35,6 +36,16 @@ public class SemiProductController {
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
 
 		return new ApiPaginatedResponse<>(semiProductService.getSemiProductList(request, language));
+	}
+
+	@GetMapping("list/by-value-chains")
+	@ApiOperation("Get a paginated list of semi products for given value-chain list")
+	public ApiPaginatedResponse<ApiSemiProduct> getSemiProductListByValueChains(
+			@ApiParam(value = "Value chain IDs", required = true) @RequestParam(value = "valueChainIds") List<Long> valueChainIds,
+			@Valid ApiPaginatedRequest request,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
+
+		return new ApiPaginatedResponse<>(semiProductService.getSemiProductListByValueChains(request, valueChainIds, language));
 	}
 
 	@GetMapping("{id}")

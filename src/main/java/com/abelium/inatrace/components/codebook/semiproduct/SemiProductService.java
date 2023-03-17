@@ -20,8 +20,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
 
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Service for SemiProduct entity.
@@ -147,4 +150,27 @@ public class SemiProductService extends BaseService {
 		return semiProduct;
 	}
 
+	public ApiPaginatedList<ApiSemiProduct> getSemiProductListByValueChains(ApiPaginatedRequest request,
+	                                                                        List<Long> valueChainIds,
+	                                                                        Language language) {
+
+		TypedQuery<SemiProduct> semiProductsQuery = em.createNamedQuery(
+						"SemiProduct.getSemiProductsForValueChainIds", SemiProduct.class)
+				.setParameter("valueChainIds", valueChainIds)
+				.setFirstResult(request.getOffset())
+				.setMaxResults(request.getLimit());
+
+		List<SemiProduct> semiProducts = semiProductsQuery.getResultList();
+
+		Long count = em.createNamedQuery("SemiProduct.countSemiProductsForValueChainIds", Long.class)
+				.setParameter("valueChainIds", valueChainIds)
+				.getSingleResult();
+
+		return new ApiPaginatedList<>(
+				semiProducts
+						.stream()
+						.map(processingEvidenceField -> SemiProductMapper.toApiSemiProduct(processingEvidenceField, language))
+						.collect(Collectors.toList()), count);
+
+	}
 }
