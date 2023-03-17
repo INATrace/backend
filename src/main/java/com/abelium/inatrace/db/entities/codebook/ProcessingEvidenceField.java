@@ -23,10 +23,10 @@ import java.util.List;
 						+ "INNER JOIN vcs.valueChain vc "
 						+ "WHERE vc.id = :valueChainId"),
 	@NamedQuery(name = "ProcessingEvidenceField.getProcessingEvidenceFieldsForValueChainIds",
-	            query = "SELECT DISTINCT vcpef.processingEvidenceField From ValueChainProcessingEvidenceField vcpef "
+	            query = "SELECT DISTINCT vcpef.processingEvidenceField FROM ValueChainProcessingEvidenceField vcpef "
 			            + "WHERE vcpef.valueChain.id IN :valueChainIds"),
 	@NamedQuery(name = "ProcessingEvidenceField.countProcessingEvidenceFieldsForValueChainIds",
-	            query = "SELECT COUNT(DISTINCT vcpef.processingEvidenceField) From ValueChainProcessingEvidenceField vcpef "
+	            query = "SELECT COUNT(DISTINCT vcpef.processingEvidenceField) FROM ValueChainProcessingEvidenceField vcpef "
 			            + "WHERE vcpef.valueChain.id IN :valueChainIds")
 })
 public class ProcessingEvidenceField extends TimestampEntity {

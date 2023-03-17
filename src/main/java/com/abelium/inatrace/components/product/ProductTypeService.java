@@ -20,6 +20,7 @@ public class ProductTypeService extends BaseService {
 
     @Transactional
     public ApiResponse<ApiProductType> createProductType(ApiProductType apiProductType) {
+
         ProductType productType = ProductTypeMapper.toProductType(apiProductType);
 
         em.persist(productType);
@@ -28,12 +29,18 @@ public class ProductTypeService extends BaseService {
     }
 
     public ApiPaginatedResponse<ApiProductType> getProductTypes() {
-        List<ApiProductType> productTypeList = em.createQuery("SELECT pt FROM ProductType pt", ProductType.class).getResultList().stream().map(ProductTypeMapper::toApiProductType).collect(Collectors.toList());
+
+        List<ApiProductType> productTypeList = em.createQuery("SELECT pt FROM ProductType pt", ProductType.class)
+                .getResultList()
+                .stream()
+                .map(ProductTypeMapper::toApiProductType)
+                .collect(Collectors.toList());
 
         return new ApiPaginatedResponse<>(new ApiPaginatedList<>(productTypeList, productTypeList.size()));
     }
 
     public ApiResponse<ApiProductType> getProductType(Long id) throws ApiException {
+
         ProductType productType = em.find(ProductType.class, id);
 
         if (productType == null) {
@@ -45,6 +52,7 @@ public class ProductTypeService extends BaseService {
 
     @Transactional
     public ApiResponse<ApiProductType> updateProductType(ApiProductType apiProductType) throws ApiException {
+
         if (apiProductType.getId() == null) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Id must be provided!");
         }
@@ -63,6 +71,7 @@ public class ProductTypeService extends BaseService {
 
     @Transactional
     public ApiDefaultResponse deleteProductType(Long id) throws ApiException {
+
         if (id == null) {
             throw new ApiException(ApiStatus.INVALID_REQUEST, "Id must be provided!");
         }
@@ -77,4 +86,5 @@ public class ProductTypeService extends BaseService {
 
         return new ApiDefaultResponse();
     }
+
 }

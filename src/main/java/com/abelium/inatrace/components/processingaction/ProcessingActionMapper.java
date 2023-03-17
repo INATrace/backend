@@ -43,8 +43,6 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setId(entity.getId());
 
 		// Map the value chains
-//		apiProcessingAction.setValueChain(ValueChainMapper.toApiValueChainBase(entity.getValueChain()));
-
 		List<ApiValueChain> apiValueChains = new ArrayList<>();
 		entity.getProcessingActionsValueChains().forEach(vcpa -> {
 

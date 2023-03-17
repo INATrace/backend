@@ -188,7 +188,6 @@ public class CompanyApiTools {
 		}
 	}
 
-
 	private ValueChain fetchValueChain(Long id) throws ApiException {
 		// find value chain
 		ValueChain valueChain = Queries.get(em, ValueChain.class, id);
@@ -198,7 +197,6 @@ public class CompanyApiTools {
 
 		return valueChain;
 	}
-	
 	
 	private void updateCompanyTranslatables(Long userId, CompanyTranslatables c, ApiCompany ac) throws ApiException {
 		c.setName(ac.name);

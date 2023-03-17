@@ -94,6 +94,7 @@ public class UserService extends BaseService {
 	}
 
 	private UserCustomer fetchUserCustomerById(Long id) throws ApiException {
+
 		UserCustomer userCustomer = Queries.get(em, UserCustomer.class, id);
 		if (userCustomer == null) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user customer ID");

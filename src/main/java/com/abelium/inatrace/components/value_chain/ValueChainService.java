@@ -310,6 +310,7 @@ public class ValueChainService extends BaseService {
 	}
 
 	private void updateProductType(ValueChain entity, ApiValueChain apiValueChain) throws ApiException {
+
 		if (apiValueChain.getProductType() == null || apiValueChain.getProductType().getId() == null) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Product type id must be specified");
 		}

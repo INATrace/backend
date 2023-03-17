@@ -14,9 +14,9 @@ import java.util.List;
 @Entity
 @NamedQueries({
 		@NamedQuery(name = "SemiProduct.getSemiProductsForValueChainIds",
-		            query = "SELECT DISTINCT vcpet.semiProduct From ValueChainSemiProduct vcpet WHERE vcpet.valueChain.id IN :valueChainIds"),
+		            query = "SELECT DISTINCT vcpet.semiProduct FROM ValueChainSemiProduct vcpet WHERE vcpet.valueChain.id IN :valueChainIds"),
 		@NamedQuery(name = "SemiProduct.countSemiProductsForValueChainIds",
-		            query = "SELECT COUNT(DISTINCT vcpet.semiProduct) From ValueChainSemiProduct vcpet WHERE vcpet.valueChain.id IN :valueChainIds")
+		            query = "SELECT COUNT(DISTINCT vcpet.semiProduct) FROM ValueChainSemiProduct vcpet WHERE vcpet.valueChain.id IN :valueChainIds")
 })
 public class SemiProduct extends TimestampEntity {
 

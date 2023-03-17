@@ -71,6 +71,7 @@ public class CompanyQueries extends BaseService {
 	}
 
 	public List<ApiValueChain> fetchCompanyValueChains(Long companyId) {
+
 		ValueChainCompany valuechainCompanyProxy = Torpedo.from(ValueChainCompany.class);
 		OnGoingLogicalCondition companyCondition = Torpedo.condition(valuechainCompanyProxy.getCompany().getId()).eq(companyId);
 		Torpedo.where(companyCondition);

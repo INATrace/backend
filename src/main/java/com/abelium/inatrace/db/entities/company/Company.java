@@ -162,7 +162,7 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	private List<BulkPayment> bulkPayments = new ArrayList<>();
 
 	/**
-	 * A list of supported value chains for the company (filter). If empty, all value chains are available.
+	 * A list of supported value chains for the company (filter)
 	 */
 	@OneToMany(mappedBy = "company")
 	private List<ValueChainCompany> valueChains;

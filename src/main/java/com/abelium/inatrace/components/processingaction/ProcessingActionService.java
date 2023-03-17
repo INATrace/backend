@@ -118,9 +118,7 @@ public class ProcessingActionService extends BaseService {
 		// Set processing action owner company
 		entity.setCompany(company);
 
-//		// Set the value chain
-//		entity.setValueChain(valueChainService.fetchValueChain(apiProcessingAction.getValueChain().getId()));
-
+		// Set the value chain
 		entity.setSortOrder(apiProcessingAction.getSortOrder());
 		entity.setPrefix(apiProcessingAction.getPrefix());
 		entity.setRepackedOutputs(apiProcessingAction.getRepackedOutputs());

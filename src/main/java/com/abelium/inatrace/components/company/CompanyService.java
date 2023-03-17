@@ -658,6 +658,7 @@ public class CompanyService extends BaseService {
 	}
 
 	private ProductType fetchProductType(Long id) throws ApiException {
+
 		ProductType productType = em.find(ProductType.class, id);
 		if (productType == null) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid product type ID");
@@ -849,6 +850,7 @@ public class CompanyService extends BaseService {
 		return PaginationTools.createPaginatedResponse(em, request, () -> getCompanyValueChains(companyId, request),
 				ValueChainMapper::toApiValueChainBase);
 	}
+
 	public ValueChain getCompanyValueChains(Long companyId, ApiPaginatedRequest request) {
 
 		ValueChainCompany valuechainCompanyProxy = Torpedo.from(ValueChainCompany.class);

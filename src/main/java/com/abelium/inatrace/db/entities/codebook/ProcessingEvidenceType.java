@@ -20,9 +20,9 @@ import java.util.List;
 		@NamedQuery(name = "ProcessingEvidenceType.countProcessingEvidenceTypesByValueChain",
 		            query = "SELECT COUNT(vcpet.processingEvidenceType) FROM ValueChainProcEvidenceType vcpet WHERE vcpet.valueChain.id = :valueChainId"),
 		@NamedQuery(name = "ProcessingEvidenceType.getProcessingEvidenceTypesForValueChainIds",
-		            query = "SELECT DISTINCT vcpet.processingEvidenceType From ValueChainProcEvidenceType vcpet WHERE vcpet.valueChain.id IN :valueChainIds"),
+		            query = "SELECT DISTINCT vcpet.processingEvidenceType FROM ValueChainProcEvidenceType vcpet WHERE vcpet.valueChain.id IN :valueChainIds"),
 		@NamedQuery(name = "ProcessingEvidenceType.countProcessingEvidenceTypesForValueChainIds",
-		            query = "SELECT COUNT(DISTINCT vcpet.processingEvidenceType) From ValueChainProcEvidenceType vcpet WHERE vcpet.valueChain.id IN :valueChainIds")
+		            query = "SELECT COUNT(DISTINCT vcpet.processingEvidenceType) FROM ValueChainProcEvidenceType vcpet WHERE vcpet.valueChain.id IN :valueChainIds")
 })
 public class ProcessingEvidenceType extends TimestampEntity {
 
