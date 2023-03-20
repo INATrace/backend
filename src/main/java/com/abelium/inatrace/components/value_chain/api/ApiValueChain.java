@@ -2,7 +2,6 @@ package com.abelium.inatrace.components.value_chain.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
-import com.abelium.inatrace.components.codebook.grade_abbreviation.api.ApiGradeAbbreviation;
 import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
 import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
@@ -36,9 +35,6 @@ public class ApiValueChain extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "list of supported measuring unit types", position = 6)
 	private List<ApiMeasureUnitType> measureUnitTypes;
-
-	@ApiModelProperty(value = "list of supported grade abbreviations", position = 7)
-	private List<ApiGradeAbbreviation> gradeAbbreviations;
 
 	@ApiModelProperty(value = "list of supported processing evidence types", position = 8)
 	private List<ApiProcessingEvidenceType> processingEvidenceTypes;
@@ -90,14 +86,6 @@ public class ApiValueChain extends ApiBaseEntity {
 
 	public void setMeasureUnitTypes(List<ApiMeasureUnitType> measureUnitTypes) {
 		this.measureUnitTypes = measureUnitTypes;
-	}
-
-	public List<ApiGradeAbbreviation> getGradeAbbreviations() {
-		return gradeAbbreviations;
-	}
-
-	public void setGradeAbbreviations(List<ApiGradeAbbreviation> gradeAbbreviations) {
-		this.gradeAbbreviations = gradeAbbreviations;
 	}
 
 	public List<ApiProcessingEvidenceType> getProcessingEvidenceTypes() {

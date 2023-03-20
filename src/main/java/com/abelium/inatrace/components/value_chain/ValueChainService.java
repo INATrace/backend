@@ -7,8 +7,6 @@ import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.facility_type.FacilityTypeService;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
-import com.abelium.inatrace.components.codebook.grade_abbreviation.GradeAbbreviationService;
-import com.abelium.inatrace.components.codebook.grade_abbreviation.api.ApiGradeAbbreviation;
 import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeService;
 import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.ProcessingEvidenceTypeService;
@@ -23,7 +21,6 @@ import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChainListRequest;
 import com.abelium.inatrace.db.entities.codebook.*;
 import com.abelium.inatrace.db.entities.common.User;
-import com.abelium.inatrace.db.entities.codebook.ProductType;
 import com.abelium.inatrace.db.entities.value_chain.*;
 import com.abelium.inatrace.db.entities.value_chain.enums.ValueChainStatus;
 import com.abelium.inatrace.security.service.CustomUserDetails;
@@ -55,7 +52,6 @@ public class ValueChainService extends BaseService {
 	private final UserService userService;
 	private final FacilityTypeService facilityTypeService;
 	private final MeasureUnitTypeService measureUnitTypeService;
-	private final GradeAbbreviationService gradeAbbreviationService;
 	private final ProcessingEvidenceTypeService procEvidenceTypeService;
 	private final ProcessingEvidenceFieldService procEvidenceFieldService;
 	private final SemiProductService semiProductService;
@@ -64,14 +60,12 @@ public class ValueChainService extends BaseService {
 	public ValueChainService(UserService userService,
 	                         FacilityTypeService facilityTypeService,
 	                         MeasureUnitTypeService measureUnitTypeService,
-	                         GradeAbbreviationService gradeAbbreviationService,
 	                         ProcessingEvidenceTypeService procEvidenceTypeService,
 	                         ProcessingEvidenceFieldService procEvidenceFieldService,
 	                         SemiProductService semiProductService) {
 		this.userService = userService;
 		this.facilityTypeService = facilityTypeService;
 		this.measureUnitTypeService = measureUnitTypeService;
-		this.gradeAbbreviationService = gradeAbbreviationService;
 		this.procEvidenceTypeService = procEvidenceTypeService;
 		this.procEvidenceFieldService = procEvidenceFieldService;
 		this.semiProductService = semiProductService;
@@ -151,9 +145,6 @@ public class ValueChainService extends BaseService {
 
 		// Update measuring unit types
 		updateVCMeasureUnitTypes(entity, apiValueChain);
-
-		// Update grade abbreviations
-		updateVCGradeAbbreviations(entity, apiValueChain);
 
 		// Update processing evidence types
 		updateVCProcEvidenceTypes(entity, apiValueChain);
@@ -240,23 +231,6 @@ public class ValueChainService extends BaseService {
 			}
 		}
 		currentVCMeasureUnits.values().forEach(vcMUT -> entity.getMeasureUnitTypes().remove(vcMUT));
-	}
-
-	private void updateVCGradeAbbreviations(ValueChain entity, ApiValueChain apiValueChain) throws ApiException {
-
-		Map<Long, ValueChainGradeAbbreviation> currentVCGradeAbbreviations = entity.getGradeAbbreviations().stream()
-				.collect(Collectors.toMap(vcGA -> vcGA.getGradeAbbreviationType().getId(), vcGA -> vcGA));
-		for (ApiGradeAbbreviation apiGradeAbbreviation : apiValueChain.getGradeAbbreviations()) {
-			ValueChainGradeAbbreviation vcGA = currentVCGradeAbbreviations.get(apiGradeAbbreviation.getId());
-			if (vcGA == null) {
-				GradeAbbreviationType gradeAbbreviationType = gradeAbbreviationService.fetchGradeAbbreviationType(
-						apiGradeAbbreviation.getId());
-				entity.getGradeAbbreviations().add(new ValueChainGradeAbbreviation(entity, gradeAbbreviationType));
-			} else {
-				currentVCGradeAbbreviations.remove(apiGradeAbbreviation.getId());
-			}
-		}
-		currentVCGradeAbbreviations.values().forEach(vcGA -> entity.getGradeAbbreviations().remove(vcGA));
 	}
 
 	private void updateVCProcEvidenceTypes(ValueChain entity, ApiValueChain apiValueChain) throws ApiException {

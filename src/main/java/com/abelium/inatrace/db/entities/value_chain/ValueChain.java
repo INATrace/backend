@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Value chain entity representing definition of generic value chains. This is used as a template when creating products.
- * It contains the relations with the supported facility types, grade abbreviations, measure unit types, processing
+ * It contains the relations with the supported facility types, measure unit types, processing
  * evidence types and semi products.
  *
  * @author Pece Adjievski, Sunesis d.o.o.
@@ -42,12 +42,6 @@ public class ValueChain extends TimestampEntity {
 	 */
 	@OneToMany(mappedBy = "valueChain", orphanRemoval = true, cascade = CascadeType.ALL)
 	private List<ValueChainMeasureUnitType> measureUnitTypes;
-
-	/**
-	 * Holds a list of supported grade abbreviations by this value chain.
-	 */
-	@OneToMany(mappedBy = "valueChain", orphanRemoval = true, cascade = CascadeType.ALL)
-	private List<ValueChainGradeAbbreviation> gradeAbbreviations;
 
 	/**
 	 * Holds a list of supported processing evidence by this value chain.
@@ -126,17 +120,6 @@ public class ValueChain extends TimestampEntity {
 
 	public void setMeasureUnitTypes(List<ValueChainMeasureUnitType> measureUnitTypes) {
 		this.measureUnitTypes = measureUnitTypes;
-	}
-
-	public List<ValueChainGradeAbbreviation> getGradeAbbreviations() {
-		if (gradeAbbreviations == null) {
-			gradeAbbreviations = new ArrayList<>();
-		}
-		return gradeAbbreviations;
-	}
-
-	public void setGradeAbbreviations(List<ValueChainGradeAbbreviation> gradeAbbreviations) {
-		this.gradeAbbreviations = gradeAbbreviations;
 	}
 
 	public List<ValueChainSemiProduct> getSemiProducts() {

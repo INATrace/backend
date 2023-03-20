@@ -1,7 +1,6 @@
 package com.abelium.inatrace.components.value_chain;
 
 import com.abelium.inatrace.components.codebook.facility_type.FacilityTypeMapper;
-import com.abelium.inatrace.components.codebook.grade_abbreviation.GradeAbbreviationMapper;
 import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeMapper;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.ProcessingEvidenceTypeMapper;
 import com.abelium.inatrace.components.codebook.processingevidencefield.ProcessingEvidenceFieldMapper;
@@ -69,13 +68,6 @@ public final class ValueChainMapper {
 			apiValueChain.setMeasureUnitTypes(entity.getMeasureUnitTypes().stream()
 					.map(vcMeasureUnitType -> MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(
 							vcMeasureUnitType.getMeasureUnitType())).collect(Collectors.toList()));
-		}
-
-		// Map grade abbreviations
-		if (!entity.getGradeAbbreviations().isEmpty()) {
-			apiValueChain.setGradeAbbreviations(entity.getGradeAbbreviations().stream()
-					.map(vcGradeAbbreviation -> GradeAbbreviationMapper.toApiGradeAbbreviation(
-							vcGradeAbbreviation.getGradeAbbreviationType())).collect(Collectors.toList()));
 		}
 
 		// Map processing evidence types
