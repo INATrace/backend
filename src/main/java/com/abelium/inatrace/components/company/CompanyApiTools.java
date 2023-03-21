@@ -415,8 +415,8 @@ public class CompanyApiTools {
 		ApiFarmInformation apiFarmInformation = new ApiFarmInformation();
 		apiFarmInformation.setAreaUnit(farmInformation.getAreaUnit());
 		apiFarmInformation.setAreaOrganicCertified(farmInformation.getAreaOrganicCertified());
-		apiFarmInformation.setCoffeeCultivatedArea(farmInformation.getCoffeeCultivatedArea());
-		apiFarmInformation.setNumberOfTrees(farmInformation.getNumberOfTrees());
+		apiFarmInformation.setPlantCultivatedArea(farmInformation.getPlantCultivatedArea());
+		apiFarmInformation.setNumberOfPlants(farmInformation.getNumberOfPlants());
 		apiFarmInformation.setOrganic(farmInformation.getOrganic());
 		apiFarmInformation.setStartTransitionToOrganic(farmInformation.getStartTransitionToOrganic());
 		apiFarmInformation.setTotalCultivatedArea(farmInformation.getTotalCultivatedArea());

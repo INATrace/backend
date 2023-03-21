@@ -101,7 +101,7 @@ public class UserCustomer extends BaseEntity {
 	@OneToMany(mappedBy = "userCustomer", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<UserCustomerCertification> certifications;
 
-	@OneToMany(mappedBy = "userCustomer")
+	@OneToMany(mappedBy = "userCustomer", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<UserCustomerProductType> productTypes;
 	
 	public UserCustomerType getType() {
