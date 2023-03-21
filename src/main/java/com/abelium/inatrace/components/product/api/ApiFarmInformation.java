@@ -15,11 +15,11 @@ public class ApiFarmInformation {
     @ApiModelProperty(value = "Total cultivated area (ha)")
     public BigDecimal totalCultivatedArea;
 
-    @ApiModelProperty(value = "Area cultivated with coffee (ha)")
-    public BigDecimal coffeeCultivatedArea;
+    @ApiModelProperty(value = "Area cultivated with plant (ha)")
+    public BigDecimal plantCultivatedArea;
 
-    @ApiModelProperty(value = "Number of trees")
-    public Integer numberOfTrees;
+    @ApiModelProperty(value = "Number of plants")
+    public Integer numberOfPlants;
 
     @ApiModelProperty(value = "Organic")
     public Boolean organic;
@@ -38,20 +38,20 @@ public class ApiFarmInformation {
         this.totalCultivatedArea = totalCultivatedArea;
     }
 
-    public BigDecimal getCoffeeCultivatedArea() {
-        return coffeeCultivatedArea;
+    public BigDecimal getPlantCultivatedArea() {
+        return plantCultivatedArea;
     }
 
-    public void setCoffeeCultivatedArea(BigDecimal coffeeCultivatedArea) {
-        this.coffeeCultivatedArea = coffeeCultivatedArea;
+    public void setPlantCultivatedArea(BigDecimal plantCultivatedArea) {
+        this.plantCultivatedArea = plantCultivatedArea;
     }
 
-    public Integer getNumberOfTrees() {
-        return numberOfTrees;
+    public Integer getNumberOfPlants() {
+        return numberOfPlants;
     }
 
-    public void setNumberOfTrees(Integer numberOfTrees) {
-        this.numberOfTrees = numberOfTrees;
+    public void setNumberOfPlants(Integer numberOfPlants) {
+        this.numberOfPlants = numberOfPlants;
     }
 
     public Boolean getOrganic() {

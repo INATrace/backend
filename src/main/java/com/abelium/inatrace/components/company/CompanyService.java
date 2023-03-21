@@ -297,8 +297,8 @@ public class CompanyService extends BaseService {
 			userCustomer.setFarm(new FarmInformation());
 			userCustomer.getFarm().setAreaUnit(apiUserCustomer.getFarm().getAreaUnit());
 			userCustomer.getFarm().setAreaOrganicCertified(apiUserCustomer.getFarm().getAreaOrganicCertified());
-			userCustomer.getFarm().setCoffeeCultivatedArea(apiUserCustomer.getFarm().getCoffeeCultivatedArea());
-			userCustomer.getFarm().setNumberOfTrees(apiUserCustomer.getFarm().getNumberOfTrees());
+			userCustomer.getFarm().setPlantCultivatedArea(apiUserCustomer.getFarm().getPlantCultivatedArea());
+			userCustomer.getFarm().setNumberOfPlants(apiUserCustomer.getFarm().getNumberOfPlants());
 			userCustomer.getFarm().setOrganic(apiUserCustomer.getFarm().getOrganic());
 			userCustomer.getFarm().setStartTransitionToOrganic(apiUserCustomer.getFarm().getStartTransitionToOrganic());
 			userCustomer.getFarm().setTotalCultivatedArea(apiUserCustomer.getFarm().getTotalCultivatedArea());
@@ -413,8 +413,8 @@ public class CompanyService extends BaseService {
 		}
 		userCustomer.getFarm().setAreaUnit(apiUserCustomer.getFarm().getAreaUnit());
 		userCustomer.getFarm().setAreaOrganicCertified(apiUserCustomer.getFarm().getAreaOrganicCertified());
-		userCustomer.getFarm().setCoffeeCultivatedArea(apiUserCustomer.getFarm().getCoffeeCultivatedArea());
-		userCustomer.getFarm().setNumberOfTrees(apiUserCustomer.getFarm().getNumberOfTrees());
+		userCustomer.getFarm().setPlantCultivatedArea(apiUserCustomer.getFarm().getPlantCultivatedArea());
+		userCustomer.getFarm().setNumberOfPlants(apiUserCustomer.getFarm().getNumberOfPlants());
 		userCustomer.getFarm().setOrganic(apiUserCustomer.getFarm().getOrganic());
 		userCustomer.getFarm().setStartTransitionToOrganic(apiUserCustomer.getFarm().getStartTransitionToOrganic());
 		userCustomer.getFarm().setTotalCultivatedArea(apiUserCustomer.getFarm().getTotalCultivatedArea());

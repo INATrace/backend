@@ -19,10 +19,10 @@ public class FarmInformation {
     private BigDecimal totalCultivatedArea;
 
     @Column(length = Lengths.DEFAULT)
-    private BigDecimal coffeeCultivatedArea;
+    private BigDecimal plantCultivatedArea;
 
     @Column(length = Lengths.DEFAULT)
-    private Integer numberOfTrees;
+    private Integer numberOfPlants;
 
     @Column
     private Boolean organic;
@@ -41,20 +41,20 @@ public class FarmInformation {
         this.totalCultivatedArea = totalCultivatedArea;
     }
 
-    public BigDecimal getCoffeeCultivatedArea() {
-        return coffeeCultivatedArea;
+    public BigDecimal getPlantCultivatedArea() {
+        return plantCultivatedArea;
     }
 
-    public void setCoffeeCultivatedArea(BigDecimal coffeeCultivatedArea) {
-        this.coffeeCultivatedArea = coffeeCultivatedArea;
+    public void setPlantCultivatedArea(BigDecimal plantCultivatedArea) {
+        this.plantCultivatedArea = plantCultivatedArea;
     }
 
-    public Integer getNumberOfTrees() {
-        return numberOfTrees;
+    public Integer getNumberOfPlants() {
+        return numberOfPlants;
     }
 
-    public void setNumberOfTrees(Integer numberOfTrees) {
-        this.numberOfTrees = numberOfTrees;
+    public void setNumberOfPlants(Integer numberOfPlants) {
+        this.numberOfPlants = numberOfPlants;
     }
 
     public Boolean getOrganic() {

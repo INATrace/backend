@@ -91,8 +91,8 @@ public class UserCustomerImportService extends BaseService {
                 apiUserCustomer.setFarm(new ApiFarmInformation());
                 apiUserCustomer.getFarm().setAreaOrganicCertified(getNumericBigDecimal(row.getCell(26)));
                 apiUserCustomer.getFarm().setAreaUnit(getString(row.getCell(21)));
-                apiUserCustomer.getFarm().setCoffeeCultivatedArea(getNumericBigDecimal(row.getCell(23)));
-                apiUserCustomer.getFarm().setNumberOfTrees(getNumericInteger(row.getCell(24)));
+                apiUserCustomer.getFarm().setPlantCultivatedArea(getNumericBigDecimal(row.getCell(23)));
+                apiUserCustomer.getFarm().setNumberOfPlants(getNumericInteger(row.getCell(24)));
                 apiUserCustomer.getFarm().setOrganic(getBoolean(row.getCell(25)));
                 apiUserCustomer.getFarm().setStartTransitionToOrganic(getDate(row.getCell(27)));
                 apiUserCustomer.getFarm().setTotalCultivatedArea(getNumericBigDecimal(row.getCell(22)));
@@ -210,8 +210,8 @@ public class UserCustomerImportService extends BaseService {
                 validCell(row.getCell(20), List.of(CellType.STRING)) &&                     // Member of associations
                 validCell(row.getCell(21), List.of(CellType.STRING)) &&                     // Area unit
                 validCell(row.getCell(22), List.of(CellType.NUMERIC)) &&                    // Total cultivated area
-                validCell(row.getCell(23), List.of(CellType.NUMERIC)) &&                    // Area cultivated with coffee
-                validCell(row.getCell(24), List.of(CellType.NUMERIC)) &&                    // Number of coffee trees
+                validCell(row.getCell(23), List.of(CellType.NUMERIC)) &&                    // Area cultivated with plant
+                validCell(row.getCell(24), List.of(CellType.NUMERIC)) &&                    // Number of plants
                 validCell(row.getCell(25), List.of(CellType.STRING)) &&                     // Organic production (EU)
                 validCell(row.getCell(26), List.of(CellType.NUMERIC)) &&                    // Area organic certified
                 validCell(row.getCell(27), List.of(CellType.NUMERIC)) &&                    // Start date of transitioning to organic
