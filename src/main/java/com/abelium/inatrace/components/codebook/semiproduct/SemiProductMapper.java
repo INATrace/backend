@@ -28,7 +28,7 @@ public final class SemiProductMapper {
 	 */
 	public static ApiSemiProduct toApiSemiProductBase(SemiProduct entity, Language language) {
 
-		if(entity == null) {
+		if (entity == null) {
 			return null;
 		}
 
@@ -48,6 +48,28 @@ public final class SemiProductMapper {
 	}
 
 	/**
+	 * Mapping the base entity attributes and the Measuring unit type.
+	 *
+	 * @param entity DB entity.
+	 * @return API model entity.
+	 */
+	public static ApiSemiProduct toValueChainApiSemiProduct(SemiProduct entity, Language language) {
+
+		if (entity == null) {
+			return null;
+		}
+
+		ApiSemiProduct apiSemiProduct = SemiProductMapper.toApiSemiProductBase(entity, language);
+
+		if (entity.getMeasurementUnitType() != null) {
+			apiSemiProduct.setMeasurementUnitType(
+					MeasureUnitTypeMapper.toApiMeasureUnitTypeBase(entity.getMeasurementUnitType()));
+		}
+
+		return apiSemiProduct;
+	}
+
+	/**
 	 * Mapping of the base attributes and all the associations.
 	 *
 	 * @param entity DB entity.
@@ -55,7 +77,7 @@ public final class SemiProductMapper {
 	 */
 	public static ApiSemiProduct toApiSemiProduct(SemiProduct entity, Language language) {
 
-		if(entity == null) {
+		if (entity == null) {
 			return null;
 		}
 

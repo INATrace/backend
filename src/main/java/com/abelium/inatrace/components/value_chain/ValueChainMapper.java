@@ -87,7 +87,7 @@ public final class ValueChainMapper {
 		// Map semi-products
 		if (!entity.getSemiProducts().isEmpty()) {
 			apiValueChain.setSemiProducts(entity.getSemiProducts().stream()
-					.map(vcSemiProduct -> SemiProductMapper.toApiSemiProductBase(vcSemiProduct.getSemiProduct(), language))
+					.map(vcSemiProduct -> SemiProductMapper.toValueChainApiSemiProduct(vcSemiProduct.getSemiProduct(), language))
 					.collect(Collectors.toList()));
 		}
 
@@ -98,4 +98,5 @@ public final class ValueChainMapper {
 
 		return apiValueChain;
 	}
+
 }
