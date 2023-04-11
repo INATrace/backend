@@ -521,27 +521,14 @@ public class CompanyService extends BaseService {
 
 	private void updateUserCustomerProductTypes(ApiUserCustomer apiUserCustomer, UserCustomer userCustomer) throws ApiException {
 
-		Set<Long> newProductTypesList = apiUserCustomer.getProductTypes().stream().map(ApiProductType::getId).collect(
-				Collectors.toSet());
-		Set<Long> remainingOldProductTypes = new HashSet<>();
+		userCustomer.getProductTypes().clear();
 
-		// remove old, that were deleted
-		userCustomer.getProductTypes().forEach(userCustomerProductType -> {
-			if (!newProductTypesList.contains(userCustomerProductType.getProductType().getId())) {
-				em.remove(userCustomerProductType);
-			} else {
-				remainingOldProductTypes.add(userCustomerProductType.getProductType().getId());
-			}
-		});
-
-		// add all new, not added previously
 		for (ApiProductType apiProductType : apiUserCustomer.getProductTypes()) {
-			if (!remainingOldProductTypes.contains(apiProductType.getId())){
-				UserCustomerProductType userCustomerProductType = new UserCustomerProductType();
-				userCustomerProductType.setProductType(fetchProductType(apiProductType.getId()));
-				userCustomerProductType.setUserCustomer(userCustomer);
-				em.persist(userCustomerProductType);
-			}
+			UserCustomerProductType userCustomerProductType = new UserCustomerProductType();
+			userCustomerProductType.setProductType(fetchProductType(apiProductType.getId()));
+			userCustomerProductType.setUserCustomer(userCustomer);
+
+			userCustomer.getProductTypes().add(userCustomerProductType);
 		}
 	}
 
