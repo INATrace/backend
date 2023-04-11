@@ -18,9 +18,11 @@ public class FarmInformation {
     @Column(length = Lengths.DEFAULT)
     private BigDecimal totalCultivatedArea;
 
+    @Deprecated
     @Column(length = Lengths.DEFAULT)
     private BigDecimal plantCultivatedArea;
 
+    @Deprecated
     @Column(length = Lengths.DEFAULT)
     private Integer numberOfPlants;
 

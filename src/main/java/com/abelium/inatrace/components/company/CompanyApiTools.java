@@ -14,6 +14,7 @@ import com.abelium.inatrace.components.company.types.CompanyTranslatables;
 import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.product.api.ApiBankInformation;
 import com.abelium.inatrace.components.product.api.ApiFarmInformation;
+import com.abelium.inatrace.components.product.api.ApiPlantInformation;
 import com.abelium.inatrace.components.user.UserApiTools;
 import com.abelium.inatrace.components.user.UserQueries;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
@@ -31,10 +32,7 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -367,7 +365,7 @@ public class CompanyApiTools {
 		apiUserCustomer.setBank(toApiBankInformation(userCustomer.getBank()));
 
 		// Farm
-		apiUserCustomer.setFarm(toApiFarmInformation(userCustomer.getFarm()));
+		apiUserCustomer.setFarm(toApiFarmInformation(userCustomer));
 
 		// Associations
 		apiUserCustomer.setAssociations(toApiUserCustomerAssociationList(userCustomer.getAssociations()));
@@ -410,16 +408,31 @@ public class CompanyApiTools {
 		return apiBankInformation;
 	}
 
-	public ApiFarmInformation toApiFarmInformation(FarmInformation farmInformation) {
-		if (farmInformation == null) return null;
+	public ApiFarmInformation toApiFarmInformation(UserCustomer userCustomer) {
+		if (userCustomer.getFarm() == null) return null;
 		ApiFarmInformation apiFarmInformation = new ApiFarmInformation();
-		apiFarmInformation.setAreaUnit(farmInformation.getAreaUnit());
-		apiFarmInformation.setAreaOrganicCertified(farmInformation.getAreaOrganicCertified());
-		apiFarmInformation.setPlantCultivatedArea(farmInformation.getPlantCultivatedArea());
-		apiFarmInformation.setNumberOfPlants(farmInformation.getNumberOfPlants());
-		apiFarmInformation.setOrganic(farmInformation.getOrganic());
-		apiFarmInformation.setStartTransitionToOrganic(farmInformation.getStartTransitionToOrganic());
-		apiFarmInformation.setTotalCultivatedArea(farmInformation.getTotalCultivatedArea());
+		apiFarmInformation.setAreaUnit(userCustomer.getFarm().getAreaUnit());
+		apiFarmInformation.setAreaOrganicCertified(userCustomer.getFarm().getAreaOrganicCertified());
+		apiFarmInformation.setOrganic(userCustomer.getFarm().getOrganic());
+		apiFarmInformation.setStartTransitionToOrganic(userCustomer.getFarm().getStartTransitionToOrganic());
+		apiFarmInformation.setTotalCultivatedArea(userCustomer.getFarm().getTotalCultivatedArea());
+
+		if (!userCustomer.getPlantInformationList().isEmpty()) {
+			apiFarmInformation.setPlantInformationList(new ArrayList<>());
+
+			userCustomer.getPlantInformationList().forEach(userCustomerPlantInformation -> {
+				if (userCustomerPlantInformation.getPlantInformation() != null) {
+					ApiPlantInformation apiPlantInformation = new ApiPlantInformation();
+					apiPlantInformation.setNumberOfPlants(
+							userCustomerPlantInformation.getPlantInformation().getNumberOfPlants());
+					apiPlantInformation.setPlantCultivatedArea(
+							userCustomerPlantInformation.getPlantInformation().getPlantCultivatedArea());
+					apiPlantInformation.setProductType(ProductTypeMapper.toApiProductType(
+							userCustomerPlantInformation.getPlantInformation().getProductType()));
+					apiFarmInformation.getPlantInformationList().add(apiPlantInformation);
+				}
+			});
+		}
 
 		return apiFarmInformation;
 	}

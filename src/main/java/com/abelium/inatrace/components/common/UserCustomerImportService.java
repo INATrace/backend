@@ -12,6 +12,7 @@ import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.product.api.ApiBankInformation;
 import com.abelium.inatrace.components.product.api.ApiFarmInformation;
+import com.abelium.inatrace.components.product.api.ApiPlantInformation;
 import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.common.Document;
@@ -91,8 +92,16 @@ public class UserCustomerImportService extends BaseService {
                 apiUserCustomer.setFarm(new ApiFarmInformation());
                 apiUserCustomer.getFarm().setAreaOrganicCertified(getNumericBigDecimal(row.getCell(26)));
                 apiUserCustomer.getFarm().setAreaUnit(getString(row.getCell(21)));
-                apiUserCustomer.getFarm().setPlantCultivatedArea(getNumericBigDecimal(row.getCell(23)));
-                apiUserCustomer.getFarm().setNumberOfPlants(getNumericInteger(row.getCell(24)));
+
+                // TODO: support for multiple plants:
+                apiUserCustomer.getFarm().setPlantInformationList(new ArrayList<>());
+                apiUserCustomer.getFarm().getPlantInformationList().add(new ApiPlantInformation());
+                // set product
+                apiUserCustomer.getFarm().getPlantInformationList().get(0).setPlantCultivatedArea(getNumericBigDecimal(row.getCell(23)));
+                apiUserCustomer.getFarm().getPlantInformationList().get(0).setNumberOfPlants(getNumericInteger(row.getCell(24)));
+
+//                apiUserCustomer.getFarm().setPlantCultivatedArea(getNumericBigDecimal(row.getCell(23)));
+//                apiUserCustomer.getFarm().setNumberOfPlants(getNumericInteger(row.getCell(24)));
                 apiUserCustomer.getFarm().setOrganic(getBoolean(row.getCell(25)));
                 apiUserCustomer.getFarm().setStartTransitionToOrganic(getDate(row.getCell(27)));
                 apiUserCustomer.getFarm().setTotalCultivatedArea(getNumericBigDecimal(row.getCell(22)));

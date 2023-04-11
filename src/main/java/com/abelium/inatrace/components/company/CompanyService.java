@@ -16,16 +16,17 @@ import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
+import com.abelium.inatrace.components.product.api.ApiPlantInformation;
 import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.components.user.UserQueries;
 import com.abelium.inatrace.components.value_chain.ValueChainMapper;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
+import com.abelium.inatrace.db.entities.codebook.ProductType;
 import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
-import com.abelium.inatrace.db.entities.codebook.ProductType;
 import com.abelium.inatrace.db.entities.value_chain.CompanyValueChain;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.security.service.CustomUserDetails;
@@ -297,8 +298,6 @@ public class CompanyService extends BaseService {
 			userCustomer.setFarm(new FarmInformation());
 			userCustomer.getFarm().setAreaUnit(apiUserCustomer.getFarm().getAreaUnit());
 			userCustomer.getFarm().setAreaOrganicCertified(apiUserCustomer.getFarm().getAreaOrganicCertified());
-			userCustomer.getFarm().setPlantCultivatedArea(apiUserCustomer.getFarm().getPlantCultivatedArea());
-			userCustomer.getFarm().setNumberOfPlants(apiUserCustomer.getFarm().getNumberOfPlants());
 			userCustomer.getFarm().setOrganic(apiUserCustomer.getFarm().getOrganic());
 			userCustomer.getFarm().setStartTransitionToOrganic(apiUserCustomer.getFarm().getStartTransitionToOrganic());
 			userCustomer.getFarm().setTotalCultivatedArea(apiUserCustomer.getFarm().getTotalCultivatedArea());
@@ -337,6 +336,24 @@ public class CompanyService extends BaseService {
 				userCustomerProductType.setProductType(fetchProductType(apiProductType.getId()));
 				userCustomerProductType.setUserCustomer(userCustomer);
 				em.persist(userCustomerProductType);
+			}
+		}
+
+		// Set farm plants information
+		if (apiUserCustomer.getFarm() != null && !apiUserCustomer.getFarm().getPlantInformationList().isEmpty()) {
+			userCustomer.setPlantInformationList(new ArrayList<>());
+
+			for(ApiPlantInformation apiPlantInfo: apiUserCustomer.getFarm().getPlantInformationList()) {
+				PlantInformation plantInformation = new PlantInformation();
+				plantInformation.setNumberOfPlants(apiPlantInfo.getNumberOfPlants());
+				plantInformation.setPlantCultivatedArea(apiPlantInfo.getPlantCultivatedArea());
+				plantInformation.setProductType(fetchProductType(apiPlantInfo.getProductType().getId()));
+
+				UserCustomerPlantInformation userCustomerPlantInformation = new UserCustomerPlantInformation();
+				userCustomerPlantInformation.setPlantInformation(plantInformation);
+				userCustomerPlantInformation.setUserCustomer(userCustomer);
+
+				userCustomer.getPlantInformationList().add(userCustomerPlantInformation);
 			}
 		}
 
@@ -413,8 +430,6 @@ public class CompanyService extends BaseService {
 		}
 		userCustomer.getFarm().setAreaUnit(apiUserCustomer.getFarm().getAreaUnit());
 		userCustomer.getFarm().setAreaOrganicCertified(apiUserCustomer.getFarm().getAreaOrganicCertified());
-		userCustomer.getFarm().setPlantCultivatedArea(apiUserCustomer.getFarm().getPlantCultivatedArea());
-		userCustomer.getFarm().setNumberOfPlants(apiUserCustomer.getFarm().getNumberOfPlants());
 		userCustomer.getFarm().setOrganic(apiUserCustomer.getFarm().getOrganic());
 		userCustomer.getFarm().setStartTransitionToOrganic(apiUserCustomer.getFarm().getStartTransitionToOrganic());
 		userCustomer.getFarm().setTotalCultivatedArea(apiUserCustomer.getFarm().getTotalCultivatedArea());
@@ -441,6 +456,11 @@ public class CompanyService extends BaseService {
 		// Set product types
 		if (apiUserCustomer.getProductTypes() != null) {
 			updateUserCustomerProductTypes(apiUserCustomer, userCustomer);
+		}
+
+		// Update farm plant information
+		if (apiUserCustomer.getFarm() != null && !apiUserCustomer.getFarm().getPlantInformationList().isEmpty()) {
+			updateUserCustomerPlantInformation(apiUserCustomer, userCustomer);
 		}
 
 		if (userCustomer.getAssociations() == null) {
@@ -522,6 +542,26 @@ public class CompanyService extends BaseService {
 				userCustomerProductType.setUserCustomer(userCustomer);
 				em.persist(userCustomerProductType);
 			}
+		}
+	}
+
+	private void updateUserCustomerPlantInformation(ApiUserCustomer apiUserCustomer, UserCustomer userCustomer) throws ApiException {
+
+		// remove all old data
+		userCustomer.getPlantInformationList().clear();
+
+		// add new
+		for (ApiPlantInformation apiPlantInfo: apiUserCustomer.getFarm().getPlantInformationList()) {
+			PlantInformation plantInformation = new PlantInformation();
+			plantInformation.setNumberOfPlants(apiPlantInfo.getNumberOfPlants());
+			plantInformation.setPlantCultivatedArea(apiPlantInfo.getPlantCultivatedArea());
+			plantInformation.setProductType(fetchProductType(apiPlantInfo.getProductType().getId()));
+
+			UserCustomerPlantInformation userCustomerPlantInformation = new UserCustomerPlantInformation();
+			userCustomerPlantInformation.setPlantInformation(plantInformation);
+			userCustomerPlantInformation.setUserCustomer(userCustomer);
+
+			userCustomer.getPlantInformationList().add(userCustomerPlantInformation);
 		}
 	}
 
