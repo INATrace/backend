@@ -99,9 +99,10 @@ public class CompanyController {
     @ApiOperation(value = "Get user customer by id")
     public ApiResponse<ApiUserCustomer> getUserCustomer(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @ApiParam(value = "User customer ID", required = true) @PathVariable("id") Long id) throws ApiException {
+            @Valid @ApiParam(value = "User customer ID", required = true) @PathVariable("id") Long id,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
-        return new ApiResponse<>(companyService.getUserCustomer(id, authUser));
+        return new ApiResponse<>(companyService.getUserCustomer(id, authUser, language));
     }
 
     @GetMapping(value = "/userCustomers/{companyId}/{type}")
@@ -110,10 +111,11 @@ public class CompanyController {
             @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
             @Valid @ApiParam(value = "Type of user customer (collector, farmer)") @PathVariable("type") UserCustomerType type,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
             @Valid ApiListFarmersRequest request) throws ApiException {
 
         return new ApiPaginatedResponse<>(companyService.getUserCustomersForCompanyAndType(companyId, type, request,
-                authUser));
+                authUser, language));
     }
 
     @PostMapping(value = "/userCustomers/add/{companyId}")
@@ -121,18 +123,20 @@ public class CompanyController {
     public ApiResponse<ApiUserCustomer> addUserCustomer(
             @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
             @Valid @RequestBody ApiUserCustomer request
     ) throws ApiException {
-        return new ApiResponse<>(companyService.addUserCustomer(companyId, request, authUser));
+        return new ApiResponse<>(companyService.addUserCustomer(companyId, request, authUser, language));
     }
 
     @PutMapping(value = "/userCustomers/edit")
     @ApiOperation(value = "Update user customer with given ID")
     public ApiResponse<ApiUserCustomer> updateUserCustomer(
             @AuthenticationPrincipal CustomUserDetails authUser,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
             @Valid @RequestBody ApiUserCustomer request
     ) throws ApiException {
-        return new ApiResponse<>(companyService.updateUserCustomer(request, authUser));
+        return new ApiResponse<>(companyService.updateUserCustomer(request, authUser, language));
     }
 
     @DeleteMapping(value = "/userCustomers/{id}")
@@ -211,8 +215,9 @@ public class CompanyController {
     public ApiUserCustomerImportResponse importFarmersSpreadsheet(
             @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
-            @Valid @ApiParam(value = "Document ID", required = true) @PathVariable("documentId") Long documentId) throws ApiException {
-        return companyService.importFarmersSpreadsheet(companyId, documentId, authUser);
+            @Valid @ApiParam(value = "Document ID", required = true) @PathVariable("documentId") Long documentId,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
+        return companyService.importFarmersSpreadsheet(companyId, documentId, authUser, language);
     }
 
     @GetMapping(value = "/{id}/value-chains")
@@ -229,8 +234,9 @@ public class CompanyController {
     public ApiPaginatedResponse<ApiProductType> getCompanyProductTypes(
             @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long id,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
             @Valid ApiPaginatedRequest request) throws ApiException {
-        return new ApiPaginatedResponse<>(companyService.getCompanyProductTypesList(id, request, authUser));
+        return new ApiPaginatedResponse<>(companyService.getCompanyProductTypesList(id, request, authUser, language));
     }
 
 }

@@ -93,7 +93,7 @@ public final class ValueChainMapper {
 
 		// Map product type
 		if (entity.getProductType() != null) {
-			apiValueChain.setProductType(ProductTypeMapper.toApiProductType(entity.getProductType()));
+			apiValueChain.setProductType(ProductTypeMapper.toApiProductType(entity.getProductType(), language));
 		}
 
 		return apiValueChain;

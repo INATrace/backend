@@ -338,7 +338,7 @@ public class CompanyApiTools {
 		return acu;
 	}
 
-	public ApiUserCustomer toApiUserCustomer(UserCustomer userCustomer, Long userId) {
+	public ApiUserCustomer toApiUserCustomer(UserCustomer userCustomer, Long userId, Language language) {
 
 		if (userCustomer == null) {
 			return null;
@@ -365,7 +365,7 @@ public class CompanyApiTools {
 		apiUserCustomer.setBank(toApiBankInformation(userCustomer.getBank()));
 
 		// Farm
-		apiUserCustomer.setFarm(toApiFarmInformation(userCustomer));
+		apiUserCustomer.setFarm(toApiFarmInformation(userCustomer, language));
 
 		// Associations
 		apiUserCustomer.setAssociations(toApiUserCustomerAssociationList(userCustomer.getAssociations()));
@@ -390,7 +390,7 @@ public class CompanyApiTools {
 		// Product types if Farmer
 		if (UserCustomerType.FARMER.equals(apiUserCustomer.getType())) {
 			apiUserCustomer.setProductTypes(userCustomer.getProductTypes().stream()
-					.map(ucpt -> ProductTypeMapper.toApiProductType(ucpt.getProductType()))
+					.map(ucpt -> ProductTypeMapper.toApiProductType(ucpt.getProductType(), language))
 					.collect(Collectors.toList()));
 		}
 
@@ -408,7 +408,7 @@ public class CompanyApiTools {
 		return apiBankInformation;
 	}
 
-	public ApiFarmInformation toApiFarmInformation(UserCustomer userCustomer) {
+	public ApiFarmInformation toApiFarmInformation(UserCustomer userCustomer, Language language) {
 		if (userCustomer.getFarm() == null) return null;
 		ApiFarmInformation apiFarmInformation = new ApiFarmInformation();
 		apiFarmInformation.setAreaUnit(userCustomer.getFarm().getAreaUnit());
@@ -428,7 +428,7 @@ public class CompanyApiTools {
 					apiPlantInformation.setPlantCultivatedArea(
 							userCustomerPlantInformation.getPlantInformation().getPlantCultivatedArea());
 					apiPlantInformation.setProductType(ProductTypeMapper.toApiProductType(
-							userCustomerPlantInformation.getPlantInformation().getProductType()));
+							userCustomerPlantInformation.getPlantInformation().getProductType(), language));
 					apiFarmInformation.getPlantInformationList().add(apiPlantInformation);
 				}
 			});

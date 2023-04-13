@@ -2,9 +2,9 @@ package com.abelium.inatrace.db.entities.codebook;
 
 import com.abelium.inatrace.db.base.TimestampEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Version;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class ProductType extends TimestampEntity {
@@ -17,6 +17,12 @@ public class ProductType extends TimestampEntity {
 
     @Column
     private String description;
+
+    /**
+     * Translations for the product type
+     */
+    @OneToMany(mappedBy = "productType", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductTypeTranslation> productTypeTranslations;
 
     public Long getEntityVersion() {
         return entityVersion;
@@ -40,5 +46,16 @@ public class ProductType extends TimestampEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<ProductTypeTranslation> getProductTypeTranslations() {
+        if (productTypeTranslations == null) {
+            productTypeTranslations = new ArrayList<>();
+        }
+        return productTypeTranslations;
+    }
+
+    public void setProductTypeTranslations(List<ProductTypeTranslation> productTypeTranslations) {
+        this.productTypeTranslations = productTypeTranslations;
     }
 }

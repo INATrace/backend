@@ -239,12 +239,12 @@ public class CompanyService extends BaseService {
 		}
 	}
 
-	public ApiUserCustomer getUserCustomer(Long id, CustomUserDetails user) throws ApiException {
+	public ApiUserCustomer getUserCustomer(Long id, CustomUserDetails user, Language language) throws ApiException {
 
 		UserCustomer userCustomer = fetchUserCustomer(id);
 		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), user);
 
-		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId());
+		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId(), language);
 	}
 
 	public boolean existsUserCustomer(ApiUserCustomer apiUserCustomer) {
@@ -259,18 +259,19 @@ public class CompanyService extends BaseService {
 	public ApiPaginatedList<ApiUserCustomer> getUserCustomersForCompanyAndType(Long companyId,
 	                                                                           UserCustomerType type,
 	                                                                           ApiListFarmersRequest request,
-	                                                                           CustomUserDetails user) throws ApiException {
+	                                                                           CustomUserDetails user,
+	                                                                           Language language) throws ApiException {
 
 		Company company = companyQueries.fetchCompany(companyId);
 		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request,
 				() -> userCustomerListQueryObject(companyId, type, request),
-				uc -> companyApiTools.toApiUserCustomer(uc, user.getUserId()));
+				uc -> companyApiTools.toApiUserCustomer(uc, user.getUserId(), language));
 	}
 
 	@Transactional
-	public ApiUserCustomer addUserCustomer(Long companyId, ApiUserCustomer apiUserCustomer, CustomUserDetails user) throws ApiException {
+	public ApiUserCustomer addUserCustomer(Long companyId, ApiUserCustomer apiUserCustomer, CustomUserDetails user, Language language) throws ApiException {
 
 		Company company = companyQueries.fetchCompany(companyId);
 		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
@@ -395,11 +396,11 @@ public class CompanyService extends BaseService {
 			}
 		}
 
-		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId());
+		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId(), language);
 	}
 
 	@Transactional
-	public ApiUserCustomer updateUserCustomer(ApiUserCustomer apiUserCustomer, CustomUserDetails user) throws ApiException {
+	public ApiUserCustomer updateUserCustomer(ApiUserCustomer apiUserCustomer, CustomUserDetails user, Language language) throws ApiException {
 
 		if (apiUserCustomer == null) {
 			return null;
@@ -516,7 +517,7 @@ public class CompanyService extends BaseService {
 			certification.setValidity(apiCertification.getValidity());
 		}
 
-		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId());
+		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId(), language);
 	}
 
 	private void updateUserCustomerProductTypes(ApiUserCustomer apiUserCustomer, UserCustomer userCustomer) throws ApiException {
@@ -864,8 +865,8 @@ public class CompanyService extends BaseService {
 		return !companyUserList.isEmpty();
 	}
 
-	public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, CustomUserDetails user) throws ApiException {
-		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId, user);
+	public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, CustomUserDetails user, Language language) throws ApiException {
+		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId, user, language);
 	}
 
 	public ApiPaginatedList<ApiValueChain> getCompanyValueChainList(Long companyId, ApiPaginatedRequest request, CustomUserDetails authUser) throws ApiException {
@@ -903,14 +904,14 @@ public class CompanyService extends BaseService {
 		return valueChainProxy;
 	}
 
-	public ApiPaginatedList<ApiProductType> getCompanyProductTypesList(Long companyId, ApiPaginatedRequest request, CustomUserDetails authUser) throws ApiException {
+	public ApiPaginatedList<ApiProductType> getCompanyProductTypesList(Long companyId, ApiPaginatedRequest request, CustomUserDetails authUser, Language language) throws ApiException {
 
 		// user permissions check
 		Company company = companyQueries.fetchCompany(companyId);
 		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> getCompanyProductTypes(companyId, request),
-				ProductTypeMapper::toApiProductType);
+				apt -> ProductTypeMapper.toApiProductType(apt, language));
 	}
 
 	public ProductType getCompanyProductTypes(Long companyId, ApiPaginatedRequest request) {
