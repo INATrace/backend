@@ -35,6 +35,13 @@ public class ProductTypeService extends BaseService {
                 .orElseThrow(() -> new ApiException(ApiStatus.INVALID_REQUEST, "English translation is required!"));
 
         apiProductType.getTranslations().forEach(apiProductTypeTranslation -> {
+
+            if (Language.EN.equals(apiProductTypeTranslation.getLanguage())) {
+                // update the name from EN translation
+                productType.setName(apiProductTypeTranslation.getName());
+                productType.setDescription(apiProductTypeTranslation.getDescription());
+            }
+
             ProductTypeTranslation translation = new ProductTypeTranslation();
             translation.setName(apiProductTypeTranslation.getName());
             translation.setDescription(apiProductTypeTranslation.getDescription());
@@ -81,9 +88,6 @@ public class ProductTypeService extends BaseService {
             throw new ApiException(ApiStatus.NOT_FOUND, PRODUCT_TYPE_DOES_NOT_EXIST);
         }
 
-        productType.setName(apiProductType.getName());
-        productType.setDescription(apiProductType.getDescription());
-
         apiProductType.getTranslations().stream().filter(productTypeTranslation -> productTypeTranslation != null &&
                         Language.EN.equals(productTypeTranslation.getLanguage()) &&
                         productTypeTranslation.getName() != null &&
@@ -102,6 +106,13 @@ public class ProductTypeService extends BaseService {
                             productTypeTranslation.getLanguage().equals(apiProductTypeTranslation.getLanguage()))
                     .findFirst()
                     .orElse(new ProductTypeTranslation());
+
+            if (Language.EN.equals(apiProductTypeTranslation.getLanguage())) {
+                // update the name from EN translation
+                productType.setName(apiProductTypeTranslation.getName());
+                productType.setDescription(apiProductTypeTranslation.getDescription());
+            }
+
             translation.setName(apiProductTypeTranslation.getName());
             translation.setDescription(apiProductTypeTranslation.getDescription());
             translation.setLanguage(apiProductTypeTranslation.getLanguage());
