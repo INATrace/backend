@@ -39,6 +39,7 @@ public class ProductTypeService extends BaseService {
             if (Language.EN.equals(apiProductTypeTranslation.getLanguage())) {
                 // update the name from EN translation
                 productType.setName(apiProductTypeTranslation.getName());
+                productType.setFieldName(apiProductTypeTranslation.getName().trim().replace(" ", "_").toUpperCase());
                 productType.setDescription(apiProductTypeTranslation.getDescription());
             }
 
@@ -110,6 +111,7 @@ public class ProductTypeService extends BaseService {
             if (Language.EN.equals(apiProductTypeTranslation.getLanguage())) {
                 // update the name from EN translation
                 productType.setName(apiProductTypeTranslation.getName());
+                productType.setFieldName(apiProductTypeTranslation.getName().trim().replace(" ", "_").toUpperCase());
                 productType.setDescription(apiProductTypeTranslation.getDescription());
             }
 

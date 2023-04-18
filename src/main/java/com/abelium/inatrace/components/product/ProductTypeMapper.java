@@ -31,6 +31,7 @@ public class ProductTypeMapper {
         ApiProductType apiProductType = new ApiProductType();
         apiProductType.setId(entity.getId());
         apiProductType.setName(entity.getName());
+        apiProductType.setFieldName(entity.getFieldName());
         apiProductType.setDescription(entity.getDescription());
 
         return apiProductType;
@@ -49,6 +50,7 @@ public class ProductTypeMapper {
         ApiProductType apiProductType = new ApiProductType();
         apiProductType.setId(entity.getId());
         apiProductType.setName(translation.getName());
+        apiProductType.setFieldName(entity.getFieldName());
         apiProductType.setDescription(translation.getDescription());
 
         return apiProductType;
