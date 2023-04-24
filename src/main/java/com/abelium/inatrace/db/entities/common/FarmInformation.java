@@ -18,11 +18,11 @@ public class FarmInformation {
     @Column(length = Lengths.DEFAULT)
     private BigDecimal totalCultivatedArea;
 
-    @Deprecated
+    @Deprecated // FIXME: after this gets deployed to PROD and DEMO, remove it
     @Column(length = Lengths.DEFAULT)
     private BigDecimal plantCultivatedArea;
 
-    @Deprecated
+    @Deprecated // FIXME: after this gets deployed to PROD and DEMO, remove it
     @Column(length = Lengths.DEFAULT)
     private Integer numberOfPlants;
 
