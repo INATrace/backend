@@ -7,7 +7,7 @@ import java.util.List;
 public class ApiProductType extends ApiTimestampEntity {
 
     private String name;
-    private String fieldName;
+    private String code;
     private String description;
 
     private List<ApiProductTypeTranslation> translations;
@@ -20,12 +20,12 @@ public class ApiProductType extends ApiTimestampEntity {
         this.name = name;
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public String getCode() {
+        return code;
     }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getDescription() {

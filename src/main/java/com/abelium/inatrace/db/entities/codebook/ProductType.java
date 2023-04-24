@@ -13,7 +13,7 @@ public class ProductType extends TimestampEntity {
     private Long entityVersion;
 
     @Column
-    private String fieldName;
+    private String code;
 
     @Column
     private String name;
@@ -35,12 +35,12 @@ public class ProductType extends TimestampEntity {
         this.entityVersion = entityVersion;
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public String getCode() {
+        return code;
     }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public void setCode(String fieldName) {
+        this.code = fieldName;
     }
 
     public String getName() {

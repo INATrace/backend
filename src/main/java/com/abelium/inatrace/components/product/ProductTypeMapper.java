@@ -23,20 +23,6 @@ public class ProductTypeMapper {
         return productType;
     }
 
-    public static ApiProductType toApiProductTypeBase(ProductType entity) {
-        if (entity == null) {
-            return null;
-        }
-
-        ApiProductType apiProductType = new ApiProductType();
-        apiProductType.setId(entity.getId());
-        apiProductType.setName(entity.getName());
-        apiProductType.setFieldName(entity.getFieldName());
-        apiProductType.setDescription(entity.getDescription());
-
-        return apiProductType;
-    }
-
     public static ApiProductType toApiProductType(ProductType entity, Language language) {
 
         if (entity == null) {
@@ -50,7 +36,7 @@ public class ProductTypeMapper {
         ApiProductType apiProductType = new ApiProductType();
         apiProductType.setId(entity.getId());
         apiProductType.setName(translation.getName());
-        apiProductType.setFieldName(entity.getFieldName());
+        apiProductType.setCode(entity.getCode());
         apiProductType.setDescription(translation.getDescription());
 
         return apiProductType;

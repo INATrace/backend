@@ -25,7 +25,7 @@ public class ProductTypeService extends BaseService {
 
         ProductType productType = ProductTypeMapper.toProductType(apiProductType);
 
-        productType.setFieldName(apiProductType.getFieldName());
+        productType.setCode(apiProductType.getCode());
         em.persist(productType);
 
         apiProductType.getTranslations().stream().filter(productTypeTranslation -> productTypeTranslation != null &&
@@ -89,7 +89,7 @@ public class ProductTypeService extends BaseService {
             throw new ApiException(ApiStatus.NOT_FOUND, PRODUCT_TYPE_DOES_NOT_EXIST);
         }
 
-        productType.setFieldName(apiProductType.getFieldName());
+        productType.setCode(apiProductType.getCode());
 
         apiProductType.getTranslations().stream().filter(productTypeTranslation -> productTypeTranslation != null &&
                         Language.EN.equals(productTypeTranslation.getLanguage()) &&

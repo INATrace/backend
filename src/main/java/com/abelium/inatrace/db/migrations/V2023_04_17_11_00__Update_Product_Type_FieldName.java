@@ -16,7 +16,7 @@ public class V2023_04_17_11_00__Update_Product_Type_FieldName implements JpaMigr
         List<ProductType> productTypeList = Queries.getAll(em, ProductType.class);
 
         for (ProductType productType : productTypeList) {
-           productType.setFieldName(productType.getName().trim().replace(" ", "_").toUpperCase());
+           productType.setCode(productType.getName().trim().replace(" ", "_").toUpperCase());
         }
     }
 }
