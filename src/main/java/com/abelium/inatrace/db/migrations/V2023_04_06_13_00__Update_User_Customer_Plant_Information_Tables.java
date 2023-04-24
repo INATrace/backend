@@ -22,12 +22,12 @@ public class V2023_04_06_13_00__Update_User_Customer_Plant_Information_Tables im
 			userCustomerList.forEach(userCustomer -> {
 
 				if (userCustomer.getFarm() != null &&
-						(userCustomer.getFarm().getNumberOfTrees() != null
-						|| userCustomer.getFarm().getCoffeeCultivatedArea() != null)) {
+						(userCustomer.getFarm().getNumberOfPlants() != null
+						|| userCustomer.getFarm().getPlantCultivatedArea() != null)) {
 
 					PlantInformation plantInformation = new PlantInformation();
-					plantInformation.setNumberOfPlants(userCustomer.getFarm().getNumberOfTrees());
-					plantInformation.setPlantCultivatedArea(userCustomer.getFarm().getCoffeeCultivatedArea());
+					plantInformation.setNumberOfPlants(userCustomer.getFarm().getNumberOfPlants());
+					plantInformation.setPlantCultivatedArea(userCustomer.getFarm().getPlantCultivatedArea());
 					if (userCustomer.getProductTypes()!=null && userCustomer.getProductTypes().get(0)!=null) {
 						plantInformation.setProductType(userCustomer.getProductTypes().get(0).getProductType());
 					}

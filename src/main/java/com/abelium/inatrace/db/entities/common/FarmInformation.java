@@ -1,5 +1,7 @@
 package com.abelium.inatrace.db.entities.common;
 
+import com.abelium.inatrace.api.types.Lengths;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.MappedSuperclass;
@@ -13,21 +15,21 @@ public class FarmInformation {
     @Column
     private String areaUnit;
 
-    @Column
+    @Column(length = Lengths.DEFAULT)
     private BigDecimal totalCultivatedArea;
 
     @Deprecated // FIXME: after this gets deployed to PROD and DEMO, remove it
-    @Column
-    private BigDecimal coffeeCultivatedArea;
+    @Column(length = Lengths.DEFAULT)
+    private BigDecimal plantCultivatedArea;
 
     @Deprecated // FIXME: after this gets deployed to PROD and DEMO, remove it
-    @Column
-    private Integer numberOfTrees;
+    @Column(length = Lengths.DEFAULT)
+    private Integer numberOfPlants;
 
     @Column
     private Boolean organic;
 
-    @Column
+    @Column(length = Lengths.DEFAULT)
     private BigDecimal areaOrganicCertified;
 
     @Column
@@ -41,20 +43,20 @@ public class FarmInformation {
         this.totalCultivatedArea = totalCultivatedArea;
     }
 
-    public BigDecimal getCoffeeCultivatedArea() {
-        return coffeeCultivatedArea;
+    public BigDecimal getPlantCultivatedArea() {
+        return plantCultivatedArea;
     }
 
-    public void setCoffeeCultivatedArea(BigDecimal plantCultivatedArea) {
-        this.coffeeCultivatedArea = plantCultivatedArea;
+    public void setPlantCultivatedArea(BigDecimal plantCultivatedArea) {
+        this.plantCultivatedArea = plantCultivatedArea;
     }
 
-    public Integer getNumberOfTrees() {
-        return numberOfTrees;
+    public Integer getNumberOfPlants() {
+        return numberOfPlants;
     }
 
-    public void setNumberOfTrees(Integer numberOfPlants) {
-        this.numberOfTrees = numberOfPlants;
+    public void setNumberOfPlants(Integer numberOfPlants) {
+        this.numberOfPlants = numberOfPlants;
     }
 
     public Boolean getOrganic() {
