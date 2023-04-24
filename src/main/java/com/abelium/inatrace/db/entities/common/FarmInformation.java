@@ -15,21 +15,21 @@ public class FarmInformation {
     @Column
     private String areaUnit;
 
-    @Column(length = Lengths.DEFAULT)
+    @Column
     private BigDecimal totalCultivatedArea;
 
     @Deprecated // FIXME: after this gets deployed to PROD and DEMO, remove it
-    @Column(length = Lengths.DEFAULT)
+    @Column
     private BigDecimal plantCultivatedArea;
 
     @Deprecated // FIXME: after this gets deployed to PROD and DEMO, remove it
-    @Column(length = Lengths.DEFAULT)
+    @Column
     private Integer numberOfPlants;
 
     @Column
     private Boolean organic;
 
-    @Column(length = Lengths.DEFAULT)
+    @Column
     private BigDecimal areaOrganicCertified;
 
     @Column
