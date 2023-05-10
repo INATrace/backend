@@ -204,6 +204,10 @@ public class CompanyService extends BaseService {
 	@Transactional
 	public void updateCompany(CustomUserDetails authUser, ApiCompanyUpdate ac) throws ApiException {
 		Company c = companyQueries.fetchCompany(authUser, ac.id);
+
+		// Check that the user is company enrolled and Company admin
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(c.getUsers(), authUser);
+
 		companyApiTools.updateCompanyWithUsers(authUser.getUserId(), c, ac);
 
 		if (ac.valueChains != null) {

@@ -86,8 +86,10 @@ public class CompanyQueries extends BaseService {
 
 	@Transactional
 	public Company fetchCompany(CustomUserDetails authUser, Long companyId) throws ApiException {
-		if (authUser.getUserRole() == UserRole.ADMIN)
+
+		if (authUser.getUserRole() == UserRole.ADMIN) {
 			return fetchCompany(companyId);
+		}
 
 		CompanyUser cuProxy = Torpedo.from(CompanyUser.class);
 		Torpedo.where(cuProxy.getCompany().getId()).eq(companyId).
