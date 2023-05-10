@@ -136,6 +136,7 @@ public class CompanyService extends BaseService {
 
 	@Transactional
 	public ApiBaseEntity createCompany(Long userId, ApiCompany request) throws ApiException {
+
 		User user = Queries.get(em, User.class, userId);
 		Company company = new Company();
 		CompanyUser companyUser = new CompanyUser();
@@ -145,6 +146,7 @@ public class CompanyService extends BaseService {
 
 		companyUser.setUser(user);
 		companyUser.setCompany(company);
+		companyUser.setRole(CompanyUserRole.ADMIN);
 		em.persist(companyUser);
 
 		if (request.valueChains != null) {
