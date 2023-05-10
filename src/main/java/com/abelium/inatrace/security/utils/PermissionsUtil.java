@@ -42,21 +42,6 @@ public final class PermissionsUtil {
 	}
 
 	/**
-	 * Checks if the requesting user is a Company admin or a System admin.
-	 */
-	public static void checkUserIfCompanyAdminOrSystemAdmin(List<CompanyUser> companyUsers, CustomUserDetails userToCheck) throws ApiException {
-
-		if (UserRole.ADMIN.equals(userToCheck.getUserRole())) {
-			return;
-		}
-
-		CompanyUser companyUser = findCompanyUser(userToCheck.getUserId(), companyUsers);
-		if (!CompanyUserRole.ADMIN.equals(companyUser.getRole())) {
-			throw new ApiException(ApiStatus.UNAUTHORIZED, "User doesn't have required permission!");
-		}
-	}
-
-	/**
 	 * Checks if the requesting user is part of a particular company and is Company or System admin.
 	 */
 	public static void checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(List<CompanyUser> companyUsers, CustomUserDetails userToCheck) throws ApiException {
