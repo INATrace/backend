@@ -12,7 +12,7 @@ import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.product.api.ApiBankInformation;
 import com.abelium.inatrace.components.product.api.ApiFarmInformation;
-import com.abelium.inatrace.components.product.api.ApiPlantInformation;
+import com.abelium.inatrace.components.product.api.ApiFarmPlantInformation;
 import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.db.entities.codebook.ProductType;
 import com.abelium.inatrace.db.entities.common.Country;
@@ -102,22 +102,22 @@ public class UserCustomerImportService extends BaseService {
                 apiUserCustomer.getFarm().setAreaOrganicCertified(getNumericBigDecimal(row.getCell(28)));
                 apiUserCustomer.getFarm().setAreaUnit(getString(row.getCell(21)));
 
-                apiUserCustomer.getFarm().setPlantInformationList(new ArrayList<>());
+                apiUserCustomer.getFarm().setFarmPlantInformationList(new ArrayList<>());
 
                 // Farm plant info for the first company's product type
-                ApiPlantInformation apiPlant1Information = new ApiPlantInformation();
+                ApiFarmPlantInformation apiPlant1Information = new ApiFarmPlantInformation();
                 apiPlant1Information.setProductType(companyProductTypes.get(0));
                 apiPlant1Information.setPlantCultivatedArea(getNumericBigDecimal(row.getCell(23)));
                 apiPlant1Information.setNumberOfPlants(getNumericInteger(row.getCell(24)));
-                apiUserCustomer.getFarm().getPlantInformationList().add(apiPlant1Information);
+                apiUserCustomer.getFarm().getFarmPlantInformationList().add(apiPlant1Information);
 
                 // Farm plant info for the second company's product type
                 if (hasSecondProductType && companyProductTypes.get(1) != null) {
-                    ApiPlantInformation apiPlant2Information = new ApiPlantInformation();
+                    ApiFarmPlantInformation apiPlant2Information = new ApiFarmPlantInformation();
                     apiPlant2Information.setProductType(companyProductTypes.get(1));
                     apiPlant2Information.setPlantCultivatedArea(getNumericBigDecimal(row.getCell(25)));
                     apiPlant2Information.setNumberOfPlants(getNumericInteger(row.getCell(26)));
-                    apiUserCustomer.getFarm().getPlantInformationList().add(apiPlant2Information);
+                    apiUserCustomer.getFarm().getFarmPlantInformationList().add(apiPlant2Information);
                 }
 
                 // set product

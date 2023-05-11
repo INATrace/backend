@@ -10,10 +10,13 @@ import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
 
 @Entity
-public class PlantInformation extends BaseEntity {
+public class FarmPlantInformation extends BaseEntity {
 
 	@ManyToOne
 	private ProductType productType;
+
+	@ManyToOne
+	private UserCustomer userCustomer;
 
 	@Column(length = Lengths.DEFAULT)
 	private BigDecimal plantCultivatedArea;
@@ -27,6 +30,14 @@ public class PlantInformation extends BaseEntity {
 
 	public void setProductType(ProductType productType) {
 		this.productType = productType;
+	}
+
+	public UserCustomer getUserCustomer() {
+		return userCustomer;
+	}
+
+	public void setUserCustomer(UserCustomer userCustomer) {
+		this.userCustomer = userCustomer;
 	}
 
 	public BigDecimal getPlantCultivatedArea() {

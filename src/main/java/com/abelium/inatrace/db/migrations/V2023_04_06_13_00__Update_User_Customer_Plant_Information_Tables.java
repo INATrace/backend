@@ -1,7 +1,7 @@
 package com.abelium.inatrace.db.migrations;
 
 import com.abelium.inatrace.components.flyway.JpaMigration;
-import com.abelium.inatrace.db.entities.common.PlantInformation;
+import com.abelium.inatrace.db.entities.common.FarmPlantInformation;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.common.UserCustomerPlantInformation;
 import com.abelium.inatrace.tools.Queries;
@@ -25,16 +25,16 @@ public class V2023_04_06_13_00__Update_User_Customer_Plant_Information_Tables im
 						(userCustomer.getFarm().getNumberOfPlants() != null
 						|| userCustomer.getFarm().getPlantCultivatedArea() != null)) {
 
-					PlantInformation plantInformation = new PlantInformation();
-					plantInformation.setNumberOfPlants(userCustomer.getFarm().getNumberOfPlants());
-					plantInformation.setPlantCultivatedArea(userCustomer.getFarm().getPlantCultivatedArea());
+					FarmPlantInformation farmPlantInformation = new FarmPlantInformation();
+					farmPlantInformation.setNumberOfPlants(userCustomer.getFarm().getNumberOfPlants());
+					farmPlantInformation.setPlantCultivatedArea(userCustomer.getFarm().getPlantCultivatedArea());
 					if (userCustomer.getProductTypes()!=null && userCustomer.getProductTypes().get(0)!=null) {
-						plantInformation.setProductType(userCustomer.getProductTypes().get(0).getProductType());
+						farmPlantInformation.setProductType(userCustomer.getProductTypes().get(0).getProductType());
 					}
 
 					UserCustomerPlantInformation userCustomerPlantInformation = new UserCustomerPlantInformation();
 					userCustomerPlantInformation.setUserCustomer(userCustomer);
-					userCustomerPlantInformation.setPlantInformation(plantInformation);
+					userCustomerPlantInformation.setPlantInformation(farmPlantInformation);
 					em.persist(userCustomerPlantInformation);
 				}
 			});

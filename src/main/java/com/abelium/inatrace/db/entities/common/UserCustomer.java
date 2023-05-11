@@ -105,7 +105,7 @@ public class UserCustomer extends BaseEntity {
 	private List<UserCustomerProductType> productTypes;
 
 	@OneToMany(mappedBy = "userCustomer", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<UserCustomerPlantInformation> plantInformationList;
+	private List<FarmPlantInformation> farmPlantInformationList;
 	
 	public UserCustomerType getType() {
 		return type;
@@ -249,15 +249,15 @@ public class UserCustomer extends BaseEntity {
 		this.productTypes = productTypes;
 	}
 
-	public List<UserCustomerPlantInformation> getPlantInformationList() {
-		if (plantInformationList == null) {
-			plantInformationList = new ArrayList<>();
+	public List<FarmPlantInformation> getFarmPlantInformationList() {
+		if (farmPlantInformationList == null) {
+			farmPlantInformationList = new ArrayList<>();
 		}
-		return plantInformationList;
+		return farmPlantInformationList;
 	}
 
-	public void setPlantInformationList(List<UserCustomerPlantInformation> plantInformationList) {
-		this.plantInformationList = plantInformationList;
+	public void setFarmPlantInformationList(List<FarmPlantInformation> farmPlantInformationList) {
+		this.farmPlantInformationList = farmPlantInformationList;
 	}
 
 	public String getLocation() {
