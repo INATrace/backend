@@ -1,7 +1,5 @@
 package com.abelium.inatrace.db.entities.common;
 
-import com.abelium.inatrace.api.types.Lengths;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.MappedSuperclass;
@@ -18,14 +16,6 @@ public class FarmInformation {
     @Column
     private BigDecimal totalCultivatedArea;
 
-    @Deprecated // FIXME: after this gets deployed to PROD and DEMO, remove it
-    @Column
-    private BigDecimal plantCultivatedArea;
-
-    @Deprecated // FIXME: after this gets deployed to PROD and DEMO, remove it
-    @Column
-    private Integer numberOfPlants;
-
     @Column
     private Boolean organic;
 
@@ -41,22 +31,6 @@ public class FarmInformation {
 
     public void setTotalCultivatedArea(BigDecimal totalCultivatedArea) {
         this.totalCultivatedArea = totalCultivatedArea;
-    }
-
-    public BigDecimal getPlantCultivatedArea() {
-        return plantCultivatedArea;
-    }
-
-    public void setPlantCultivatedArea(BigDecimal plantCultivatedArea) {
-        this.plantCultivatedArea = plantCultivatedArea;
-    }
-
-    public Integer getNumberOfPlants() {
-        return numberOfPlants;
-    }
-
-    public void setNumberOfPlants(Integer numberOfPlants) {
-        this.numberOfPlants = numberOfPlants;
     }
 
     public Boolean getOrganic() {
