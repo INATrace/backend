@@ -14,7 +14,7 @@ import com.abelium.inatrace.components.company.types.CompanyTranslatables;
 import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.product.api.ApiBankInformation;
 import com.abelium.inatrace.components.product.api.ApiFarmInformation;
-import com.abelium.inatrace.components.product.api.ApiPlantInformation;
+import com.abelium.inatrace.components.product.api.ApiFarmPlantInformation;
 import com.abelium.inatrace.components.user.UserApiTools;
 import com.abelium.inatrace.components.user.UserQueries;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
@@ -417,19 +417,19 @@ public class CompanyApiTools {
 		apiFarmInformation.setStartTransitionToOrganic(userCustomer.getFarm().getStartTransitionToOrganic());
 		apiFarmInformation.setTotalCultivatedArea(userCustomer.getFarm().getTotalCultivatedArea());
 
-		if (!userCustomer.getPlantInformationList().isEmpty()) {
-			apiFarmInformation.setPlantInformationList(new ArrayList<>());
+		if (!userCustomer.getFarmPlantInformationList().isEmpty()) {
+			apiFarmInformation.setFarmPlantInformationList(new ArrayList<>());
 
-			userCustomer.getPlantInformationList().forEach(userCustomerPlantInformation -> {
-				if (userCustomerPlantInformation.getPlantInformation() != null) {
-					ApiPlantInformation apiPlantInformation = new ApiPlantInformation();
-					apiPlantInformation.setNumberOfPlants(
-							userCustomerPlantInformation.getPlantInformation().getNumberOfPlants());
-					apiPlantInformation.setPlantCultivatedArea(
-							userCustomerPlantInformation.getPlantInformation().getPlantCultivatedArea());
-					apiPlantInformation.setProductType(ProductTypeMapper.toApiProductType(
-							userCustomerPlantInformation.getPlantInformation().getProductType(), language));
-					apiFarmInformation.getPlantInformationList().add(apiPlantInformation);
+			userCustomer.getFarmPlantInformationList().forEach(plantInformation -> {
+				if (plantInformation != null) {
+					ApiFarmPlantInformation apiFarmPlantInformation = new ApiFarmPlantInformation();
+					apiFarmPlantInformation.setNumberOfPlants(
+							plantInformation.getNumberOfPlants());
+					apiFarmPlantInformation.setPlantCultivatedArea(
+							plantInformation.getPlantCultivatedArea());
+					apiFarmPlantInformation.setProductType(ProductTypeMapper.toApiProductType(
+							plantInformation.getProductType(), language));
+					apiFarmInformation.getFarmPlantInformationList().add(apiFarmPlantInformation);
 				}
 			});
 		}

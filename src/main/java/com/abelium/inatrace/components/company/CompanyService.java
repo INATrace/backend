@@ -16,7 +16,7 @@ import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
-import com.abelium.inatrace.components.product.api.ApiPlantInformation;
+import com.abelium.inatrace.components.product.api.ApiFarmPlantInformation;
 import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.components.user.UserQueries;
 import com.abelium.inatrace.components.value_chain.ValueChainMapper;
@@ -347,20 +347,17 @@ public class CompanyService extends BaseService {
 		}
 
 		// Set farm plants information
-		if (apiUserCustomer.getFarm() != null && !apiUserCustomer.getFarm().getPlantInformationList().isEmpty()) {
-			userCustomer.setPlantInformationList(new ArrayList<>());
+		if (apiUserCustomer.getFarm() != null && !apiUserCustomer.getFarm().getFarmPlantInformationList().isEmpty()) {
+			userCustomer.setFarmPlantInformationList(new ArrayList<>());
 
-			for(ApiPlantInformation apiPlantInfo: apiUserCustomer.getFarm().getPlantInformationList()) {
-				PlantInformation plantInformation = new PlantInformation();
-				plantInformation.setNumberOfPlants(apiPlantInfo.getNumberOfPlants());
-				plantInformation.setPlantCultivatedArea(apiPlantInfo.getPlantCultivatedArea());
-				plantInformation.setProductType(fetchProductType(apiPlantInfo.getProductType().getId()));
+			for(ApiFarmPlantInformation apiPlantInfo: apiUserCustomer.getFarm().getFarmPlantInformationList()) {
+				FarmPlantInformation farmPlantInformation = new FarmPlantInformation();
+				farmPlantInformation.setNumberOfPlants(apiPlantInfo.getNumberOfPlants());
+				farmPlantInformation.setPlantCultivatedArea(apiPlantInfo.getPlantCultivatedArea());
+				farmPlantInformation.setProductType(fetchProductType(apiPlantInfo.getProductType().getId()));
+				farmPlantInformation.setUserCustomer(userCustomer);
 
-				UserCustomerPlantInformation userCustomerPlantInformation = new UserCustomerPlantInformation();
-				userCustomerPlantInformation.setPlantInformation(plantInformation);
-				userCustomerPlantInformation.setUserCustomer(userCustomer);
-
-				userCustomer.getPlantInformationList().add(userCustomerPlantInformation);
+				userCustomer.getFarmPlantInformationList().add(farmPlantInformation);
 			}
 		}
 
@@ -466,7 +463,7 @@ public class CompanyService extends BaseService {
 		}
 
 		// Update farm plant information
-		if (apiUserCustomer.getFarm() != null && !apiUserCustomer.getFarm().getPlantInformationList().isEmpty()) {
+		if (apiUserCustomer.getFarm() != null && !apiUserCustomer.getFarm().getFarmPlantInformationList().isEmpty()) {
 			updateUserCustomerPlantInformation(apiUserCustomer, userCustomer);
 		}
 
@@ -542,20 +539,17 @@ public class CompanyService extends BaseService {
 	private void updateUserCustomerPlantInformation(ApiUserCustomer apiUserCustomer, UserCustomer userCustomer) throws ApiException {
 
 		// remove all old data
-		userCustomer.getPlantInformationList().clear();
+		userCustomer.getFarmPlantInformationList().clear();
 
 		// add new
-		for (ApiPlantInformation apiPlantInfo: apiUserCustomer.getFarm().getPlantInformationList()) {
-			PlantInformation plantInformation = new PlantInformation();
-			plantInformation.setNumberOfPlants(apiPlantInfo.getNumberOfPlants());
-			plantInformation.setPlantCultivatedArea(apiPlantInfo.getPlantCultivatedArea());
-			plantInformation.setProductType(fetchProductType(apiPlantInfo.getProductType().getId()));
+		for (ApiFarmPlantInformation apiPlantInfo: apiUserCustomer.getFarm().getFarmPlantInformationList()) {
+			FarmPlantInformation farmPlantInformation = new FarmPlantInformation();
+			farmPlantInformation.setNumberOfPlants(apiPlantInfo.getNumberOfPlants());
+			farmPlantInformation.setPlantCultivatedArea(apiPlantInfo.getPlantCultivatedArea());
+			farmPlantInformation.setProductType(fetchProductType(apiPlantInfo.getProductType().getId()));
+			farmPlantInformation.setUserCustomer(userCustomer);
 
-			UserCustomerPlantInformation userCustomerPlantInformation = new UserCustomerPlantInformation();
-			userCustomerPlantInformation.setPlantInformation(plantInformation);
-			userCustomerPlantInformation.setUserCustomer(userCustomer);
-
-			userCustomer.getPlantInformationList().add(userCustomerPlantInformation);
+			userCustomer.getFarmPlantInformationList().add(farmPlantInformation);
 		}
 	}
 

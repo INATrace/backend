@@ -6,6 +6,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
+// FIXME: delete this entity after migration
 @Entity
 public class UserCustomerPlantInformation extends BaseEntity {
 
@@ -13,7 +14,7 @@ public class UserCustomerPlantInformation extends BaseEntity {
 	private UserCustomer userCustomer;
 
 	@ManyToOne(cascade = CascadeType.ALL)
-	private PlantInformation plantInformation;
+	private FarmPlantInformation plantInformation;
 
 	public UserCustomer getUserCustomer() {
 		return userCustomer;
@@ -23,11 +24,11 @@ public class UserCustomerPlantInformation extends BaseEntity {
 		this.userCustomer = userCustomer;
 	}
 
-	public PlantInformation getPlantInformation() {
+	public FarmPlantInformation getPlantInformation() {
 		return plantInformation;
 	}
 
-	public void setPlantInformation(PlantInformation plantInformation) {
+	public void setPlantInformation(FarmPlantInformation plantInformation) {
 		this.plantInformation = plantInformation;
 	}
 }

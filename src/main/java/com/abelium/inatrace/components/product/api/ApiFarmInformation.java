@@ -18,7 +18,7 @@ public class ApiFarmInformation {
     public BigDecimal totalCultivatedArea;
 
     @ApiModelProperty(value = "List of plant information")
-    public List<ApiPlantInformation> plantInformationList;
+    public List<ApiFarmPlantInformation> farmPlantInformationList;
 
     @ApiModelProperty(value = "Organic")
     public Boolean organic;
@@ -37,15 +37,15 @@ public class ApiFarmInformation {
         this.totalCultivatedArea = totalCultivatedArea;
     }
 
-    public List<ApiPlantInformation> getPlantInformationList() {
-        if (plantInformationList == null) {
-            plantInformationList = new ArrayList<>();
+    public List<ApiFarmPlantInformation> getFarmPlantInformationList() {
+        if (farmPlantInformationList == null) {
+            farmPlantInformationList = new ArrayList<>();
         }
-        return plantInformationList;
+        return farmPlantInformationList;
     }
 
-    public void setPlantInformationList(List<ApiPlantInformation> plantInformationList) {
-        this.plantInformationList = plantInformationList;
+    public void setFarmPlantInformationList(List<ApiFarmPlantInformation> farmPlantInformationList) {
+        this.farmPlantInformationList = farmPlantInformationList;
     }
 
     public Boolean getOrganic() {

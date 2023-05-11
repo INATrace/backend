@@ -6,7 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import java.math.BigDecimal;
 
 @Validated
-public class ApiPlantInformation {
+public class ApiFarmPlantInformation {
 
 	@ApiModelProperty(value = "Product type")
 	public ApiProductType productType;
