@@ -5,7 +5,6 @@ import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
-import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.db.entities.value_chain.ProcessingActionValueChain;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
@@ -49,10 +48,6 @@ public class ProcessingAction extends TimestampEntity {
 	 */
 	@ManyToOne
 	private SemiProduct inputSemiProduct;
-
-	// FIXME: this field should be removed once we have migrated to the new DB schema in all environments
-	@ManyToOne
-	private SemiProduct outputSemiProduct;
 
 	/**
 	 * Used when we have action types: PROCESSING, QUOTE, TRANSFER, GENERATE_QR_CODE.
@@ -99,11 +94,6 @@ public class ProcessingAction extends TimestampEntity {
 	 */
 	@Column
 	private Boolean finalProductAction;
-
-	// FIXME: this attribute is not used anymore, it should be removed after product-type migrations
-	@ManyToOne
-	@Deprecated
-	private ValueChain valueChain;
 
 	/**
 	 * The value chains that this Processing action supports - used to source semi-products, proc. evidence types and proc. evidence fields
@@ -183,10 +173,6 @@ public class ProcessingAction extends TimestampEntity {
 		this.inputSemiProduct = inputSemiProduct;
 	}
 
-	public SemiProduct getOutputSemiProduct() {
-		return outputSemiProduct;
-	}
-
 	public List<ProcessingActionOutputSemiProduct> getOutputSemiProducts() {
 		return outputSemiProducts;
 	}
@@ -257,14 +243,6 @@ public class ProcessingAction extends TimestampEntity {
 
 	public void setFinalProductAction(Boolean finalProductAction) {
 		this.finalProductAction = finalProductAction;
-	}
-
-	public ValueChain getValueChain() {
-		return valueChain;
-	}
-
-	public void setValueChain(ValueChain valueChain) {
-		this.valueChain = valueChain;
 	}
 
 	public List<ProcessingActionValueChain> getProcessingActionsValueChains() {
