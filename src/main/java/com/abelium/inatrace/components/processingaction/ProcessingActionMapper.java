@@ -68,7 +68,7 @@ public final class ProcessingActionMapper {
 
 		apiProcessingAction.setSortOrder(entity.getSortOrder());
 		apiProcessingAction.setPrefix(entity.getPrefix());
-		apiProcessingAction.setRepackedOutputs(entity.getRepackedOutputs());
+		apiProcessingAction.setRepackedOutputFinalProducts(entity.getRepackedOutputFinalProducts());
 		apiProcessingAction.setMaxOutputWeight(entity.getMaxOutputWeight());
 		apiProcessingAction.setPublicTimelineLabel(entity.getPublicTimelineLabel());
 		apiProcessingAction.setPublicTimelineLocation(entity.getPublicTimelineLocation());
@@ -85,11 +85,12 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setInputSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct(), language));
 
 		// Map the output semi-products
-		apiProcessingAction.setOutputSemiProducts(entity.getOutputSemiProducts()
-				.stream()
-				.map(paOSM -> SemiProductMapper.toApiSemiProduct(paOSM.getOutputSemiProduct(), language))
-				.collect(Collectors.toList())
-		);
+		// TODO: refactor to new API model
+//		apiProcessingAction.setOutputSemiProducts(entity.getOutputSemiProducts()
+//				.stream()
+//				.map(paOSM -> SemiProductMapper.toApiSemiProduct(paOSM.getOutputSemiProduct(), language))
+//				.collect(Collectors.toList())
+//		);
 
 		// Map the input and output final products
 		apiProcessingAction.setInputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getInputFinalProduct()));
@@ -213,11 +214,12 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setInputSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct(), language));
 
 		// Map the output semi-products
-		apiProcessingAction.setOutputSemiProducts(entity.getOutputSemiProducts()
-				.stream()
-				.map(paOSM -> SemiProductMapper.toApiSemiProduct(paOSM.getOutputSemiProduct(), language))
-				.collect(Collectors.toList())
-		);
+		// TODO: refactor to new API model
+//		apiProcessingAction.setOutputSemiProducts(entity.getOutputSemiProducts()
+//				.stream()
+//				.map(paOSM -> SemiProductMapper.toApiSemiProduct(paOSM.getOutputSemiProduct(), language))
+//				.collect(Collectors.toList())
+//		);
 
 		// Map the input and output final products
 		apiProcessingAction.setInputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getInputFinalProduct()));

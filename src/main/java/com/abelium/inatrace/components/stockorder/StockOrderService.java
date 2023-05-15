@@ -1201,7 +1201,7 @@ public class StockOrderService extends BaseService {
             BigDecimal expectedTotalQuantityPerUnit = procAction.getEstimatedOutputQuantityPerUnit();
 
             if (procAction.getType().equals(ProcessingActionType.PROCESSING) &&
-                    BooleanUtils.isFalse(procAction.getRepackedOutputs()) && expectedTotalQuantityPerUnit != null) {
+                    BooleanUtils.isFalse(procAction.getRepackedOutputFinalProducts()) && expectedTotalQuantityPerUnit != null) {
 
                 // Calculate the total input quantity (summed up input transactions from the processing order)
                 List<Transaction> inputTxs = processingOrder.getInputTransactions();

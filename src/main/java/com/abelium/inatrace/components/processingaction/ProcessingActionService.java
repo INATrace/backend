@@ -121,7 +121,7 @@ public class ProcessingActionService extends BaseService {
 		// Set the value chain
 		entity.setSortOrder(apiProcessingAction.getSortOrder());
 		entity.setPrefix(apiProcessingAction.getPrefix());
-		entity.setRepackedOutputs(apiProcessingAction.getRepackedOutputs());
+		entity.setRepackedOutputFinalProducts(apiProcessingAction.getRepackedOutputFinalProducts());
 		entity.setMaxOutputWeight(apiProcessingAction.getMaxOutputWeight());
 		entity.setPublicTimelineLabel(apiProcessingAction.getPublicTimelineLabel());
 		entity.setPublicTimelineLocation(apiProcessingAction.getPublicTimelineLocation());
@@ -262,7 +262,7 @@ public class ProcessingActionService extends BaseService {
 		}
 
 		// If repacked output is selected, validate that there is no more than one output semi-product defined
-		if (BooleanUtils.isTrue(apiProcessingAction.getRepackedOutputs()) &&
+		if (BooleanUtils.isTrue(apiProcessingAction.getRepackedOutputFinalProducts()) &&
 				apiProcessingAction.getOutputSemiProducts() != null &&
 				apiProcessingAction.getOutputSemiProducts().size() > 1) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Only one output semi-product is allowed when repacked output is selected");
