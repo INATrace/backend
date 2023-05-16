@@ -37,6 +37,7 @@ import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
 /**
@@ -121,12 +122,19 @@ public class ProcessingActionService extends BaseService {
 		// Set the value chain
 		entity.setSortOrder(apiProcessingAction.getSortOrder());
 		entity.setPrefix(apiProcessingAction.getPrefix());
-		entity.setRepackedOutputFinalProducts(apiProcessingAction.getRepackedOutputFinalProducts());
-		entity.setMaxOutputWeight(apiProcessingAction.getMaxOutputWeight());
 		entity.setPublicTimelineLabel(apiProcessingAction.getPublicTimelineLabel());
 		entity.setPublicTimelineLocation(apiProcessingAction.getPublicTimelineLocation());
 		entity.setPublicTimelineIconType(apiProcessingAction.getPublicTimelineIconType());
 		entity.setType(apiProcessingAction.getType());
+
+		// Set the repack for output final product
+		if (apiProcessingAction.getOutputFinalProduct() != null) {
+			entity.setRepackedOutputFinalProducts(apiProcessingAction.getRepackedOutputFinalProducts());
+			entity.setMaxOutputWeight(apiProcessingAction.getMaxOutputWeight());
+		} else {
+			entity.setRepackedOutputFinalProducts(null);
+			entity.setMaxOutputWeight(null);
+		}
 
 		// If we have shipment or transfer, set the field denoting if we are dealing with final products
 		if (ProcessingActionType.TRANSFER.equals(apiProcessingAction.getType()) ||
@@ -261,11 +269,12 @@ public class ProcessingActionService extends BaseService {
 					"Estimated output quantity cannot be provided when action is not 'PROCESSING'");
 		}
 
-		// If repacked output is selected, validate that there is no more than one output semi-product defined
-		if (BooleanUtils.isTrue(apiProcessingAction.getRepackedOutputFinalProducts()) &&
-				apiProcessingAction.getOutputSemiProducts() != null &&
-				apiProcessingAction.getOutputSemiProducts().size() > 1) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Only one output semi-product is allowed when repacked output is selected");
+		// If repack output for final product is selected, validate that maximum output quantity is provided
+		if (BooleanUtils.isTrue(apiProcessingAction.getRepackedOutputFinalProducts())) {
+			if (apiProcessingAction.getMaxOutputWeight() == null || apiProcessingAction.getMaxOutputWeight().compareTo(
+					BigDecimal.ZERO) <= 0) {
+				throw new ApiException(ApiStatus.INVALID_REQUEST, "Maximum output quantity is required when 'repackedOutputFinalProducts' is selected");
+			}
 		}
 
 		switch (apiProcessingAction.getType()) {
