@@ -45,7 +45,7 @@ public class SemiProductService extends BaseService {
 	public ApiPaginatedList<ApiSemiProduct> getSemiProductList(ApiPaginatedRequest request, Language language) {
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> semiProductQueryObject(request),
-				semiProduct -> SemiProductMapper.toApiSemiProductDetail(semiProduct, language));
+				semiProduct -> SemiProductMapper.toApiSemiProductDetail(semiProduct, ApiSemiProduct.class, language));
 	}
 
 	private SemiProduct semiProductQueryObject(ApiPaginatedRequest request) {
@@ -71,12 +71,12 @@ public class SemiProductService extends BaseService {
 
 	public ApiSemiProduct getSemiProduct(Long id, Language language) throws ApiException {
 
-		return SemiProductMapper.toApiSemiProduct(fetchSemiProduct(id), language);
+		return SemiProductMapper.toApiSemiProduct(fetchSemiProduct(id), ApiSemiProduct.class, language);
 	}
 
 	public ApiSemiProduct getSemiProductDetails(Long id, Language language) throws ApiException {
 
-		return SemiProductMapper.toApiSemiProductDetail(fetchSemiProduct(id), language);
+		return SemiProductMapper.toApiSemiProductDetail(fetchSemiProduct(id), ApiSemiProduct.class, language);
 	}
 
 	@Transactional
@@ -169,7 +169,7 @@ public class SemiProductService extends BaseService {
 		return new ApiPaginatedList<>(
 				semiProducts
 						.stream()
-						.map(processingEvidenceField -> SemiProductMapper.toApiSemiProduct(processingEvidenceField, language))
+						.map(processingEvidenceField -> SemiProductMapper.toApiSemiProduct(processingEvidenceField, ApiSemiProduct.class, language))
 						.collect(Collectors.toList()), count);
 
 	}

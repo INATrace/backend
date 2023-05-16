@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.stockorder.mappers;
 
 import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
+import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.mappers.ActivityProofMapper;
 import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
@@ -116,7 +117,7 @@ public class StockOrderMapper {
         });
 
         // Map the semi-product that is represented by this stock order
-        apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct(), language));
+        apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct(), ApiSemiProduct.class, language));
 
         apiStockOrder.setPriceDeterminedLater(entity.getPriceDeterminedLater());
 
@@ -274,7 +275,7 @@ public class StockOrderMapper {
             apiStockOrder.setBalance(entity.getBalance());
         }
 
-        apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProductBase(entity.getSemiProduct(), language));
+        apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProductBase(entity.getSemiProduct(), ApiSemiProduct.class, language));
         apiStockOrder.setFinalProduct(ProductApiTools.toApiFinalProductBase(entity.getFinalProduct()));
 
         return apiStockOrder;

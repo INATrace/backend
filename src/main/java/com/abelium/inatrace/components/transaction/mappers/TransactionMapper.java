@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.transaction.mappers;
 
 import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
+import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.facility.FacilityMapper;
 import com.abelium.inatrace.components.product.ProductApiTools;
@@ -44,7 +45,7 @@ public class TransactionMapper {
         }
 
         apiTransaction.setCompany(CompanyMapper.toApiCompanyBase(entity.getCompany()));
-        apiTransaction.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct(), language));
+        apiTransaction.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct(), ApiSemiProduct.class, language));
         apiTransaction.setFinalProduct(ProductApiTools.toApiFinalProduct(entity.getFinalProduct()));
         apiTransaction.setShipmentId(entity.getShipmentId());
         apiTransaction.setPricePerUnit(entity.getPricePerUnit());

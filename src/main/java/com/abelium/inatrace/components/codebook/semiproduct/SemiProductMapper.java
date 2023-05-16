@@ -7,6 +7,7 @@ import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.codebook.SemiProductTranslation;
 import com.abelium.inatrace.types.Language;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 /**
@@ -26,7 +27,7 @@ public final class SemiProductMapper {
 	 * @param entity DB entity.
 	 * @return API model entity.
 	 */
-	public static ApiSemiProduct toApiSemiProductBase(SemiProduct entity, Language language) {
+	public static <T extends ApiSemiProduct> T toApiSemiProductBase(SemiProduct entity, Class<T> apiSemiProductClass, Language language) {
 
 		if (entity == null) {
 			return null;
@@ -38,7 +39,14 @@ public final class SemiProductMapper {
 				.findFirst()
 				.orElse(new SemiProductTranslation());
 
-		ApiSemiProduct apiSemiProduct = new ApiSemiProduct();
+		// ApiSemiProduct apiSemiProduct = new ApiSemiProduct();
+		T apiSemiProduct;
+		try {
+			apiSemiProduct = apiSemiProductClass.getConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		}
+
 		apiSemiProduct.setId(entity.getId());
 		apiSemiProduct.setName(translation.getName());
 		apiSemiProduct.setDescription(translation.getDescription());
@@ -59,7 +67,7 @@ public final class SemiProductMapper {
 			return null;
 		}
 
-		ApiSemiProduct apiSemiProduct = SemiProductMapper.toApiSemiProductBase(entity, language);
+		ApiSemiProduct apiSemiProduct = SemiProductMapper.toApiSemiProductBase(entity, ApiSemiProduct.class, language);
 
 		if (entity.getMeasurementUnitType() != null) {
 			apiSemiProduct.setMeasurementUnitType(
@@ -75,13 +83,13 @@ public final class SemiProductMapper {
 	 * @param entity DB entity.
 	 * @return API model entity.
 	 */
-	public static ApiSemiProduct toApiSemiProduct(SemiProduct entity, Language language) {
+	public static <T extends ApiSemiProduct> T toApiSemiProduct(SemiProduct entity, Class<T> apiSemiProductClass, Language language) {
 
 		if (entity == null) {
 			return null;
 		}
 
-		ApiSemiProduct apiSemiProduct = SemiProductMapper.toApiSemiProductBase(entity, language);
+		T apiSemiProduct = SemiProductMapper.toApiSemiProductBase(entity, apiSemiProductClass, language);
 
 		apiSemiProduct.setSKU(entity.getSKU());
 		apiSemiProduct.setSKUEndCustomer(entity.getSKUEndCustomer());
@@ -95,13 +103,13 @@ public final class SemiProductMapper {
 		return apiSemiProduct;
 	}
 
-	public static ApiSemiProduct toApiSemiProductDetail(SemiProduct entity, Language language) {
+	public static <T extends ApiSemiProduct> T toApiSemiProductDetail(SemiProduct entity, Class<T> apiSemiProductClass, Language language) {
 
 		if (entity == null) {
 			return null;
 		}
 
-		ApiSemiProduct apiSemiProduct = toApiSemiProduct(entity, language);
+		T apiSemiProduct = toApiSemiProduct(entity, apiSemiProductClass, language);
 		apiSemiProduct.setTranslations(new ArrayList<>());
 
 		entity.getSemiProductTranslations().forEach(semiProductTranslation -> {
@@ -114,4 +122,5 @@ public final class SemiProductMapper {
 
 		return apiSemiProduct;
 	}
+
 }

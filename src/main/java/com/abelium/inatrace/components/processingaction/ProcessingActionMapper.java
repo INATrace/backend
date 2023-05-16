@@ -3,9 +3,11 @@ package com.abelium.inatrace.components.processingaction;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
 import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
+import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
+import com.abelium.inatrace.components.processingaction.api.ApiProcessingActionOutputSemiProduct;
 import com.abelium.inatrace.components.processingactiontranslation.ProcessingActionTranslationMapper;
 import com.abelium.inatrace.components.product.ProductApiTools;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
@@ -15,12 +17,10 @@ import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceType;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceTypeTranslation;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.facility.FacilityTranslation;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingActionFacility;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPEF;
-import com.abelium.inatrace.db.entities.processingaction.ProcessingActionPET;
+import com.abelium.inatrace.db.entities.processingaction.*;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.types.Language;
+import org.apache.commons.lang3.BooleanUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,15 +82,14 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setCompany(apiCompany);
 
 		// Map the input semi-product
-		apiProcessingAction.setInputSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct(), language));
+		apiProcessingAction.setInputSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct(), ApiSemiProduct.class, language));
 
 		// Map the output semi-products
-		// TODO: refactor to new API model
-//		apiProcessingAction.setOutputSemiProducts(entity.getOutputSemiProducts()
-//				.stream()
-//				.map(paOSM -> SemiProductMapper.toApiSemiProduct(paOSM.getOutputSemiProduct(), language))
-//				.collect(Collectors.toList())
-//		);
+		apiProcessingAction.setOutputSemiProducts(entity.getOutputSemiProducts()
+				.stream()
+				.map(paOSM -> ProcessingActionMapper.toApiProcessingActionOSM(paOSM, language))
+				.collect(Collectors.toList())
+		);
 
 		// Map the input and output final products
 		apiProcessingAction.setInputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getInputFinalProduct()));
@@ -211,21 +210,32 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setType(entity.getType());
 
 		// Map the input semi-product
-		apiProcessingAction.setInputSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct(), language));
+		apiProcessingAction.setInputSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getInputSemiProduct(), ApiSemiProduct.class, language));
 
 		// Map the output semi-products
-		// TODO: refactor to new API model
-//		apiProcessingAction.setOutputSemiProducts(entity.getOutputSemiProducts()
-//				.stream()
-//				.map(paOSM -> SemiProductMapper.toApiSemiProduct(paOSM.getOutputSemiProduct(), language))
-//				.collect(Collectors.toList())
-//		);
+		apiProcessingAction.setOutputSemiProducts(entity.getOutputSemiProducts()
+				.stream()
+				.map(paOSM -> ProcessingActionMapper.toApiProcessingActionOSM(paOSM, language))
+				.collect(Collectors.toList())
+		);
 
 		// Map the input and output final products
 		apiProcessingAction.setInputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getInputFinalProduct()));
 		apiProcessingAction.setOutputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getOutputFinalProduct()));
 
 		return apiProcessingAction;
+	}
+
+	public static ApiProcessingActionOutputSemiProduct toApiProcessingActionOSM(ProcessingActionOutputSemiProduct entity, Language language) {
+
+		ApiProcessingActionOutputSemiProduct apiPaOSM = SemiProductMapper.toApiSemiProduct(
+				entity.getOutputSemiProduct(), ApiProcessingActionOutputSemiProduct.class, language);
+		apiPaOSM.setRepackedOutput(entity.getRepackedOutput());
+		if (BooleanUtils.isTrue(entity.getRepackedOutput())) {
+			apiPaOSM.setMaxOutputWeight(entity.getMaxOutputWeight());
+		}
+
+		return apiPaOSM;
 	}
 
 }
