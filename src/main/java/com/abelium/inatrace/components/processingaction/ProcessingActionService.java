@@ -127,8 +127,11 @@ public class ProcessingActionService extends BaseService {
 		entity.setPublicTimelineIconType(apiProcessingAction.getPublicTimelineIconType());
 		entity.setType(apiProcessingAction.getType());
 
+		// Set semi-products and final products (depending on the Processing action type)
+		setSemiAndFinalProducts(apiProcessingAction, entity);
+
 		// Set the repack for output final product
-		if (apiProcessingAction.getOutputFinalProduct() != null) {
+		if (entity.getOutputFinalProduct() != null) {
 			entity.setRepackedOutputFinalProducts(apiProcessingAction.getRepackedOutputFinalProducts());
 			entity.setMaxOutputWeight(apiProcessingAction.getMaxOutputWeight());
 		} else {
@@ -143,9 +146,6 @@ public class ProcessingActionService extends BaseService {
 		} else {
 			entity.setFinalProductAction(Boolean.FALSE);
 		}
-
-		// Set semi-products and final products (depending on the Processing action type)
-		setSemiAndFinalProducts(apiProcessingAction, entity);
 
 		// Set the estimated output quantity per unit
 		entity.setEstimatedOutputQuantityPerUnit(apiProcessingAction.getEstimatedOutputQuantityPerUnit());
@@ -369,6 +369,10 @@ public class ProcessingActionService extends BaseService {
 					entity.getOutputSemiProducts().add(paOSM);
 				}
 
+				// Clear input and output final products (if they were set from previous version)
+				entity.setInputFinalProduct(null);
+				entity.setOutputFinalProduct(null);
+
 				break;
 
 			case FINAL_PROCESSING:
@@ -381,6 +385,9 @@ public class ProcessingActionService extends BaseService {
 				outputFinalProduct = finalProductService.fetchFinalProduct(apiProcessingAction.getOutputFinalProduct().getId());
 				entity.setOutputFinalProduct(outputFinalProduct);
 
+				// Clear all output semi-product (if they were set from previous version)
+				entity.getOutputSemiProducts().clear();
+
 				break;
 
 			case TRANSFER:
@@ -392,6 +399,10 @@ public class ProcessingActionService extends BaseService {
 					inputFinalProduct = finalProductService.fetchFinalProduct(apiProcessingAction.getInputFinalProduct().getId());
 					entity.setInputFinalProduct(inputFinalProduct);
 					entity.setOutputFinalProduct(inputFinalProduct);
+
+					// Clear all output semi-product (if they were set from previous version)
+					entity.setInputSemiProduct(null);
+					entity.getOutputSemiProducts().clear();
 				} else {
 
 					// Set the input semi-product and set the output to be the same as the input
@@ -403,6 +414,10 @@ public class ProcessingActionService extends BaseService {
 					paOSM.setProcessingAction(entity);
 					paOSM.setOutputSemiProduct(inputSemiProduct);
 					entity.getOutputSemiProducts().add(paOSM);
+
+					// Clear input and output final products (if they were set from previous version)
+					entity.setInputFinalProduct(null);
+					entity.setOutputFinalProduct(null);
 				}
 				break;
 
@@ -417,6 +432,10 @@ public class ProcessingActionService extends BaseService {
 				paOSM.setProcessingAction(entity);
 				paOSM.setOutputSemiProduct(inputSemiProduct);
 				entity.getOutputSemiProducts().add(paOSM);
+
+				// Clear input and output final products (if they were set from previous version)
+				entity.setInputFinalProduct(null);
+				entity.setOutputFinalProduct(null);
 		}
 	}
 
