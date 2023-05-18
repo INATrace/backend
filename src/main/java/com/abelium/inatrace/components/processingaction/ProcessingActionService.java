@@ -8,12 +8,12 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.ProcessingEvidenceTypeService;
 import com.abelium.inatrace.components.codebook.processingevidencefield.ProcessingEvidenceFieldService;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductService;
-import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.facility.FacilityService;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
+import com.abelium.inatrace.components.processingaction.api.ApiProcessingActionOutputSemiProduct;
 import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.value_chain.ValueChainService;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
@@ -362,10 +362,12 @@ public class ProcessingActionService extends BaseService {
 
 				// Set the output semi-products
 				entity.getOutputSemiProducts().clear();
-				for (ApiSemiProduct apiSemiProduct : apiProcessingAction.getOutputSemiProducts()) {
+				for (ApiProcessingActionOutputSemiProduct apiPaOSM : apiProcessingAction.getOutputSemiProducts()) {
 					ProcessingActionOutputSemiProduct paOSM = new ProcessingActionOutputSemiProduct();
 					paOSM.setProcessingAction(entity);
-					paOSM.setOutputSemiProduct(semiProductService.fetchSemiProduct(apiSemiProduct.getId()));
+					paOSM.setOutputSemiProduct(semiProductService.fetchSemiProduct(apiPaOSM.getId()));
+					paOSM.setRepackedOutput(apiPaOSM.getRepackedOutput());
+					paOSM.setMaxOutputWeight(apiPaOSM.getMaxOutputWeight());
 					entity.getOutputSemiProducts().add(paOSM);
 				}
 
@@ -413,6 +415,8 @@ public class ProcessingActionService extends BaseService {
 					ProcessingActionOutputSemiProduct paOSM = new ProcessingActionOutputSemiProduct();
 					paOSM.setProcessingAction(entity);
 					paOSM.setOutputSemiProduct(inputSemiProduct);
+					paOSM.setRepackedOutput(null);
+					paOSM.setMaxOutputWeight(null);
 					entity.getOutputSemiProducts().add(paOSM);
 
 					// Clear input and output final products (if they were set from previous version)
@@ -431,6 +435,8 @@ public class ProcessingActionService extends BaseService {
 				ProcessingActionOutputSemiProduct paOSM = new ProcessingActionOutputSemiProduct();
 				paOSM.setProcessingAction(entity);
 				paOSM.setOutputSemiProduct(inputSemiProduct);
+				paOSM.setRepackedOutput(null);
+				paOSM.setMaxOutputWeight(null);
 				entity.getOutputSemiProducts().add(paOSM);
 
 				// Clear input and output final products (if they were set from previous version)
