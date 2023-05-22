@@ -934,6 +934,7 @@ public class StockOrderService extends BaseService {
         entity.setIdentifier(apiStockOrder.getIdentifier());
         entity.setPreferredWayOfPayment(apiStockOrder.getPreferredWayOfPayment());
         entity.setSacNumber(apiStockOrder.getSacNumber());
+        entity.setRepackedOriginStockOrderId(apiStockOrder.getRepackedOriginStockOrderId());
         entity.setProductionDate(apiStockOrder.getProductionDate());
         entity.setDeliveryTime(apiStockOrder.getDeliveryTime());
         entity.setComments(apiStockOrder.getComments());

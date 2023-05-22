@@ -248,6 +248,10 @@ public class StockOrder extends TimestampEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private FinalProduct qrCodeTagFinalProduct;
 
+	// Generated ID provided by the client; This is used to group repacked stock orders when doing repacking with multiple outputs
+	@Column
+	private String repackedOriginStockOrderId;
+
 	public User getCreatedBy() {
 		return createdBy;
 	}
@@ -637,6 +641,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setQrCodeTagFinalProduct(FinalProduct qrCodeTagFinalProduct) {
 		this.qrCodeTagFinalProduct = qrCodeTagFinalProduct;
+	}
+
+	public String getRepackedOriginStockOrderId() {
+		return repackedOriginStockOrderId;
+	}
+
+	public void setRepackedOriginStockOrderId(String repackedOriginStockOrder) {
+		this.repackedOriginStockOrderId = repackedOriginStockOrder;
 	}
 
 	public StockOrderLocation getProductionLocation() {

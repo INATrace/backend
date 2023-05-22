@@ -176,6 +176,7 @@ public class StockOrderMapper {
         apiStockOrder.setLotPrefix(entity.getLotPrefix());
         apiStockOrder.setInternalLotNumber(setupInternalLotNumberForSacked(entity.getInternalLotNumber(), entity.getSacNumber()));
         apiStockOrder.setSacNumber(entity.getSacNumber());
+        apiStockOrder.setRepackedOriginStockOrderId(entity.getRepackedOriginStockOrderId());
         apiStockOrder.setPurchaseOrder(entity.getPurchaseOrder());
 
         // Set other data fields
