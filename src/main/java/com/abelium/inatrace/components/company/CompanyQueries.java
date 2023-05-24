@@ -119,7 +119,7 @@ public class CompanyQueries extends BaseService {
 	public List<Long> fetchCompanyIdsForUserAdmin(Long userId) {
 		CompanyUser companyUser = Torpedo.from(CompanyUser.class);
 		Torpedo.where(companyUser.getUser().getId()).eq(userId).
-				and(companyUser.getRole()).eq(CompanyUserRole.ADMIN);
+				and(companyUser.getRole()).eq(CompanyUserRole.COMPANY_ADMIN);
 		return Torpedo.select(companyUser.getCompany().getId()).list(em);
 	}
 

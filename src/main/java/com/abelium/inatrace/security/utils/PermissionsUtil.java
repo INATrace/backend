@@ -48,7 +48,7 @@ public final class PermissionsUtil {
 
 		CompanyUser companyUser = findCompanyUser(userToCheck.getUserId(), companyUsers);
 
-		if (!UserRole.SYSTEM_ADMIN.equals(userToCheck.getUserRole()) && !CompanyUserRole.ADMIN.equals(companyUser.getRole())) {
+		if (!UserRole.SYSTEM_ADMIN.equals(userToCheck.getUserRole()) && !CompanyUserRole.COMPANY_ADMIN.equals(companyUser.getRole())) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "User doesn't have required permission!");
 		}
 	}

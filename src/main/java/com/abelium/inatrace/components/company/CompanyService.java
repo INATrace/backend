@@ -146,7 +146,7 @@ public class CompanyService extends BaseService {
 
 		companyUser.setUser(user);
 		companyUser.setCompany(company);
-		companyUser.setRole(CompanyUserRole.ADMIN);
+		companyUser.setRole(CompanyUserRole.COMPANY_ADMIN);
 		em.persist(companyUser);
 
 		if (request.valueChains != null) {
@@ -860,7 +860,7 @@ public class CompanyService extends BaseService {
 		CompanyUser companyUser = Torpedo.from(CompanyUser.class);
 		Torpedo.where(companyUser.getCompany().getId()).eq(companyId).
 				and(companyUser.getUser().getId()).eq(customUserDetails.getUserId()).
-				and(companyUser.getRole()).eq(CompanyUserRole.ADMIN);
+				and(companyUser.getRole()).eq(CompanyUserRole.COMPANY_ADMIN);
 		List<CompanyUser> companyUserList = Torpedo.select(companyUser).list(em);
 		return !companyUserList.isEmpty();
 	}

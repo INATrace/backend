@@ -260,7 +260,7 @@ public class UserService extends BaseService {
 				CompanyUser companyUser = new CompanyUser();
 				companyUser.setUser(user);
 				companyUser.setCompany(c);
-				companyUser.setRole(CompanyUserRole.ADMIN);
+				companyUser.setRole(CompanyUserRole.COMPANY_ADMIN);
 				em.persist(companyUser);
 			});
 		}
