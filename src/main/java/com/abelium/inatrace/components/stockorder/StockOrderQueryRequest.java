@@ -64,6 +64,21 @@ public class StockOrderQueryRequest {
         this.productionDateStart = productionDateStart;
         this.productionDateEnd = productionDateEnd;
     }
+
+    // used for delivery total calculation
+    public StockOrderQueryRequest(Long companyId, Long facilityId, Long farmerId, Long semiProductId,
+                                  Boolean isWomenShare, Boolean organicOnly, LocalDate productionDateStart,
+                                  LocalDate productionDateEnd) {
+        this.companyId = companyId;
+        this.facilityId = facilityId;
+        this.farmerId = farmerId;
+        this.semiProductId = semiProductId;
+        this.isWomenShare = isWomenShare;
+        this.organicOnly = organicOnly;
+        this.productionDateStart = productionDateStart;
+        this.productionDateEnd = productionDateEnd;
+
+    }
     
     public StockOrderQueryRequest(Long companyId,
                                   Long facilityId,

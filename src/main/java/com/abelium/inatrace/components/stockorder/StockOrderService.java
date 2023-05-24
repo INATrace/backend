@@ -60,6 +60,7 @@ import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -710,6 +711,73 @@ public class StockOrderService extends BaseService {
         }).collect(Collectors.toList()));
 
         return stockOrderHistory;
+    }
+
+    public ApiDeliveriesTotal getDeliveriesGraphData(ApiDeliveriesUnitType aggregationType,
+                                                     StockOrderQueryRequest stockOrderQueryRequest) {
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
+        Root<StockOrder> root = cq.from(StockOrder.class);
+
+        Expression<Integer> timeAggregateExpression;
+
+        switch (aggregationType) {
+            case YEAR:
+                timeAggregateExpression = cb.function("YEAR", Integer.class, root.get("productionDate"));
+                break;
+            case MONTH:
+                timeAggregateExpression = cb.function("MONTH", Integer.class, root.get("productionDate"));
+                break;
+            case WEEK:
+                timeAggregateExpression = cb.function("WEEK", Integer.class, root.get("productionDate"));
+                break;
+            case DAY:
+            default:
+                timeAggregateExpression = root.get("productionDate");
+                break;
+        }
+
+        List<Predicate> predicateList = new ArrayList<>();
+        predicateList.add(cb.equal(root.get("orderType"), OrderType.PURCHASE_ORDER));
+
+        if (stockOrderQueryRequest != null) {
+
+            if (stockOrderQueryRequest.companyId != null) {
+                predicateList.add(cb.equal(root.get("company").get("id"), stockOrderQueryRequest.companyId));
+            }
+            if (stockOrderQueryRequest.facilityId != null) {
+                predicateList.add(cb.equal(root.get("facility").get("id"), stockOrderQueryRequest.facilityId));
+            }
+            if (stockOrderQueryRequest.farmerId != null) {
+                predicateList.add(cb.equal(root.get("producerUserCustomer").get("id"), stockOrderQueryRequest.farmerId));
+            }
+            if (stockOrderQueryRequest.semiProductId != null) {
+                predicateList.add(cb.equal(root.get("semiProduct").get("id"), stockOrderQueryRequest.semiProductId));
+            }
+            if (stockOrderQueryRequest.isWomenShare != null) {
+                predicateList.add(cb.equal(root.get("womenShare"), stockOrderQueryRequest.isWomenShare));
+            }
+            if (stockOrderQueryRequest.organicOnly != null) {
+                predicateList.add(cb.equal(root.get("organic"), stockOrderQueryRequest.organicOnly));
+            }
+            if (stockOrderQueryRequest.productionDateStart != null) {
+                predicateList.add(cb.greaterThanOrEqualTo(root.get("productionDate"), stockOrderQueryRequest.productionDateStart));
+            }
+            if (stockOrderQueryRequest.productionDateEnd != null) {
+                predicateList.add(cb.lessThanOrEqualTo(root.get("productionDate"), stockOrderQueryRequest.productionDateEnd));
+            }
+        }
+
+        cq.multiselect(timeAggregateExpression, cb.sum(root.get("totalQuantity")))
+                .where(predicateList.toArray(new Predicate[0]))
+                .groupBy(timeAggregateExpression);
+
+        List<ApiDeliveriesTotalItem> totalQuantityList = em.createQuery(cq).getResultList().stream()
+                    .map(data -> new ApiDeliveriesTotalItem(String.valueOf(data[0]), (BigDecimal) data[1]))
+                    .collect(Collectors.toList());
+
+        return new ApiDeliveriesTotal(aggregationType, totalQuantityList);
     }
 
     private List<Transaction> findOutputTransactions(StockOrder stockOrder) {
