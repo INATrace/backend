@@ -16,7 +16,7 @@ public class V2020_11_26_12_30__Update_Company_User_Role implements JpaMigration
     	List<CompanyUser> cuList = Queries.getAll(em, CompanyUser.class);
     	
         for (CompanyUser cu : cuList) {
-        	cu.setRole(CompanyUserRole.USER);
+        	cu.setRole(CompanyUserRole.COMPANY_USER);
         }
     }
 }
