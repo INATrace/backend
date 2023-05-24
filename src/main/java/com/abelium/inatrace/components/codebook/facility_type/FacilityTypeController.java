@@ -43,7 +43,7 @@ public class FacilityTypeController {
 	}
 
 	@PutMapping
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@ApiOperation("Create or update facility type. If ID is provided, the entity entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateFacilityType(
 			@Valid @RequestBody ApiFacilityType apiFacilityType) throws ApiException {
@@ -52,7 +52,7 @@ public class FacilityTypeController {
 	}
 
 	@DeleteMapping("{id}")
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@ApiOperation("Deletes a facility type with the provided ID.")
 	public ApiDefaultResponse deleteFacilityType(
 			@Valid @ApiParam(value = "Facility type ID", required = true) @PathVariable("id") Long id) throws ApiException {

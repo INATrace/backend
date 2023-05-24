@@ -43,7 +43,7 @@ public class MeasureUnitTypeController {
 	}
 
 	@PutMapping
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@ApiOperation("Create or update measurement unit type. If ID is provided, the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateMeasurementUnitType(@Valid @RequestBody ApiMeasureUnitType apiMeasureUnitType) throws ApiException {
 
@@ -51,7 +51,7 @@ public class MeasureUnitTypeController {
 	}
 
 	@DeleteMapping("{id}")
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@ApiOperation("Deletes a measurement with the provided ID.")
 	public ApiDefaultResponse deleteMeasurementUnitType(
 			@Valid @ApiParam(value = "Measurement unit type ID", required = true) @PathVariable("id") Long id) throws ApiException {

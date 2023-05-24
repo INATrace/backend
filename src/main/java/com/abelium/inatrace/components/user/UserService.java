@@ -401,7 +401,7 @@ public class UserService extends BaseService {
 		if (user.getStatus() != UserStatus.ACTIVE && user.getStatus() != UserStatus.CONFIRMED_EMAIL) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user status");
 		}
-		if (user.getRole() == UserRole.ADMIN) {
+		if (user.getRole() == UserRole.SYSTEM_ADMIN) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Cannot change status");
 		}
 		user.setStatus(UserStatus.DEACTIVATED);
@@ -411,17 +411,17 @@ public class UserService extends BaseService {
 		if (user.getStatus() != UserStatus.ACTIVE) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user status");
 		}
-		if (user.getRole() == UserRole.ADMIN) {
+		if (user.getRole() == UserRole.SYSTEM_ADMIN) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user role");
 		}
-		user.setRole(UserRole.ADMIN);
+		user.setRole(UserRole.SYSTEM_ADMIN);
 	}
 	
 	public void setUserRole(User user, UserRole role) throws ApiException {
 		if (user.getStatus() != UserStatus.ACTIVE) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user status");
 		}
-		if (user.getRole() == UserRole.ADMIN) {
+		if (user.getRole() == UserRole.SYSTEM_ADMIN) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user role");
 		}
 		if (role == null) {
@@ -431,7 +431,7 @@ public class UserService extends BaseService {
 	}
 
 	public void unsetUserAdmin(User user) throws ApiException {
-		if (user.getRole() != UserRole.ADMIN) {
+		if (user.getRole() != UserRole.SYSTEM_ADMIN) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user role");
 		}
 		user.setRole(UserRole.USER);
@@ -473,7 +473,7 @@ public class UserService extends BaseService {
 				case ACTIVE: 
 					actions.add(UserAction.DEACTIVATE_USER);
 					actions.add(UserAction.SET_USER_ROLE);
-					if (user.getRole() == UserRole.ADMIN) actions.add(UserAction.UNSET_USER_ADMIN);
+					if (user.getRole() == UserRole.SYSTEM_ADMIN) actions.add(UserAction.UNSET_USER_ADMIN);
 					else actions.add(UserAction.SET_USER_ADMIN);
 					break;
 				case CONFIRMED_EMAIL: actions.addAll(Arrays.asList(UserAction.DEACTIVATE_USER, UserAction.ACTIVATE_USER)); break;

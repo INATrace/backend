@@ -66,7 +66,7 @@ public class SemiProductController {
 	}
 
 	@PutMapping
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@ApiOperation("Create or update semi product. If ID is provided, the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateSemiProduct(@Valid @RequestBody ApiSemiProduct apiSemiProduct) throws ApiException {
 
@@ -74,7 +74,7 @@ public class SemiProductController {
 	}
 
 	@DeleteMapping("{id}")
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@ApiOperation("Deletes a semi product with the provided ID.")
 	public ApiDefaultResponse deleteSemiProduct(@Valid @ApiParam(value = "Semi product ID", required = true) @PathVariable("id") Long id) throws ApiException {
 

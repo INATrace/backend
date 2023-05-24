@@ -84,7 +84,7 @@ public class CommonController
     }    
 
     @ApiOperation(value = "Updates or creates 'global settings'")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @PostMapping(value = "/globalSettings/{name}")
     public ApiDefaultResponse updateGlobalSettings(
     		@Valid @PathVariable(value = "name", required = true) String name,

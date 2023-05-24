@@ -69,7 +69,7 @@ public class ProcessingEvidenceTypeController {
 	}
 
 	@PutMapping
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@ApiOperation("Create or update processing evidence type. If ID is provided, the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateProcessingEvidenceType(
 			@Valid @RequestBody ApiProcessingEvidenceType apiProcessingEvidenceType) throws ApiException {
@@ -79,7 +79,7 @@ public class ProcessingEvidenceTypeController {
 	}
 
 	@DeleteMapping("{id}")
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@ApiOperation("Deletes a processing evidence type with the provided ID.")
 	public ApiDefaultResponse deleteProcessingEvidenceType(
 			@Valid @ApiParam(value = "Processing evidence type ID", required = true) @PathVariable("id") Long id) throws ApiException {

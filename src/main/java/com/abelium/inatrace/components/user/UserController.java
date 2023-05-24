@@ -52,7 +52,7 @@ public class UserController {
     }
     
     @GetMapping(value = "/admin/list")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @ApiOperation(value = "Lists all users. Must be an administrator. Sorting: email, surname or default")
     public ApiPaginatedResponse<ApiUserBase> adminListUsers(@Valid ApiListUsersRequest request) {
     	return new ApiPaginatedResponse<>(userEngine.adminListUsers(request));
@@ -84,7 +84,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/admin/execute/{action}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @ApiOperation(value = "Execute user (status, role) action. Must be an administrator")
     public ApiDefaultResponse activateUser(
     		@AuthenticationPrincipal CustomUserDetails authUser,
@@ -95,7 +95,7 @@ public class UserController {
     }
     
     @GetMapping(value = "/admin/profile/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @ApiOperation(value = "Get profile of a user. Must be an administrator")
     public ApiResponse<ApiUser> getProfileForAdmin(
     		@AuthenticationPrincipal CustomUserDetails authUser,
@@ -117,7 +117,7 @@ public class UserController {
     }
     
     @PutMapping(value = "/admin/profile")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @ApiOperation(value = "Update profile of a user. Must be admin")
     public ApiDefaultResponse adminUpdateProfile(@Valid @RequestBody ApiAdminUserUpdate request) throws ApiException {
     	userEngine.updateProfile(request.id, request);

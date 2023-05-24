@@ -5,11 +5,9 @@ import org.springframework.security.core.GrantedAuthority;
 public enum UserRole implements GrantedAuthority {
     
 	USER("USER"),
-    ADMIN("ADMIN"),
-    MANAGER("USER"),
-    ACCOUNTANT("USER");
+    SYSTEM_ADMIN("SYSTEM_ADMIN");
 	
-	private String authority;
+	private final String authority;
 
 	UserRole(String authority) {
 		this.authority = authority;
@@ -21,4 +19,3 @@ public enum UserRole implements GrantedAuthority {
 	}
     
 }
-

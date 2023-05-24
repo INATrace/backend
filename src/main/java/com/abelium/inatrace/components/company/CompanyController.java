@@ -39,7 +39,7 @@ public class CompanyController {
 	}
 
 	@PostMapping(value = "/create")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @ApiOperation(value = "Create a new company (with the logged-in user as company admin)")
     public ApiResponse<ApiBaseEntity> createCompany(@AuthenticationPrincipal CustomUserDetails authUser, @Valid @RequestBody ApiCompany request) throws ApiException {
 		return new ApiResponse<>(companyService.createCompany(authUser.getUserId(), request));
@@ -53,7 +53,7 @@ public class CompanyController {
     }
     
     @GetMapping(value = "/admin/list")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @ApiOperation(value = "Lists all companies. Must be admin. Sorting: name or default")
     public ApiPaginatedResponse<ApiCompanyListResponse> listCompaniesAdmin(@Valid ApiListCompaniesRequest request) {
     	return new ApiPaginatedResponse<>(companyService.listCompanies(request));
@@ -210,7 +210,7 @@ public class CompanyController {
     }
 
     @PostMapping(value = "/userCustomers/import/farmers/{companyId}/{documentId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @ApiOperation(value = "Upload .xls or .xlsx spreadsheet of farmers to import into DB")
     public ApiUserCustomerImportResponse importFarmersSpreadsheet(
             @AuthenticationPrincipal CustomUserDetails authUser,

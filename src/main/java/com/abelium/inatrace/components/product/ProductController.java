@@ -48,7 +48,7 @@ public class ProductController {
     }
     
     @GetMapping(value = "/admin/list")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @ApiOperation(value = "Lists all products. Must be admin. Sorting: name or default")
     public ApiPaginatedResponse<ApiProductListResponse> listProductsAdmin(@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid ApiListProductsRequest request) {

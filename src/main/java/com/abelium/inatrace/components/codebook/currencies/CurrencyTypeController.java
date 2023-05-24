@@ -37,7 +37,7 @@ public class CurrencyTypeController {
     }
 
     @PutMapping("{id}/enable")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @ApiOperation(value = "Enable currency with the specified ID")
     public ApiDefaultResponse enableCurrency(@PathVariable("id") Long id) {
         currencyTypeService.updateStatus(id, Boolean.TRUE);
@@ -45,7 +45,7 @@ public class CurrencyTypeController {
     }
 
     @PutMapping("{id}/disable")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @ApiOperation(value = "Disable currency with the specified ID")
     public ApiDefaultResponse disableCurrency(@PathVariable("id") Long id) {
         currencyTypeService.updateStatus(id, Boolean.FALSE);

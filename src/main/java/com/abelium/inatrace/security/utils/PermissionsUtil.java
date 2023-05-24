@@ -36,7 +36,7 @@ public final class PermissionsUtil {
 	 * Checks if the requesting user is part of a particular company or a System admin.
 	 */
 	public static void checkUserIfCompanyEnrolledOrSystemAdmin(List<CompanyUser> companyUsers, CustomUserDetails userToCheck) throws ApiException {
-		if (!UserRole.ADMIN.equals(userToCheck.getUserRole()) && companyUsers.stream().noneMatch(cu -> cu.getUser().getId().equals(userToCheck.getUserId()))) {
+		if (!UserRole.SYSTEM_ADMIN.equals(userToCheck.getUserRole()) && companyUsers.stream().noneMatch(cu -> cu.getUser().getId().equals(userToCheck.getUserId()))) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "Unknown user company or not system admin!");
 		}
 	}
@@ -48,7 +48,7 @@ public final class PermissionsUtil {
 
 		CompanyUser companyUser = findCompanyUser(userToCheck.getUserId(), companyUsers);
 
-		if (!UserRole.ADMIN.equals(userToCheck.getUserRole()) && !CompanyUserRole.ADMIN.equals(companyUser.getRole())) {
+		if (!UserRole.SYSTEM_ADMIN.equals(userToCheck.getUserRole()) && !CompanyUserRole.ADMIN.equals(companyUser.getRole())) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "User doesn't have required permission!");
 		}
 	}

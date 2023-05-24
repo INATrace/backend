@@ -87,7 +87,7 @@ public class CompanyQueries extends BaseService {
 	@Transactional
 	public Company fetchCompany(CustomUserDetails authUser, Long companyId) throws ApiException {
 
-		if (authUser.getUserRole() == UserRole.ADMIN) {
+		if (authUser.getUserRole() == UserRole.SYSTEM_ADMIN) {
 			return fetchCompany(companyId);
 		}
 

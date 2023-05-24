@@ -171,7 +171,7 @@ public class CompanyService extends BaseService {
 		actions.add(CompanyAction.VIEW_COMPANY_PROFILE);
 		actions.add(CompanyAction.UPDATE_COMPANY_PROFILE);
 
-		if (authUser.getUserRole() == UserRole.ADMIN) {
+		if (authUser.getUserRole() == UserRole.SYSTEM_ADMIN) {
 			switch (c.getStatus()) {
 				case REGISTERED:
 					actions.addAll(Arrays.asList(CompanyAction.ACTIVATE_COMPANY, CompanyAction.DEACTIVATE_COMPANY));
@@ -853,7 +853,7 @@ public class CompanyService extends BaseService {
 	}
 
 	public boolean isSystemAdmin(CustomUserDetails customUserDetails) {
-		return UserRole.ADMIN.equals(customUserDetails.getUserRole());
+		return UserRole.SYSTEM_ADMIN.equals(customUserDetails.getUserRole());
 	}
 
 	public boolean isCompanyAdmin(CustomUserDetails customUserDetails, Long companyId) {
