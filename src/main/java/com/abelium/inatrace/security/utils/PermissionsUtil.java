@@ -9,6 +9,7 @@ import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.CompanyUserRole;
 import com.abelium.inatrace.types.UserRole;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -78,6 +79,15 @@ public final class PermissionsUtil {
 
 		if (!userIsAssociatedWithOneOfTheProducts) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "User doesn't have required permission!");
+		}
+	}
+
+	/**
+	 * Checks if Regional admin is connected with the user's companies for whom requests access.
+	 */
+	public static void checkRegionalAdminIfConnectedWithUser(List<Long> regionalAdminCompanyIds, List<Long> userCompanyIds) throws ApiException {
+		if (!CollectionUtils.containsAny(userCompanyIds, regionalAdminCompanyIds)) {
+			throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
 		}
 	}
 

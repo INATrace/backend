@@ -84,22 +84,22 @@ public class UserController {
     }
 
     @PostMapping(value = "/admin/execute/{action}")
-    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
-    @ApiOperation(value = "Execute user (status, role) action. Must be an administrator")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
+    @ApiOperation(value = "Execute user (status, role) action. Must be a System admin or Regional admin (Regional admin has limited actions available)")
     public ApiDefaultResponse activateUser(
     		@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @RequestBody ApiUserRole request, 
-    		@Valid @PathVariable(value = "action", required = true) UserAction action) throws ApiException {
+    		@Valid @PathVariable(value = "action") UserAction action) throws ApiException {
     	userEngine.changeUserStatus(authUser, request, action);
     	return new ApiDefaultResponse();
     }
     
     @GetMapping(value = "/admin/profile/{id}")
-    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
     @ApiOperation(value = "Get profile of a user. Must be an administrator")
     public ApiResponse<ApiUser> getProfileForAdmin(
     		@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @PathVariable(value = "id", required = true) Long userId) throws ApiException {
+    		@Valid @PathVariable(value = "id") Long userId) throws ApiException {
     	return new ApiResponse<>(userEngine.getProfileForAdmin(authUser, userId));
     }
     
@@ -112,15 +112,15 @@ public class UserController {
     @PutMapping(value = "/profile")
     @ApiOperation(value = "Update profile of the currently logged in user")
     public ApiDefaultResponse updateProfile(@AuthenticationPrincipal CustomUserDetails authUser, @Valid @RequestBody ApiUserUpdate request) throws ApiException {
-    	userEngine.updateProfile(authUser.getUserId(), request);
+    	userEngine.updateProfile(authUser, authUser.getUserId(), request);
     	return new ApiDefaultResponse();
     }
     
     @PutMapping(value = "/admin/profile")
-    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
     @ApiOperation(value = "Update profile of a user. Must be admin")
-    public ApiDefaultResponse adminUpdateProfile(@Valid @RequestBody ApiAdminUserUpdate request) throws ApiException {
-    	userEngine.updateProfile(request.id, request);
+    public ApiDefaultResponse adminUpdateProfile(@AuthenticationPrincipal CustomUserDetails authUser, @Valid @RequestBody ApiAdminUserUpdate request) throws ApiException {
+    	userEngine.updateProfile(authUser, request.id, request);
     	return new ApiDefaultResponse();
     }     
        

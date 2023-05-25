@@ -39,7 +39,7 @@ public class CompanyController {
 	}
 
 	@PostMapping(value = "/create")
-    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
     @ApiOperation(value = "Create a new company (with the logged-in user as company admin)")
     public ApiResponse<ApiBaseEntity> createCompany(@AuthenticationPrincipal CustomUserDetails authUser, @Valid @RequestBody ApiCompany request) throws ApiException {
 		return new ApiResponse<>(companyService.createCompany(authUser.getUserId(), request));

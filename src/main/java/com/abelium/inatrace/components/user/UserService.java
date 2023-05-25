@@ -18,6 +18,7 @@ import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.PasswordTools;
 import com.abelium.inatrace.tools.Queries;
@@ -340,7 +341,7 @@ public class UserService extends BaseService {
 	        default: QueryTools.orderBy(request.sort, cuProxy.getUser().getSurname());
         }
         return Torpedo.distinct(cuProxy.getUser());
-    }	
+    }
     
     @Transactional
 	public ApiPaginatedList<ApiUserBase> listUsers(CustomUserDetails authUser, ApiListUsersRequest request) {
@@ -426,19 +427,6 @@ public class UserService extends BaseService {
 		}
 		user.setRole(UserRole.REGIONAL_ADMIN);
 	}
-	
-	public void setUserRole(User user, UserRole role) throws ApiException {
-		if (user.getStatus() != UserStatus.ACTIVE) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user status");
-		}
-		if (user.getRole() == UserRole.SYSTEM_ADMIN) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user role");
-		}
-		if (role == null) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid role");
-		}
-		user.setRole(role);
-	}
 
 	private void unsetUserSystemAdmin(User user) throws ApiException {
 		if (user.getRole() != UserRole.SYSTEM_ADMIN) {
@@ -485,13 +473,24 @@ public class UserService extends BaseService {
 		List<Long> companyIds = companyQueries.fetchCompanyIdsForUser(userId, 
 				Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED));
 
+		// If regional admin, check that it's connected with the user profile (connected through company)
+		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+			List<Long> regionalAdminCompanyIds = companyQueries.fetchCompanyIdsForUser(authUser.getUserId(),
+					Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED));
+			PermissionsUtil.checkRegionalAdminIfConnectedWithUser(regionalAdminCompanyIds, companyIds);
+		}
+
 		List<Long> companyIdsAdmin = companyQueries.fetchCompanyIdsForUserAdmin(userId);
 
 		if (!authUser.getUserId().equals(userId)) {
 			switch (user.getStatus()) {
 				case ACTIVE: 
 					actions.add(UserAction.DEACTIVATE_USER);
-					actions.add(UserAction.SET_USER_ROLE);
+
+					// If Regional admin don't set any additional actions
+					if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+						break;
+					}
 
 					if (user.getRole() == UserRole.SYSTEM_ADMIN) {
 						actions.add(UserAction.UNSET_USER_SYSTEM_ADMIN);
@@ -513,7 +512,15 @@ public class UserService extends BaseService {
 	}
 
     @Transactional
-	public void updateProfile(Long userId, ApiUserUpdate request) throws ApiException {
+	public void updateProfile(CustomUserDetails authUser, Long userId, ApiUserUpdate request) throws ApiException {
+
+		// Check if Regional admin has access to the requested user
+		if (!authUser.getUserId().equals(userId) && authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+			PermissionsUtil.checkRegionalAdminIfConnectedWithUser(
+					companyQueries.fetchCompanyIdsForUser(authUser.getUserId(), Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED)),
+					companyQueries.fetchCompanyIdsForUser(userId, Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED)));
+		}
+
     	User user = userQueries.fetchUser(userId);
 		user.setName(request.name);
 		user.setSurname(request.surname);
@@ -522,9 +529,17 @@ public class UserService extends BaseService {
 
     @Transactional
 	public void changeUserStatus(CustomUserDetails authUser, ApiUserRole request, UserAction action) throws ApiException {
+
     	if (authUser.getUserId().equals(request.id)) {
     		throw new ApiException(ApiStatus.INVALID_REQUEST, "Cannot change status/role for this user");
     	}
+
+		// Check if Regional admin has access to the requested user
+		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+			PermissionsUtil.checkRegionalAdminIfConnectedWithUser(
+					companyQueries.fetchCompanyIdsForUser(authUser.getUserId(), Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED)),
+					companyQueries.fetchCompanyIdsForUser(request.id, Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED)));
+		}
     	
 		User user = userQueries.fetchUser(request.id);
 		
@@ -536,7 +551,6 @@ public class UserService extends BaseService {
 			case SET_USER_REGIONAL_ADMIN: setUserRegionalAdmin(user); break;
 			case UNSET_USER_REGIONAL_ADMIN: unsetUserRegionalAdmin(user); break;
 			case CONFIRM_USER_EMAIL: confirmUserEmail(user); break;
-			case SET_USER_ROLE: setUserRole(user, request.role); break;
 			default: throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user status");
 		}
 	}
