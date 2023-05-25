@@ -22,7 +22,7 @@ public class ProductTypeController {
     private ProductTypeService productTypeService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
     @ApiOperation(value = "Create a new product type")
     public ApiResponse<ApiBaseEntity> createProductType(
             @Valid @RequestBody ApiProductType apiProductType

@@ -8,9 +8,11 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+import com.abelium.inatrace.types.UserRole;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
@@ -56,11 +58,17 @@ public class FacilityTypeService extends BaseService {
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdateFacilityType(ApiFacilityType apiFacilityType) throws ApiException {
+	public ApiBaseEntity createOrUpdateFacilityType(CustomUserDetails authUser, ApiFacilityType apiFacilityType) throws ApiException {
 
 		FacilityType entity;
 
 		if (apiFacilityType.getId() != null) {
+
+			// Editing is not permitted for Regional admin
+			if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+				throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
+			}
+
 			entity = fetchFacilityType(apiFacilityType.getId());
 		} else {
 

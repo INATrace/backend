@@ -11,10 +11,12 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.codebook.SemiProductTranslation;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
+import com.abelium.inatrace.types.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -80,11 +82,17 @@ public class SemiProductService extends BaseService {
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdateSemiProduct(ApiSemiProduct apiSemiProduct) throws ApiException {
+	public ApiBaseEntity createOrUpdateSemiProduct(CustomUserDetails authUser, ApiSemiProduct apiSemiProduct) throws ApiException {
 
 		SemiProduct semiProduct;
 
 		if (apiSemiProduct.getId() != null) {
+
+			// Editing is not permitted for Regional admin
+			if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+				throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
+			}
+
 			semiProduct = fetchSemiProduct(apiSemiProduct.getId());
 		} else {
 			semiProduct = new SemiProduct();

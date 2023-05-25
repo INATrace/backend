@@ -3,10 +3,12 @@ package com.abelium.inatrace.components.codebook.measure_unit_type;
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -43,11 +45,13 @@ public class MeasureUnitTypeController {
 	}
 
 	@PutMapping
-	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
+	@PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
 	@ApiOperation("Create or update measurement unit type. If ID is provided, the entity with the provided ID is updated.")
-	public ApiResponse<ApiBaseEntity> createOrUpdateMeasurementUnitType(@Valid @RequestBody ApiMeasureUnitType apiMeasureUnitType) throws ApiException {
+	public ApiResponse<ApiBaseEntity> createOrUpdateMeasurementUnitType(
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid @RequestBody ApiMeasureUnitType apiMeasureUnitType) throws ApiException {
 
-		return new ApiResponse<>(measureUnitTypeService.createOrUpdateMeasureUnitType(apiMeasureUnitType));
+		return new ApiResponse<>(measureUnitTypeService.createOrUpdateMeasureUnitType(authUser, apiMeasureUnitType));
 	}
 
 	@DeleteMapping("{id}")

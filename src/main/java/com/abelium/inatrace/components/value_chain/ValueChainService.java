@@ -2,7 +2,6 @@ package com.abelium.inatrace.components.value_chain;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.ApiPaginatedList;
-import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.facility_type.FacilityTypeService;
@@ -28,6 +27,7 @@ import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
+import com.abelium.inatrace.types.UserRole;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -36,7 +36,6 @@ import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -117,12 +116,18 @@ public class ValueChainService extends BaseService {
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdateValueChain(Long userId, ApiValueChain apiValueChain) throws ApiException {
+	public ApiBaseEntity createOrUpdateValueChain(CustomUserDetails authUser, ApiValueChain apiValueChain) throws ApiException {
 
-		User user = userService.fetchUserById(userId);
+		User user = userService.fetchUserById(authUser.getUserId());
 		ValueChain entity;
 
 		if (apiValueChain.getId() != null) {
+
+			// Editing is not permitted for Regional admin
+			if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+				throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
+			}
+
 			entity = fetchValueChain(apiValueChain.getId());
 
 			if (entity.getValueChainStatus().equals(ValueChainStatus.DISABLED)) {
@@ -296,44 +301,4 @@ public class ValueChainService extends BaseService {
 		entity.setProductType(productType);
 	}
 
-	public ApiPaginatedList<ApiValueChain> listSelectedValueChainsForFacility(Long facilityId, ApiPaginatedRequest request, CustomUserDetails authUser) {
-
-		return PaginationTools.createPaginatedResponse(em, request, () -> getSelectedValueChainsForFacility(facilityId, request),
-				ValueChainMapper::toApiValueChainBase);
-	}
-
-	private ValueChain getSelectedValueChainsForFacility(Long facilityId, ApiPaginatedRequest request) {
-
-		FacilityValueChain facilityValueChainProxy = Torpedo.from(FacilityValueChain.class);
-		OnGoingLogicalCondition facilityCondition = Torpedo.condition(facilityValueChainProxy.getFacility().getId()).eq(facilityId);
-		Torpedo.where(facilityCondition);
-		List<Long> valueChainIds = Torpedo.select(facilityValueChainProxy.getValueChain().getId()).list(em);
-
-		ValueChain valueChainProxy = Torpedo.from(ValueChain.class);
-		OnGoingLogicalCondition valueChainCondition = Torpedo.condition().and(valueChainProxy.getId()).in(valueChainIds);
-		Torpedo.where(valueChainCondition);
-
-		return valueChainProxy;
-	}
-
-	public ApiPaginatedList<ApiValueChain> listSelectedValueChainsForProcessingAction(Long processingActionId, ApiPaginatedRequest request, CustomUserDetails authUser) {
-
-		return PaginationTools.createPaginatedResponse(em, request, () -> getSelectedValueChainsForProcessingAction(processingActionId, request),
-				ValueChainMapper::toApiValueChainBase);
-	}
-
-	private ValueChain getSelectedValueChainsForProcessingAction(Long processingActionId, ApiPaginatedRequest request) {
-
-		ProcessingActionValueChain processingActionValueChainProxy = Torpedo.from(ProcessingActionValueChain.class);
-		OnGoingLogicalCondition processingActionCondition = Torpedo.condition(
-				processingActionValueChainProxy.getProcessingAction().getId()).eq(processingActionId);
-		Torpedo.where(processingActionCondition);
-		List<Long> valueChainIds = Torpedo.select(processingActionValueChainProxy.getValueChain().getId()).list(em);
-
-		ValueChain valueChainProxy = Torpedo.from(ValueChain.class);
-		OnGoingLogicalCondition valueChainCondition = Torpedo.condition().and(valueChainProxy.getId()).in(valueChainIds);
-		Torpedo.where(valueChainCondition);
-
-		return valueChainProxy;
-	}
 }

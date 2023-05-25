@@ -3,11 +3,13 @@ package com.abelium.inatrace.components.codebook.semiproduct;
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -66,11 +68,13 @@ public class SemiProductController {
 	}
 
 	@PutMapping
-	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
+	@PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
 	@ApiOperation("Create or update semi product. If ID is provided, the entity with the provided ID is updated.")
-	public ApiResponse<ApiBaseEntity> createOrUpdateSemiProduct(@Valid @RequestBody ApiSemiProduct apiSemiProduct) throws ApiException {
+	public ApiResponse<ApiBaseEntity> createOrUpdateSemiProduct(
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid @RequestBody ApiSemiProduct apiSemiProduct) throws ApiException {
 
-		return new ApiResponse<>(semiProductService.createOrUpdateSemiProduct(apiSemiProduct));
+		return new ApiResponse<>(semiProductService.createOrUpdateSemiProduct(authUser, apiSemiProduct));
 	}
 
 	@DeleteMapping("{id}")

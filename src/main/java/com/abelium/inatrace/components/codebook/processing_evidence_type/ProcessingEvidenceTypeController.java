@@ -3,11 +3,13 @@ package com.abelium.inatrace.components.codebook.processing_evidence_type;
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -69,13 +71,14 @@ public class ProcessingEvidenceTypeController {
 	}
 
 	@PutMapping
-	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
+	@PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
 	@ApiOperation("Create or update processing evidence type. If ID is provided, the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateProcessingEvidenceType(
+			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid @RequestBody ApiProcessingEvidenceType apiProcessingEvidenceType) throws ApiException {
 
 		return new ApiResponse<>(
-				processingEvidenceTypeService.createOrUpdateProcessingEvidenceType(apiProcessingEvidenceType));
+				processingEvidenceTypeService.createOrUpdateProcessingEvidenceType(authUser, apiProcessingEvidenceType));
 	}
 
 	@DeleteMapping("{id}")

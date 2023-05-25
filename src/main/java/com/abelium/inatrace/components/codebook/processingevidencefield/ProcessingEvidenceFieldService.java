@@ -9,10 +9,12 @@ import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiP
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceField;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceFieldTranslation;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
+import com.abelium.inatrace.types.UserRole;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
@@ -53,11 +55,17 @@ public class ProcessingEvidenceFieldService extends BaseService {
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdateProcessingEvidenceField(ApiProcessingEvidenceField apiProcessingEvidenceField) throws ApiException {
+	public ApiBaseEntity createOrUpdateProcessingEvidenceField(CustomUserDetails authUser,
+															   ApiProcessingEvidenceField apiProcessingEvidenceField) throws ApiException {
 
 		ProcessingEvidenceField entity;
 
 		if (apiProcessingEvidenceField.getId() != null) {
+
+			// Editing is not permitted for Regional admin
+			if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+				throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
+			}
 			entity = fetchProcessingEvidenceField(apiProcessingEvidenceField.getId());
 		} else {
 			entity = new ProcessingEvidenceField();

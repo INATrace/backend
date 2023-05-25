@@ -37,7 +37,7 @@ public class CurrencyTypeController {
     }
 
     @PutMapping("{id}/enable")
-    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
     @ApiOperation(value = "Enable currency with the specified ID")
     public ApiDefaultResponse enableCurrency(@PathVariable("id") Long id) {
         currencyTypeService.updateStatus(id, Boolean.TRUE);

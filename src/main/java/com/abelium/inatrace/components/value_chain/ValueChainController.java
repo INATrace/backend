@@ -48,13 +48,13 @@ public class ValueChainController {
 	}
 
 	@PutMapping
-	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
+	@PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
 	@ApiOperation("Create or update value chain. If ID is provided, the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateValueChain(
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid @RequestBody ApiValueChain apiValueChain) throws ApiException {
 
-		return new ApiResponse<>(valueChainService.createOrUpdateValueChain(authUser.getUserId(), apiValueChain));
+		return new ApiResponse<>(valueChainService.createOrUpdateValueChain(authUser, apiValueChain));
 	}
 
 	@PostMapping("{id}/enable")
