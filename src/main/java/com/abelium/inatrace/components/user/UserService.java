@@ -407,7 +407,7 @@ public class UserService extends BaseService {
 		user.setStatus(UserStatus.DEACTIVATED);
 	}
 	
-	public void setUserAdmin(User user) throws ApiException {
+	private void setUserSystemAdmin(User user) throws ApiException {
 		if (user.getStatus() != UserStatus.ACTIVE) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user status");
 		}
@@ -415,6 +415,16 @@ public class UserService extends BaseService {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user role");
 		}
 		user.setRole(UserRole.SYSTEM_ADMIN);
+	}
+
+	private void setUserRegionalAdmin(User user) throws ApiException {
+		if (user.getStatus() != UserStatus.ACTIVE) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user status");
+		}
+		if (user.getRole() == UserRole.REGIONAL_ADMIN) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user role");
+		}
+		user.setRole(UserRole.REGIONAL_ADMIN);
 	}
 	
 	public void setUserRole(User user, UserRole role) throws ApiException {
@@ -430,8 +440,15 @@ public class UserService extends BaseService {
 		user.setRole(role);
 	}
 
-	public void unsetUserAdmin(User user) throws ApiException {
+	private void unsetUserSystemAdmin(User user) throws ApiException {
 		if (user.getRole() != UserRole.SYSTEM_ADMIN) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user role");
+		}
+		user.setRole(UserRole.USER);
+	}
+
+	private void unsetUserRegionalAdmin(User user) throws ApiException {
+		if (user.getRole() != UserRole.REGIONAL_ADMIN) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user role");
 		}
 		user.setRole(UserRole.USER);
@@ -439,6 +456,7 @@ public class UserService extends BaseService {
 	
     @Transactional
 	public ApiUserGet getProfileForUser(Long userId) throws ApiException {
+
     	User user = userQueries.fetchUser(userId);
     	List<UserAction> actions = new ArrayList<>();
 
@@ -457,6 +475,7 @@ public class UserService extends BaseService {
     
     @Transactional
 	public ApiUser getProfileForAdmin(CustomUserDetails authUser, Long userId) throws ApiException {
+
     	User user = userQueries.fetchUser(userId);
     	List<UserAction> actions = new ArrayList<>();
 
@@ -473,8 +492,16 @@ public class UserService extends BaseService {
 				case ACTIVE: 
 					actions.add(UserAction.DEACTIVATE_USER);
 					actions.add(UserAction.SET_USER_ROLE);
-					if (user.getRole() == UserRole.SYSTEM_ADMIN) actions.add(UserAction.UNSET_USER_ADMIN);
-					else actions.add(UserAction.SET_USER_ADMIN);
+
+					if (user.getRole() == UserRole.SYSTEM_ADMIN) {
+						actions.add(UserAction.UNSET_USER_SYSTEM_ADMIN);
+					} else if (user.getRole() == UserRole.REGIONAL_ADMIN) {
+						actions.add(UserAction.UNSET_USER_REGIONAL_ADMIN);
+					} else {
+						actions.add(UserAction.SET_USER_SYSTEM_ADMIN);
+						actions.add(UserAction.SET_USER_REGIONAL_ADMIN);
+					}
+
 					break;
 				case CONFIRMED_EMAIL: actions.addAll(Arrays.asList(UserAction.DEACTIVATE_USER, UserAction.ACTIVATE_USER)); break;
 				case DEACTIVATED: actions.add(UserAction.ACTIVATE_USER); break;
@@ -504,8 +531,10 @@ public class UserService extends BaseService {
 		switch (action) {
 			case ACTIVATE_USER: activateUser(user); break;
 			case DEACTIVATE_USER: deactivateUser(user); break;
-			case SET_USER_ADMIN: setUserAdmin(user); break;
-			case UNSET_USER_ADMIN: unsetUserAdmin(user); break;
+			case SET_USER_SYSTEM_ADMIN: setUserSystemAdmin(user); break;
+			case UNSET_USER_SYSTEM_ADMIN: unsetUserSystemAdmin(user); break;
+			case SET_USER_REGIONAL_ADMIN: setUserRegionalAdmin(user); break;
+			case UNSET_USER_REGIONAL_ADMIN: unsetUserRegionalAdmin(user); break;
 			case CONFIRM_USER_EMAIL: confirmUserEmail(user); break;
 			case SET_USER_ROLE: setUserRole(user, request.role); break;
 			default: throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user status");
