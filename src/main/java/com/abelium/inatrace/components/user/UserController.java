@@ -58,6 +58,15 @@ public class UserController {
     	return new ApiPaginatedResponse<>(userEngine.adminListUsers(request));
     }
 
+	@GetMapping(value = "/regional-admin/list")
+	@PreAuthorize("hasAuthority('REGIONAL_ADMIN')")
+	@ApiOperation(value = "Lists all available users for the requesting Regional admin. It also contains all users that are not yet part of any company.")
+	public ApiPaginatedResponse<ApiUserBase> regionalAdminListUsers(
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid ApiListUsersRequest request) {
+		return new ApiPaginatedResponse<>(userEngine.regionalAdminListUsers(authUser, request));
+	}
+
     @GetMapping(value = "/list")
     @ApiOperation(value = "Lists all users in the logged-in user's companies")
     public ApiPaginatedResponse<ApiUserBase> listUsers(@AuthenticationPrincipal CustomUserDetails authUser, @Valid ApiListUsersRequest request) {

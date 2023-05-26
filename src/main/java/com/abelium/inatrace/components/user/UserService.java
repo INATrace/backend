@@ -266,8 +266,20 @@ public class UserService extends BaseService {
 			});
 		}
 	}
+
+	public ApiPaginatedList<ApiUserBase> adminListUsers(ApiListUsersRequest request) {
+		return PaginationTools.createPaginatedResponse(em, request, () -> adminUserListQueryObject(request),
+				UserApiTools::toApiUserBase);
+	}
+
+	public ApiPaginatedList<ApiUserBase> regionalAdminListUsers(CustomUserDetails authUser, ApiListUsersRequest request) {
+		return PaginationTools.createPaginatedResponse1(em, request, () -> regionalAdminUserListQueryObject(
+						authUser.getUserId(), request),
+				UserApiTools::toApiUserBase);
+	}
 	
     private User adminUserListQueryObject(ApiListUsersRequest request) {
+
         User uProxy = Torpedo.from(User.class);
         
         OnGoingLogicalCondition condition = Torpedo.condition(); // .Torpedo conditions = new ArrayList<>();
@@ -299,15 +311,43 @@ public class UserService extends BaseService {
 	        default: QueryTools.orderBy(request.sort, uProxy.getId());
         }
         return uProxy;
-    }	
+    }
 
-    @Transactional
-	public ApiPaginatedList<ApiUserBase> adminListUsers(ApiListUsersRequest request) {
-    	return PaginationTools.createPaginatedResponse(em, request, () -> adminUserListQueryObject(request), 
-    			UserApiTools::toApiUserBase); 
+	private Function<User> regionalAdminUserListQueryObject(Long userId, ApiListUsersRequest request) {
+
+		List<Long> companyIds = companyQueries.fetchCompanyIdsForUser(userId, List.of(CompanyStatus.ACTIVE));
+
+		User uProxy = Torpedo.from(User.class);
+		CompanyUser cuProxy = Torpedo.leftJoin(uProxy.getUserCompanies());
+
+		OnGoingLogicalCondition condition = Torpedo.condition();
+
+		OnGoingLogicalCondition connectedOrUnassignedCondition = Torpedo
+				.condition(uProxy.getUserCompanies()).isEmpty()
+				.or(cuProxy.getCompany().getId()).in(companyIds);
+		condition = condition.and(connectedOrUnassignedCondition);
+
+		if (StringUtils.isNotBlank(request.query)) {
+			OnGoingLogicalCondition queryCondition = Torpedo
+					.condition(uProxy.getName()).like().any(request.query)
+					.or(uProxy.getSurname()).like().any(request.query)
+					.or(uProxy.getEmail()).like().any(request.query);
+			condition = condition.and(queryCondition);
+		}
+
+		OnGoingLogicalCondition statusCondition = Torpedo
+				.condition(uProxy.getStatus()).eq(UserStatus.ACTIVE)
+				.or(uProxy.getStatus()).eq(UserStatus.CONFIRMED_EMAIL)
+				.or(uProxy.getStatus()).eq(UserStatus.UNCONFIRMED);
+		condition = condition.and(statusCondition);
+
+		Torpedo.where(condition);
+
+		return Torpedo.distinct(uProxy);
 	}
 
     private Function<User> userListQueryObject(Long userId, ApiListUsersRequest request) {
+
     	List<Long> companyIds = companyQueries.fetchCompanyIdsForUser(userId, List.of(CompanyStatus.ACTIVE));
     	
     	CompanyUser cuProxy = Torpedo.from(CompanyUser.class);
