@@ -194,6 +194,15 @@ public class CompanyService extends BaseService {
 		return companyApiTools.toApiCompanyGet(authUser.getUserId(), c, language, actions, users, valueChains);
 	}
 
+	public ApiCompanyName getCompanyName(CustomUserDetails authUser, long id) throws ApiException {
+
+		Company c = companyQueries.fetchCompany(id);
+
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(c.getUsers(), authUser);
+
+		return companyApiTools.toApiCompanyName(c);
+	}
+
 	public List<ApiCompanyUser> getCompanyUsers(Long id, CustomUserDetails user) throws ApiException {
 
 		// Validate that company exists with the provided ID and that request user is enrolled in this company

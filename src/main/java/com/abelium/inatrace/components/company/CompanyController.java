@@ -67,6 +67,14 @@ public class CompanyController {
     	return new ApiResponse<>(companyService.getCompany(authUser, id, Language.valueOf(language)));
     }
 
+    @GetMapping(value = "/profile/{id}/name")
+    @ApiOperation(value = "Get the company name and abbreviation")
+    public ApiResponse<ApiCompanyName> getCompanyName(
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "Record id", required = true) @PathVariable("id") Long id) throws ApiException {
+        return new ApiResponse<>(companyService.getCompanyName(authUser, id));
+    }
+
 	@GetMapping("/profile/{id}/users")
 	@ApiOperation("Get all user for the company with the provided ID")
 	public ApiResponse<List<ApiCompanyUser>> getCompanyUsers(

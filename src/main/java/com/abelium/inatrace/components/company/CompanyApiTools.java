@@ -100,6 +100,15 @@ public class CompanyApiTools {
 		ac.valueChains = valueChains;
 		return ac;
 	}
+
+	public ApiCompanyName toApiCompanyName(Company c) {
+
+		ApiCompanyName apiCompanyName = new ApiCompanyName();
+		apiCompanyName.setId(c.getId());
+		apiCompanyName.setName(c.getName());
+		apiCompanyName.setAbbreviation(c.getAbbreviation());
+		return apiCompanyName;
+	}
 	
 	public ApiCompany toApiCompany(Long userId, Company c, Language language) {
 		if (c == null) return null;
