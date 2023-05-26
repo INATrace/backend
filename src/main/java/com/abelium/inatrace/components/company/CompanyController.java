@@ -92,15 +92,13 @@ public class CompanyController {
     }
     
     @PostMapping(value = "/execute/{action}")
-    @ApiOperation(value = "Execute company action. Must be an administrator")
-    public ApiDefaultResponse executeAction(@AuthenticationPrincipal CustomUserDetails authUser,
+    @ApiOperation(value = "Execute company action. Must be an Company admin, System admin or Regional admin enrolled in this company")
+    public ApiDefaultResponse executeAction(
+            @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @RequestBody ApiCompanyActionRequest request,
     		@Valid @PathVariable(value = "action") CompanyAction action) throws ApiException {
-        if (companyService.isSystemAdmin(authUser) || companyService.isCompanyAdmin(authUser, request.getCompanyId())) {
-            companyService.executeAction(request, action);
-            return new ApiDefaultResponse();
-        }
-    	throw new ApiException(ApiStatus.UNAUTHORIZED, "User must be system or company admin");
+        companyService.executeAction(authUser, request, action);
+        return new ApiDefaultResponse();
     }
 
     @GetMapping(value = "/userCustomers/{id}")

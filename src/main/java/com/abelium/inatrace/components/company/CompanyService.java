@@ -1,9 +1,6 @@
 package com.abelium.inatrace.components.company;
 
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiPaginatedList;
-import com.abelium.inatrace.api.ApiPaginatedRequest;
-import com.abelium.inatrace.api.ApiStatus;
+import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.CommonService;
@@ -228,8 +225,17 @@ public class CompanyService extends BaseService {
 	}
 
 	@Transactional
-	public void executeAction(ApiCompanyActionRequest request, CompanyAction action) throws ApiException {
+	public void executeAction(CustomUserDetails authUser, ApiCompanyActionRequest request, CompanyAction action) throws ApiException {
+
 		Company c = companyQueries.fetchCompany(request.companyId);
+
+		// Check if requesting user is authorized for the company
+		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+			PermissionsUtil.checkUserIfCompanyEnrolled(c.getUsers(), authUser);
+		} else {
+			PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(c.getUsers(), authUser);
+		}
+
 		switch (action) {
 			case ACTIVATE_COMPANY:
 				activateCompany(c);
