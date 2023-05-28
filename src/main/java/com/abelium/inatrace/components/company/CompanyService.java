@@ -232,8 +232,8 @@ public class CompanyService extends BaseService {
 		// Check if requesting user is authorized for the company
 		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
 			PermissionsUtil.checkUserIfCompanyEnrolled(c.getUsers(), authUser);
-		} else {
-			PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(c.getUsers(), authUser);
+		} else if (authUser.getUserRole() != UserRole.SYSTEM_ADMIN) {
+			isCompanyAdmin(authUser, c.getId());
 		}
 
 		switch (action) {
