@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/chain/stock-order")
@@ -248,11 +249,13 @@ public class StockOrderController {
     @GetMapping("deliveries-aggregated-data")
     public ApiResponse<ApiDeliveriesTotal> getDeliveriesGraphData(
             @Valid @ApiParam(value = "Company ID", required = true) @RequestParam("companyId") Long companyId,
-            @Valid @ApiParam(value = "Facility ID") @RequestParam(value = "facilityId", required = false) Long facilityId,
+            @Valid @ApiParam(value = "Facility IDs") @RequestParam(value = "facilityIds", required = false) List<Long> facilityIds,
             @Valid @ApiParam(value = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
             @Valid @ApiParam(value = "Farmer (UserCustomer) ID") @RequestParam(value = "farmerId", required = false) Long farmerId,
+            @Valid @ApiParam(value = "Collector (Representative of producer UserCustomer) ID") @RequestParam(value = "collectorId", required = false) Long collectorId,
             @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
             @Valid @ApiParam(value = "Organic only") @RequestParam(value = "organicOnly", required = false) Boolean organicOnly,
+            @Valid @ApiParam(value = "Price determined later") @RequestParam(value = "priceDeterminedLater", required = false) Boolean priceDeterminedLater,
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
             @Valid @ApiParam(value = "Aggregation type", required = true) @RequestParam(value = "aggregationType") ApiDeliveriesUnitType aggregationType
@@ -261,11 +264,13 @@ public class StockOrderController {
                 aggregationType,
                 new StockOrderQueryRequest(
                         companyId,
-                        facilityId,
+                        facilityIds,
                         farmerId,
+                        collectorId,
                         semiProductId,
                         isWomenShare,
                         organicOnly,
+                        priceDeterminedLater,
                         productionDateStart,
                         productionDateEnd
                 )));

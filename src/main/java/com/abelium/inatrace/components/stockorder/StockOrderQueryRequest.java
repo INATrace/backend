@@ -4,11 +4,13 @@ import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class StockOrderQueryRequest {
 
     public Long companyId;
     public Long facilityId;
+    public List<Long> facilityIds;
     public Long quoteCompanyId;
     public Long quoteFacilityId;
     public Long farmerId;
@@ -28,6 +30,8 @@ public class StockOrderQueryRequest {
     public String producerUserCustomerName;
     public Boolean isAvailable;
     public Boolean isOpenOnly;
+
+    public Boolean priceDeterminedLater;
 
     public StockOrderQueryRequest() {}
 
@@ -66,15 +70,17 @@ public class StockOrderQueryRequest {
     }
 
     // used for delivery total calculation
-    public StockOrderQueryRequest(Long companyId, Long facilityId, Long farmerId, Long semiProductId,
-                                  Boolean isWomenShare, Boolean organicOnly, LocalDate productionDateStart,
+    public StockOrderQueryRequest(Long companyId, List<Long> facilityIds, Long farmerId, Long representativeOfProducerUserCustomerId, Long semiProductId,
+                                  Boolean isWomenShare, Boolean organicOnly, Boolean priceDeterminedLater, LocalDate productionDateStart,
                                   LocalDate productionDateEnd) {
         this.companyId = companyId;
-        this.facilityId = facilityId;
+        this.facilityIds = facilityIds;
         this.farmerId = farmerId;
+        this.representativeOfProducerUserCustomerId = representativeOfProducerUserCustomerId;
         this.semiProductId = semiProductId;
         this.isWomenShare = isWomenShare;
         this.organicOnly = organicOnly;
+        this.priceDeterminedLater = priceDeterminedLater;
         this.productionDateStart = productionDateStart;
         this.productionDateEnd = productionDateEnd;
 

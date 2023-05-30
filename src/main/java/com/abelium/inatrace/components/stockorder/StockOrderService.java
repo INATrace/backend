@@ -746,11 +746,14 @@ public class StockOrderService extends BaseService {
             if (stockOrderQueryRequest.companyId != null) {
                 predicateList.add(cb.equal(root.get("company").get("id"), stockOrderQueryRequest.companyId));
             }
-            if (stockOrderQueryRequest.facilityId != null) {
-                predicateList.add(cb.equal(root.get("facility").get("id"), stockOrderQueryRequest.facilityId));
+            if (stockOrderQueryRequest.facilityIds != null) {
+                predicateList.add(root.get("facility").get("id").in(stockOrderQueryRequest.facilityIds));
             }
             if (stockOrderQueryRequest.farmerId != null) {
                 predicateList.add(cb.equal(root.get("producerUserCustomer").get("id"), stockOrderQueryRequest.farmerId));
+            }
+            if (stockOrderQueryRequest.representativeOfProducerUserCustomerId != null) {
+                predicateList.add(cb.equal(root.get("representativeOfProducerUserCustomer").get("id"), stockOrderQueryRequest.representativeOfProducerUserCustomerId));
             }
             if (stockOrderQueryRequest.semiProductId != null) {
                 predicateList.add(cb.equal(root.get("semiProduct").get("id"), stockOrderQueryRequest.semiProductId));
@@ -760,6 +763,9 @@ public class StockOrderService extends BaseService {
             }
             if (stockOrderQueryRequest.organicOnly != null) {
                 predicateList.add(cb.equal(root.get("organic"), stockOrderQueryRequest.organicOnly));
+            }
+            if (stockOrderQueryRequest.priceDeterminedLater != null) {
+                predicateList.add(cb.equal(root.get("priceDeterminedLater"), stockOrderQueryRequest.priceDeterminedLater));
             }
             if (stockOrderQueryRequest.productionDateStart != null) {
                 predicateList.add(cb.greaterThanOrEqualTo(root.get("productionDate"), stockOrderQueryRequest.productionDateStart));
