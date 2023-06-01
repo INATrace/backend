@@ -600,6 +600,11 @@ public class UserService extends BaseService {
 			PermissionsUtil.checkRegionalAdminIfConnectedWithUser(
 					companyQueries.fetchCompanyIdsForUser(authUser.getUserId(), Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED)),
 					companyQueries.fetchCompanyIdsForUser(request.id, Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED)));
+
+			// Check if action is 'DEACTIVATE_USER' - this is not allowed by the Regional admin
+			if (action == UserAction.DEACTIVATE_USER) {
+				throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
+			}
 		}
     	
 		User user = userQueries.fetchUser(request.id);
