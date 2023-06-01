@@ -232,6 +232,12 @@ public class CompanyService extends BaseService {
 		// Check if requesting user is authorized for the company
 		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
 			PermissionsUtil.checkUserIfCompanyEnrolled(c.getUsers(), authUser);
+
+			// Check if action is 'DEACTIVATE_COMPANY' or 'MERGE_TO_COMPANY' - this is not allowed by the Regional admin
+			if (action == CompanyAction.DEACTIVATE_COMPANY || action == CompanyAction.MERGE_TO_COMPANY) {
+				throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
+			}
+
 		} else if (authUser.getUserRole() != UserRole.SYSTEM_ADMIN) {
 			isCompanyAdmin(authUser, c.getId());
 		}
