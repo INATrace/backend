@@ -536,9 +536,13 @@ public class UserService extends BaseService {
 
 		// If regional admin, check that it's connected with the user profile (connected through company)
 		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
-			List<Long> regionalAdminCompanyIds = companyQueries.fetchCompanyIdsForUser(authUser.getUserId(),
-					Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED));
-			PermissionsUtil.checkRegionalAdminIfConnectedWithUser(regionalAdminCompanyIds, companyIds);
+
+			// If user is assigned to any company, check that the Regional admin has access to these companies
+			if (!user.getUserCompanies().isEmpty()) {
+				List<Long> regionalAdminCompanyIds = companyQueries.fetchCompanyIdsForUser(authUser.getUserId(),
+						Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED));
+				PermissionsUtil.checkRegionalAdminIfConnectedWithUser(regionalAdminCompanyIds, companyIds);
+			}
 		}
 
 		List<Long> companyIdsAdmin = companyQueries.fetchCompanyIdsForUserAdmin(userId);
@@ -595,19 +599,23 @@ public class UserService extends BaseService {
     		throw new ApiException(ApiStatus.INVALID_REQUEST, "Cannot change status/role for this user");
     	}
 
+		User user = userQueries.fetchUser(request.id);
+
 		// Check if Regional admin has access to the requested user
 		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
-			PermissionsUtil.checkRegionalAdminIfConnectedWithUser(
-					companyQueries.fetchCompanyIdsForUser(authUser.getUserId(), Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED)),
-					companyQueries.fetchCompanyIdsForUser(request.id, Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED)));
 
 			// Check if action is 'DEACTIVATE_USER' - this is not allowed by the Regional admin
 			if (action == UserAction.DEACTIVATE_USER) {
 				throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
 			}
+
+			// If user is assigned to any company, check that the Regional admin has access to these companies
+			if (!user.getUserCompanies().isEmpty()) {
+				PermissionsUtil.checkRegionalAdminIfConnectedWithUser(
+						companyQueries.fetchCompanyIdsForUser(authUser.getUserId(), Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED)),
+						companyQueries.fetchCompanyIdsForUser(request.id, Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED)));
+			}
 		}
-    	
-		User user = userQueries.fetchUser(request.id);
 		
 		switch (action) {
 			case ACTIVATE_USER: activateUser(user); break;
