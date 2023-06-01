@@ -308,7 +308,7 @@ public class UserService extends BaseService {
         switch (request.sortBy) {
 	        case "email": QueryTools.orderBy(request.sort, uProxy.getEmail()); break;
 	        case "surname": QueryTools.orderBy(request.sort, uProxy.getSurname()); break;
-	        default: QueryTools.orderBy(request.sort, uProxy.getId());
+	        default: QueryTools.orderBy(request.sort, uProxy.getName());
         }
         return uProxy;
     }
@@ -327,21 +327,42 @@ public class UserService extends BaseService {
 				.or(cuProxy.getCompany().getId()).in(companyIds);
 		condition = condition.and(connectedOrUnassignedCondition);
 
-		if (StringUtils.isNotBlank(request.query)) {
-			OnGoingLogicalCondition queryCondition = Torpedo
-					.condition(uProxy.getName()).like().any(request.query)
-					.or(uProxy.getSurname()).like().any(request.query)
-					.or(uProxy.getEmail()).like().any(request.query);
-			condition = condition.and(queryCondition);
-		}
-
 		OnGoingLogicalCondition statusCondition = Torpedo
 				.condition(uProxy.getStatus()).eq(UserStatus.ACTIVE)
 				.or(uProxy.getStatus()).eq(UserStatus.CONFIRMED_EMAIL)
 				.or(uProxy.getStatus()).eq(UserStatus.UNCONFIRMED);
 		condition = condition.and(statusCondition);
 
+		if (StringUtils.isNotBlank(request.query)) {
+			OnGoingLogicalCondition queryCondition = Torpedo
+					.condition(uProxy.getName()).like().any(request.query)
+					.or(uProxy.getSurname()).like().any(request.query)
+					.or(uProxy.getEmail()).like().any(request.query);
+			condition = condition.and(queryCondition);
+		} else {
+			if (StringUtils.isNotBlank(request.email)) {
+				condition = condition.and(uProxy.getEmail()).like().any(request.email);
+			}
+			if (StringUtils.isNotBlank(request.surname)) {
+				condition = condition.and(uProxy.getSurname()).like().any(request.surname);
+			}
+		}
+
+		if (request.status != null) {
+			condition = condition.and(Torpedo.condition(uProxy.getStatus()).eq(request.status));
+		}
+
+		if (request.role != null) {
+			condition = condition.and(Torpedo.condition(uProxy.getRole()).eq(request.role));
+		}
+
 		Torpedo.where(condition);
+
+		switch (request.sortBy) {
+			case "email": QueryTools.orderBy(request.sort, uProxy.getEmail()); break;
+			case "surname": QueryTools.orderBy(request.sort, uProxy.getSurname()); break;
+			default: QueryTools.orderBy(request.sort, uProxy.getName());
+		}
 
 		return Torpedo.distinct(uProxy);
 	}
@@ -378,7 +399,7 @@ public class UserService extends BaseService {
         switch (request.sortBy) {
 	        case "email": QueryTools.orderBy(request.sort, cuProxy.getUser().getEmail()); break;
 	        case "surname": QueryTools.orderBy(request.sort, cuProxy.getUser().getSurname()); break;
-	        default: QueryTools.orderBy(request.sort, cuProxy.getUser().getSurname());
+	        default: QueryTools.orderBy(request.sort, cuProxy.getUser().getName());
         }
         return Torpedo.distinct(cuProxy.getUser());
     }
