@@ -334,7 +334,7 @@ public class ProductApiTools {
 		if (pu.valueChain != null) {
 			p.setValueChain(valueChainQueries.fetchValueChain(pu.valueChain.getId()));
 		}
-		if (pu.associatedCompanies != null && authUser.getUserRole() == UserRole.SYSTEM_ADMIN) {
+		if (pu.associatedCompanies != null && (authUser.getUserRole() == UserRole.SYSTEM_ADMIN || authUser.getUserRole() == UserRole.REGIONAL_ADMIN)) {
 			updateProductCompanies(p, p.getAssociatedCompanies(), pu.associatedCompanies);
 		}
         
