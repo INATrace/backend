@@ -1,6 +1,6 @@
 package com.abelium.inatrace.components.stockorder.api;
 
-public enum ApiDeliveriesUnitType {
+public enum ApiAggregationTimeUnit {
 	DAY,
 	WEEK,
 	MONTH,

@@ -713,8 +713,8 @@ public class StockOrderService extends BaseService {
         return stockOrderHistory;
     }
 
-    public ApiDeliveriesTotal getDeliveriesGraphData(ApiDeliveriesUnitType aggregationType,
-                                                     StockOrderQueryRequest stockOrderQueryRequest) {
+    public ApiDeliveriesTotal getDeliveriesAggregatedData(ApiAggregationTimeUnit aggregationType,
+                                                          StockOrderQueryRequest stockOrderQueryRequest) {
 
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
@@ -1455,4 +1455,150 @@ public class StockOrderService extends BaseService {
         }
     }
 
+    public ApiProcessingPerformanceTotal getProcessingPerformanceData(ApiAggregationTimeUnit aggregationType,
+                                                                      ProcessingPerformanceQueryRequest processingPerformanceQueryRequest) {
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Object[]> transactionQuery = cb.createQuery(Object[].class);
+        Root<Transaction> transactionRoot = transactionQuery.from(Transaction.class);
+        Join<Transaction, ProcessingOrder> transactionProcessingOrderJoin = transactionRoot.join(
+                "targetProcessingOrder");
+        Join<ProcessingOrder, ProcessingAction> processingActionJoin = transactionProcessingOrderJoin.join(
+                "processingAction");
+
+        // Input calculation
+        Expression<Integer> inputTimeAggregateExpression;
+        switch (aggregationType) {
+            case YEAR:
+                inputTimeAggregateExpression = cb.function("YEAR", Integer.class,
+                        transactionProcessingOrderJoin.get("processingDate"));
+                break;
+            case MONTH:
+                inputTimeAggregateExpression = cb.function("MONTH", Integer.class,
+                        transactionProcessingOrderJoin.get("processingDate"));
+                break;
+            case WEEK:
+                inputTimeAggregateExpression = cb.function("WEEK", Integer.class,
+                        transactionProcessingOrderJoin.get("processingDate"));
+                break;
+            case DAY:
+            default:
+                inputTimeAggregateExpression = transactionProcessingOrderJoin.get("processingDate");
+                break;
+        }
+
+        List<Predicate> predicateList = new ArrayList<>();
+        predicateList.add(processingActionJoin.get("type")
+                .in(ProcessingActionType.PROCESSING, ProcessingActionType.FINAL_PROCESSING));
+
+        if (processingPerformanceQueryRequest != null) {
+            if (processingPerformanceQueryRequest.companyId != null) {
+                predicateList.add(cb.equal(transactionRoot.get("company").get("id"),
+                        processingPerformanceQueryRequest.companyId));
+            }
+            if (processingPerformanceQueryRequest.facilityId != null) {
+                predicateList.add(cb.equal(transactionRoot.get("sourceFacility").get("id"),
+                        processingPerformanceQueryRequest.facilityId));
+            }
+            if (processingPerformanceQueryRequest.processActionId != null) {
+                predicateList.add(cb.equal(processingActionJoin.get("id"),
+                        processingPerformanceQueryRequest.processActionId));
+            }
+            if (processingPerformanceQueryRequest.dateStart != null) {
+                predicateList.add(cb.greaterThanOrEqualTo(transactionProcessingOrderJoin.get("processingDate"),
+                        processingPerformanceQueryRequest.dateStart));
+            }
+            if (processingPerformanceQueryRequest.dateEnd != null) {
+                predicateList.add(cb.lessThanOrEqualTo(transactionProcessingOrderJoin.get("processingDate"),
+                        processingPerformanceQueryRequest.dateEnd));
+            }
+        }
+
+        transactionQuery.multiselect(inputTimeAggregateExpression, cb.sum(transactionRoot.get("inputQuantity")))
+                .where(predicateList.toArray(new Predicate[0]))
+                .groupBy(inputTimeAggregateExpression);
+
+        Map<String, ApiProcessingPerformanceTotalItem> mapProcPerf = new HashMap<>();
+
+        em.createQuery(transactionQuery).getResultList().forEach(data -> mapProcPerf.put(String.valueOf(data[0]),
+                new ApiProcessingPerformanceTotalItem(String.valueOf(data[0]), (BigDecimal) data[1], BigDecimal.ZERO,
+                        BigDecimal.ZERO)));
+
+        // Output calculation
+        CriteriaQuery<Object[]> stockOrderQuery = cb.createQuery(Object[].class);
+        Root<StockOrder> stockOrderRoot = stockOrderQuery.from(StockOrder.class);
+        Join<StockOrder, ProcessingOrder> stockOrderProcessingOrderJoin = stockOrderRoot.join("processingOrder");
+        Join<ProcessingOrder, ProcessingAction> stockOrderProcessingActionJoin = stockOrderProcessingOrderJoin.join(
+                "processingAction");
+
+        Expression<Integer> outputTimeAggregateExpression;
+        switch (aggregationType) {
+            case YEAR:
+                outputTimeAggregateExpression = cb.function("YEAR", Integer.class,
+                        stockOrderProcessingOrderJoin.get("processingDate"));
+                break;
+            case MONTH:
+                outputTimeAggregateExpression = cb.function("MONTH", Integer.class,
+                        stockOrderProcessingOrderJoin.get("processingDate"));
+                break;
+            case WEEK:
+                outputTimeAggregateExpression = cb.function("WEEK", Integer.class,
+                        stockOrderProcessingOrderJoin.get("processingDate"));
+                break;
+            case DAY:
+            default:
+                outputTimeAggregateExpression = stockOrderProcessingOrderJoin.get("processingDate");
+                break;
+        }
+
+        predicateList = new ArrayList<>();
+        predicateList.add(cb.equal(stockOrderRoot.get("orderType"), OrderType.PROCESSING_ORDER));
+
+        predicateList.add(stockOrderProcessingActionJoin.get("type")
+                .in(ProcessingActionType.PROCESSING, ProcessingActionType.FINAL_PROCESSING));
+
+        if (processingPerformanceQueryRequest != null) {
+            if (processingPerformanceQueryRequest.companyId != null) {
+                predicateList.add(
+                        cb.equal(stockOrderRoot.get("company").get("id"), processingPerformanceQueryRequest.companyId));
+            }
+            if (processingPerformanceQueryRequest.facilityId != null) {
+                predicateList.add(cb.equal(stockOrderRoot.get("facility").get("id"),
+                        processingPerformanceQueryRequest.facilityId));
+            }
+            if (processingPerformanceQueryRequest.processActionId != null) {
+                predicateList.add(cb.equal(stockOrderProcessingActionJoin.get("id"),
+                        processingPerformanceQueryRequest.processActionId));
+            }
+            if (processingPerformanceQueryRequest.dateStart != null) {
+                predicateList.add(cb.greaterThanOrEqualTo(stockOrderProcessingOrderJoin.get("processingDate"),
+                        processingPerformanceQueryRequest.dateStart));
+            }
+            if (processingPerformanceQueryRequest.dateEnd != null) {
+                predicateList.add(cb.lessThanOrEqualTo(stockOrderProcessingOrderJoin.get("processingDate"),
+                        processingPerformanceQueryRequest.dateEnd));
+            }
+        }
+
+        stockOrderQuery.multiselect(outputTimeAggregateExpression, cb.sum(stockOrderRoot.get("totalQuantity")))
+                .where(predicateList.toArray(new Predicate[0]))
+                .groupBy(outputTimeAggregateExpression);
+
+        // merge inputs and outputs
+        em.createQuery(stockOrderQuery).getResultList().forEach(data -> {
+            if (!mapProcPerf.containsKey(String.valueOf(data[0]))) {
+                mapProcPerf.put(String.valueOf(data[0]),
+                        new ApiProcessingPerformanceTotalItem(String.valueOf(data[0]), BigDecimal.ZERO,
+                                (BigDecimal) data[1], BigDecimal.ZERO));
+            } else {
+                mapProcPerf.get(String.valueOf(data[0])).setOutputQuantity((BigDecimal) data[1]);
+                mapProcPerf.get(String.valueOf(data[0])).setRatio(
+                        ((BigDecimal) data[1]).multiply(BigDecimal.valueOf(100L))
+                                .divide(mapProcPerf.get(String.valueOf(data[0])).getInputQuantity(),
+                                        RoundingMode.HALF_UP));
+            }
+        });
+
+        return new ApiProcessingPerformanceTotal(aggregationType, new ArrayList<>(mapProcPerf.values()));
+    }
 }

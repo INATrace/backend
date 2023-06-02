@@ -247,7 +247,7 @@ public class StockOrderController {
     }
 
     @GetMapping("deliveries-aggregated-data")
-    public ApiResponse<ApiDeliveriesTotal> getDeliveriesGraphData(
+    public ApiResponse<ApiDeliveriesTotal> getDeliveriesAggregatedData(
             @Valid @ApiParam(value = "Company ID", required = true) @RequestParam("companyId") Long companyId,
             @Valid @ApiParam(value = "Facility IDs") @RequestParam(value = "facilityIds", required = false) List<Long> facilityIds,
             @Valid @ApiParam(value = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
@@ -258,9 +258,10 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Price determined later") @RequestParam(value = "priceDeterminedLater", required = false) Boolean priceDeterminedLater,
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
-            @Valid @ApiParam(value = "Aggregation type", required = true) @RequestParam(value = "aggregationType") ApiDeliveriesUnitType aggregationType
+            @Valid @ApiParam(value = "Aggregation type", required = true) @RequestParam(value = "aggregationType")
+            ApiAggregationTimeUnit aggregationType
     ) throws ApiException {
-        return new ApiResponse<>(stockOrderService.getDeliveriesGraphData(
+        return new ApiResponse<>(stockOrderService.getDeliveriesAggregatedData(
                 aggregationType,
                 new StockOrderQueryRequest(
                         companyId,
@@ -273,6 +274,27 @@ public class StockOrderController {
                         priceDeterminedLater,
                         productionDateStart,
                         productionDateEnd
+                )));
+    }
+
+    @GetMapping("processing-performance-data")
+    public ApiResponse<ApiProcessingPerformanceTotal> getProcessingPerformanceData(
+            @Valid @ApiParam(value = "Company ID", required = true) @RequestParam("companyId") Long companyId,
+            @Valid @ApiParam(value = "Facility ID") @RequestParam(value = "facilityId", required = false) Long facilityId,
+            @Valid @ApiParam(value = "Process ID") @RequestParam(value = "processActionId", required = false) Long processActionId,
+            @Valid @ApiParam(value = "Date range start") @RequestParam(value = "dateStart", required = false) LocalDate dateStart,
+            @Valid @ApiParam(value = "Date range end") @RequestParam(value = "dateEnd", required = false) LocalDate dateEnd,
+            @Valid @ApiParam(value = "Aggregation type", required = true) @RequestParam(value = "aggregationType")
+            ApiAggregationTimeUnit aggregationType
+    ) throws ApiException {
+        return new ApiResponse<>(stockOrderService.getProcessingPerformanceData(
+                aggregationType,
+                new ProcessingPerformanceQueryRequest(
+                        companyId,
+                        facilityId,
+                        processActionId,
+                        dateStart,
+                        dateEnd
                 )));
     }
 

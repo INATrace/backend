@@ -4,20 +4,20 @@ import java.util.List;
 
 public class ApiDeliveriesTotal {
 
-	private ApiDeliveriesUnitType unitType;
+	private ApiAggregationTimeUnit unitType;
 
 	private List<ApiDeliveriesTotalItem> totals;
 
-	public ApiDeliveriesTotal(ApiDeliveriesUnitType unitType, List<ApiDeliveriesTotalItem> totals) {
+	public ApiDeliveriesTotal(ApiAggregationTimeUnit unitType, List<ApiDeliveriesTotalItem> totals) {
 		this.unitType = unitType;
 		this.totals = totals;
 	}
 
-	public ApiDeliveriesUnitType getUnitType() {
+	public ApiAggregationTimeUnit getUnitType() {
 		return unitType;
 	}
 
-	public void setUnitType(ApiDeliveriesUnitType unitType) {
+	public void setUnitType(ApiAggregationTimeUnit unitType) {
 		this.unitType = unitType;
 	}
 
