@@ -20,12 +20,14 @@ import com.abelium.inatrace.components.user.UserQueries;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.*;
+import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.db.entities.value_chain.CompanyValueChain;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.tools.ListTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserCustomerType;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -86,18 +88,29 @@ public class CompanyApiTools {
 		ac.allowBeycoIntegration = c.getAllowBeycoIntegration();
 	}
 	
-	public ApiCompanyGet toApiCompanyGet(Long userId, Company c, Language language, 
-			List<CompanyAction> actions,
-			List<ApiCompanyUser> users,
-			List<ApiValueChain> valueChains
-	) {
-		if (c == null) return null;
+	public ApiCompanyGet toApiCompanyGet(Long userId,
+										 Company c,
+										 Language language,
+										 List<CompanyAction> actions,
+										 List<ApiCompanyUser> users,
+										 List<ApiValueChain> valueChains) {
+
+		if (c == null) {
+			return null;
+		}
 		
 		ApiCompanyGet ac = new ApiCompanyGet();
 		updateApiCompany(userId, ac, c, language);
 		ac.actions = actions;
 		ac.users = users;
 		ac.valueChains = valueChains;
+
+		// Map the company roles
+		ac.setCompanyRoles(c.getCompanyRoles().stream().map(ProductCompany::getType).distinct().collect(Collectors.toList()));
+
+		// Set the flag if this company supports collectors for deliveries
+		ac.setSupportsCollectors(c.getFacilities().stream().anyMatch(f -> BooleanUtils.isTrue(f.getDisplayMayInvolveCollectors())));
+
 		return ac;
 	}
 
