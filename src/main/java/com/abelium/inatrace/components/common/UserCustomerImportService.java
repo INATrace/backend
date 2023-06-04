@@ -326,6 +326,8 @@ public class UserCustomerImportService extends BaseService {
                 return Gender.MALE;
             case "F":
                 return Gender.FEMALE;
+            case "N/A":
+                return Gender.N_A;
             default:
                 return null;
         }
