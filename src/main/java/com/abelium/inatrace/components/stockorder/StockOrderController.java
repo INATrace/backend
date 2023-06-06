@@ -277,25 +277,12 @@ public class StockOrderController {
                 )));
     }
 
-    @GetMapping("processing-performance-data")
-    public ApiResponse<ApiProcessingPerformanceTotal> getProcessingPerformanceData(
-            @Valid @ApiParam(value = "Company ID", required = true) @RequestParam("companyId") Long companyId,
-            @Valid @ApiParam(value = "Facility ID") @RequestParam(value = "facilityId", required = false) Long facilityId,
-            @Valid @ApiParam(value = "Process ID") @RequestParam(value = "processActionId", required = false) Long processActionId,
-            @Valid @ApiParam(value = "Date range start") @RequestParam(value = "dateStart", required = false) LocalDate dateStart,
-            @Valid @ApiParam(value = "Date range end") @RequestParam(value = "dateEnd", required = false) LocalDate dateEnd,
-            @Valid @ApiParam(value = "Aggregation type", required = true) @RequestParam(value = "aggregationType")
-            ApiAggregationTimeUnit aggregationType
+    @PostMapping(value = "processing-performance-data")
+    @ApiOperation("Calculates processing performance data")
+    public ApiResponse<ApiProcessingPerformanceTotal> calculateProcessingPerformanceData(
+            @Valid @RequestBody ApiProcessingPerformanceRequest processingPerformanceRequest
     ) throws ApiException {
-        return new ApiResponse<>(stockOrderService.getProcessingPerformanceData(
-                aggregationType,
-                new ProcessingPerformanceQueryRequest(
-                        companyId,
-                        facilityId,
-                        processActionId,
-                        dateStart,
-                        dateEnd
-                )));
+        return new ApiResponse<>(stockOrderService.getProcessingPerformanceData(processingPerformanceRequest));
     }
 
 }
