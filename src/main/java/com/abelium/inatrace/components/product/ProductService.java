@@ -238,7 +238,7 @@ public class ProductService extends BaseService {
 	@Transactional
 	public void updateCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id, List<ApiProductLabelCompanyDocument> documentList) throws ApiException {
 
-		productQueries.checkProductLabelPermission(authUser, id);
+		productQueries.checkProductLabelPermissionAssoc(authUser, id);
 
 		// Get existing state
 		List<ProductLabelCompanyDocument> existing = selectedCompanyDocumentsForProductLabel(id);
