@@ -1,5 +1,7 @@
 package com.abelium.inatrace.components.stockorder.api;
 
+import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -13,10 +15,12 @@ public class ApiProcessingPerformanceRequest {
 	private List<ApiProcessingPerformanceRequestEvidenceField> evidenceFields;
 	private ApiAggregationTimeUnit aggregationType;
 
+	private MeasureUnitType measureUnitType;
+
 	public ApiProcessingPerformanceRequest(Long companyId, Long facilityId, Long processActionId, LocalDate dateStart,
 	                                       LocalDate dateEnd,
 	                                       List<ApiProcessingPerformanceRequestEvidenceField> evidenceFields,
-	                                       ApiAggregationTimeUnit aggregationType) {
+	                                       ApiAggregationTimeUnit aggregationType, MeasureUnitType measureUnitType) {
 		this.companyId = companyId;
 		this.facilityId = facilityId;
 		this.processActionId = processActionId;
@@ -24,6 +28,7 @@ public class ApiProcessingPerformanceRequest {
 		this.dateEnd = dateEnd;
 		this.evidenceFields = evidenceFields;
 		this.aggregationType = aggregationType;
+		this.measureUnitType = measureUnitType;
 	}
 
 	public Long getCompanyId() {
@@ -80,5 +85,13 @@ public class ApiProcessingPerformanceRequest {
 
 	public void setAggregationType(ApiAggregationTimeUnit aggregationType) {
 		this.aggregationType = aggregationType;
+	}
+
+	public MeasureUnitType getMeasureUnitType() {
+		return measureUnitType;
+	}
+
+	public void setMeasureUnitType(MeasureUnitType measureUnitType) {
+		this.measureUnitType = measureUnitType;
 	}
 }

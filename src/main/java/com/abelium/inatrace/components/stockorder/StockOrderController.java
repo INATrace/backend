@@ -260,7 +260,7 @@ public class StockOrderController {
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
             @Valid @ApiParam(value = "Aggregation type", required = true) @RequestParam(value = "aggregationType")
             ApiAggregationTimeUnit aggregationType
-    ) throws ApiException {
+    ) {
         return new ApiResponse<>(stockOrderService.getDeliveriesAggregatedData(
                 aggregationType,
                 new StockOrderQueryRequest(
@@ -282,7 +282,7 @@ public class StockOrderController {
     public ApiResponse<ApiProcessingPerformanceTotal> calculateProcessingPerformanceData(
             @Valid @RequestBody ApiProcessingPerformanceRequest processingPerformanceRequest
     ) throws ApiException {
-        return new ApiResponse<>(stockOrderService.getProcessingPerformanceData(processingPerformanceRequest));
+        return new ApiResponse<>(stockOrderService.calculateProcessingPerformanceData(processingPerformanceRequest));
     }
 
 }

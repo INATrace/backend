@@ -722,6 +722,7 @@ public class StockOrderService extends BaseService {
 
         Expression<Integer> timeAggregateExpression;
 
+        // Prepare groupby expression by year/month/week
         switch (aggregationType) {
             case YEAR:
                 timeAggregateExpression = cb.function("YEAR", Integer.class, root.get("productionDate"));
@@ -738,9 +739,12 @@ public class StockOrderService extends BaseService {
                 break;
         }
 
+        // Prepare predicates
+        // Order type must be of type PURCHASE_ORDER
         List<Predicate> predicateList = new ArrayList<>();
         predicateList.add(cb.equal(root.get("orderType"), OrderType.PURCHASE_ORDER));
 
+        // Other predicate from the request params
         if (stockOrderQueryRequest != null) {
 
             if (stockOrderQueryRequest.companyId != null) {
@@ -783,6 +787,7 @@ public class StockOrderService extends BaseService {
                     .map(data -> new ApiDeliveriesTotalItem(String.valueOf(data[0]), (BigDecimal) data[1]))
                     .collect(Collectors.toList());
 
+        // Sort the results
         totalQuantityList.sort((item1,item2) -> {
             if (item1 == null) return 1;
             if (item2 == null) return -1;
@@ -1461,7 +1466,7 @@ public class StockOrderService extends BaseService {
         }
     }
 
-    public ApiProcessingPerformanceTotal getProcessingPerformanceData(ApiProcessingPerformanceRequest apiProcessingPerformanceRequest) throws ApiException {
+    public ApiProcessingPerformanceTotal calculateProcessingPerformanceData(ApiProcessingPerformanceRequest apiProcessingPerformanceRequest) throws ApiException {
 
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Object[]> transactionQuery = cb.createQuery(Object[].class);
@@ -1471,6 +1476,7 @@ public class StockOrderService extends BaseService {
         Join<ProcessingOrder, ProcessingAction> processingActionJoin = transactionProcessingOrderJoin.join(
                 "processingAction");
 
+        // Request validation
         if (apiProcessingPerformanceRequest.getCompanyId() == null) {
             throw new ApiException(ApiStatus.VALIDATION_ERROR, "Company id needs to be provided!");
         }
@@ -1478,7 +1484,8 @@ public class StockOrderService extends BaseService {
             throw new ApiException(ApiStatus.VALIDATION_ERROR, "AggregationType needs to be provided!");
         }
 
-        // Input calculation
+        // Input calculation query
+        // Prepare groupby expression by year/month/week
         Expression<Integer> inputTimeAggregateExpression;
         switch (apiProcessingPerformanceRequest.getAggregationType()) {
             case YEAR:
@@ -1499,10 +1506,13 @@ public class StockOrderService extends BaseService {
                 break;
         }
 
+        // Prepare predicates
+        // Statuses for processing: PROCESSING, FINAL_PROCESSING
         List<Predicate> predicateList = new ArrayList<>();
         predicateList.add(processingActionJoin.get("type")
                 .in(ProcessingActionType.PROCESSING, ProcessingActionType.FINAL_PROCESSING));
 
+        // Other predicates from request params
         if (apiProcessingPerformanceRequest.getCompanyId() != null) {
             predicateList.add(
                     cb.equal(transactionRoot.get("company").get("id"), apiProcessingPerformanceRequest.getCompanyId()));
@@ -1523,7 +1533,13 @@ public class StockOrderService extends BaseService {
             predicateList.add(cb.lessThanOrEqualTo(transactionProcessingOrderJoin.get("processingDate"),
                     apiProcessingPerformanceRequest.getDateEnd()));
         }
+        if (apiProcessingPerformanceRequest.getMeasureUnitType() != null) {
+            predicateList.add(cb.equal(transactionRoot.get("inputMeasureUnitType").get("id"),
+                    apiProcessingPerformanceRequest.getMeasureUnitType().getId()));
+        }
 
+        // If evidence fields filter present, first retrieve list of processing order ids
+        // then use them as search predicate
         List<Long> poIds = null;
         if (apiProcessingPerformanceRequest.getEvidenceFields() != null &&
             !apiProcessingPerformanceRequest.getEvidenceFields().isEmpty()) {
@@ -1535,8 +1551,10 @@ public class StockOrderService extends BaseService {
                 .where(predicateList.toArray(new Predicate[0]))
                 .groupBy(inputTimeAggregateExpression);
 
+        // Map is used for combining queries for input and output
         Map<String, ApiProcessingPerformanceTotalItem> mapProcPerf = new HashMap<>();
 
+        // Query for input calcuclation, then add to the map
         em.createQuery(transactionQuery).getResultList().forEach(data -> mapProcPerf.put(String.valueOf(data[0]),
                 new ApiProcessingPerformanceTotalItem(String.valueOf(data[0]), (BigDecimal) data[1], BigDecimal.ZERO,
                         BigDecimal.ZERO)));
@@ -1548,6 +1566,7 @@ public class StockOrderService extends BaseService {
         Join<ProcessingOrder, ProcessingAction> stockOrderProcessingActionJoin = stockOrderProcessingOrderJoin.join(
                 "processingAction");
 
+        // Prepare groupby expression by year/month/week
         Expression<Integer> outputTimeAggregateExpression;
         switch (apiProcessingPerformanceRequest.getAggregationType()) {
             case YEAR:
@@ -1568,12 +1587,17 @@ public class StockOrderService extends BaseService {
                 break;
         }
 
+
+        // Prepare predicates
+        // Order type for processing: PROCESSING_ORDER
+        // Statuses for processing: PROCESSING, FINAL_PROCESSING
         predicateList = new ArrayList<>();
         predicateList.add(cb.equal(stockOrderRoot.get("orderType"), OrderType.PROCESSING_ORDER));
 
         predicateList.add(stockOrderProcessingActionJoin.get("type")
                 .in(ProcessingActionType.PROCESSING, ProcessingActionType.FINAL_PROCESSING));
 
+        // Other predicates from request params
         if (apiProcessingPerformanceRequest.getCompanyId() != null) {
             predicateList.add(
                     cb.equal(stockOrderRoot.get("company").get("id"), apiProcessingPerformanceRequest.getCompanyId()));
@@ -1594,7 +1618,12 @@ public class StockOrderService extends BaseService {
             predicateList.add(cb.lessThanOrEqualTo(stockOrderProcessingOrderJoin.get("processingDate"),
                     apiProcessingPerformanceRequest.getDateEnd()));
         }
+        if (apiProcessingPerformanceRequest.getMeasureUnitType() != null) {
+            predicateList.add(cb.equal(stockOrderRoot.get("measurementUnitType").get("id"),
+                    apiProcessingPerformanceRequest.getMeasureUnitType().getId()));
+        }
 
+        // If evidence fields filter present, use processing order ids as search predicate
         if (apiProcessingPerformanceRequest.getEvidenceFields() != null &&
                 !apiProcessingPerformanceRequest.getEvidenceFields().isEmpty()) {
             predicateList.add(stockOrderProcessingOrderJoin.get("id").in(poIds));
@@ -1604,7 +1633,8 @@ public class StockOrderService extends BaseService {
                 .where(predicateList.toArray(new Predicate[0]))
                 .groupBy(outputTimeAggregateExpression);
 
-        // merge inputs and outputs
+        // merge inputs and outputs into the map,
+        // also calculate percentage of output/input
         em.createQuery(stockOrderQuery).getResultList().forEach(data -> {
             if (!mapProcPerf.containsKey(String.valueOf(data[0]))) {
                 mapProcPerf.put(String.valueOf(data[0]),
@@ -1621,6 +1651,7 @@ public class StockOrderService extends BaseService {
 
         List<ApiProcessingPerformanceTotalItem> resultList = new ArrayList<>(mapProcPerf.values());
 
+        // sort the aggregation results
         resultList.sort((item1,item2) -> {
             if (item1 == null) return 1;
             if (item2 == null) return -1;
@@ -1630,13 +1661,15 @@ public class StockOrderService extends BaseService {
         return new ApiProcessingPerformanceTotal(apiProcessingPerformanceRequest.getAggregationType(), resultList);
     }
 
+    /**
+     * Query the processing orders that match the processing evindence fields conditions. Conditions are combined
+     * using or:
+     *      (fieldName eq fieldValue) or (fieldName eq fieldValue) ...
+     *
+     * @param request - operation request
+     * @return - list of processingOrder ids, that match the condition
+     */
     private List<Long> retrieveProcessingOrdersFromPEFields(ApiProcessingPerformanceRequest request) {
-
-//        SELECT stringValue, stockOrder_id, SO.processingOrder_id
-//        FROM StockOrderPEFieldValue sopef INNER JOIN StockOrder SO on sopef.stockOrder_id = SO.id WHERE
-//                (processingEvidenceField_id = 4 AND stringValue LIKE '%A1%') OR
-//                (processingEvidenceField_id = 5 AND stringValue LIKE '%L-123%');
-
 
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> processingOrdersQuery = cb.createQuery(Long.class);
@@ -1645,23 +1678,25 @@ public class StockOrderService extends BaseService {
 
         List<Predicate> predicateList = new ArrayList<>();
 
-        for (ApiProcessingPerformanceRequestEvidenceField pefield: request.getEvidenceFields()) {
+        for (ApiProcessingPerformanceRequestEvidenceField pefield : request.getEvidenceFields()) {
             if (pefield.getStringValue() != null) {
-                predicateList.add(cb.and(cb.equal(soPevRoot.get("processingEvidenceField").get("fieldName"), pefield.getEvidenceField().getFieldName()),
+                predicateList.add(cb.and(cb.equal(soPevRoot.get("processingEvidenceField").get("fieldName"),
+                                pefield.getEvidenceField().getFieldName()),
                         cb.like(soPevRoot.get("stringValue"), pefield.getStringValue())));
             } else if (pefield.getNumericValue() != null) {
-                predicateList.add(cb.and(cb.equal(soPevRoot.get("processingEvidenceField").get("fieldName"), pefield.getEvidenceField().getFieldName()),
+                predicateList.add(cb.and(cb.equal(soPevRoot.get("processingEvidenceField").get("fieldName"),
+                                pefield.getEvidenceField().getFieldName()),
                         cb.equal(soPevRoot.get("numericValue"), pefield.getNumericValue())));
             } else if (pefield.getInstantValue() != null) {
-                predicateList.add(cb.and(cb.equal(soPevRoot.get("processingEvidenceField").get("fieldName"), pefield.getEvidenceField().getFieldName()),
+                predicateList.add(cb.and(cb.equal(soPevRoot.get("processingEvidenceField").get("fieldName"),
+                                pefield.getEvidenceField().getFieldName()),
                         cb.equal(soPevRoot.get("instantValue"), pefield.getInstantValue())));
             }
         }
         Predicate orPredicate = cb.or(predicateList.toArray(new Predicate[0]));
 
-       processingOrdersQuery.multiselect(sopevStockOrderJoin.get("processingOrder").get("id"))
-                .where(orPredicate);
+        processingOrdersQuery.multiselect(sopevStockOrderJoin.get("processingOrder").get("id")).where(orPredicate);
 
-      return new ArrayList<>(em.createQuery(processingOrdersQuery).getResultList());
+        return new ArrayList<>(em.createQuery(processingOrdersQuery).getResultList());
     }
 }
