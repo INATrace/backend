@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Lazy
 @Service
@@ -527,25 +528,35 @@ public class UserService extends BaseService {
 
     	User user = userQueries.fetchUser(userId);
     	List<UserAction> actions = new ArrayList<>();
-
-    	actions.add(UserAction.VIEW_USER_PROFILE);
-		actions.add(UserAction.UPDATE_USER_PROFILE);
 		
 		List<Long> companyIds = companyQueries.fetchCompanyIdsForUser(userId, 
 				Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED));
+
+	    List<Long> companyIdsAdmin = companyQueries.fetchCompanyIdsForUserAdmin(userId);
 
 		// If regional admin, check that it's connected with the user profile (connected through company)
 		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
 
 			// If user is assigned to any company, check that the Regional admin has access to these companies
 			if (!user.getUserCompanies().isEmpty()) {
+
+				// Company IDs where the Regional admin is enrolled into
 				List<Long> regionalAdminCompanyIds = companyQueries.fetchCompanyIdsForUser(authUser.getUserId(),
 						Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED));
+
 				PermissionsUtil.checkRegionalAdminIfConnectedWithUser(regionalAdminCompanyIds, companyIds);
+
+				// Filter the user's company IDs lists (only the company IDs where both the User and the Regional admin are enrolled into should be present)
+				companyIds = companyIds.stream().filter(cID -> regionalAdminCompanyIds.stream().anyMatch(cID::equals)).collect(
+						Collectors.toList());
+
+				companyIdsAdmin = companyIdsAdmin.stream().filter(cAdminID -> regionalAdminCompanyIds.stream().anyMatch(cAdminID::equals)).collect(
+						Collectors.toList());
 			}
 		}
 
-		List<Long> companyIdsAdmin = companyQueries.fetchCompanyIdsForUserAdmin(userId);
+	    actions.add(UserAction.VIEW_USER_PROFILE);
+	    actions.add(UserAction.UPDATE_USER_PROFILE);
 
 		if (!authUser.getUserId().equals(userId)) {
 			switch (user.getStatus()) {
