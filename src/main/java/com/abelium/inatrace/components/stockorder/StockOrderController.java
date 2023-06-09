@@ -3,9 +3,7 @@ package com.abelium.inatrace.components.stockorder;
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
-import com.abelium.inatrace.components.stockorder.api.ApiPurchaseOrder;
-import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
-import com.abelium.inatrace.components.stockorder.api.ApiStockOrderHistory;
+import com.abelium.inatrace.components.stockorder.api.*;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/chain/stock-order")
@@ -245,6 +244,45 @@ public class StockOrderController {
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
     ) throws ApiException {
         return new ApiResponse<>(stockOrderService.getStockOrderAggregatedHistoryList(id, language, authUser, true));
+    }
+
+    @GetMapping("deliveries-aggregated-data")
+    public ApiResponse<ApiDeliveriesTotal> getDeliveriesAggregatedData(
+            @Valid @ApiParam(value = "Company ID", required = true) @RequestParam("companyId") Long companyId,
+            @Valid @ApiParam(value = "Facility IDs") @RequestParam(value = "facilityIds", required = false) List<Long> facilityIds,
+            @Valid @ApiParam(value = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+            @Valid @ApiParam(value = "Farmer (UserCustomer) ID") @RequestParam(value = "farmerId", required = false) Long farmerId,
+            @Valid @ApiParam(value = "Collector (Representative of producer UserCustomer) ID") @RequestParam(value = "collectorId", required = false) Long collectorId,
+            @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
+            @Valid @ApiParam(value = "Organic only") @RequestParam(value = "organicOnly", required = false) Boolean organicOnly,
+            @Valid @ApiParam(value = "Price determined later") @RequestParam(value = "priceDeterminedLater", required = false) Boolean priceDeterminedLater,
+            @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+            @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
+            @Valid @ApiParam(value = "Aggregation type", required = true) @RequestParam(value = "aggregationType")
+            ApiAggregationTimeUnit aggregationType
+    ) {
+        return new ApiResponse<>(stockOrderService.getDeliveriesAggregatedData(
+                aggregationType,
+                new StockOrderQueryRequest(
+                        companyId,
+                        facilityIds,
+                        farmerId,
+                        collectorId,
+                        semiProductId,
+                        isWomenShare,
+                        organicOnly,
+                        priceDeterminedLater,
+                        productionDateStart,
+                        productionDateEnd
+                )));
+    }
+
+    @PostMapping(value = "processing-performance-data")
+    @ApiOperation("Calculates processing performance data")
+    public ApiResponse<ApiProcessingPerformanceTotal> calculateProcessingPerformanceData(
+            @Valid @RequestBody ApiProcessingPerformanceRequest processingPerformanceRequest
+    ) throws ApiException {
+        return new ApiResponse<>(stockOrderService.calculateProcessingPerformanceData(processingPerformanceRequest));
     }
 
 }
