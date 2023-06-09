@@ -1634,8 +1634,8 @@ public class StockOrderService extends BaseService {
                 .where(predicateList.toArray(new Predicate[0]))
                 .groupBy(outputTimeAggregateExpression);
 
-        // merge inputs and outputs into the map,
-        // also calculate percentage of output/input
+        // Merge inputs and outputs into the map,
+        // Also calculate percentage of output/input
         em.createQuery(stockOrderQuery).getResultList().forEach(data -> {
             if (!mapProcPerf.containsKey(String.valueOf(data[0]))) {
                 mapProcPerf.put(String.valueOf(data[0]),
@@ -1652,7 +1652,7 @@ public class StockOrderService extends BaseService {
 
         List<ApiProcessingPerformanceTotalItem> resultList = new ArrayList<>(mapProcPerf.values());
 
-        // sort the aggregation results
+        // Sort the aggregation results
         resultList.sort((item1,item2) -> {
             if (item1 == null) return 1;
             if (item2 == null) return -1;
