@@ -11,10 +11,12 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.codebook.SemiProductTranslation;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
+import com.abelium.inatrace.types.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -45,7 +47,7 @@ public class SemiProductService extends BaseService {
 	public ApiPaginatedList<ApiSemiProduct> getSemiProductList(ApiPaginatedRequest request, Language language) {
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> semiProductQueryObject(request),
-				semiProduct -> SemiProductMapper.toApiSemiProductDetail(semiProduct, language));
+				semiProduct -> SemiProductMapper.toApiSemiProductDetail(semiProduct, ApiSemiProduct.class, language));
 	}
 
 	private SemiProduct semiProductQueryObject(ApiPaginatedRequest request) {
@@ -71,20 +73,26 @@ public class SemiProductService extends BaseService {
 
 	public ApiSemiProduct getSemiProduct(Long id, Language language) throws ApiException {
 
-		return SemiProductMapper.toApiSemiProduct(fetchSemiProduct(id), language);
+		return SemiProductMapper.toApiSemiProduct(fetchSemiProduct(id), ApiSemiProduct.class, language);
 	}
 
 	public ApiSemiProduct getSemiProductDetails(Long id, Language language) throws ApiException {
 
-		return SemiProductMapper.toApiSemiProductDetail(fetchSemiProduct(id), language);
+		return SemiProductMapper.toApiSemiProductDetail(fetchSemiProduct(id), ApiSemiProduct.class, language);
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdateSemiProduct(ApiSemiProduct apiSemiProduct) throws ApiException {
+	public ApiBaseEntity createOrUpdateSemiProduct(CustomUserDetails authUser, ApiSemiProduct apiSemiProduct) throws ApiException {
 
 		SemiProduct semiProduct;
 
 		if (apiSemiProduct.getId() != null) {
+
+			// Editing is not permitted for Regional admin
+			if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+				throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
+			}
+
 			semiProduct = fetchSemiProduct(apiSemiProduct.getId());
 		} else {
 			semiProduct = new SemiProduct();
@@ -169,7 +177,7 @@ public class SemiProductService extends BaseService {
 		return new ApiPaginatedList<>(
 				semiProducts
 						.stream()
-						.map(processingEvidenceField -> SemiProductMapper.toApiSemiProduct(processingEvidenceField, language))
+						.map(processingEvidenceField -> SemiProductMapper.toApiSemiProduct(processingEvidenceField, ApiSemiProduct.class, language))
 						.collect(Collectors.toList()), count);
 
 	}

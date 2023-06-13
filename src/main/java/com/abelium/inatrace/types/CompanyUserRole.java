@@ -1,8 +1,8 @@
 package com.abelium.inatrace.types;
 
 public enum CompanyUserRole {
-	USER,
-    ADMIN,
+    COMPANY_USER,
+    COMPANY_ADMIN,
     MANAGER,
-    ACCOUNTANT;
+    ACCOUNTANT
 }

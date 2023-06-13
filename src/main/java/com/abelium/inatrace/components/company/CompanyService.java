@@ -1,9 +1,6 @@
 package com.abelium.inatrace.components.company;
 
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiPaginatedList;
-import com.abelium.inatrace.api.ApiPaginatedRequest;
-import com.abelium.inatrace.api.ApiStatus;
+import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.CommonService;
@@ -146,7 +143,7 @@ public class CompanyService extends BaseService {
 
 		companyUser.setUser(user);
 		companyUser.setCompany(company);
-		companyUser.setRole(CompanyUserRole.ADMIN);
+		companyUser.setRole(CompanyUserRole.COMPANY_ADMIN);
 		em.persist(companyUser);
 
 		if (request.valueChains != null) {
@@ -171,7 +168,7 @@ public class CompanyService extends BaseService {
 		actions.add(CompanyAction.VIEW_COMPANY_PROFILE);
 		actions.add(CompanyAction.UPDATE_COMPANY_PROFILE);
 
-		if (authUser.getUserRole() == UserRole.ADMIN) {
+		if (authUser.getUserRole() == UserRole.SYSTEM_ADMIN) {
 			switch (c.getStatus()) {
 				case REGISTERED:
 					actions.addAll(Arrays.asList(CompanyAction.ACTIVATE_COMPANY, CompanyAction.DEACTIVATE_COMPANY));
@@ -192,6 +189,15 @@ public class CompanyService extends BaseService {
 		}
 
 		return companyApiTools.toApiCompanyGet(authUser.getUserId(), c, language, actions, users, valueChains);
+	}
+
+	public ApiCompanyName getCompanyName(CustomUserDetails authUser, long id) throws ApiException {
+
+		Company c = companyQueries.fetchCompany(id);
+
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(c.getUsers(), authUser);
+
+		return companyApiTools.toApiCompanyName(c);
 	}
 
 	public List<ApiCompanyUser> getCompanyUsers(Long id, CustomUserDetails user) throws ApiException {
@@ -219,8 +225,23 @@ public class CompanyService extends BaseService {
 	}
 
 	@Transactional
-	public void executeAction(ApiCompanyActionRequest request, CompanyAction action) throws ApiException {
+	public void executeAction(CustomUserDetails authUser, ApiCompanyActionRequest request, CompanyAction action) throws ApiException {
+
 		Company c = companyQueries.fetchCompany(request.companyId);
+
+		// Check if requesting user is authorized for the company
+		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+			PermissionsUtil.checkUserIfCompanyEnrolled(c.getUsers(), authUser);
+
+			// Check if action is 'DEACTIVATE_COMPANY' or 'MERGE_TO_COMPANY' - this is not allowed by the Regional admin
+			if (action == CompanyAction.DEACTIVATE_COMPANY || action == CompanyAction.MERGE_TO_COMPANY) {
+				throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
+			}
+
+		} else if (authUser.getUserRole() != UserRole.SYSTEM_ADMIN) {
+			isCompanyAdmin(authUser, c.getId());
+		}
+
 		switch (action) {
 			case ACTIVATE_COMPANY:
 				activateCompany(c);
@@ -853,20 +874,27 @@ public class CompanyService extends BaseService {
 	}
 
 	public boolean isSystemAdmin(CustomUserDetails customUserDetails) {
-		return UserRole.ADMIN.equals(customUserDetails.getUserRole());
+		return UserRole.SYSTEM_ADMIN.equals(customUserDetails.getUserRole());
 	}
 
 	public boolean isCompanyAdmin(CustomUserDetails customUserDetails, Long companyId) {
 		CompanyUser companyUser = Torpedo.from(CompanyUser.class);
 		Torpedo.where(companyUser.getCompany().getId()).eq(companyId).
 				and(companyUser.getUser().getId()).eq(customUserDetails.getUserId()).
-				and(companyUser.getRole()).eq(CompanyUserRole.ADMIN);
+				and(companyUser.getRole()).eq(CompanyUserRole.COMPANY_ADMIN);
 		List<CompanyUser> companyUserList = Torpedo.select(companyUser).list(em);
 		return !companyUserList.isEmpty();
 	}
 
-	public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, CustomUserDetails user, Language language) throws ApiException {
-		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId, user, language);
+	public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, CustomUserDetails authUser, Language language) throws ApiException {
+
+		// If importing as a Regional admin, check that it is enrolled in the company
+		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+			Company company = companyQueries.fetchCompany(companyId);
+			PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
+		}
+
+		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId, authUser, language);
 	}
 
 	public ApiPaginatedList<ApiValueChain> getCompanyValueChainList(Long companyId, ApiPaginatedRequest request, CustomUserDetails authUser) throws ApiException {

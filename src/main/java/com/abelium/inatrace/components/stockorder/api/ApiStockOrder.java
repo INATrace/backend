@@ -177,9 +177,6 @@ public class ApiStockOrder extends ApiBaseEntity {
     @ApiModelProperty(value = "Currency for price per unit for end customer")
     private String currencyForEndCustomer;
 
-//    @ApiModelProperty(value = "Required women's coffee", position = 61)
-//    private Boolean requiredWomensCoffee;
-
     @ApiModelProperty(value = "Organic")
     private Boolean organic;
 
@@ -200,6 +197,9 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     @ApiModelProperty(value = "Payments for stock order")
     private List<ApiPayment> payments;
+
+    @ApiModelProperty(value = "The ID from which this repacked stock order was created; This ID is generated and provided by the client; Only applicable for repacked stock orders")
+    private String repackedOriginStockOrderId;
 
     public String getIdentifier() {
         return identifier;
@@ -659,5 +659,13 @@ public class ApiStockOrder extends ApiBaseEntity {
 
     public void setPayments(List<ApiPayment> payments) {
         this.payments = payments;
+    }
+
+    public String getRepackedOriginStockOrderId() {
+        return repackedOriginStockOrderId;
+    }
+
+    public void setRepackedOriginStockOrderId(String repackedOriginStockOrderId) {
+        this.repackedOriginStockOrderId = repackedOriginStockOrderId;
     }
 }

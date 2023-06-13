@@ -38,7 +38,7 @@ public class ProductQueries extends BaseService {
 	}	
 	
     public void checkProductLabelPermission(CustomUserDetails authUser, Long labelId) throws ApiException {
-		if (authUser.getUserRole() == UserRole.ADMIN) return; 
+		if (authUser.getUserRole() == UserRole.SYSTEM_ADMIN) return;
     
     	Number count = em.createQuery("SELECT count(*) FROM ProductLabel pl INNER JOIN CompanyUser cu ON cu.company.id = pl.product.company.id "
     			+ "WHERE cu.user.id = :userId AND pl.id = :labelId", Number.class).
@@ -51,7 +51,7 @@ public class ProductQueries extends BaseService {
     }
     
     public void checkProductLabelPermissionAssoc(CustomUserDetails authUser, Long labelId) throws ApiException {
-		if (authUser.getUserRole() == UserRole.ADMIN) return; 
+		if (authUser.getUserRole() == UserRole.SYSTEM_ADMIN) return;
     
     	Number count = em.createQuery("SELECT count(*) FROM ProductLabel pl INNER JOIN CompanyUser cu ON cu.company.id = pl.product.company.id "
     			+ "WHERE cu.user.id = :userId AND pl.id = :labelId", Number.class).
@@ -75,7 +75,7 @@ public class ProductQueries extends BaseService {
 
     @Transactional
     public void checkProductLabelPermission(CustomUserDetails authUser, String labelUid) throws ApiException {
-		if (authUser.getUserRole() == UserRole.ADMIN) return; 
+		if (authUser.getUserRole() == UserRole.SYSTEM_ADMIN) return;
     
     	Number count = em.createQuery("SELECT count(*) FROM ProductLabel pl INNER JOIN CompanyUser cu ON cu.company.id = pl.product.company.id "
     			+ "WHERE cu.user.id = :userId AND pl.uuid = :labelUid", Number.class).
@@ -89,7 +89,7 @@ public class ProductQueries extends BaseService {
 
     @Transactional
     public void checkProductLabelPermissionAssoc(CustomUserDetails authUser, String labelUid) throws ApiException {
-		if (authUser.getUserRole() == UserRole.ADMIN) return; 
+		if (authUser.getUserRole() == UserRole.SYSTEM_ADMIN) return;
 	    
     	Number count = em.createQuery("SELECT count(*) FROM ProductLabel pl INNER JOIN CompanyUser cu ON cu.company.id = pl.product.company.id "
     			+ "WHERE cu.user.id = :userId AND pl.uuid = :labelUid", Number.class).

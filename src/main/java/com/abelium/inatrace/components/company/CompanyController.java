@@ -39,7 +39,7 @@ public class CompanyController {
 	}
 
 	@PostMapping(value = "/create")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
     @ApiOperation(value = "Create a new company (with the logged-in user as company admin)")
     public ApiResponse<ApiBaseEntity> createCompany(@AuthenticationPrincipal CustomUserDetails authUser, @Valid @RequestBody ApiCompany request) throws ApiException {
 		return new ApiResponse<>(companyService.createCompany(authUser.getUserId(), request));
@@ -53,7 +53,7 @@ public class CompanyController {
     }
     
     @GetMapping(value = "/admin/list")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @ApiOperation(value = "Lists all companies. Must be admin. Sorting: name or default")
     public ApiPaginatedResponse<ApiCompanyListResponse> listCompaniesAdmin(@Valid ApiListCompaniesRequest request) {
     	return new ApiPaginatedResponse<>(companyService.listCompanies(request));
@@ -65,6 +65,14 @@ public class CompanyController {
     		@Valid @ApiParam(value = "Record id", required = true) @PathVariable("id") Long id,
     		@Valid @ApiParam(value = "language") @RequestParam(value = "language", defaultValue = "EN") String language) throws ApiException {
     	return new ApiResponse<>(companyService.getCompany(authUser, id, Language.valueOf(language)));
+    }
+
+    @GetMapping(value = "/profile/{id}/name")
+    @ApiOperation(value = "Get the company name and abbreviation")
+    public ApiResponse<ApiCompanyName> getCompanyName(
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "Record id", required = true) @PathVariable("id") Long id) throws ApiException {
+        return new ApiResponse<>(companyService.getCompanyName(authUser, id));
     }
 
 	@GetMapping("/profile/{id}/users")
@@ -84,15 +92,13 @@ public class CompanyController {
     }
     
     @PostMapping(value = "/execute/{action}")
-    @ApiOperation(value = "Execute company action. Must be an administrator")
-    public ApiDefaultResponse executeAction(@AuthenticationPrincipal CustomUserDetails authUser,
+    @ApiOperation(value = "Execute company action. Must be an Company admin, System admin or Regional admin enrolled in this company")
+    public ApiDefaultResponse executeAction(
+            @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @RequestBody ApiCompanyActionRequest request,
     		@Valid @PathVariable(value = "action") CompanyAction action) throws ApiException {
-        if (companyService.isSystemAdmin(authUser) || companyService.isCompanyAdmin(authUser, request.getCompanyId())) {
-            companyService.executeAction(request, action);
-            return new ApiDefaultResponse();
-        }
-    	throw new ApiException(ApiStatus.UNAUTHORIZED, "User must be system or company admin");
+        companyService.executeAction(authUser, request, action);
+        return new ApiDefaultResponse();
     }
 
     @GetMapping(value = "/userCustomers/{id}")
@@ -210,7 +216,7 @@ public class CompanyController {
     }
 
     @PostMapping(value = "/userCustomers/import/farmers/{companyId}/{documentId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
     @ApiOperation(value = "Upload .xls or .xlsx spreadsheet of farmers to import into DB")
     public ApiUserCustomerImportResponse importFarmersSpreadsheet(
             @AuthenticationPrincipal CustomUserDetails authUser,

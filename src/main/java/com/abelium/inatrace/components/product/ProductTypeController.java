@@ -22,7 +22,7 @@ public class ProductTypeController {
     private ProductTypeService productTypeService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
     @ApiOperation(value = "Create a new product type")
     public ApiResponse<ApiBaseEntity> createProductType(
             @Valid @RequestBody ApiProductType apiProductType
@@ -48,7 +48,7 @@ public class ProductTypeController {
     }
 
     @PutMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @ApiOperation(value = "Update a product type")
     public ApiResponse<ApiBaseEntity> updateProductType(
             @Valid @RequestBody ApiProductType apiProductType
@@ -57,7 +57,7 @@ public class ProductTypeController {
     }
 
     @DeleteMapping(value = "/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @ApiOperation(value = "Delete a product type")
     public ApiDefaultResponse deleteProductType(
             @RequestParam(value = "id") Long id

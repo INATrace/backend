@@ -306,7 +306,7 @@ Example of successful and unsuccessful response
     "name": "Example",
     "surname": "Example",
     "status": "ACTIVE",
-    "role": "ADMIN",
+    "role": "SYSTEM_ADMIN",
     "actions": [
       "VIEW_USER_PROFILE",
       "UPDATE_USER_PROFILE"

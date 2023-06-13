@@ -30,12 +30,6 @@ public class ProcessingAction extends TimestampEntity {
 
 	@Column
 	private String prefix;
-	
-	@Column
-	private Boolean repackedOutputs;
-
-	@Column
-	private BigDecimal maxOutputWeight;
 
 	@Column
 	private BigDecimal estimatedOutputQuantityPerUnit;
@@ -67,6 +61,18 @@ public class ProcessingAction extends TimestampEntity {
 	 */
 	@ManyToOne
 	private FinalProduct outputFinalProduct;
+
+	/**
+	 * Specified if the output of the final product should be repacked. It's used only when 'outputFinalProduct' is set.
+	 */
+	@Column
+	private Boolean repackedOutputFinalProducts;
+
+	/**
+	 * Specifies the maximum output weight when using 'repackedOutputFinalProducts' (set value to 'true').
+	 */
+	@Column
+	private BigDecimal maxOutputWeight;
 
 	/**
 	 * Used when we have action type GENERATE_QR_CODE. It holds the reference to the Final product
@@ -133,12 +139,12 @@ public class ProcessingAction extends TimestampEntity {
 		this.prefix = prefix;
 	}
 
-	public Boolean getRepackedOutputs() {
-		return repackedOutputs;
+	public Boolean getRepackedOutputFinalProducts() {
+		return repackedOutputFinalProducts;
 	}
 
-	public void setRepackedOutputs(Boolean repackedOutputs) {
-		this.repackedOutputs = repackedOutputs;
+	public void setRepackedOutputFinalProducts(Boolean repackedOutputFinalProducts) {
+		this.repackedOutputFinalProducts = repackedOutputFinalProducts;
 	}
 
 	public BigDecimal getMaxOutputWeight() {

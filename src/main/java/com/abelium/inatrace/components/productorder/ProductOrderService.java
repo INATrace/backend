@@ -76,7 +76,7 @@ public class ProductOrderService extends BaseService {
 
 		Facility facility = facilityService.fetchFacility(apiProductOrder.getFacility().getId());
 		if (
-				user.getUserRole() != UserRole.ADMIN &&
+				user.getUserRole() != UserRole.SYSTEM_ADMIN &&
 				facility.getCompany().getUsers().stream().noneMatch(cu -> cu.getUser().getId().equals(user.getUserId()))) {
 			throw new ApiException(ApiStatus.AUTH_ERROR, "User is not enrolled in owner company");
 		}

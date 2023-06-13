@@ -69,7 +69,7 @@ public class StockOrderQueryRequest {
         this.productionDateEnd = productionDateEnd;
     }
 
-    // used for delivery total calculation
+    // Used for delivery total calculation
     public StockOrderQueryRequest(Long companyId, List<Long> facilityIds, Long farmerId, Long representativeOfProducerUserCustomerId, Long semiProductId,
                                   Boolean isWomenShare, Boolean organicOnly, Boolean priceDeterminedLater, LocalDate productionDateStart,
                                   LocalDate productionDateEnd) {

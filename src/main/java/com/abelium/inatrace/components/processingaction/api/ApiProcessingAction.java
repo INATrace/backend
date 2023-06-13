@@ -40,12 +40,6 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	@ApiModelProperty(value = "Processing action prefix")
 	private String prefix;
 
-	@ApiModelProperty(value = "Processing action repacked outputs")
-	private Boolean repackedOutputs;
-	
-	@ApiModelProperty(value = "Processing action maximum output weight")
-	private BigDecimal maxOutputWeight;
-
 	@ApiModelProperty(value = "The estimated output quantity per unit for this processing action")
 	private BigDecimal estimatedOutputQuantityPerUnit;
 	
@@ -62,13 +56,19 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	private ApiSemiProduct inputSemiProduct;
 
 	@ApiModelProperty(value = "List of supported output semi-products")
-	private List<ApiSemiProduct> outputSemiProducts;
+	private List<ApiProcessingActionOutputSemiProduct> outputSemiProducts;
 
 	@ApiModelProperty(value = "The input Final product")
 	private ApiFinalProduct inputFinalProduct;
 
 	@ApiModelProperty(value = "The output final product")
 	private ApiFinalProduct outputFinalProduct;
+
+	@ApiModelProperty(value = "Processing action repacked outputs when using output final product")
+	private Boolean repackedOutputFinalProducts;
+
+	@ApiModelProperty(value = "Processing action maximum output weight when repacked outputs for final product is set to 'true'")
+	private BigDecimal maxOutputWeight;
 
 	@ApiModelProperty(value = "The Final product for which the QR code tag will be generated (used with action type GENERATE_QR_CODE)")
 	private ApiFinalProduct qrCodeForFinalProduct;
@@ -141,12 +141,12 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		this.prefix = prefix;
 	}
 
-	public Boolean getRepackedOutputs() {
-		return repackedOutputs;
+	public Boolean getRepackedOutputFinalProducts() {
+		return repackedOutputFinalProducts;
 	}
 
-	public void setRepackedOutputs(Boolean repackedOutputs) {
-		this.repackedOutputs = repackedOutputs;
+	public void setRepackedOutputFinalProducts(Boolean repackedOutputFinalProducts) {
+		this.repackedOutputFinalProducts = repackedOutputFinalProducts;
 	}
 
 	public BigDecimal getMaxOutputWeight() {
@@ -197,11 +197,11 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		this.inputSemiProduct = inputSemiProduct;
 	}
 
-	public List<ApiSemiProduct> getOutputSemiProducts() {
+	public List<ApiProcessingActionOutputSemiProduct> getOutputSemiProducts() {
 		return outputSemiProducts;
 	}
 
-	public void setOutputSemiProducts(List<ApiSemiProduct> outputSemiProducts) {
+	public void setOutputSemiProducts(List<ApiProcessingActionOutputSemiProduct> outputSemiProducts) {
 		this.outputSemiProducts = outputSemiProducts;
 	}
 

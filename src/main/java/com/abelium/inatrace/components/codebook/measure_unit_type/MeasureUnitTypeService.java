@@ -8,9 +8,11 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+import com.abelium.inatrace.types.UserRole;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
@@ -57,11 +59,17 @@ public class MeasureUnitTypeService extends BaseService {
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdateMeasureUnitType(ApiMeasureUnitType apiMeasureUnitType) throws ApiException {
+	public ApiBaseEntity createOrUpdateMeasureUnitType(CustomUserDetails authUser, ApiMeasureUnitType apiMeasureUnitType) throws ApiException {
 
 		MeasureUnitType entity;
 
 		if (apiMeasureUnitType.getId() != null) {
+
+			// Editing is not permitted for Regional admin
+			if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+				throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
+			}
+
 			entity = fetchMeasureUnitType(apiMeasureUnitType.getId());
 		} else {
 

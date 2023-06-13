@@ -238,7 +238,7 @@ public class ProductService extends BaseService {
 	@Transactional
 	public void updateCompanyDocumentsForProductLabel(CustomUserDetails authUser, Long id, List<ApiProductLabelCompanyDocument> documentList) throws ApiException {
 
-		productQueries.checkProductLabelPermission(authUser, id);
+		productQueries.checkProductLabelPermissionAssoc(authUser, id);
 
 		// Get existing state
 		List<ProductLabelCompanyDocument> existing = selectedCompanyDocumentsForProductLabel(id);
@@ -747,7 +747,7 @@ public class ProductService extends BaseService {
 
     private void checkProductPermission(CustomUserDetails authUser, Long productId) throws ApiException {
 
-		if (authUser.getUserRole() == UserRole.ADMIN) return;
+		if (authUser.getUserRole() == UserRole.SYSTEM_ADMIN) return;
 
 		// Get all the companies that are product admins (owner companies)
 		List<Company> productOwnerCompanies = em.createNamedQuery("ProductCompany.getProductOwnerCompanies", Company.class)
@@ -771,7 +771,7 @@ public class ProductService extends BaseService {
     }
     
     private void checkProductPermissionAssoc(CustomUserDetails authUser, Long productId) throws ApiException {
-		if (authUser.getUserRole() == UserRole.ADMIN) return; 
+		if (authUser.getUserRole() == UserRole.SYSTEM_ADMIN) return;
     
     	Number count = em.createQuery("SELECT count(p) FROM Product p INNER JOIN CompanyUser cu ON cu.company.id = p.company.id "
     			+ "WHERE cu.user.id = :userId AND p.id = :productId", Number.class).
@@ -791,7 +791,7 @@ public class ProductService extends BaseService {
     }
     
     private void checkProductLabelBatchPermissionAssoc(CustomUserDetails authUser, Long batchId) throws ApiException {
-		if (authUser.getUserRole() == UserRole.ADMIN) return; 
+		if (authUser.getUserRole() == UserRole.SYSTEM_ADMIN) return;
     
     	Number count = em.createQuery("SELECT count(plb) FROM ProductLabelBatch plb INNER JOIN CompanyUser cu ON cu.company.id = plb.label.product.company.id "
     			+ "WHERE cu.user.id = :userId AND plb.id = :batchId", Number.class).

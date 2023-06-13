@@ -22,7 +22,7 @@ public class ApiCompanyActionRequest {
 	public Long otherCompanyId;
 	
 	@ApiModelProperty(value = "Company user role", position = 3)
-	public CompanyUserRole companyUserRole = CompanyUserRole.USER;
+	public CompanyUserRole companyUserRole = CompanyUserRole.COMPANY_USER;
 	
 
 	public Long getCompanyId() {
