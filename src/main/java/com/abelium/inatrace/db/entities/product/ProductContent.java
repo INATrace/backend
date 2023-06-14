@@ -30,13 +30,6 @@ public class ProductContent extends BaseEntity {
 	 */
 	@Lob
 	private String description;
-
-	/**
-	 * ingredients - list the ingredients in the product and describe their properties 
-	 * (example: Organic Shea Butter, Fair Trade Mango....)
-	 */
-	@Lob
-	private String ingredients;
 	
 	/**
 	 * nutritional Value - list the nutritional value of the product
@@ -139,14 +132,6 @@ public class ProductContent extends BaseEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getIngredients() {
-		return ingredients;
-	}
-
-	public void setIngredients(String ingredients) {
-		this.ingredients = ingredients;
 	}
 
 	public String getNutritionalValue() {

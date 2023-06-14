@@ -1,14 +1,13 @@
 package com.abelium.inatrace.components.product.api;
 
-import java.util.Map;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.Length;
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.types.Lengths;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 public class ApiProductBase extends ApiBaseEntity {
 
@@ -20,10 +19,6 @@ public class ApiProductBase extends ApiBaseEntity {
 	@Length(max = 2000)
 	@ApiModelProperty(value = "product description", position = 4)
 	public String description;
-
-	@Length(max = 2000)
-	@ApiModelProperty(value = "ingredients - list the ingredients in the product and describe their properties", position = 5)
-	public String ingredients;
 	
 	@Length(max = 2000)
 	@ApiModelProperty(value = "nutritional Value - list the nutritional value of the product", position = 6)
@@ -54,14 +49,6 @@ public class ApiProductBase extends ApiBaseEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getIngredients() {
-		return ingredients;
-	}
-
-	public void setIngredients(String ingredients) {
-		this.ingredients = ingredients;
 	}
 
 	public String getNutritionalValue() {

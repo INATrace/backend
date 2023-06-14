@@ -123,7 +123,6 @@ public class ProductApiTools {
 		ap.name = p.getName();
 		ap.photo = CommonApiTools.toApiDocument(p.getPhoto(), userId);
 		ap.description = p.getDescription();
-		ap.ingredients = p.getIngredients();
 		ap.nutritionalValue = p.getNutritionalValue();
 		ap.howToUse = p.getHowToUse();
 		ap.origin = new ApiProductOrigin();
@@ -375,7 +374,6 @@ public class ProductApiTools {
 		p.setName(pu.name);
 		p.setPhoto(commonEngine.fetchDocument(userId, pu.photo));
 		p.setDescription(pu.description);
-		p.setIngredients(pu.ingredients);
 		p.setNutritionalValue(pu.nutritionalValue);
 		p.setHowToUse(pu.howToUse);
 		if (pu.origin != null) {
