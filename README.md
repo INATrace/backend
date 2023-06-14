@@ -273,7 +273,6 @@ Response:
   "name":"string",
   "photo":"ApiDocument",
   "description":"string",
-  "howToUse":"string",
   "origin": ApiProductOrigin,
   "keyMarketsShare":{},
   "process": ApiProcess,

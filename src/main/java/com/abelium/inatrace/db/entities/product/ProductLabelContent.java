@@ -49,7 +49,6 @@ public class ProductLabelContent extends ProductContent {
 		plc.setName(p.getName());
 		plc.setPhoto(p.getPhoto());
 		plc.setDescription(p.getDescription());
-		plc.setHowToUse(p.getHowToUse());
 		plc.setOriginText(p.getOriginText());
 		plc.setKeyMarketsShare(new HashMap<>(p.getKeyMarketsShare()));
 		plc.setProcess(p.getProcess().copy());

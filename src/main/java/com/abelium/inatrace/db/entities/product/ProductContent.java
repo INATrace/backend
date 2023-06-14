@@ -30,12 +30,6 @@ public class ProductContent extends BaseEntity {
 	 */
 	@Lob
 	private String description;
-
-	/**
-	 * how to Use / Recipes - Describe the best way to use the product (e.g. recipes, how to apply the product…)
-	 */
-	@Lob
-	private String howToUse;
 	
 	/**
 	 * origin - text and quantity input - Briefly describe where the product or its 
@@ -126,14 +120,6 @@ public class ProductContent extends BaseEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getHowToUse() {
-		return howToUse;
-	}
-
-	public void setHowToUse(String howToUse) {
-		this.howToUse = howToUse;
 	}
 
 	public String getOriginText() {

@@ -19,10 +19,6 @@ public class ApiProductBase extends ApiBaseEntity {
 	@Length(max = 2000)
 	@ApiModelProperty(value = "product description", position = 4)
 	public String description;
-	
-	@Length(max = 2000)
-	@ApiModelProperty(value = "how to Use / Recipes - Describe the best way to use the product (e.g. recipes, how to apply the product...)", position = 7)
-	public String howToUse;
 
 	@ApiModelProperty(value = "origin - text and location ", position = 8)
 	@Valid
@@ -45,14 +41,6 @@ public class ApiProductBase extends ApiBaseEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getHowToUse() {
-		return howToUse;
-	}
-
-	public void setHowToUse(String howToUse) {
-		this.howToUse = howToUse;
 	}
 
 	public ApiProductOrigin getOrigin() {
