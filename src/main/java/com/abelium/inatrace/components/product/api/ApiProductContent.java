@@ -2,7 +2,6 @@ package com.abelium.inatrace.components.product.api;
 
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -24,14 +23,7 @@ public class ApiProductContent extends ApiProductBase {
 	@ApiModelProperty(value = "environmental sustainability", position = 13)
 	@Valid
 	public ApiSustainability sustainability;
-	
-	@ApiModelProperty(value = "speciality document", position = 16)
-	public ApiDocument specialityDocument;
-	
-	@Length(max = 2000)
-	@ApiModelProperty(value = "speciality document", position = 17)
-	public String specialityDescription;
-	
+
 	@ApiModelProperty(value = "settings", position = 18)
 	@Valid
 	public ApiProductSettings settings;
@@ -72,22 +64,6 @@ public class ApiProductContent extends ApiProductBase {
 
 	public void setSustainability(ApiSustainability sustainability) {
 		this.sustainability = sustainability;
-	}
-
-	public ApiDocument getSpecialityDocument() {
-		return specialityDocument;
-	}
-
-	public void setSpecialityDocument(ApiDocument specialityDocument) {
-		this.specialityDocument = specialityDocument;
-	}
-
-	public String getSpecialityDescription() {
-		return specialityDescription;
-	}
-
-	public void setSpecialityDescription(String specialityDescription) {
-		this.specialityDescription = specialityDescription;
 	}
 
 	public ApiProductSettings getSettings() {

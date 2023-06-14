@@ -130,8 +130,6 @@ public class ProductApiTools {
 		ap.sustainability = toApiSustainability(p.getSustainability());
 		ap.settings = toApiSettings(userId, p.getSettings());
 		ap.knowledgeBlog = p.getKnowledgeBlog();
-		ap.specialityDocument = CommonApiTools.toApiDocument(p.getSpecialityDocument(), userId);
-		ap.specialityDescription = p.getSpecialityDescription();
 		ap.setBusinessToCustomerSettings(toApiBusinessToCustomerSettings(p.getBusinessToCustomerSettings(), userId));
 	}
 	
@@ -407,8 +405,6 @@ public class ProductApiTools {
 
 			updateBusinessToCustomerSettings(userId, p.getBusinessToCustomerSettings(), apiBusinessToCustomerSettings);
 		}
-		p.setSpecialityDocument(commonEngine.fetchDocument(userId, pu.specialityDocument));
-		p.setSpecialityDescription(pu.specialityDescription);
 		p.setKnowledgeBlog(pu.knowledgeBlog);
 	}
 	

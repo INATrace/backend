@@ -58,18 +58,6 @@ public class ProductContent extends BaseEntity {
      */
     @OneToOne(fetch = FetchType.LAZY)
     private ProductJourney journey = new ProductJourney();
-
-	/**
-	 * speciality document
-	 */
-	@ManyToOne
-	private Document specialityDocument;
-	
-	/**
-	 * speciality description
-	 */
-	@Lob
-	private String specialityDescription;
 	
 	/**
 	 * product settings
@@ -140,22 +128,6 @@ public class ProductContent extends BaseEntity {
 
 	public void setSustainability(Sustainability sustainability) {
 		this.sustainability = sustainability;
-	}
-
-	public Document getSpecialityDocument() {
-		return specialityDocument;
-	}
-
-	public void setSpecialityDocument(Document specialityDocument) {
-		this.specialityDocument = specialityDocument;
-	}
-
-	public String getSpecialityDescription() {
-		return specialityDescription;
-	}
-
-	public void setSpecialityDescription(String specialityDescription) {
-		this.specialityDescription = specialityDescription;
 	}
 
 	public ProductSettings getSettings() {

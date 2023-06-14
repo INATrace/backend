@@ -280,8 +280,6 @@ Response:
   "associatedCompanies": ApiProductCompany,
   "company": ApiCompany,
   "labels": ApiProductLabelValues,
-  "specialityDocument": ApiDocument,
-  "specialityDescription":"string",
   "settings": ApiProductSettings,
   "knowledgeBlog":"boolean"
 }

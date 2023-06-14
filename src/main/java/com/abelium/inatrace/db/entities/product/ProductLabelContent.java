@@ -52,8 +52,6 @@ public class ProductLabelContent extends ProductContent {
 		plc.setProcess(p.getProcess().copy());
 		plc.setResponsibility(p.getResponsibility().copy());
 		plc.setSustainability(p.getSustainability().copy());
-		plc.setSpecialityDocument(p.getSpecialityDocument());
-		plc.setSpecialityDescription(p.getSpecialityDescription());
 		plc.setSettings(p.getSettings().copy());
 		plc.setCompany(p.getCompany()); // no copy -- read only!
 		plc.setOriginLocations(p.getOriginLocations().stream().map(ProductLocation::copy).collect(Collectors.toList()));
