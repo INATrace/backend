@@ -4,7 +4,6 @@ import com.abelium.inatrace.db.entities.company.Company;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +49,6 @@ public class ProductLabelContent extends ProductContent {
 		plc.setPhoto(p.getPhoto());
 		plc.setDescription(p.getDescription());
 		plc.setOriginText(p.getOriginText());
-		plc.setKeyMarketsShare(new HashMap<>(p.getKeyMarketsShare()));
 		plc.setProcess(p.getProcess().copy());
 		plc.setResponsibility(p.getResponsibility().copy());
 		plc.setSustainability(p.getSustainability().copy());

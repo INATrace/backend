@@ -1,13 +1,10 @@
 package com.abelium.inatrace.db.entities.product;
 
-import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
-import com.abelium.inatrace.db.entities.process.Process;
 import com.abelium.inatrace.db.entities.common.Document;
+import com.abelium.inatrace.db.entities.process.Process;
 
 import javax.persistence.*;
-import java.util.HashMap;
-import java.util.Map;
 
 @MappedSuperclass
 public class ProductContent extends BaseEntity {
@@ -15,7 +12,7 @@ public class ProductContent extends BaseEntity {
 	/**
 	 * product name
 	 */
-	@Column(length = Lengths.DEFAULT)
+	@Column
 	private String name;
 
 	/**
@@ -37,15 +34,6 @@ public class ProductContent extends BaseEntity {
 	 */
 	@Lob
 	private String originText;
-		
-	/**
-	 * Key Markets
-	 */
-	@ElementCollection(fetch = FetchType.EAGER)
-    @MapKeyColumn(name = "market")
-    @Column(name = "share")	
-    @CollectionTable
-    private Map<String, Double> keyMarketsShare = new HashMap<>();
 
 	/**
 	 * process
@@ -128,14 +116,6 @@ public class ProductContent extends BaseEntity {
 
 	public void setOriginText(String originText) {
 		this.originText = originText;
-	}
-
-	public Map<String, Double> getKeyMarketsShare() {
-		return keyMarketsShare;
-	}
-
-	public void setKeyMarketsShare(Map<String, Double> keyMarketsShare) {
-		this.keyMarketsShare = keyMarketsShare;
 	}
 
 	public Process getProcess() {

@@ -274,7 +274,6 @@ Response:
   "photo":"ApiDocument",
   "description":"string",
   "origin": ApiProductOrigin,
-  "keyMarketsShare":{},
   "process": ApiProcess,
   "responsibility": ApiResponsibility,
   "sustainability": ApiSustainability,

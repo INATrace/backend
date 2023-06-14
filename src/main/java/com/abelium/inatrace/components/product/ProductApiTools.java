@@ -125,7 +125,6 @@ public class ProductApiTools {
 		ap.description = p.getDescription();
 		ap.origin = new ApiProductOrigin();
 		ap.origin.text = p.getOriginText();
-		ap.keyMarketsShare = p.getKeyMarketsShare();
 		ap.process = toApiProcess(userId, p.getProcess());
 		ap.responsibility = toApiResponsibility(userId, p.getResponsibility());
 		ap.sustainability = toApiSustainability(p.getSustainability());
@@ -375,7 +374,6 @@ public class ProductApiTools {
 		if (pu.origin != null) {
 			p.setOriginText(pu.origin.text);
 		}
-		if (pu.keyMarketsShare != null) p.setKeyMarketsShare(pu.keyMarketsShare);
 		if (pu.process != null) updateProcess(userId, p.getProcess(), pu.process);
 		if (pu.responsibility != null) updateResponsibility(userId, p.getResponsibility(), pu.responsibility);
 		if (pu.sustainability != null) updateSustainability(p.getSustainability(), pu.sustainability);

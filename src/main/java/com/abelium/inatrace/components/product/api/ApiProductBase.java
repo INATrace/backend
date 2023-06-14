@@ -7,7 +7,6 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.Map;
 
 public class ApiProductBase extends ApiBaseEntity {
 
@@ -23,9 +22,6 @@ public class ApiProductBase extends ApiBaseEntity {
 	@ApiModelProperty(value = "origin - text and location ", position = 8)
 	@Valid
 	public ApiProductOrigin origin;
-
-	@ApiModelProperty(value = "Key Markets, market name - share number map", position = 10)
-    public Map<String, Double> keyMarketsShare;
 
 	public String getName() {
 		return name;
@@ -51,11 +47,4 @@ public class ApiProductBase extends ApiBaseEntity {
 		this.origin = origin;
 	}
 
-	public Map<String, Double> getKeyMarketsShare() {
-		return keyMarketsShare;
-	}
-
-	public void setKeyMarketsShare(Map<String, Double> keyMarketsShare) {
-		this.keyMarketsShare = keyMarketsShare;
-	}
 }
