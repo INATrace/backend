@@ -5,7 +5,6 @@ import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTyp
 import com.abelium.inatrace.components.common.CommonApiTools;
 import com.abelium.inatrace.components.common.CommonService;
 import com.abelium.inatrace.components.common.StorageKeyCache;
-import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.company.CompanyApiTools;
 import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
@@ -18,8 +17,6 @@ import com.abelium.inatrace.db.entities.common.Location;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.company.CompanyDocument;
 import com.abelium.inatrace.db.entities.process.Process;
-import com.abelium.inatrace.db.entities.process.ProcessDocument;
-import com.abelium.inatrace.db.entities.process.ProcessStandard;
 import com.abelium.inatrace.db.entities.product.*;
 import com.abelium.inatrace.db.entities.product.enums.FairPricesUnit;
 import com.abelium.inatrace.security.service.CustomUserDetails;
@@ -138,10 +135,6 @@ public class ProductApiTools {
 
 		ApiProcess ap = new ApiProcess();
 		ap.production = p.getProduction();
-		ap.storage = p.getStorage();
-		ap.codesOfConduct = p.getCodesOfConduct();
-		ap.standards = p.getStandards().stream().map(s -> toApiProcessStandard(userId, s)).collect(Collectors.toList());
-		ap.records = p.getRecords().stream().map(s -> toApiProcessDocument(userId, s)).collect(Collectors.toList());
 		return ap;
 	}
 	
@@ -183,26 +176,6 @@ public class ProductApiTools {
 		ar.pictures = r.getPictures().stream().map(s -> toApiResponsibilityFarmerPicture(userId, s)).collect(Collectors.toList());
 		ar.story = r.getStory();
 		return ar;
-	}
-
-	public static ApiCertification toApiProcessStandard(Long userId, ProcessStandard ps) {
-		if (ps == null) return null;
-		
-		ApiCertification aps = new ApiCertification();
-		aps.description = ps.getDescription();
-		aps.type = ps.getType();
-		aps.validity = ps.getValidity();
-		aps.certificate = CommonApiTools.toApiDocument(ps.getCertificate(), userId);
-		return aps;
-	}
-	
-	public static ApiProcessDocument toApiProcessDocument(Long userId, ProcessDocument pd) {
-		if (pd == null) return null;
-		
-		ApiProcessDocument apd = new ApiProcessDocument();
-		apd.description = pd.getDescription();
-		apd.document = CommonApiTools.toApiDocument(pd.getDocument(), userId);
-		return apd;
 	}
 	
 	public static ApiResponsibilityFarmerPicture toApiResponsibilityFarmerPicture(Long userId, ResponsibilityFarmerPicture rfp) {
@@ -372,7 +345,7 @@ public class ProductApiTools {
 		if (pu.origin != null) {
 			p.setOriginText(pu.origin.text);
 		}
-		if (pu.process != null) updateProcess(userId, p.getProcess(), pu.process);
+		if (pu.process != null) updateProcess(p.getProcess(), pu.process);
 		if (pu.responsibility != null) updateResponsibility(userId, p.getResponsibility(), pu.responsibility);
 		if (pu.sustainability != null) updateSustainability(p.getSustainability(), pu.sustainability);
 		if (pu.settings != null) updateSettings(userId, p.getSettings(), pu.settings);
@@ -549,18 +522,8 @@ public class ProductApiTools {
 		r.setStory(ar.story);
 	}
 
-	private void updateProcess(Long userId, Process p, ApiProcess ap) throws ApiException {
+	private void updateProcess(Process p, ApiProcess ap) {
 		p.setProduction(ap.production);
-		p.setStorage(ap.storage);
-		p.setCodesOfConduct(ap.codesOfConduct);
-		if (ap.standards != null) {
-			p.getStandards().clear();
-			p.getStandards().addAll(ListTools.mapThrowable(ap.standards, aps -> toProcessStandard(userId, p, aps)));
-		}
-		if (ap.records != null) {
-			p.getRecords().clear();
-			p.getRecords().addAll(ListTools.mapThrowable(ap.records, apr -> toProcessDocument(userId, p, apr)));
-		}
 	}
 
 	private ResponsibilityFarmerPicture toResponsibilityFarmerPicture(Long userId, Responsibility r, ApiResponsibilityFarmerPicture arfp) throws ApiException {
@@ -569,24 +532,6 @@ public class ProductApiTools {
 		rfp.setDescription(arfp.description);
 		rfp.setDocument(commonEngine.fetchDocument(userId, arfp.document));
 		return rfp;
-	}
-	
-	private ProcessDocument toProcessDocument(Long userId, Process p, ApiProcessDocument ad) throws ApiException {
-		ProcessDocument pd = new ProcessDocument();
-		pd.setProcess(p);
-		pd.setDescription(ad.description);
-		pd.setDocument(commonEngine.fetchDocument(userId, ad.document));
-		return pd;
-	}
-	
-	private ProcessStandard toProcessStandard(Long userId, Process p, ApiCertification aps) throws ApiException {
-		ProcessStandard ps = new ProcessStandard();
-		ps.setProcess(p);
-		ps.setDescription(aps.description);
-		ps.setType(aps.type);
-		ps.setValidity(aps.validity);
-		ps.setCertificate(commonEngine.fetchDocument(userId, aps.certificate));
-		return ps;
 	}
 
 	public ApiProductLabelValues toApiProductLabelValues(Long userId, ProductLabel pl) throws ApiException {
