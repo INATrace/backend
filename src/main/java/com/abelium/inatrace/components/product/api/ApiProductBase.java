@@ -21,10 +21,6 @@ public class ApiProductBase extends ApiBaseEntity {
 	public String description;
 	
 	@Length(max = 2000)
-	@ApiModelProperty(value = "nutritional Value - list the nutritional value of the product", position = 6)
-	public String nutritionalValue;
-	
-	@Length(max = 2000)
 	@ApiModelProperty(value = "how to Use / Recipes - Describe the best way to use the product (e.g. recipes, how to apply the product...)", position = 7)
 	public String howToUse;
 
@@ -49,14 +45,6 @@ public class ApiProductBase extends ApiBaseEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getNutritionalValue() {
-		return nutritionalValue;
-	}
-
-	public void setNutritionalValue(String nutritionalValue) {
-		this.nutritionalValue = nutritionalValue;
 	}
 
 	public String getHowToUse() {

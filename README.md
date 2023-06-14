@@ -273,7 +273,6 @@ Response:
   "name":"string",
   "photo":"ApiDocument",
   "description":"string",
-  "nutritionalValue":"string",
   "howToUse":"string",
   "origin": ApiProductOrigin,
   "keyMarketsShare":{},

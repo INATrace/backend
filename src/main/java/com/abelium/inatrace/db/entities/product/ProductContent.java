@@ -30,12 +30,6 @@ public class ProductContent extends BaseEntity {
 	 */
 	@Lob
 	private String description;
-	
-	/**
-	 * nutritional Value - list the nutritional value of the product
-	 */
-	@Lob
-	private String nutritionalValue;
 
 	/**
 	 * how to Use / Recipes - Describe the best way to use the product (e.g. recipes, how to apply the product…)
@@ -132,14 +126,6 @@ public class ProductContent extends BaseEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getNutritionalValue() {
-		return nutritionalValue;
-	}
-
-	public void setNutritionalValue(String nutritionalValue) {
-		this.nutritionalValue = nutritionalValue;
 	}
 
 	public String getHowToUse() {
