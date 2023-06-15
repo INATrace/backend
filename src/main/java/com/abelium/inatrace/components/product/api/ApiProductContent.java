@@ -28,9 +28,6 @@ public class ApiProductContent extends ApiProductBase {
 	@Valid
 	public ApiProductSettings settings;
 
-	@ApiModelProperty(value = "knowledge blog", position = 20)
-	public Boolean knowledgeBlog;
-
 	@ApiModelProperty(value = "B2C settings", position = 21)
 	private ApiBusinessToCustomerSettings businessToCustomerSettings;
 	
@@ -72,14 +69,6 @@ public class ApiProductContent extends ApiProductBase {
 
 	public void setSettings(ApiProductSettings settings) {
 		this.settings = settings;
-	}
-
-	public Boolean getKnowledgeBlog() {
-		return knowledgeBlog;
-	}
-
-	public void setKnowledgeBlog(Boolean knowledgeBlog) {
-		this.knowledgeBlog = knowledgeBlog;
 	}
 
 	public ApiBusinessToCustomerSettings getBusinessToCustomerSettings() {

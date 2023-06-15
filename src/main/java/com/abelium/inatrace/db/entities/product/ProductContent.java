@@ -64,12 +64,6 @@ public class ProductContent extends BaseEntity {
 	 */
 	@OneToOne(fetch = FetchType.LAZY)
 	private ProductSettings settings = new ProductSettings();
-	
-	/**
-	 * knowledge blog
-	 */
-	@Column
-	private Boolean knowledgeBlog;
 
 	@OneToOne
 	private BusinessToCustomerSettings businessToCustomerSettings = new BusinessToCustomerSettings();
@@ -136,14 +130,6 @@ public class ProductContent extends BaseEntity {
 
 	public void setSettings(ProductSettings settings) {
 		this.settings = settings;
-	}
-
-	public Boolean getKnowledgeBlog() {
-		return knowledgeBlog;
-	}
-
-	public void setKnowledgeBlog(Boolean knowledgeBlog) {
-		this.knowledgeBlog = knowledgeBlog;
 	}
 
     public ProductJourney getJourney() {

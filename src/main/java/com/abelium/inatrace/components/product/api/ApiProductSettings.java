@@ -11,15 +11,6 @@ import java.util.Map;
 @Validated
 public class ApiProductSettings {
 
-	@ApiModelProperty(value = "check authenticity", position = 1)
-	public Boolean checkAuthenticity;
-	
-	@ApiModelProperty(value = "trace origin", position = 2)
-	public Boolean traceOrigin;
-	
-	@ApiModelProperty(value = "give feedback", position = 3)
-	public Boolean giveFeedback;
-
 	@ApiModelProperty(value = "cost breakdown", position = 4)
 	public Boolean costBreakdown;
 	
@@ -47,31 +38,6 @@ public class ApiProductSettings {
 	@Length(max = 50_000)
 	@ApiModelProperty(value = "Terms of use text", position = 12)
 	public String termsOfUseText;
-
-	
-	public Boolean getCheckAuthenticity() {
-		return checkAuthenticity;
-	}
-
-	public void setCheckAuthenticity(Boolean checkAuthenticity) {
-		this.checkAuthenticity = checkAuthenticity;
-	}
-
-	public Boolean getTraceOrigin() {
-		return traceOrigin;
-	}
-
-	public void setTraceOrigin(Boolean traceOrigin) {
-		this.traceOrigin = traceOrigin;
-	}
-
-	public Boolean getGiveFeedback() {
-		return giveFeedback;
-	}
-
-	public void setGiveFeedback(Boolean giveFeedback) {
-		this.giveFeedback = giveFeedback;
-	}
 
 	public Boolean getCostBreakdown() {
 		return costBreakdown;

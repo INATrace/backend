@@ -126,7 +126,6 @@ public class ProductApiTools {
 		ap.responsibility = toApiResponsibility(userId, p.getResponsibility());
 		ap.sustainability = toApiSustainability(p.getSustainability());
 		ap.settings = toApiSettings(userId, p.getSettings());
-		ap.knowledgeBlog = p.getKnowledgeBlog();
 		ap.setBusinessToCustomerSettings(toApiBusinessToCustomerSettings(p.getBusinessToCustomerSettings(), userId));
 	}
 	
@@ -152,9 +151,6 @@ public class ProductApiTools {
 		if (ps == null) return null;
 		
 		ApiProductSettings aps = new ApiProductSettings();
-		aps.checkAuthenticity = ps.getCheckAuthenticity();
-		aps.traceOrigin = ps.getTraceOrigin();
-		aps.giveFeedback = ps.getGiveFeedback();
 		aps.costBreakdown = ps.getCostBreakdown();
 		aps.pricingTransparency = ps.getPricingTransparency();
 		aps.incomeIncreaseDocument = CommonApiTools.toApiDocument(ps.getIncomeIncreaseDocument(), userId);
@@ -365,7 +361,6 @@ public class ProductApiTools {
 
 			updateBusinessToCustomerSettings(userId, p.getBusinessToCustomerSettings(), apiBusinessToCustomerSettings);
 		}
-		p.setKnowledgeBlog(pu.knowledgeBlog);
 	}
 	
 	public void updateProductLabelContent(Long userId, ProductLabelContent p, ApiProductLabelContent pu) throws ApiException {
@@ -443,9 +438,6 @@ public class ProductApiTools {
 	}
 	
 	private void updateSettings(Long userId, ProductSettings ps, ApiProductSettings aps) throws ApiException {
-		ps.setCheckAuthenticity(aps.checkAuthenticity);
-		ps.setTraceOrigin(aps.traceOrigin);
-		ps.setGiveFeedback(aps.giveFeedback);
 		ps.setCostBreakdown(aps.costBreakdown);
 		ps.setPricingTransparency(aps.pricingTransparency);
 		ps.setIncomeIncreaseDocument(commonEngine.fetchDocument(userId, aps.incomeIncreaseDocument));
