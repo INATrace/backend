@@ -1,4 +1,4 @@
-package com.abelium.inatrace.components.stockorder.api;
+package com.abelium.inatrace.components.dashboard.api;
 
 public enum ApiAggregationTimeUnit {
 	DAY,

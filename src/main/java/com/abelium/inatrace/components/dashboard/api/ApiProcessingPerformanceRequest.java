@@ -1,6 +1,4 @@
-package com.abelium.inatrace.components.stockorder.api;
-
-import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
+package com.abelium.inatrace.components.dashboard.api;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,13 +12,12 @@ public class ApiProcessingPerformanceRequest {
 	private LocalDate dateEnd;
 	private List<ApiProcessingPerformanceRequestEvidenceField> evidenceFields;
 	private ApiAggregationTimeUnit aggregationType;
-
-	private MeasureUnitType measureUnitType;
+	private ApiExportType exportType;
 
 	public ApiProcessingPerformanceRequest(Long companyId, Long facilityId, Long processActionId, LocalDate dateStart,
 	                                       LocalDate dateEnd,
 	                                       List<ApiProcessingPerformanceRequestEvidenceField> evidenceFields,
-	                                       ApiAggregationTimeUnit aggregationType, MeasureUnitType measureUnitType) {
+	                                       ApiAggregationTimeUnit aggregationType, ApiExportType exportType) {
 		this.companyId = companyId;
 		this.facilityId = facilityId;
 		this.processActionId = processActionId;
@@ -28,7 +25,7 @@ public class ApiProcessingPerformanceRequest {
 		this.dateEnd = dateEnd;
 		this.evidenceFields = evidenceFields;
 		this.aggregationType = aggregationType;
-		this.measureUnitType = measureUnitType;
+		this.exportType = exportType;
 	}
 
 	public Long getCompanyId() {
@@ -87,11 +84,11 @@ public class ApiProcessingPerformanceRequest {
 		this.aggregationType = aggregationType;
 	}
 
-	public MeasureUnitType getMeasureUnitType() {
-		return measureUnitType;
+	public ApiExportType getExportType() {
+		return exportType;
 	}
 
-	public void setMeasureUnitType(MeasureUnitType measureUnitType) {
-		this.measureUnitType = measureUnitType;
+	public void setExportType(ApiExportType exportType) {
+		this.exportType = exportType;
 	}
 }
