@@ -171,21 +171,8 @@ public class ProductApiTools {
 		
 		ApiResponsibility ar = new ApiResponsibility();
 		ar.laborPolicies = r.getLaborPolicies();
-		ar.relationship = r.getRelationship();
-		ar.farmer = r.getFarmer();
-		ar.pictures = r.getPictures().stream().map(s -> toApiResponsibilityFarmerPicture(userId, s)).collect(Collectors.toList());
-		ar.story = r.getStory();
 		return ar;
 	}
-	
-	public static ApiResponsibilityFarmerPicture toApiResponsibilityFarmerPicture(Long userId, ResponsibilityFarmerPicture rfp) {
-		if (rfp == null) return null;
-		
-		ApiResponsibilityFarmerPicture arfp = new ApiResponsibilityFarmerPicture();
-		arfp.description = rfp.getDescription();
-		arfp.document = CommonApiTools.toApiDocument(rfp.getDocument(), userId);
-		return arfp;
-	}	
 
 	public static ApiLocation toApiLocation(Location l) {
 		if (l == null) return null;
@@ -346,7 +333,7 @@ public class ProductApiTools {
 			p.setOriginText(pu.origin.text);
 		}
 		if (pu.process != null) updateProcess(p.getProcess(), pu.process);
-		if (pu.responsibility != null) updateResponsibility(userId, p.getResponsibility(), pu.responsibility);
+		if (pu.responsibility != null) updateResponsibility(p.getResponsibility(), pu.responsibility);
 		if (pu.sustainability != null) updateSustainability(p.getSustainability(), pu.sustainability);
 		if (pu.settings != null) updateSettings(userId, p.getSettings(), pu.settings);
 
@@ -511,27 +498,12 @@ public class ProductApiTools {
 		b2c.setAverageRegionFarmGatePrice(ab2c.getAverageRegionFarmGatePrice());
 	}
 	
-	private void updateResponsibility(Long userId, Responsibility r, ApiResponsibility ar) throws ApiException {
+	private void updateResponsibility(Responsibility r, ApiResponsibility ar) {
 		r.setLaborPolicies(ar.laborPolicies);
-		r.setRelationship(ar.relationship);
-		r.setFarmer(ar.farmer);
-		if (ar.pictures != null) {
-			r.getPictures().clear();
-			r.getPictures().addAll(ListTools.mapThrowable(ar.pictures, arfp -> toResponsibilityFarmerPicture(userId, r, arfp)));
-		}
-		r.setStory(ar.story);
 	}
 
 	private void updateProcess(Process p, ApiProcess ap) {
 		p.setProduction(ap.production);
-	}
-
-	private ResponsibilityFarmerPicture toResponsibilityFarmerPicture(Long userId, Responsibility r, ApiResponsibilityFarmerPicture arfp) throws ApiException {
-		ResponsibilityFarmerPicture rfp = new ResponsibilityFarmerPicture();
-		rfp.setResponsibility(r);
-		rfp.setDescription(arfp.description);
-		rfp.setDocument(commonEngine.fetchDocument(userId, arfp.document));
-		return rfp;
 	}
 
 	public ApiProductLabelValues toApiProductLabelValues(Long userId, ProductLabel pl) throws ApiException {
