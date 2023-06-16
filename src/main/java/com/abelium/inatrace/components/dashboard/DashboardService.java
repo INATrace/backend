@@ -129,6 +129,9 @@ public class DashboardService extends BaseService {
             }
         }
 
+        BigDecimal measuringUnitNormalisationQuotient = calculateSemiProductNormalisationQuotient(
+                apiDeliveriesQueryRequest.semiProductId);
+
         List<ApiDeliveriesTotalItem> totalQuantityList;
 
         if (aggregationExpressions.size() < 2) {
@@ -137,7 +140,9 @@ public class DashboardService extends BaseService {
                     .groupBy(aggregationExpressions.get(0));
 
             totalQuantityList = em.createQuery(cq).getResultList().stream()
-                    .map(data -> new ApiDeliveriesTotalItem(String.valueOf(data[0]), null, (BigDecimal) data[1]))
+                    .map(data -> new ApiDeliveriesTotalItem(String.valueOf(data[0]), null,
+                            ((BigDecimal) data[1]).multiply(measuringUnitNormalisationQuotient)
+                                    .setScale(2, RoundingMode.HALF_UP)))
                     .collect(Collectors.toList());
         }  else {
             cq.multiselect(aggregationExpressions.get(0), aggregationExpressions.get(1), cb.sum(root.get("totalQuantity")))
@@ -146,7 +151,9 @@ public class DashboardService extends BaseService {
 
             totalQuantityList = em.createQuery(cq).getResultList().stream()
                     .map(data -> new ApiDeliveriesTotalItem(
-                            String.valueOf(data[0]), (Integer) data[1], (BigDecimal) data[2]))
+                            String.valueOf(data[0]), (Integer) data[1],
+                            ((BigDecimal) data[2]).multiply(measuringUnitNormalisationQuotient)
+                                    .setScale(2, RoundingMode.HALF_UP)))
                     .collect(Collectors.toList());
         }
 
@@ -424,6 +431,21 @@ public class DashboardService extends BaseService {
 
         return MeasureUnitTypeMapper.toApiMeasureUnitType(
                 processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct().getMeasurementUnitType());
+    }
+
+    private BigDecimal calculateSemiProductNormalisationQuotient(Long idSemiProduct) {
+
+        if (idSemiProduct == null) {
+            return BigDecimal.ONE;
+        }
+
+        SemiProduct semiProduct = Queries.get(em, SemiProduct.class, idSemiProduct);
+
+        if (semiProduct == null || semiProduct.getMeasurementUnitType() == null) {
+            return BigDecimal.ONE;
+        }
+
+        return semiProduct.getMeasurementUnitType().getWeight();
     }
 
     private BigDecimal calculateInputNormalisationQuotient(Long idProcessingAction) throws ApiException {
