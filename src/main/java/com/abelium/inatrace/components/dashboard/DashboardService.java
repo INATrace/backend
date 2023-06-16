@@ -501,6 +501,7 @@ public class DashboardService extends BaseService {
 
             headerRecord.add("Date");
             headerRecord.add("Total quantity");
+            headerRecord.add("Measuring unit");
 
             // Add additional  filters
             headerRecord.addAll(additionalFilters.keySet());
@@ -513,6 +514,9 @@ public class DashboardService extends BaseService {
                 List<String> dataValues = new ArrayList<>();
                 dataValues.add(createDateColumn(item, total.getUnitType()));
                 dataValues.add(item.getTotalQuantity().toString());
+
+                // deliveries unit is always in kg
+                dataValues.add("kg");
 
                 // Prepare additional filter values
                 dataValues.addAll(additionalFilters.values());
@@ -535,6 +539,7 @@ public class DashboardService extends BaseService {
         List<String> headerCells = new ArrayList<>();
         headerCells.add("Date");
         headerCells.add("Total quantity");
+        headerCells.add("Measuring unit");
         headerCells.addAll(additionalFilters.keySet());
 
         PdfPTable table = new PdfPTable(headerCells.size());
@@ -552,6 +557,9 @@ public class DashboardService extends BaseService {
 
             table.addCell(createDateColumn(totalItem, total.getUnitType()));
             table.addCell(totalItem.getTotalQuantity().toString());
+
+            // deliveries unit is always in kg
+            table.addCell("kg");
 
             additionalFilters.values().forEach(table::addCell);
         });
@@ -588,8 +596,9 @@ public class DashboardService extends BaseService {
             Row headerRow = sheet.createRow(0);
             headerRow.createCell(0, CellType.STRING).setCellValue("Date");
             headerRow.createCell(1, CellType.STRING).setCellValue("Total quantity");
+            headerRow.createCell(2, CellType.STRING).setCellValue("Measuring unit");
 
-            int headerColumnIndex = 2;
+            int headerColumnIndex = 3;
             // additional selected filters
             for (String filterName : additionalFilters.keySet()) {
                 headerRow.createCell(headerColumnIndex++, CellType.STRING).setCellValue(filterName);
@@ -603,7 +612,10 @@ public class DashboardService extends BaseService {
                 row.createCell(0, CellType.STRING).setCellValue(createDateColumn(total.getTotals().get(i), total.getUnitType()));
                 row.createCell(1, CellType.NUMERIC).setCellValue(total.getTotals().get(i).getTotalQuantity().doubleValue());
 
-                int columnIndex = 2;
+                // deliveries unit is always in kg
+                row.createCell(2, CellType.STRING).setCellValue("kg");
+
+                int columnIndex = 3;
                 // generate additional fields
                 for (String filterValue : additionalFilters.values()) {
                     row.createCell(columnIndex++, CellType.STRING).setCellValue(filterValue);
@@ -633,6 +645,7 @@ public class DashboardService extends BaseService {
             headerRecord.add("Date");
             headerRecord.add("Input quantity");
             headerRecord.add("Output quantity");
+            headerRecord.add("Measuring unit");
             headerRecord.add("Ratio");
 
             // Add additional  filters
@@ -647,6 +660,7 @@ public class DashboardService extends BaseService {
                 dataValues.add(createDateColumn(item, total.getUnitType()));
                 dataValues.add(item.getInputQuantity().toString());
                 dataValues.add(item.getOutputQuantity().toString());
+                dataValues.add(total.getMeasureUnitType().getLabel());
                 dataValues.add(item.getRatio().toString());
 
                 // Prepare additional filter values
@@ -671,6 +685,7 @@ public class DashboardService extends BaseService {
         headerCells.add("Date");
         headerCells.add("Input quantity");
         headerCells.add("Output quantity");
+        headerCells.add("Measuring unit");
         headerCells.add("Ratio");
         headerCells.addAll(additionalFilters.keySet());
 
@@ -690,6 +705,7 @@ public class DashboardService extends BaseService {
             table.addCell(createDateColumn(totalItem, total.getUnitType()));
             table.addCell(totalItem.getInputQuantity().toString());
             table.addCell(totalItem.getOutputQuantity().toString());
+            table.addCell(total.getMeasureUnitType().getLabel());
             table.addCell(totalItem.getRatio().toString());
 
             additionalFilters.values().forEach(table::addCell);
@@ -727,9 +743,10 @@ public class DashboardService extends BaseService {
             headerRow.createCell(0, CellType.STRING).setCellValue("Date");
             headerRow.createCell(1, CellType.STRING).setCellValue("Input quantity");
             headerRow.createCell(2, CellType.STRING).setCellValue("Output quantity");
-            headerRow.createCell(3, CellType.STRING).setCellValue("Ratio");
+            headerRow.createCell(3, CellType.STRING).setCellValue("Measuring unit");
+            headerRow.createCell(4, CellType.STRING).setCellValue("Ratio");
 
-            int headerColumnIndex = 4;
+            int headerColumnIndex = 5;
             // additional selected filters
             for (String filterName : additionalFilters.keySet()) {
                 headerRow.createCell(headerColumnIndex++, CellType.STRING).setCellValue(filterName);
@@ -743,9 +760,10 @@ public class DashboardService extends BaseService {
                 row.createCell(0, CellType.STRING).setCellValue(createDateColumn(total.getTotals().get(i), total.getUnitType()));
                 row.createCell(1, CellType.NUMERIC).setCellValue(total.getTotals().get(i).getInputQuantity().doubleValue());
                 row.createCell(2, CellType.NUMERIC).setCellValue(total.getTotals().get(i).getOutputQuantity().doubleValue());
-                row.createCell(3, CellType.NUMERIC).setCellValue(total.getTotals().get(i).getRatio().doubleValue());
+                row.createCell(3, CellType.STRING).setCellValue(total.getMeasureUnitType().getLabel());
+                row.createCell(4, CellType.NUMERIC).setCellValue(total.getTotals().get(i).getRatio().doubleValue());
 
-                int columnIndex = 4;
+                int columnIndex = 5;
                 // generate additional fields
                 for (String filterValue : additionalFilters.values()) {
                     row.createCell(columnIndex++, CellType.STRING).setCellValue(filterValue);
