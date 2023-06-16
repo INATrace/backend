@@ -7,16 +7,21 @@ import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasure
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.dashboard.api.*;
 import com.abelium.inatrace.components.processingaction.ProcessingActionService;
-import com.abelium.inatrace.components.stockorder.StockOrderQueryRequest;
+import com.abelium.inatrace.db.entities.codebook.SemiProduct;
+import com.abelium.inatrace.db.entities.common.UserCustomer;
+import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderPEFieldValue;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
+import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
+import com.lowagie.text.PageSize;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
@@ -50,13 +55,14 @@ import java.util.stream.Collectors;
 public class DashboardService extends BaseService {
 
     private final ProcessingActionService processingActionService;
+
     @Autowired
     public DashboardService(ProcessingActionService processingActionService) {
         this.processingActionService = processingActionService;
     }
 
     public ApiDeliveriesTotal getDeliveriesAggregatedData(ApiAggregationTimeUnit aggregationType,
-                                                          StockOrderQueryRequest stockOrderQueryRequest) {
+                                                          ApiDeliveriesQueryRequest apiDeliveriesQueryRequest) {
 
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
@@ -89,37 +95,37 @@ public class DashboardService extends BaseService {
         predicateList.add(cb.equal(root.get("orderType"), OrderType.PURCHASE_ORDER));
 
         // Other predicate from the request params
-        if (stockOrderQueryRequest != null) {
+        if (apiDeliveriesQueryRequest != null) {
 
-            if (stockOrderQueryRequest.companyId != null) {
-                predicateList.add(cb.equal(root.get("company").get("id"), stockOrderQueryRequest.companyId));
+            if (apiDeliveriesQueryRequest.companyId != null) {
+                predicateList.add(cb.equal(root.get("company").get("id"), apiDeliveriesQueryRequest.companyId));
             }
-            if (stockOrderQueryRequest.facilityIds != null) {
-                predicateList.add(root.get("facility").get("id").in(stockOrderQueryRequest.facilityIds));
+            if (apiDeliveriesQueryRequest.facilityIds != null) {
+                predicateList.add(root.get("facility").get("id").in(apiDeliveriesQueryRequest.facilityIds));
             }
-            if (stockOrderQueryRequest.farmerId != null) {
-                predicateList.add(cb.equal(root.get("producerUserCustomer").get("id"), stockOrderQueryRequest.farmerId));
+            if (apiDeliveriesQueryRequest.farmerId != null) {
+                predicateList.add(cb.equal(root.get("producerUserCustomer").get("id"), apiDeliveriesQueryRequest.farmerId));
             }
-            if (stockOrderQueryRequest.representativeOfProducerUserCustomerId != null) {
-                predicateList.add(cb.equal(root.get("representativeOfProducerUserCustomer").get("id"), stockOrderQueryRequest.representativeOfProducerUserCustomerId));
+            if (apiDeliveriesQueryRequest.representativeOfProducerUserCustomerId != null) {
+                predicateList.add(cb.equal(root.get("representativeOfProducerUserCustomer").get("id"), apiDeliveriesQueryRequest.representativeOfProducerUserCustomerId));
             }
-            if (stockOrderQueryRequest.semiProductId != null) {
-                predicateList.add(cb.equal(root.get("semiProduct").get("id"), stockOrderQueryRequest.semiProductId));
+            if (apiDeliveriesQueryRequest.semiProductId != null) {
+                predicateList.add(cb.equal(root.get("semiProduct").get("id"), apiDeliveriesQueryRequest.semiProductId));
             }
-            if (stockOrderQueryRequest.isWomenShare != null) {
-                predicateList.add(cb.equal(root.get("womenShare"), stockOrderQueryRequest.isWomenShare));
+            if (apiDeliveriesQueryRequest.isWomenShare != null) {
+                predicateList.add(cb.equal(root.get("womenShare"), apiDeliveriesQueryRequest.isWomenShare));
             }
-            if (stockOrderQueryRequest.organicOnly != null) {
-                predicateList.add(cb.equal(root.get("organic"), stockOrderQueryRequest.organicOnly));
+            if (apiDeliveriesQueryRequest.organicOnly != null) {
+                predicateList.add(cb.equal(root.get("organic"), apiDeliveriesQueryRequest.organicOnly));
             }
-            if (stockOrderQueryRequest.priceDeterminedLater != null) {
-                predicateList.add(cb.equal(root.get("priceDeterminedLater"), stockOrderQueryRequest.priceDeterminedLater));
+            if (apiDeliveriesQueryRequest.priceDeterminedLater != null) {
+                predicateList.add(cb.equal(root.get("priceDeterminedLater"), apiDeliveriesQueryRequest.priceDeterminedLater));
             }
-            if (stockOrderQueryRequest.productionDateStart != null) {
-                predicateList.add(cb.greaterThanOrEqualTo(root.get("productionDate"), stockOrderQueryRequest.productionDateStart));
+            if (apiDeliveriesQueryRequest.productionDateStart != null) {
+                predicateList.add(cb.greaterThanOrEqualTo(root.get("productionDate"), apiDeliveriesQueryRequest.productionDateStart));
             }
-            if (stockOrderQueryRequest.productionDateEnd != null) {
-                predicateList.add(cb.lessThanOrEqualTo(root.get("productionDate"), stockOrderQueryRequest.productionDateEnd));
+            if (apiDeliveriesQueryRequest.productionDateEnd != null) {
+                predicateList.add(cb.lessThanOrEqualTo(root.get("productionDate"), apiDeliveriesQueryRequest.productionDateEnd));
             }
         }
 
@@ -422,6 +428,18 @@ public class DashboardService extends BaseService {
 
         ProcessingAction processingAction = processingActionService.fetchProcessingAction(idProcessingAction);
 
+        // default return 1, if not found
+        if (processingAction == null || processingAction.getInputSemiProduct() == null ||
+                processingAction.getInputSemiProduct().getMeasurementUnitType() == null ||
+                processingAction.getOutputSemiProducts() == null || processingAction.getOutputSemiProducts().isEmpty() ||
+                processingAction.getOutputSemiProducts().get(0) == null ||
+                processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct() == null ||
+                processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct()
+                        .getMeasurementUnitType() == null
+        ) {
+            return BigDecimal.ONE;
+        }
+
         BigDecimal inputWeight = processingAction.getInputSemiProduct().getMeasurementUnitType().getWeight();
 
         BigDecimal outputWeight = processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct()
@@ -469,7 +487,10 @@ public class DashboardService extends BaseService {
         return new ArrayList<>(em.createQuery(processingOrdersQuery).getResultList());
     }
 
-    public byte[] convertDeliveryDataToCsv(ApiDeliveriesTotal total, Map<String, String> additionalFilters) throws IOException {
+    public byte[] convertDeliveryDataToCsv(ApiDeliveriesTotal total, ApiDeliveriesQueryRequest request) throws IOException {
+
+        // get additional filters
+        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request);
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try (CSVPrinter csvPrinter = new CSVPrinter(new OutputStreamWriter(bytes), CSVFormat.RFC4180)) {
@@ -488,7 +509,7 @@ public class DashboardService extends BaseService {
             for (ApiDeliveriesTotalItem item: total.getTotals()) {
 
                 List<String> dataValues = new ArrayList<>();
-                dataValues.add(item.getUnit());
+                dataValues.add(createDateColumn(item, total.getUnitType()));
                 dataValues.add(item.getTotalQuantity().toString());
 
                 // Prepare additional filter values
@@ -504,7 +525,10 @@ public class DashboardService extends BaseService {
         return bytes.toByteArray();
     }
 
-    public byte[] convertDeliveryDataToPDF(ApiDeliveriesTotal total, Map<String, String> additionalFilters) throws ApiException {
+    public byte[] convertDeliveryDataToPDF(ApiDeliveriesTotal total, ApiDeliveriesQueryRequest request) throws ApiException {
+
+        // get additional filters
+        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request);
 
         List<String> headerCells = new ArrayList<>();
         headerCells.add("Date");
@@ -524,7 +548,7 @@ public class DashboardService extends BaseService {
 
         total.getTotals().forEach(totalItem -> {
 
-            table.addCell(totalItem.getUnit());
+            table.addCell(createDateColumn(totalItem, total.getUnitType()));
             table.addCell(totalItem.getTotalQuantity().toString());
 
             additionalFilters.values().forEach(table::addCell);
@@ -537,6 +561,8 @@ public class DashboardService extends BaseService {
             PdfWriter.getInstance(document, byteArrayOutputStream);
 
             document.open();
+            document.setPageSize(PageSize.A4.rotate());
+            document.newPage();
             document.add(table);
             document.close();
 
@@ -547,7 +573,10 @@ public class DashboardService extends BaseService {
         return byteArrayOutputStream.toByteArray();
     }
 
-    public byte[] convertDeliveryDataToExcel(ApiDeliveriesTotal total, Map<String, String> additionalFilters) throws IOException {
+    public byte[] convertDeliveryDataToExcel(ApiDeliveriesTotal total, ApiDeliveriesQueryRequest request) throws IOException {
+
+        // get additional filters
+        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
@@ -569,7 +598,7 @@ public class DashboardService extends BaseService {
                 Row row = sheet.createRow(i + 1);
 
                 // generate common fields
-                row.createCell(0, CellType.STRING).setCellValue(total.getTotals().get(i).getUnit());
+                row.createCell(0, CellType.STRING).setCellValue(createDateColumn(total.getTotals().get(i), total.getUnitType()));
                 row.createCell(1, CellType.NUMERIC).setCellValue(total.getTotals().get(i).getTotalQuantity().doubleValue());
 
                 int columnIndex = 2;
@@ -579,13 +608,20 @@ public class DashboardService extends BaseService {
                 }
             }
 
+            for (int j = 0; j < headerColumnIndex; j++) {
+                sheet.setColumnWidth(j, 4000);
+            }
+
             workbook.write(byteArrayOutputStream);
         }
 
         return byteArrayOutputStream.toByteArray();
     }
 
-    public byte[] convertPerformanceDataToCsv(ApiProcessingPerformanceTotal total, Map<String, String> additionalFilters) throws IOException {
+    public byte[] convertPerformanceDataToCsv(ApiProcessingPerformanceTotal total, ApiProcessingPerformanceRequest request) throws IOException {
+
+        // get additional filters
+        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request);
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try (CSVPrinter csvPrinter = new CSVPrinter(new OutputStreamWriter(bytes), CSVFormat.RFC4180)) {
@@ -606,7 +642,7 @@ public class DashboardService extends BaseService {
             for (ApiProcessingPerformanceTotalItem item: total.getTotals()) {
 
                 List<String> dataValues = new ArrayList<>();
-                dataValues.add(item.getUnit());
+                dataValues.add(createDateColumn(item, total.getUnitType()));
                 dataValues.add(item.getInputQuantity().toString());
                 dataValues.add(item.getOutputQuantity().toString());
                 dataValues.add(item.getRatio().toString());
@@ -624,7 +660,10 @@ public class DashboardService extends BaseService {
         return bytes.toByteArray();
     }
 
-    public byte[] convertPerformanceDataToPDF(ApiProcessingPerformanceTotal total, Map<String, String> additionalFilters) throws ApiException {
+    public byte[] convertPerformanceDataToPDF(ApiProcessingPerformanceTotal total, ApiProcessingPerformanceRequest request) throws ApiException {
+
+        // get additional filters
+        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request);
 
         List<String> headerCells = new ArrayList<>();
         headerCells.add("Date");
@@ -646,7 +685,7 @@ public class DashboardService extends BaseService {
 
         total.getTotals().forEach(totalItem -> {
 
-            table.addCell(totalItem.getUnit());
+            table.addCell(createDateColumn(totalItem, total.getUnitType()));
             table.addCell(totalItem.getInputQuantity().toString());
             table.addCell(totalItem.getOutputQuantity().toString());
             table.addCell(totalItem.getRatio().toString());
@@ -661,6 +700,8 @@ public class DashboardService extends BaseService {
             PdfWriter.getInstance(document, byteArrayOutputStream);
 
             document.open();
+            document.setPageSize(PageSize.A4.rotate());
+            document.newPage();
             document.add(table);
             document.close();
         } catch (DocumentException e) {
@@ -670,7 +711,10 @@ public class DashboardService extends BaseService {
         return byteArrayOutputStream.toByteArray();
     }
 
-    public byte[] convertPerformanceDataToExcel(ApiProcessingPerformanceTotal total, Map<String, String> additionalFilters) throws IOException {
+    public byte[] convertPerformanceDataToExcel(ApiProcessingPerformanceTotal total, ApiProcessingPerformanceRequest request) throws IOException {
+
+        // get additional filters
+        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
@@ -694,7 +738,7 @@ public class DashboardService extends BaseService {
                 Row row = sheet.createRow(i + 1);
 
                 // generate common fields
-                row.createCell(0, CellType.STRING).setCellValue(total.getTotals().get(i).getUnit());
+                row.createCell(0, CellType.STRING).setCellValue(createDateColumn(total.getTotals().get(i), total.getUnitType()));
                 row.createCell(1, CellType.NUMERIC).setCellValue(total.getTotals().get(i).getInputQuantity().doubleValue());
                 row.createCell(2, CellType.NUMERIC).setCellValue(total.getTotals().get(i).getOutputQuantity().doubleValue());
                 row.createCell(3, CellType.NUMERIC).setCellValue(total.getTotals().get(i).getRatio().doubleValue());
@@ -706,9 +750,197 @@ public class DashboardService extends BaseService {
                 }
             }
 
+            for (int j = 0; j < headerColumnIndex; j++) {
+                sheet.setColumnWidth(j, 4000);
+            }
+
             workbook.write(byteArrayOutputStream);
         }
 
         return byteArrayOutputStream.toByteArray();
+    }
+
+    /**
+     * Creates filter columns for Export.
+     * @param queryRequest - input query of type ApiDeliveriesQueryRequest
+     * @return - map containing pair (columnName, columnValue) for additional filters
+     */
+    private Map<String, String> createAdditionalFiltersFromRequest(ApiDeliveriesQueryRequest queryRequest) {
+
+        Map<String, String> additionalFiltersMap = new HashMap<>();
+
+        if (queryRequest.getCompanyId() != null) {
+            Company company = Queries.get(em, Company.class, queryRequest.getCompanyId());
+            additionalFiltersMap.put("Company", company.getName());
+        }
+        if (queryRequest.getFacilityIds() != null) {
+            String facilities = "";
+            for (int i=0; i< queryRequest.getFacilityIds().size(); i++) {
+                Facility facility = Queries.get(em, Facility.class, queryRequest.getFacilityIds().get(i));
+                facilities = facilities.concat(facility.getName());
+                if (i < queryRequest.getFacilityIds().size() - 1) {
+                    facilities = facilities.concat(",");
+                }
+            }
+
+            additionalFiltersMap.put("Facilities", facilities);
+        }
+        if (queryRequest.getFarmerId() != null) {
+            UserCustomer userCustomer = Queries.get(em, UserCustomer.class, queryRequest.getFarmerId());
+            additionalFiltersMap.put("Farmer", userCustomer.getName() + " " + userCustomer.getSurname());
+        }
+        if (queryRequest.getRepresentativeOfProducerUserCustomerId() != null) {
+            UserCustomer representativeCustomer = Queries.get(em, UserCustomer.class,
+                    queryRequest.getRepresentativeOfProducerUserCustomerId());
+            additionalFiltersMap.put("Collector",
+                    representativeCustomer.getName() + " " + representativeCustomer.getSurname());
+        }
+        if (queryRequest.getSemiProductId() != null) {
+            SemiProduct semiProduct = Queries.get(em, SemiProduct.class, queryRequest.getSemiProductId());
+            additionalFiltersMap.put("Semi-product", semiProduct.getName());
+        }
+        if (queryRequest.getOrganicOnly() != null && queryRequest.getOrganicOnly()) {
+            additionalFiltersMap.put("Organic", queryRequest.getOrganicOnly().toString());
+        }
+        if (queryRequest.getWomenShare() != null && queryRequest.getWomenShare()) {
+            additionalFiltersMap.put("Women only", queryRequest.getWomenShare().toString());
+        }
+        if (queryRequest.getPriceDeterminedLater() != null && queryRequest.getPriceDeterminedLater()) {
+            additionalFiltersMap.put("Product in deposit", queryRequest.getPriceDeterminedLater().toString());
+        }
+
+        return additionalFiltersMap;
+    }
+
+    /**
+     * Creates filter columns for Export.
+     * @param queryRequest - input query of type ApiProcessingPerformanceRequest
+     * @return - map containing pair (columnName, columnValue) for additional filters
+     */
+    private Map<String, String> createAdditionalFiltersFromRequest(ApiProcessingPerformanceRequest queryRequest) {
+
+        Map<String, String> additionalFiltersMap = new HashMap<>();
+
+        if (queryRequest.getCompanyId() != null) {
+            Company company = Queries.get(em, Company.class, queryRequest.getCompanyId());
+            additionalFiltersMap.put("Company", company.getName());
+        }
+        if (queryRequest.getFacilityId() != null) {
+            Facility facility = Queries.get(em, Facility.class, queryRequest.getFacilityId());
+            additionalFiltersMap.put("Facility", facility.getName());
+        }
+        if (queryRequest.getProcessActionId() != null) {
+            ProcessingAction processingAction = Queries.get(em, ProcessingAction.class, queryRequest.getProcessActionId());
+            additionalFiltersMap.put("Processing", processingAction.getPublicTimelineLabel());
+        }
+        queryRequest.getEvidenceFields().forEach(evidenceField -> {
+            if (evidenceField.getStringValue() != null) {
+                additionalFiltersMap.put(evidenceField.getEvidenceField().getFieldName(),
+                        evidenceField.getStringValue());
+            } else if (evidenceField.getNumericValue() != null) {
+                additionalFiltersMap.put(evidenceField.getEvidenceField().getFieldName(),
+                        evidenceField.getNumericValue().toString());
+            } else if (evidenceField.getInstantValue() != null) {
+                additionalFiltersMap.put(evidenceField.getEvidenceField().getFieldName(),
+                        evidenceField.getInstantValue().toString());
+            }
+        });
+
+        return additionalFiltersMap;
+    }
+
+    /**
+     * Generates date column for export.
+     * @param totalItem - row of type ApiDeliveriesTotalItem
+     * @param unitType - time unit
+     * @return - formated date column
+     */
+    private String createDateColumn(ApiDeliveriesTotalItem totalItem, ApiAggregationTimeUnit unitType) {
+
+        if (totalItem != null) {
+            switch (unitType) {
+                case WEEK:
+                    return translateWeek(totalItem.getUnit()) + " " + totalItem.getYear().toString();
+                case MONTH:
+                    return translateMonth(totalItem.getUnit()) + " " + totalItem.getYear().toString();
+                case YEAR:
+                case DAY:
+                default:
+                    return totalItem.getUnit();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Generates date column for export.
+     * @param totalItem - row of type ApiProcessingPerformanceTotalItem
+     * @param unitType - time unit
+     * @return - formated date column
+     */
+    private String createDateColumn(ApiProcessingPerformanceTotalItem totalItem, ApiAggregationTimeUnit unitType) {
+
+        if (totalItem != null) {
+            switch (unitType) {
+                case WEEK:
+                    return translateWeek(totalItem.getUnit()) + " " + totalItem.getYear().toString();
+                case MONTH:
+                    return translateMonth(totalItem.getUnit()) + " " + totalItem.getYear().toString();
+                case YEAR:
+                case DAY:
+                default:
+                    return totalItem.getUnit();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Helper method for week translation
+     * @param unit - week id
+     * @return - translated and formated week
+     */
+    private String translateWeek(String unit) {
+        if (unit != null) {
+            return "Week-" + unit;
+        }
+        return null;
+    }
+
+    /**
+     * Helper method for month translations
+     * @param monthNum - id of month
+     * @return - translated
+     */
+    private String translateMonth(String monthNum) {
+        switch (monthNum) {
+            case "0":
+                return "Jan";
+            case "1":
+                return "Feb";
+            case "2":
+                return "Mar";
+            case "3":
+                return "Apr";
+            case "4":
+                return "May";
+            case "5":
+                return "Jun";
+            case "6":
+                return "Jul";
+            case "7":
+                return "Aug";
+            case "8":
+                return "Sep";
+            case "9":
+                return "Oct";
+            case "10":
+                return "Nov";
+            case "11":
+                return "Dec";
+        }
+        return null;
     }
 }

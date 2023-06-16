@@ -4,7 +4,6 @@ import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.dashboard.api.*;
-import com.abelium.inatrace.components.stockorder.StockOrderQueryRequest;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/dashboard")
@@ -46,7 +43,7 @@ public class DashboardController {
     ) {
         return new ApiResponse<>(dashboardService.getDeliveriesAggregatedData(
                 aggregationType,
-                new StockOrderQueryRequest(
+                new ApiDeliveriesQueryRequest(
                         companyId,
                         facilityIds,
                         farmerId,
@@ -78,58 +75,31 @@ public class DashboardController {
 
         byte[] response = null;
 
-        ApiDeliveriesTotal total = dashboardService.getDeliveriesAggregatedData(
-            aggregationType,
-            new StockOrderQueryRequest(
-                    companyId,
-                    facilityIds,
-                    farmerId,
-                    collectorId,
-                    semiProductId,
-                    isWomenShare,
-                    organicOnly,
-                    priceDeterminedLater,
-                    productionDateStart,
-                    productionDateEnd
-            ));
+        ApiDeliveriesQueryRequest request = new ApiDeliveriesQueryRequest(
+                companyId,
+                facilityIds,
+                farmerId,
+                collectorId,
+                semiProductId,
+                isWomenShare,
+                organicOnly,
+                priceDeterminedLater,
+                productionDateStart,
+                productionDateEnd
+        );
 
-        Map<String, String> additionalFiltersMap = new HashMap<>();
-
-        if (companyId != null) {
-            additionalFiltersMap.put("Company", companyId.toString());
-        }
-        if (facilityIds != null) {
-            additionalFiltersMap.put("Facilities", facilityIds.toString());
-        }
-        if (farmerId != null) {
-            additionalFiltersMap.put("Farmer", farmerId.toString());
-        }
-        if (collectorId != null) {
-            additionalFiltersMap.put("Collector", collectorId.toString());
-        }
-        if (semiProductId != null) {
-            additionalFiltersMap.put("Semi-product", semiProductId.toString());
-        }
-        if (organicOnly != null && organicOnly) {
-            additionalFiltersMap.put("Organic", organicOnly.toString());
-        }
-        if (isWomenShare != null && isWomenShare) {
-            additionalFiltersMap.put("Women only", isWomenShare.toString());
-        }
-        if (priceDeterminedLater != null && priceDeterminedLater) {
-            additionalFiltersMap.put("Product in deposit", priceDeterminedLater.toString());
-        }
+        ApiDeliveriesTotal total = dashboardService.getDeliveriesAggregatedData(aggregationType, request);
 
         try {
             switch (exportType) {
                 case CSV:
-                    response = dashboardService.convertDeliveryDataToCsv(total, additionalFiltersMap);
+                    response = dashboardService.convertDeliveryDataToCsv(total, request);
                     break;
                 case PDF:
-                    response = dashboardService.convertDeliveryDataToPDF(total, additionalFiltersMap);
+                    response = dashboardService.convertDeliveryDataToPDF(total, request);
                     break;
                 case EXCEL:
-                        response = dashboardService.convertDeliveryDataToExcel(total, additionalFiltersMap);
+                        response = dashboardService.convertDeliveryDataToExcel(total, request);
                     break;
                 default:
                     break;
@@ -159,42 +129,19 @@ public class DashboardController {
 
         byte[] response = null;
 
-        ApiProcessingPerformanceTotal total = dashboardService.calculateProcessingPerformanceData(processingPerformanceRequest);
-
-        Map<String, String> additionalFiltersMap = new HashMap<>();
-
-        if (processingPerformanceRequest.getCompanyId() != null) {
-            additionalFiltersMap.put("Company", processingPerformanceRequest.getCompanyId().toString());
-        }
-        if (processingPerformanceRequest.getFacilityId() != null) {
-            additionalFiltersMap.put("Facility", processingPerformanceRequest.getFacilityId().toString());
-        }
-        if (processingPerformanceRequest.getProcessActionId() != null) {
-            additionalFiltersMap.put("Processing", processingPerformanceRequest.getProcessActionId().toString());
-        }
-        processingPerformanceRequest.getEvidenceFields().forEach(evidenceField -> {
-            if (evidenceField.getStringValue() != null) {
-                additionalFiltersMap.put(evidenceField.getEvidenceField().getFieldName(),
-                        evidenceField.getStringValue());
-            } else if (evidenceField.getNumericValue() != null) {
-                additionalFiltersMap.put(evidenceField.getEvidenceField().getFieldName(),
-                        evidenceField.getNumericValue().toString());
-            } else if (evidenceField.getInstantValue() != null) {
-                additionalFiltersMap.put(evidenceField.getEvidenceField().getFieldName(),
-                        evidenceField.getInstantValue().toString());
-            }
-        });
+        ApiProcessingPerformanceTotal total = dashboardService.calculateProcessingPerformanceData(
+                processingPerformanceRequest);
 
         try {
             switch (processingPerformanceRequest.getExportType()) {
                 case CSV:
-                    response = dashboardService.convertPerformanceDataToCsv(total, additionalFiltersMap);
+                    response = dashboardService.convertPerformanceDataToCsv(total, processingPerformanceRequest);
                     break;
                 case PDF:
-                    response = dashboardService.convertPerformanceDataToPDF(total, additionalFiltersMap);
+                    response = dashboardService.convertPerformanceDataToPDF(total, processingPerformanceRequest);
                     break;
                 case EXCEL:
-                    response = dashboardService.convertPerformanceDataToExcel(total, additionalFiltersMap);
+                    response = dashboardService.convertPerformanceDataToExcel(total, processingPerformanceRequest);
                     break;
                 default:
                     break;
