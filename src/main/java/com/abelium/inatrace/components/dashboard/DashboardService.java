@@ -255,7 +255,8 @@ public class DashboardService extends BaseService {
             // Query for input calcuclation, then add to the map
             em.createQuery(transactionQuery).getResultList().forEach(data -> mapProcPerf.put(String.valueOf(data[0]),
                     new ApiProcessingPerformanceTotalItem(String.valueOf(data[0]),
-                            ((BigDecimal) data[1]).multiply(inputQuotient), BigDecimal.ZERO, BigDecimal.ZERO)));
+                            ((BigDecimal) data[1]).multiply(inputQuotient).setScale(2, RoundingMode.HALF_UP),
+                            BigDecimal.ZERO, BigDecimal.ZERO)));
         } else {
             transactionQuery.multiselect(aggregationInputExpressions.get(0), aggregationInputExpressions.get(1),
                             cb.sum(transactionRoot.get("inputQuantity"))).where(predicateList.toArray(new Predicate[0]))
@@ -265,7 +266,8 @@ public class DashboardService extends BaseService {
             em.createQuery(transactionQuery).getResultList().forEach(data -> mapProcPerf.put(
                     data[0] + "-" + data[1],
                     new ApiProcessingPerformanceTotalItem(String.valueOf(data[0]), (Integer) data[1],
-                            ((BigDecimal) data[2]).multiply(inputQuotient), BigDecimal.ZERO, BigDecimal.ZERO)));
+                            ((BigDecimal) data[2]).multiply(inputQuotient).setScale(2, RoundingMode.HALF_UP),
+                            BigDecimal.ZERO, BigDecimal.ZERO)));
         }
 
         // Output calculation
