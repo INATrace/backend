@@ -429,12 +429,19 @@ public class DashboardService extends BaseService {
 
         ProcessingAction processingAction = processingActionService.fetchProcessingAction(idProcessingAction);
 
-        if (processingAction.getOutputSemiProducts() != null &&
-            !processingAction.getOutputSemiProducts().isEmpty() &&
-            processingAction.getOutputSemiProducts().get(0) != null &&
-            processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct() != null) {
+        if (ProcessingActionType.FINAL_PROCESSING.equals(processingAction.getType())) {
+            if (processingAction.getOutputFinalProduct() != null) {
+                return MeasureUnitTypeMapper.toApiMeasureUnitType(
+                        processingAction.getOutputFinalProduct().getMeasurementUnitType());
+            }
+        } else {
+
+            if (processingAction.getOutputSemiProducts() != null && !processingAction.getOutputSemiProducts().isEmpty() &&
+                    processingAction.getOutputSemiProducts().get(0) != null &&
+                    processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct() != null) {
                 return MeasureUnitTypeMapper.toApiMeasureUnitType(
                         processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct().getMeasurementUnitType());
+            }
         }
         
         return null;
@@ -459,24 +466,36 @@ public class DashboardService extends BaseService {
 
         ProcessingAction processingAction = processingActionService.fetchProcessingAction(idProcessingAction);
 
-        // default return 1, if not found
         if (processingAction == null || processingAction.getInputSemiProduct() == null ||
-                processingAction.getInputSemiProduct().getMeasurementUnitType() == null ||
-                processingAction.getOutputSemiProducts() == null || processingAction.getOutputSemiProducts().isEmpty() ||
-                processingAction.getOutputSemiProducts().get(0) == null ||
-                processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct() == null ||
-                processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct()
-                        .getMeasurementUnitType() == null
-        ) {
+                processingAction.getInputSemiProduct().getMeasurementUnitType() == null) {
             return BigDecimal.ONE;
         }
-
         BigDecimal inputWeight = processingAction.getInputSemiProduct().getMeasurementUnitType().getWeight();
 
-        BigDecimal outputWeight = processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct()
-                .getMeasurementUnitType().getWeight();
+        BigDecimal outputWeight = BigDecimal.ONE;
+
+        if (ProcessingActionType.FINAL_PROCESSING.equals(processingAction.getType())) {
+
+            if (processingAction.getOutputFinalProduct() != null &&
+                    processingAction.getOutputFinalProduct().getMeasurementUnitType() != null) {
+                outputWeight = processingAction.getOutputFinalProduct().getMeasurementUnitType().getWeight();
+            }
+        } else {
+
+            // default return 1, if not found
+            if (processingAction.getOutputSemiProducts() != null &&
+                    !processingAction.getOutputSemiProducts().isEmpty() &&
+                    processingAction.getOutputSemiProducts().get(0) != null &&
+                    processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct() != null &&
+                    processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct().getMeasurementUnitType() !=
+                            null) {
+                outputWeight = processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct()
+                        .getMeasurementUnitType().getWeight();
+            }
+        }
 
         return inputWeight.divide(outputWeight, RoundingMode.HALF_UP);
+
     }
 
     /**
