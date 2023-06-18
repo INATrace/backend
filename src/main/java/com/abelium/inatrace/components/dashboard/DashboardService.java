@@ -429,8 +429,15 @@ public class DashboardService extends BaseService {
 
         ProcessingAction processingAction = processingActionService.fetchProcessingAction(idProcessingAction);
 
-        return MeasureUnitTypeMapper.toApiMeasureUnitType(
-                processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct().getMeasurementUnitType());
+        if (processingAction.getOutputSemiProducts() != null &&
+            !processingAction.getOutputSemiProducts().isEmpty() &&
+            processingAction.getOutputSemiProducts().get(0) != null &&
+            processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct() != null) {
+                return MeasureUnitTypeMapper.toApiMeasureUnitType(
+                        processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct().getMeasurementUnitType());
+        }
+        
+        return null;
     }
 
     private BigDecimal calculateSemiProductNormalisationQuotient(Long idSemiProduct) {
