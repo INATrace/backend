@@ -4,6 +4,7 @@ import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.dashboard.api.*;
+import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,8 @@ public class DashboardController {
             @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
             @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
             @Valid @ApiParam(value = "Aggregation type", required = true) @RequestParam(value = "aggregationType") ApiAggregationTimeUnit aggregationType,
-            @Valid @ApiParam(value = "Export type", required = true) @RequestParam(value = "exportType") ApiExportType exportType
+            @Valid @ApiParam(value = "Export type", required = true) @RequestParam(value = "exportType") ApiExportType exportType,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
     ) throws ApiException {
 
         byte[] response = null;
@@ -93,13 +95,13 @@ public class DashboardController {
         try {
             switch (exportType) {
                 case CSV:
-                    response = dashboardService.convertDeliveryDataToCsv(total, request);
+                    response = dashboardService.convertDeliveryDataToCsv(total, request, language);
                     break;
                 case PDF:
-                    response = dashboardService.convertDeliveryDataToPDF(total, request);
+                    response = dashboardService.convertDeliveryDataToPDF(total, request, language);
                     break;
                 case EXCEL:
-                        response = dashboardService.convertDeliveryDataToExcel(total, request);
+                        response = dashboardService.convertDeliveryDataToExcel(total, request, language);
                     break;
                 default:
                     break;
@@ -124,7 +126,8 @@ public class DashboardController {
     @PostMapping(value = "processing-performance-data/export")
     @ApiOperation("Exports processing performance data to the requested format")
     public ResponseEntity<byte[]> exportProcessingPerformanceData(
-            @Valid @RequestBody ApiProcessingPerformanceRequest processingPerformanceRequest
+            @Valid @RequestBody ApiProcessingPerformanceRequest processingPerformanceRequest,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
     ) throws ApiException {
 
         byte[] response = null;
@@ -135,13 +138,13 @@ public class DashboardController {
         try {
             switch (processingPerformanceRequest.getExportType()) {
                 case CSV:
-                    response = dashboardService.convertPerformanceDataToCsv(total, processingPerformanceRequest);
+                    response = dashboardService.convertPerformanceDataToCsv(total, processingPerformanceRequest, language);
                     break;
                 case PDF:
-                    response = dashboardService.convertPerformanceDataToPDF(total, processingPerformanceRequest);
+                    response = dashboardService.convertPerformanceDataToPDF(total, processingPerformanceRequest, language);
                     break;
                 case EXCEL:
-                    response = dashboardService.convertPerformanceDataToExcel(total, processingPerformanceRequest);
+                    response = dashboardService.convertPerformanceDataToExcel(total, processingPerformanceRequest, language);
                     break;
                 default:
                     break;

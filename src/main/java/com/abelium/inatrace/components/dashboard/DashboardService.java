@@ -7,17 +7,25 @@ import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasure
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.dashboard.api.*;
 import com.abelium.inatrace.components.processingaction.ProcessingActionService;
+import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceField;
+import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceFieldTranslation;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
+import com.abelium.inatrace.db.entities.codebook.SemiProductTranslation;
 import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
+import com.abelium.inatrace.db.entities.company.CompanyTranslation;
 import com.abelium.inatrace.db.entities.facility.Facility;
+import com.abelium.inatrace.db.entities.facility.FacilityTranslation;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
+import com.abelium.inatrace.db.entities.processingaction.ProcessingActionTranslation;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.StockOrderPEFieldValue;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.tools.Queries;
+import com.abelium.inatrace.tools.TranslateTools;
+import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -33,6 +41,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +64,9 @@ import java.util.stream.Collectors;
 public class DashboardService extends BaseService {
 
     private final ProcessingActionService processingActionService;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @Autowired
     public DashboardService(ProcessingActionService processingActionService) {
@@ -348,7 +360,7 @@ public class DashboardService extends BaseService {
             predicateList.add(stockOrderProcessingOrderJoin.get("id").in(poIds));
         }
 
-        List<ApiProcessingPerformanceTotalItem> resultList = null;
+        List<ApiProcessingPerformanceTotalItem> resultList;
 
         if (aggregationInputExpressions.size() < 2) {
             stockOrderQuery.multiselect(aggregationOutputExpressions.get(0),
@@ -537,19 +549,19 @@ public class DashboardService extends BaseService {
         return new ArrayList<>(em.createQuery(processingOrdersQuery).getResultList());
     }
 
-    public byte[] convertDeliveryDataToCsv(ApiDeliveriesTotal total, ApiDeliveriesQueryRequest request) throws IOException {
+    public byte[] convertDeliveryDataToCsv(ApiDeliveriesTotal total, ApiDeliveriesQueryRequest request, Language language) throws IOException {
 
         // get additional filters
-        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request);
+        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request, language);
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try (CSVPrinter csvPrinter = new CSVPrinter(new OutputStreamWriter(bytes), CSVFormat.RFC4180)) {
 
             List<String> headerRecord = new ArrayList<>();
 
-            headerRecord.add("Date");
-            headerRecord.add("Total quantity");
-            headerRecord.add("Measuring unit");
+            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.date", language));
+            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.totalQuantity", language));
+            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.measuringUnit", language));
 
             // Add additional  filters
             headerRecord.addAll(additionalFilters.keySet());
@@ -560,7 +572,7 @@ public class DashboardService extends BaseService {
             for (ApiDeliveriesTotalItem item: total.getTotals()) {
 
                 List<String> dataValues = new ArrayList<>();
-                dataValues.add(createDateColumn(item, total.getUnitType()));
+                dataValues.add(createDateColumn(item, total.getUnitType(), language));
                 dataValues.add(item.getTotalQuantity().toString());
 
                 // deliveries unit is always in kg
@@ -579,15 +591,17 @@ public class DashboardService extends BaseService {
         return bytes.toByteArray();
     }
 
-    public byte[] convertDeliveryDataToPDF(ApiDeliveriesTotal total, ApiDeliveriesQueryRequest request) throws ApiException {
+    public byte[] convertDeliveryDataToPDF(ApiDeliveriesTotal total, ApiDeliveriesQueryRequest request, Language language) throws ApiException {
 
         // get additional filters
-        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request);
+        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request, language);
 
         List<String> headerCells = new ArrayList<>();
-        headerCells.add("Date");
-        headerCells.add("Total quantity");
-        headerCells.add("Measuring unit");
+        headerCells.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.date", language));
+        headerCells.add(
+                TranslateTools.getTranslatedValue(messageSource, "export.column.label.totalQuantity", language));
+        headerCells.add(
+                TranslateTools.getTranslatedValue(messageSource, "export.column.label.measuringUnit", language));
         headerCells.addAll(additionalFilters.keySet());
 
         PdfPTable table = new PdfPTable(headerCells.size());
@@ -603,7 +617,7 @@ public class DashboardService extends BaseService {
 
         total.getTotals().forEach(totalItem -> {
 
-            table.addCell(createDateColumn(totalItem, total.getUnitType()));
+            table.addCell(createDateColumn(totalItem, total.getUnitType(), language));
             table.addCell(totalItem.getTotalQuantity().toString());
 
             // deliveries unit is always in kg
@@ -631,20 +645,24 @@ public class DashboardService extends BaseService {
         return byteArrayOutputStream.toByteArray();
     }
 
-    public byte[] convertDeliveryDataToExcel(ApiDeliveriesTotal total, ApiDeliveriesQueryRequest request) throws IOException {
+    public byte[] convertDeliveryDataToExcel(ApiDeliveriesTotal total, ApiDeliveriesQueryRequest request, Language language) throws IOException {
 
         // get additional filters
-        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request);
+        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request, language);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-            XSSFSheet sheet = workbook.createSheet("Deliveries");
+            XSSFSheet sheet = workbook.createSheet(
+                    TranslateTools.getTranslatedValue(messageSource, "export.sheet.name.deliveries", language));
 
             // generate header
             Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0, CellType.STRING).setCellValue("Date");
-            headerRow.createCell(1, CellType.STRING).setCellValue("Total quantity");
-            headerRow.createCell(2, CellType.STRING).setCellValue("Measuring unit");
+            headerRow.createCell(0, CellType.STRING).setCellValue(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.date", language));
+            headerRow.createCell(1, CellType.STRING).setCellValue(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.totalQuantity", language));
+            headerRow.createCell(2, CellType.STRING).setCellValue(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.measuringUnit", language));
 
             int headerColumnIndex = 3;
             // additional selected filters
@@ -657,8 +675,10 @@ public class DashboardService extends BaseService {
                 Row row = sheet.createRow(i + 1);
 
                 // generate common fields
-                row.createCell(0, CellType.STRING).setCellValue(createDateColumn(total.getTotals().get(i), total.getUnitType()));
-                row.createCell(1, CellType.NUMERIC).setCellValue(total.getTotals().get(i).getTotalQuantity().doubleValue());
+                row.createCell(0, CellType.STRING)
+                        .setCellValue(createDateColumn(total.getTotals().get(i), total.getUnitType(), language));
+                row.createCell(1, CellType.NUMERIC)
+                        .setCellValue(total.getTotals().get(i).getTotalQuantity().doubleValue());
 
                 // deliveries unit is always in kg
                 row.createCell(2, CellType.STRING).setCellValue("kg");
@@ -680,21 +700,26 @@ public class DashboardService extends BaseService {
         return byteArrayOutputStream.toByteArray();
     }
 
-    public byte[] convertPerformanceDataToCsv(ApiProcessingPerformanceTotal total, ApiProcessingPerformanceRequest request) throws IOException {
+    public byte[] convertPerformanceDataToCsv(ApiProcessingPerformanceTotal total,
+                                              ApiProcessingPerformanceRequest request,
+                                              Language language) throws IOException {
 
         // get additional filters
-        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request);
+        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request, language);
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try (CSVPrinter csvPrinter = new CSVPrinter(new OutputStreamWriter(bytes), CSVFormat.RFC4180)) {
 
             List<String> headerRecord = new ArrayList<>();
 
-            headerRecord.add("Date");
-            headerRecord.add("Input quantity");
-            headerRecord.add("Output quantity");
-            headerRecord.add("Measuring unit");
-            headerRecord.add("Ratio");
+            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.date", language));
+            headerRecord.add(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.inputQuantity", language));
+            headerRecord.add(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.outputQuantity", language));
+            headerRecord.add(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.measuringUnit", language));
+            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.ratio", language));
 
             // Add additional  filters
             headerRecord.addAll(additionalFilters.keySet());
@@ -705,7 +730,7 @@ public class DashboardService extends BaseService {
             for (ApiProcessingPerformanceTotalItem item: total.getTotals()) {
 
                 List<String> dataValues = new ArrayList<>();
-                dataValues.add(createDateColumn(item, total.getUnitType()));
+                dataValues.add(createDateColumn(item, total.getUnitType(), language));
                 dataValues.add(item.getInputQuantity().toString());
                 dataValues.add(item.getOutputQuantity().toString());
                 dataValues.add(total.getMeasureUnitType().getLabel());
@@ -724,17 +749,22 @@ public class DashboardService extends BaseService {
         return bytes.toByteArray();
     }
 
-    public byte[] convertPerformanceDataToPDF(ApiProcessingPerformanceTotal total, ApiProcessingPerformanceRequest request) throws ApiException {
+    public byte[] convertPerformanceDataToPDF(ApiProcessingPerformanceTotal total,
+                                              ApiProcessingPerformanceRequest request,
+                                              Language language) throws ApiException {
 
         // get additional filters
-        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request);
+        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request, language);
 
         List<String> headerCells = new ArrayList<>();
-        headerCells.add("Date");
-        headerCells.add("Input quantity");
-        headerCells.add("Output quantity");
-        headerCells.add("Measuring unit");
-        headerCells.add("Ratio");
+        headerCells.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.date", language));
+        headerCells.add(
+                TranslateTools.getTranslatedValue(messageSource, "export.column.label.inputQuantity", language));
+        headerCells.add(
+                TranslateTools.getTranslatedValue(messageSource, "export.column.label.outputQuantity", language));
+        headerCells.add(
+                TranslateTools.getTranslatedValue(messageSource, "export.column.label.measuringUnit", language));
+        headerCells.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.ratio", language));
         headerCells.addAll(additionalFilters.keySet());
 
         PdfPTable table = new PdfPTable(headerCells.size());
@@ -750,7 +780,7 @@ public class DashboardService extends BaseService {
 
         total.getTotals().forEach(totalItem -> {
 
-            table.addCell(createDateColumn(totalItem, total.getUnitType()));
+            table.addCell(createDateColumn(totalItem, total.getUnitType(), language));
             table.addCell(totalItem.getInputQuantity().toString());
             table.addCell(totalItem.getOutputQuantity().toString());
             table.addCell(total.getMeasureUnitType().getLabel());
@@ -777,22 +807,29 @@ public class DashboardService extends BaseService {
         return byteArrayOutputStream.toByteArray();
     }
 
-    public byte[] convertPerformanceDataToExcel(ApiProcessingPerformanceTotal total, ApiProcessingPerformanceRequest request) throws IOException {
+    public byte[] convertPerformanceDataToExcel(ApiProcessingPerformanceTotal total, ApiProcessingPerformanceRequest request, Language language) throws IOException {
 
         // get additional filters
-        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request);
+        Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request, language);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-            XSSFSheet sheet = workbook.createSheet("Processing performance");
+            XSSFSheet sheet = workbook.createSheet(
+                    TranslateTools.getTranslatedValue(messageSource, "export.sheet.name.processingPerformance",
+                            language));
 
             // generate header
             Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0, CellType.STRING).setCellValue("Date");
-            headerRow.createCell(1, CellType.STRING).setCellValue("Input quantity");
-            headerRow.createCell(2, CellType.STRING).setCellValue("Output quantity");
-            headerRow.createCell(3, CellType.STRING).setCellValue("Measuring unit");
-            headerRow.createCell(4, CellType.STRING).setCellValue("Ratio");
+            headerRow.createCell(0, CellType.STRING).setCellValue(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.date", language));
+            headerRow.createCell(1, CellType.STRING).setCellValue(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.inputQuantity", language));
+            headerRow.createCell(2, CellType.STRING).setCellValue(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.outputQuantity", language));
+            headerRow.createCell(3, CellType.STRING).setCellValue(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.measuringUnit", language));
+            headerRow.createCell(4, CellType.STRING).setCellValue(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.ratio", language));
 
             int headerColumnIndex = 5;
             // additional selected filters
@@ -805,7 +842,8 @@ public class DashboardService extends BaseService {
                 Row row = sheet.createRow(i + 1);
 
                 // generate common fields
-                row.createCell(0, CellType.STRING).setCellValue(createDateColumn(total.getTotals().get(i), total.getUnitType()));
+                row.createCell(0, CellType.STRING)
+                        .setCellValue(createDateColumn(total.getTotals().get(i), total.getUnitType(), language));
                 row.createCell(1, CellType.NUMERIC).setCellValue(total.getTotals().get(i).getInputQuantity().doubleValue());
                 row.createCell(2, CellType.NUMERIC).setCellValue(total.getTotals().get(i).getOutputQuantity().doubleValue());
                 row.createCell(3, CellType.STRING).setCellValue(total.getMeasureUnitType().getLabel());
@@ -833,48 +871,61 @@ public class DashboardService extends BaseService {
      * @param queryRequest - input query of type ApiDeliveriesQueryRequest
      * @return - map containing pair (columnName, columnValue) for additional filters
      */
-    private Map<String, String> createAdditionalFiltersFromRequest(ApiDeliveriesQueryRequest queryRequest) {
+    private Map<String, String> createAdditionalFiltersFromRequest(ApiDeliveriesQueryRequest queryRequest, Language language) {
 
         Map<String, String> additionalFiltersMap = new HashMap<>();
 
         if (queryRequest.getCompanyId() != null) {
-            Company company = Queries.get(em, Company.class, queryRequest.getCompanyId());
-            additionalFiltersMap.put("Company", company.getName());
+            additionalFiltersMap.put(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.company", language),
+                    getCompanyTranslationName(queryRequest.getCompanyId(), language));
         }
         if (queryRequest.getFacilityIds() != null) {
             String facilities = "";
             for (int i=0; i< queryRequest.getFacilityIds().size(); i++) {
-                Facility facility = Queries.get(em, Facility.class, queryRequest.getFacilityIds().get(i));
-                facilities = facilities.concat(facility.getName());
+                facilities = facilities.concat(
+                        getFacilityTranslationName(queryRequest.getFacilityIds().get(i), language));
                 if (i < queryRequest.getFacilityIds().size() - 1) {
                     facilities = facilities.concat(",");
                 }
             }
 
-            additionalFiltersMap.put("Facilities", facilities);
+            additionalFiltersMap.put(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.facilities", language),
+                    facilities);
         }
         if (queryRequest.getFarmerId() != null) {
             UserCustomer userCustomer = Queries.get(em, UserCustomer.class, queryRequest.getFarmerId());
-            additionalFiltersMap.put("Farmer", userCustomer.getName() + " " + userCustomer.getSurname());
+            additionalFiltersMap.put(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.farmer", language),
+                    userCustomer.getName() + " " + userCustomer.getSurname());
         }
         if (queryRequest.getRepresentativeOfProducerUserCustomerId() != null) {
             UserCustomer representativeCustomer = Queries.get(em, UserCustomer.class,
                     queryRequest.getRepresentativeOfProducerUserCustomerId());
-            additionalFiltersMap.put("Collector",
+            additionalFiltersMap.put(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.collector", language),
                     representativeCustomer.getName() + " " + representativeCustomer.getSurname());
         }
         if (queryRequest.getSemiProductId() != null) {
-            SemiProduct semiProduct = Queries.get(em, SemiProduct.class, queryRequest.getSemiProductId());
-            additionalFiltersMap.put("Semi-product", semiProduct.getName());
+            additionalFiltersMap.put(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.semiProduct", language),
+                    getSemiProductTranslationName(queryRequest.getSemiProductId(), language));
         }
         if (queryRequest.getOrganicOnly() != null && queryRequest.getOrganicOnly()) {
-            additionalFiltersMap.put("Organic", queryRequest.getOrganicOnly().toString());
+            additionalFiltersMap.put(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.organic", language),
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.value.yes", language));
         }
         if (queryRequest.getWomenShare() != null && queryRequest.getWomenShare()) {
-            additionalFiltersMap.put("Women only", queryRequest.getWomenShare().toString());
+            additionalFiltersMap.put(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.womenOnly", language),
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.value.yes", language));
         }
         if (queryRequest.getPriceDeterminedLater() != null && queryRequest.getPriceDeterminedLater()) {
-            additionalFiltersMap.put("Product in deposit", queryRequest.getPriceDeterminedLater().toString());
+            additionalFiltersMap.put(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.productInDeposit", language),
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.value.yes", language));
         }
 
         return additionalFiltersMap;
@@ -885,31 +936,37 @@ public class DashboardService extends BaseService {
      * @param queryRequest - input query of type ApiProcessingPerformanceRequest
      * @return - map containing pair (columnName, columnValue) for additional filters
      */
-    private Map<String, String> createAdditionalFiltersFromRequest(ApiProcessingPerformanceRequest queryRequest) {
+    private Map<String, String> createAdditionalFiltersFromRequest(ApiProcessingPerformanceRequest queryRequest, Language language) {
 
         Map<String, String> additionalFiltersMap = new HashMap<>();
 
         if (queryRequest.getCompanyId() != null) {
-            Company company = Queries.get(em, Company.class, queryRequest.getCompanyId());
-            additionalFiltersMap.put("Company", company.getName());
+            additionalFiltersMap.put(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.company", language),
+                    getCompanyTranslationName(queryRequest.getCompanyId(), language));
         }
         if (queryRequest.getFacilityId() != null) {
-            Facility facility = Queries.get(em, Facility.class, queryRequest.getFacilityId());
-            additionalFiltersMap.put("Facility", facility.getName());
+            additionalFiltersMap.put(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.facility", language),
+                    getFacilityTranslationName(queryRequest.getFacilityId(), language));
         }
         if (queryRequest.getProcessActionId() != null) {
-            ProcessingAction processingAction = Queries.get(em, ProcessingAction.class, queryRequest.getProcessActionId());
-            additionalFiltersMap.put("Processing", processingAction.getPublicTimelineLabel());
+            additionalFiltersMap.put(
+                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.process", language),
+                    getProcessingActionTranslationName(queryRequest.getProcessActionId(), language));
         }
         queryRequest.getEvidenceFields().forEach(evidenceField -> {
             if (evidenceField.getStringValue() != null) {
-                additionalFiltersMap.put(evidenceField.getEvidenceField().getFieldName(),
+                additionalFiltersMap.put(
+                        getEvidenceFieldTranslationName(evidenceField.getEvidenceField().getFieldName(), language),
                         evidenceField.getStringValue());
             } else if (evidenceField.getNumericValue() != null) {
-                additionalFiltersMap.put(evidenceField.getEvidenceField().getFieldName(),
+                additionalFiltersMap.put(
+                        getEvidenceFieldTranslationName(evidenceField.getEvidenceField().getFieldName(), language),
                         evidenceField.getNumericValue().toString());
             } else if (evidenceField.getInstantValue() != null) {
-                additionalFiltersMap.put(evidenceField.getEvidenceField().getFieldName(),
+                additionalFiltersMap.put(
+                        getEvidenceFieldTranslationName(evidenceField.getEvidenceField().getFieldName(), language),
                         evidenceField.getInstantValue().toString());
             }
         });
@@ -918,19 +975,184 @@ public class DashboardService extends BaseService {
     }
 
     /**
+     * First check for current language translation.
+     * If not found fallback in order: 1.check for EN translation, 2.check direct for entity name, 3. return empty
+     *
+     * @param facilityId - facility id
+     * @param language - language
+     * @return - translation name
+     */
+    private String getFacilityTranslationName(Long facilityId, Language language) {
+        Facility facility = Queries.get(em, Facility.class, facilityId);
+        if (facility != null) {
+            FacilityTranslation facilityTranslation = facility.getFacilityTranslations()
+                    .stream().filter(ft -> ft.getLanguage().equals(language))
+                    .findFirst()
+                    .orElseGet(() -> facility.getFacilityTranslations()
+                            .stream()
+                            .filter(ft -> ft.getLanguage().equals(Language.EN))
+                            .findAny()
+                            .orElse(null));
+
+            // Translation found, return result
+            if (facilityTranslation != null) {
+                return (facilityTranslation.getName() != null) ? facilityTranslation.getName() : "";
+            }
+
+            // Fallback to entity's name, if no translation is found
+            return (facility.getName() != null) ? facility.getName() : "";
+        }
+        return "";
+    }
+
+    /**
+     * First check for current language translation.
+     ** If not found fallback in order: 1.check for EN translation, 2.check direct for entity name, 3. return empty
+     *
+     * @param companyId - company id
+     * @param language - language
+     * @return - translation name
+     */
+    private String getCompanyTranslationName(Long companyId, Language language) {
+        Company company = Queries.get(em, Company.class, companyId);
+        if (company != null) {
+            CompanyTranslation companyTranslation = company.getTranslations()
+                    .stream().filter(ft -> ft.getLanguage().equals(language))
+                    .findFirst()
+                    .orElseGet(() -> company.getTranslations()
+                            .stream()
+                            .filter(ft -> ft.getLanguage().equals(Language.EN))
+                            .findAny()
+                            .orElse(null));
+
+            // Translation found, return result
+            if (companyTranslation != null) {
+                return (companyTranslation.getName() != null) ? companyTranslation.getName() : "";
+            }
+
+            // Fallback to entity's name, if no translation is found
+            return (company.getName() != null) ? company.getName() : "";
+        }
+        return "";
+    }
+
+    /**
+     * First check for current language translation.
+     ** If not found fallback in order: 1.check for EN translation, 2.check direct for entity name, 3. return empty
+     *
+     * @param semiProductId - company id
+     * @param language - language
+     * @return - translation name
+     */
+    private String getSemiProductTranslationName(Long semiProductId, Language language) {
+        SemiProduct semiProduct = Queries.get(em, SemiProduct.class, semiProductId);
+        if (semiProduct != null) {
+            SemiProductTranslation semiProductTranslation = semiProduct.getSemiProductTranslations()
+                    .stream().filter(ft -> ft.getLanguage().equals(language))
+                    .findFirst()
+                    .orElseGet(() -> semiProduct.getSemiProductTranslations()
+                            .stream()
+                            .filter(ft -> ft.getLanguage().equals(Language.EN))
+                            .findAny()
+                            .orElse(null));
+
+            // Translation found, return result
+            if (semiProductTranslation != null) {
+                return (semiProductTranslation.getName() != null) ? semiProductTranslation.getName() : "";
+            }
+
+            // Fallback to entity's name, if no translation is found
+            return (semiProduct.getName() != null) ? semiProduct.getName() : "";
+        }
+        return "";
+    }
+
+	/**
+	 * First check for current language translation.
+	 ** If not found fallback in order: 1.check for EN translation, 2. return empty
+	 *
+	 * @param processingActionId - company id
+	 * @param language - language
+	 * @return - translation name
+	 */
+	private String getProcessingActionTranslationName(Long processingActionId, Language language) {
+		ProcessingAction processingAction = Queries.get(em, ProcessingAction.class, processingActionId);
+		if (processingAction != null) {
+			ProcessingActionTranslation processingActionTranslation = processingAction.getProcessingActionTranslations()
+					.stream().filter(ft -> ft.getLanguage().equals(language))
+					.findFirst()
+					.orElseGet(() -> processingAction.getProcessingActionTranslations()
+							.stream()
+							.filter(ft -> ft.getLanguage().equals(Language.EN))
+							.findAny()
+							.orElse(null));
+
+			// Translation found, return result
+			if (processingActionTranslation != null) {
+				return (processingActionTranslation.getName() != null) ? processingActionTranslation.getName() : "";
+			}
+
+			// Return empty, if no translation is found
+			return "";
+		}
+		return "";
+	}
+
+    /**
+     * First check for current language translation.
+     * If not found fallback in order: 1.check for EN translation, 2.check for entity label 3.check for entity name, 4.evidenceFieldName
+     *
+     * @param evidenceFieldName - evidenceField name
+     * @param language - language
+     * @return - translation name
+     */
+    private String getEvidenceFieldTranslationName(String evidenceFieldName, Language language) {
+
+        ProcessingEvidenceField processingEvidenceField = Queries.getUniqueBy(em, ProcessingEvidenceField.class,
+                ProcessingEvidenceField::getFieldName, evidenceFieldName);
+        if (processingEvidenceField != null) {
+
+            ProcessingEvidenceFieldTranslation processingEvidenceFieldTranslation = processingEvidenceField.getTranslations()
+                    .stream().filter(ft -> ft.getLanguage().equals(language))
+                    .findFirst()
+                    .orElseGet(() -> processingEvidenceField.getTranslations()
+                            .stream()
+                            .filter(ft -> ft.getLanguage().equals(Language.EN))
+                            .findAny()
+                            .orElse(null));
+
+            // Translation found, return result
+            if (processingEvidenceFieldTranslation != null) {
+                return (processingEvidenceFieldTranslation.getLabel() != null) ? processingEvidenceFieldTranslation.getLabel() : "";
+            }
+
+            // Fallback to entity's label and then name, if no translation is found
+            if (processingEvidenceField.getLabel() != null) {
+                return processingEvidenceField.getLabel();
+            } else if (processingEvidenceField.getFieldName() != null) {
+                return processingEvidenceField.getFieldName();
+            } else {
+                return evidenceFieldName;
+            }
+        }
+        return evidenceFieldName;
+    }
+
+    /**
      * Generates date column for export.
      * @param totalItem - row of type ApiDeliveriesTotalItem
      * @param unitType - time unit
      * @return - formated date column
      */
-    private String createDateColumn(ApiDeliveriesTotalItem totalItem, ApiAggregationTimeUnit unitType) {
+    private String createDateColumn(ApiDeliveriesTotalItem totalItem, ApiAggregationTimeUnit unitType,
+                                    Language language) {
 
         if (totalItem != null) {
             switch (unitType) {
                 case WEEK:
-                    return translateWeek(totalItem.getUnit()) + " " + totalItem.getYear().toString();
+                    return translateWeek(totalItem.getUnit(), language) + " " + totalItem.getYear().toString();
                 case MONTH:
-                    return translateMonth(totalItem.getUnit()) + " " + totalItem.getYear().toString();
+                    return translateMonth(totalItem.getUnit(), language) + " " + totalItem.getYear().toString();
                 case YEAR:
                 case DAY:
                 default:
@@ -947,14 +1169,15 @@ public class DashboardService extends BaseService {
      * @param unitType - time unit
      * @return - formated date column
      */
-    private String createDateColumn(ApiProcessingPerformanceTotalItem totalItem, ApiAggregationTimeUnit unitType) {
+    private String createDateColumn(ApiProcessingPerformanceTotalItem totalItem, ApiAggregationTimeUnit unitType,
+                                    Language language) {
 
         if (totalItem != null) {
             switch (unitType) {
                 case WEEK:
-                    return translateWeek(totalItem.getUnit()) + " " + totalItem.getYear().toString();
+                    return translateWeek(totalItem.getUnit(), language) + " " + totalItem.getYear().toString();
                 case MONTH:
-                    return translateMonth(totalItem.getUnit()) + " " + totalItem.getYear().toString();
+                    return translateMonth(totalItem.getUnit(), language) + " " + totalItem.getYear().toString();
                 case YEAR:
                 case DAY:
                 default:
@@ -968,11 +1191,12 @@ public class DashboardService extends BaseService {
     /**
      * Helper method for week translation
      * @param unit - week id
+     * @param language - language
      * @return - translated and formated week
      */
-    private String translateWeek(String unit) {
+    private String translateWeek(String unit, Language language) {
         if (unit != null) {
-            return "Week-" + unit;
+            return TranslateTools.getTranslatedValue(messageSource, "export.column.value.week", language) + "-" + unit;
         }
         return null;
     }
@@ -982,33 +1206,46 @@ public class DashboardService extends BaseService {
      * @param monthNum - id of month
      * @return - translated
      */
-    private String translateMonth(String monthNum) {
+    private String translateMonth(String monthNum, Language language) {
         switch (monthNum) {
             case "1":
-                return "Jan";
+                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.january", language)
+                        .substring(0, 3);
             case "2":
-                return "Feb";
+                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.february", language)
+                        .substring(0, 3);
             case "3":
-                return "Mar";
+                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.march", language)
+                        .substring(0, 3);
             case "4":
-                return "Apr";
+                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.april", language)
+                        .substring(0, 3);
             case "5":
-                return "May";
+                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.may", language)
+                        .substring(0, 3);
             case "6":
-                return "Jun";
+                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.june", language)
+                        .substring(0, 3);
             case "7":
-                return "Jul";
+                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.july", language)
+                        .substring(0, 3);
             case "8":
-                return "Aug";
+                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.august", language)
+                        .substring(0, 3);
             case "9":
-                return "Sep";
+                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.september", language)
+                        .substring(0, 3);
             case "10":
-                return "Oct";
+                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.october", language)
+                        .substring(0, 3);
             case "11":
-                return "Nov";
+                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.november", language)
+                        .substring(0, 3);
             case "12":
-                return "Dec";
+                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.december", language)
+                        .substring(0, 3);
+            default:
+                return null;
         }
-        return null;
     }
 }
