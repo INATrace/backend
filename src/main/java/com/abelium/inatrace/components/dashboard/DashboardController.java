@@ -101,7 +101,7 @@ public class DashboardController {
                     response = dashboardService.convertDeliveryDataToPDF(total, request, language);
                     break;
                 case EXCEL:
-                        response = dashboardService.convertDeliveryDataToExcel(total, request, language);
+                    response = dashboardService.convertDeliveryDataToExcel(total, request, language);
                     break;
                 default:
                     break;
