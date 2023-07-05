@@ -4,7 +4,7 @@ Open-source blockchain-based track and trace system for an agricultural commodit
 chain run. It provides transparency and creation of trust through
 digitalization of supply chains, connects every actor along the supply chain, assures quality and fair pricing.
 
-Project is composed from 3 parts:
+Project is composed of 3 parts:
 
 * [Angular frontend](https://github.com/INATrace/fe/tree/main)
 * [Java backend](https://github.com/INATrace/backend/tree/main)
@@ -12,7 +12,7 @@ Project is composed from 3 parts:
 
 # INATrace 2
 This new major release includes new functionalities, refactorings, optimizations and bugfixes. The most important additions and changes are:
-* Added support for generic value chains. Different value chains with it's specific settings can now be configured in the system.
+* Added support for generic value chains. Different value chains with its specific settings can now be configured in the system.
 * Multi-tenant system support.
 * Reorganized the content in the Product section. This section now includes only the content that is related to a product.
 * Introduced a new section "Company". This section includes all the content that is related with the company's work process within the value chain.
@@ -23,7 +23,7 @@ This new major release includes new functionalities, refactorings, optimizations
 * The semi-products configuration is now part of the system settings instead of the product section.
 * Reorganized the content of the Value chain tab inside the Stakeholders section. The Value chain now includes new company roles. Added is also a section for product admin companies.
 * Added support for defining Processing evidence fields in the system settings.
-* Translation for facilities, processing actions, semi-products and processing evidence types and fields can be provided in the system as part of it's definition.
+* Translation for facilities, processing actions, semi-products and processing evidence types and fields can be provided in the system as part of its definition.
 * Added support for currencies in the system. The enabled currencies can be selected in the system settings. These currencies then appear as select options in various parts of the system where the user is expected to select a currency.
 * Added exchange rates for the enabled currencies that are synced on a daily basis. The currencies data is provided by the https://exchangeratesapi.io/ API.
 * The product section now includes Final products. Final products represent the output of a final processing. The final products can be configured by the product admin company.
@@ -40,7 +40,7 @@ This new major release includes new functionalities, refactorings, optimizations
 ### Requirements
 * Java `11` or higher
 * Maven `3`
-* MySQL `8.0.26`
+* MySQL `8.0.33`
 
 ### Optional
 * Docker
@@ -63,7 +63,7 @@ This new major release includes new functionalities, refactorings, optimizations
 Spin up a container:
 
 ```
-docker run --name inatrace-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=coffee -e MYSQL_USER=coffee -e MYSQL_PASSWORD=coffee -p 3306:3306 -d mysql:8.0.26
+docker run --name inatrace-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=inatrace -e MYSQL_USER=inatrace -e MYSQL_PASSWORD=inatrace -p 3306:3306 -d mysql:8.0.33
 ```
 
 Tables will be created and prefilled with starter data on application startup.
@@ -91,9 +91,9 @@ Spring uses `application.properties` file stored in `src/main/resources` for con
 
 ###### Datasource
 
-- `INATrace.database.name`: `coffee`
-- `spring.datasource.username`: `coffee`
-- `spring.datasource.password`: `coffee`
+- `INATrace.database.name`: `inatrace`
+- `spring.datasource.username`: `inatrace`
+- `spring.datasource.password`: `inatrace`
 
 ###### SMTP
 
@@ -125,6 +125,14 @@ Spring uses `application.properties` file stored in `src/main/resources` for con
 ###### Exchange rates API
 
 - `INAtrace.exchangerate.apiKey`: API key for exchange rate service. Create a free account at [https://exchangeratesapi.io](https://exchangeratesapi.io/) to get an API key.
+
+###### Beyco integration
+INATrace supports integration with Beyco platform. This allows users to create Beyco offers automatically from INATrace stock orders. For more info about Beyco, please go to: `https://beyco.nl`. This integration is optional. Integration properties are following:
+- `beyco.oauth2.clientId`: `clientId`
+- `beyco.oauth2.clientSecret`: `clientSecret`
+- `beyco.oauth2.url`: `url`
+
+The values of these properties are provided by Beyco. If integration with Byeco is not needed, the values of these properties should be empty.
 
 ## APIs
 
@@ -334,7 +342,7 @@ The service exposes methods `convert` and `convertAtDate` to convert between any
 ## Database
 
 ### Version
-MySQL `8.0.26`
+MySQL `8.0.33`
 
 ### Connection
 
@@ -342,7 +350,7 @@ If you are using a database management tool, use the following parameters to cre
 
 - Hostname: `localhost`
 - Port: `3306`
-- Database: `coffee`
+- Database: `inatrace`
 - Username: `root`
 - Password: `root`
 - Use SSL: `true`
@@ -353,9 +361,9 @@ If you are using a database management tool, use the following parameters to cre
 
 A complete list of entities is available [here](https://github.com/INATrace/backend/tree/main/src/main/java/com/abelium/inatrace/db).
 
-Below is the entity graph for an initialized coffee database. The full-sized vector image can be found [here](docs/images/coffee_db.svg).
+Below is the entity graph for an initialized INATrace database. The full-sized vector image can be found [here](docs/images/inatrace_db.svg).
 
-![Coffee DB entity graph](docs/images/coffee_db.svg)
+![INATrace DB entity graph](docs/images/inatrace_db.svg)
 
 #### Users
 
@@ -366,10 +374,9 @@ There are two types of users:
 
 *System users* are used for logging in. Based on their role, they have different permissions inside the system. Available roles are:
 
-- User
-- Admin
-- Manager
-- Accountant
+- User - can access resources that are owned by the company where the user is part of.
+- System admin - can administer system-wide resources and settings.
+- Regional admin - can administer resources that are owned by the company/ies where the user is part of. 
 
 *Company users* are essentially role mappings for system users within a company. Based on their role, they have different permissions in the context of the company. A system user with role *User* can have the role *Admin* in a company. Available company roles are:
 
@@ -387,6 +394,7 @@ Some items have names, descriptions and other data in multiple languages. To ena
 - ProcessingActionTranslation
 - ProcessingEvidenceFieldTranslation
 - ProcessingEvidenceTypeTranslation
+- ProductTypeTranslation
 - SemiProductTranslation
 
 ### Schema and data updates
@@ -438,7 +446,7 @@ Project INATrace welcomes contribution from everyone. See CONTRIBUTING.md for he
 
 ## License 
 
-Copyright (c) 2022 Anteja ECG d.o.o., GIZ - Deutsche Gesellschaft für Internationale Zusammenarbeit GmbH, Sunesis ltd.
+Copyright (c) 2023 Anteja ECG d.o.o., GIZ - Deutsche Gesellschaft für Internationale Zusammenarbeit GmbH, Sunesis ltd.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
