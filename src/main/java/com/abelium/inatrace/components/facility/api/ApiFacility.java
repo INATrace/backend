@@ -6,6 +6,7 @@ import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 
 import com.abelium.inatrace.components.product.api.ApiFinalProduct;
+import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
@@ -59,6 +60,9 @@ public class ApiFacility extends ApiBaseEntity {
 
 	@ApiModelProperty(value = "List of final product ID's for this facility")
 	private List<ApiFinalProduct> facilityFinalProducts;
+
+	@ApiModelProperty(value = "List of value chains for this facility")
+	private List<ApiValueChain> facilityValueChains;
 
 	@ApiModelProperty(value = "List of facility translations")
 	private List<ApiFacilityTranslation> translations;
@@ -191,6 +195,14 @@ public class ApiFacility extends ApiBaseEntity {
 		this.facilityFinalProducts = facilityFinalProducts;
 	}
 
+	public List<ApiValueChain> getFacilityValueChains() {
+		return facilityValueChains;
+	}
+
+	public void setFacilityValueChains(List<ApiValueChain> facilityValueChains) {
+		this.facilityValueChains = facilityValueChains;
+	}
+
 	public List<ApiFacilityTranslation> getTranslations() {
 		return translations;
 	}
@@ -203,9 +215,11 @@ public class ApiFacility extends ApiBaseEntity {
 		super();
 	}
 
-	public ApiFacility(String name, Boolean isCollectionFacility, Boolean isPublic, Boolean isDeactivated, Boolean displayPriceDeterminedLater,
-			ApiFacilityLocation facilityLocation, ApiCompanyBase company, ApiFacilityType facilityType,
-			List<ApiSemiProduct> facilitySemiProductList, List<ApiFacilityTranslation> facilityTranslationList) {
+	public ApiFacility(String name, Boolean isCollectionFacility, Boolean isPublic, Boolean isDeactivated,
+	                   Boolean displayPriceDeterminedLater, ApiFacilityLocation facilityLocation,
+	                   ApiCompanyBase company, ApiFacilityType facilityType,
+	                   List<ApiSemiProduct> facilitySemiProductList, List<ApiValueChain> facilityValueChains,
+	                   List<ApiFacilityTranslation> facilityTranslationList) {
 		super();
 		this.name = name;
 		this.isCollectionFacility = isCollectionFacility;
@@ -216,6 +230,7 @@ public class ApiFacility extends ApiBaseEntity {
 		this.company = company;
 		this.facilityType = facilityType;
 		this.facilitySemiProductList = facilitySemiProductList;
+		this.facilityValueChains = facilityValueChains;
 		this.translations = facilityTranslationList;
 	}
 

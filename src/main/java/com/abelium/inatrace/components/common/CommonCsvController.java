@@ -12,19 +12,17 @@ import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
-import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -55,8 +53,8 @@ public class CommonCsvController {
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
 			@Valid @ApiParam(value = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
 			@Valid @ApiParam(value = "Payment status") @RequestParam(value = "paymentStatus", required = false) PaymentStatus paymentStatus,
-			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
-			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
+			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
 			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws IOException, ApiException {
 
 		request.limit = 500;
@@ -69,8 +67,8 @@ public class CommonCsvController {
 					null,
 					preferredWayOfPayment,
 					paymentStatus,
-					productionDateStart != null ? productionDateStart.toInstant() : null,
-					productionDateEnd != null ? productionDateEnd.toInstant() : null,
+					productionDateStart,
+					productionDateEnd,
 					farmerName,
 					null,
 					null
@@ -92,8 +90,8 @@ public class CommonCsvController {
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
 			@Valid @ApiParam(value = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
 			@Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
-			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
-			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
+			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
 			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws IOException, ApiException {
 
 		request.limit = 500;
@@ -113,8 +111,8 @@ public class CommonCsvController {
 					isWomenShare,
 					preferredWayOfPayment,
 					null,
-					productionDateStart != null ? productionDateStart.toInstant() : null,
-					productionDateEnd != null ? productionDateEnd.toInstant() : null,
+					productionDateStart,
+					productionDateEnd,
 					farmerName
 				), 
 				authUser,

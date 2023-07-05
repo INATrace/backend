@@ -12,6 +12,8 @@ import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.product.api.ApiFinalProduct;
+import com.abelium.inatrace.components.value_chain.ValueChainService;
+import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.common.Address;
@@ -20,6 +22,8 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.facility.*;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
+import com.abelium.inatrace.db.entities.value_chain.FacilityValueChain;
+import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -56,11 +60,14 @@ public class FacilityService extends BaseService {
 
 	private final FinalProductService finalProductService;
 
+	private final ValueChainService valueChainService;
+
 	@Autowired
-	public FacilityService(SemiProductService semiProductService, CompanyQueries companyQueries, FinalProductService finalProductService) {
+	public FacilityService(SemiProductService semiProductService, CompanyQueries companyQueries, FinalProductService finalProductService, ValueChainService valueChainService) {
 		this.semiProductService = semiProductService;
 		this.companyQueries = companyQueries;
 		this.finalProductService = finalProductService;
+		this.valueChainService = valueChainService;
 	}
 
 	public ApiFacility getFacility(Long id, CustomUserDetails user, Language language) throws ApiException {
@@ -75,7 +82,7 @@ public class FacilityService extends BaseService {
 		} else {
 
 			// Check if req. user is enrolled in facility's company
-			PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(facility.getCompany().getUsers(), user);
+			PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
 		}
 
 		return FacilityMapper.toApiFacility(facility, language);
@@ -86,7 +93,7 @@ public class FacilityService extends BaseService {
 		Facility facility = fetchFacility(id);
 
 		// Check if req. user is enrolled in facility's company
-		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(facility.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
 
 		return FacilityMapper.toApiFacilityDetail(facility, language);
 	}
@@ -112,7 +119,7 @@ public class FacilityService extends BaseService {
 		}
 
 		// Create or update can be done only by company admin or system admin
-		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(company.getUsers(), user);
 
 		entity.setIsCollectionFacility(apiFacility.getIsCollectionFacility());
 		entity.setIsPublic(apiFacility.getIsPublic());
@@ -160,6 +167,9 @@ public class FacilityService extends BaseService {
 		// Update the Facility final products
 		updateFacilityFinalProducts(apiFacility, entity);
 
+		// Update the Facility value chains
+		updateFacilityValueChains(apiFacility, entity);
+
 		// Remove translations not in request
 		entity.getFacilityTranslations().removeIf(facilityTranslation -> apiFacility
 				.getTranslations()
@@ -186,7 +196,7 @@ public class FacilityService extends BaseService {
 		Facility facility = em.find(Facility.class, id);
 
 		// Deactivate/Activate can be done only by company admin or system admin
-		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(facility.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(facility.getCompany().getUsers(), user);
 
 		facility.setIsDeactivated(deactivated);
 	}
@@ -197,7 +207,7 @@ public class FacilityService extends BaseService {
 		Facility facility = fetchFacility(id);
 
 		// Remove can be done only by company admin or system admin
-		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(facility.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(facility.getCompany().getUsers(), user);
 
 		em.remove(facility);
 	}
@@ -221,7 +231,7 @@ public class FacilityService extends BaseService {
 																	CustomUserDetails user) throws ApiException {
 
 		Company company = companyQueries.fetchCompany(companyId);
-		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request, () ->
 						listFacilitiesByCompanyQuery(companyId, null, null, language, null),
@@ -399,6 +409,19 @@ public class FacilityService extends BaseService {
 			facilityFinalProduct.setFacility(entity);
 			facilityFinalProduct.setFinalProduct(finalProduct);
 			entity.getFacilityFinalProducts().add(facilityFinalProduct);
+		}
+	}
+
+	private void updateFacilityValueChains(ApiFacility apiFacility, Facility entity) throws ApiException {
+
+		entity.getFacilityValueChains().clear();
+
+		for (ApiValueChain apiValueChain : apiFacility.getFacilityValueChains()) {
+			FacilityValueChain facilityValueChain = new FacilityValueChain();
+			ValueChain valueChain = valueChainService.fetchValueChain(apiValueChain.getId());
+			facilityValueChain.setFacility(entity);
+			facilityValueChain.setValueChain(valueChain);
+			entity.getFacilityValueChains().add(facilityValueChain);
 		}
 	}
 

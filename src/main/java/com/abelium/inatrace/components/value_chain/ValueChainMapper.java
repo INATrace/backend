@@ -1,11 +1,11 @@
 package com.abelium.inatrace.components.value_chain;
 
 import com.abelium.inatrace.components.codebook.facility_type.FacilityTypeMapper;
-import com.abelium.inatrace.components.codebook.grade_abbreviation.GradeAbbreviationMapper;
 import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeMapper;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.ProcessingEvidenceTypeMapper;
 import com.abelium.inatrace.components.codebook.processingevidencefield.ProcessingEvidenceFieldMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
+import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.types.Language;
@@ -70,13 +70,6 @@ public final class ValueChainMapper {
 							vcMeasureUnitType.getMeasureUnitType())).collect(Collectors.toList()));
 		}
 
-		// Map grade abbreviations
-		if (!entity.getGradeAbbreviations().isEmpty()) {
-			apiValueChain.setGradeAbbreviations(entity.getGradeAbbreviations().stream()
-					.map(vcGradeAbbreviation -> GradeAbbreviationMapper.toApiGradeAbbreviation(
-							vcGradeAbbreviation.getGradeAbbreviationType())).collect(Collectors.toList()));
-		}
-
 		// Map processing evidence types
 		if (!entity.getProcEvidenceTypes().isEmpty()) {
 			apiValueChain.setProcessingEvidenceTypes(entity.getProcEvidenceTypes().stream()
@@ -94,10 +87,16 @@ public final class ValueChainMapper {
 		// Map semi-products
 		if (!entity.getSemiProducts().isEmpty()) {
 			apiValueChain.setSemiProducts(entity.getSemiProducts().stream()
-					.map(vcSemiProduct -> SemiProductMapper.toApiSemiProductBase(vcSemiProduct.getSemiProduct(), language))
+					.map(vcSemiProduct -> SemiProductMapper.toValueChainApiSemiProduct(vcSemiProduct.getSemiProduct(), language))
 					.collect(Collectors.toList()));
+		}
+
+		// Map product type
+		if (entity.getProductType() != null) {
+			apiValueChain.setProductType(ProductTypeMapper.toApiProductType(entity.getProductType(), language));
 		}
 
 		return apiValueChain;
 	}
+
 }

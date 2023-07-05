@@ -19,6 +19,9 @@ public class ApiValueChainListRequest extends ApiPaginatedRequest {
 	@ApiParam(value = "Value chain status")
 	private ValueChainStatus valueChainStatus;
 
+	@ApiParam(value = "Value chain product type ID")
+	private Long productTypeId;
+
 	public String getName() {
 		return name;
 	}
@@ -35,4 +38,11 @@ public class ApiValueChainListRequest extends ApiPaginatedRequest {
 		this.valueChainStatus = valueChainStatus;
 	}
 
+	public Long getProductTypeId() {
+		return productTypeId;
+	}
+
+	public void setProductTypeId(Long productTypeId) {
+		this.productTypeId = productTypeId;
+	}
 }

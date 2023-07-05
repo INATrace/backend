@@ -13,12 +13,16 @@ import com.abelium.inatrace.components.company.CompanyQueries;
 import com.abelium.inatrace.components.facility.FacilityService;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
+import com.abelium.inatrace.components.processingaction.api.ApiProcessingActionOutputSemiProduct;
 import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.value_chain.ValueChainService;
+import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.processingaction.*;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
+import com.abelium.inatrace.db.entities.value_chain.ProcessingActionValueChain;
+import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -33,6 +37,7 @@ import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
 /**
@@ -90,7 +95,7 @@ public class ProcessingActionService extends BaseService {
 		ProcessingAction processingAction = fetchProcessingAction(id);
 
 		// The request user should be enrolled in the processing action owner company
-		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(processingAction.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(processingAction.getCompany().getUsers(), user);
 
 		return ProcessingActionMapper.toApiProcessingActionDetail(processingAction, language);
 	}
@@ -109,33 +114,38 @@ public class ProcessingActionService extends BaseService {
 		Company company = companyQueries.fetchCompany(apiProcessingAction.getCompany().getId());
 
 		// Check that request user is enrolled in owner company
-		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(company.getUsers(), user);
 
 		// Set processing action owner company
 		entity.setCompany(company);
 
 		// Set the value chain
-		entity.setValueChain(valueChainService.fetchValueChain(apiProcessingAction.getValueChain().getId()));
-
 		entity.setSortOrder(apiProcessingAction.getSortOrder());
 		entity.setPrefix(apiProcessingAction.getPrefix());
-		entity.setRepackedOutputs(apiProcessingAction.getRepackedOutputs());
-		entity.setMaxOutputWeight(apiProcessingAction.getMaxOutputWeight());
 		entity.setPublicTimelineLabel(apiProcessingAction.getPublicTimelineLabel());
 		entity.setPublicTimelineLocation(apiProcessingAction.getPublicTimelineLocation());
 		entity.setPublicTimelineIconType(apiProcessingAction.getPublicTimelineIconType());
 		entity.setType(apiProcessingAction.getType());
 
-		// If we have shipment or transfer, set the the field denoting if we are dealing with final products
+		// Set semi-products and final products (depending on the Processing action type)
+		setSemiAndFinalProducts(apiProcessingAction, entity);
+
+		// Set the repack for output final product
+		if (entity.getOutputFinalProduct() != null) {
+			entity.setRepackedOutputFinalProducts(apiProcessingAction.getRepackedOutputFinalProducts());
+			entity.setMaxOutputWeight(apiProcessingAction.getMaxOutputWeight());
+		} else {
+			entity.setRepackedOutputFinalProducts(null);
+			entity.setMaxOutputWeight(null);
+		}
+
+		// If we have shipment or transfer, set the field denoting if we are dealing with final products
 		if (ProcessingActionType.TRANSFER.equals(apiProcessingAction.getType()) ||
 				ProcessingActionType.SHIPMENT.equals(apiProcessingAction.getType())) {
 			entity.setFinalProductAction(BooleanUtils.toBooleanDefaultIfNull(apiProcessingAction.getFinalProductAction(), false));
 		} else {
 			entity.setFinalProductAction(Boolean.FALSE);
 		}
-
-		// Set semi-products and final products (depending on the Processing action type)
-		setSemiAndFinalProducts(apiProcessingAction, entity);
 
 		// Set the estimated output quantity per unit
 		entity.setEstimatedOutputQuantityPerUnit(apiProcessingAction.getEstimatedOutputQuantityPerUnit());
@@ -151,6 +161,9 @@ public class ProcessingActionService extends BaseService {
 
 		// Create or update the supported facilities for this processing action (the facilities where this processing starts)
 		updateSupportedFacilities(apiProcessingAction, entity);
+
+		// Create or update the value-chains
+		updateValueChains(apiProcessingAction, entity);
 
 		// If action type is GENERATE_QR_CODE, set Final product for QR code
 		if (ProcessingActionType.GENERATE_QR_CODE.equals(apiProcessingAction.getType())) {
@@ -170,7 +183,7 @@ public class ProcessingActionService extends BaseService {
 
 		ProcessingAction processingAction = fetchProcessingAction(id);
 
-		PermissionsUtil.checkUserIfCompanyAdminOrSystemAdmin(processingAction.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(processingAction.getCompany().getUsers(), user);
 
 		em.remove(processingAction);
 	}
@@ -193,7 +206,7 @@ public class ProcessingActionService extends BaseService {
 
 		// Check that request user is company enrolled
 		Company company = companyQueries.fetchCompany(companyId);
-		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request, () ->
 						listProcessingActionsByCompanyQuery(companyId, language, actionType, onlyFinalProducts),
@@ -233,8 +246,10 @@ public class ProcessingActionService extends BaseService {
 	private void validateProcessingAction(ApiProcessingAction apiProcessingAction) throws ApiException {
 
 		// Validate value chain
-		if (apiProcessingAction.getValueChain() == null || apiProcessingAction.getValueChain().getId() == null) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Value chain is required");
+		if (apiProcessingAction.getValueChains() == null || apiProcessingAction.getValueChains().isEmpty() ||
+				apiProcessingAction.getValueChains().get(0) == null ||
+				apiProcessingAction.getValueChains().get(0).getId() == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "At least one value chain is required");
 		}
 
 		// Validate action type
@@ -254,6 +269,14 @@ public class ProcessingActionService extends BaseService {
 					"Estimated output quantity cannot be provided when action is not 'PROCESSING'");
 		}
 
+		// If repack output for final product is selected, validate that maximum output quantity is provided
+		if (BooleanUtils.isTrue(apiProcessingAction.getRepackedOutputFinalProducts())) {
+			if (apiProcessingAction.getMaxOutputWeight() == null || apiProcessingAction.getMaxOutputWeight().compareTo(
+					BigDecimal.ZERO) <= 0) {
+				throw new ApiException(ApiStatus.INVALID_REQUEST, "Maximum output quantity is required when 'repackedOutputFinalProducts' is selected");
+			}
+		}
+
 		switch (apiProcessingAction.getType()) {
 			case PROCESSING:
 
@@ -262,9 +285,9 @@ public class ProcessingActionService extends BaseService {
 					throw new ApiException(ApiStatus.INVALID_REQUEST, "Input semi-product is required");
 				}
 
-				// Validate output semi-product
-				if (apiProcessingAction.getOutputSemiProduct() == null || apiProcessingAction.getOutputSemiProduct().getId() == null) {
-					throw new ApiException(ApiStatus.INVALID_REQUEST, "Output semi-product is required");
+				// Validate that at least one output semi-product is present
+				if (apiProcessingAction.getOutputSemiProducts() == null || apiProcessingAction.getOutputSemiProducts().isEmpty()) {
+					throw new ApiException(ApiStatus.INVALID_REQUEST, "At least one output semi-product is required");
 				}
 				break;
 
@@ -326,7 +349,6 @@ public class ProcessingActionService extends BaseService {
 	private void setSemiAndFinalProducts(ApiProcessingAction apiProcessingAction, ProcessingAction entity) throws ApiException {
 
 		SemiProduct inputSemiProduct;
-		SemiProduct outputSemiProduct;
 
 		FinalProduct inputFinalProduct;
 		FinalProduct outputFinalProduct;
@@ -334,12 +356,24 @@ public class ProcessingActionService extends BaseService {
 		switch (apiProcessingAction.getType()) {
 			case PROCESSING:
 
-				// Set the input and output semi-product
+				// Set the input semi-product
 				inputSemiProduct = semiProductService.fetchSemiProduct(apiProcessingAction.getInputSemiProduct().getId());
 				entity.setInputSemiProduct(inputSemiProduct);
 
-				outputSemiProduct = semiProductService.fetchSemiProduct(apiProcessingAction.getOutputSemiProduct().getId());
-				entity.setOutputSemiProduct(outputSemiProduct);
+				// Set the output semi-products
+				entity.getOutputSemiProducts().clear();
+				for (ApiProcessingActionOutputSemiProduct apiPaOSM : apiProcessingAction.getOutputSemiProducts()) {
+					ProcessingActionOutputSemiProduct paOSM = new ProcessingActionOutputSemiProduct();
+					paOSM.setProcessingAction(entity);
+					paOSM.setOutputSemiProduct(semiProductService.fetchSemiProduct(apiPaOSM.getId()));
+					paOSM.setRepackedOutput(apiPaOSM.getRepackedOutput());
+					paOSM.setMaxOutputWeight(apiPaOSM.getMaxOutputWeight());
+					entity.getOutputSemiProducts().add(paOSM);
+				}
+
+				// Clear input and output final products (if they were set from previous version)
+				entity.setInputFinalProduct(null);
+				entity.setOutputFinalProduct(null);
 
 				break;
 
@@ -353,6 +387,9 @@ public class ProcessingActionService extends BaseService {
 				outputFinalProduct = finalProductService.fetchFinalProduct(apiProcessingAction.getOutputFinalProduct().getId());
 				entity.setOutputFinalProduct(outputFinalProduct);
 
+				// Clear all output semi-product (if they were set from previous version)
+				entity.getOutputSemiProducts().clear();
+
 				break;
 
 			case TRANSFER:
@@ -364,12 +401,27 @@ public class ProcessingActionService extends BaseService {
 					inputFinalProduct = finalProductService.fetchFinalProduct(apiProcessingAction.getInputFinalProduct().getId());
 					entity.setInputFinalProduct(inputFinalProduct);
 					entity.setOutputFinalProduct(inputFinalProduct);
+
+					// Clear all output semi-product (if they were set from previous version)
+					entity.setInputSemiProduct(null);
+					entity.getOutputSemiProducts().clear();
 				} else {
 
 					// Set the input semi-product and set the output to be the same as the input
 					inputSemiProduct = semiProductService.fetchSemiProduct(apiProcessingAction.getInputSemiProduct().getId());
 					entity.setInputSemiProduct(inputSemiProduct);
-					entity.setOutputSemiProduct(inputSemiProduct);
+
+					entity.getOutputSemiProducts().clear();
+					ProcessingActionOutputSemiProduct paOSM = new ProcessingActionOutputSemiProduct();
+					paOSM.setProcessingAction(entity);
+					paOSM.setOutputSemiProduct(inputSemiProduct);
+					paOSM.setRepackedOutput(null);
+					paOSM.setMaxOutputWeight(null);
+					entity.getOutputSemiProducts().add(paOSM);
+
+					// Clear input and output final products (if they were set from previous version)
+					entity.setInputFinalProduct(null);
+					entity.setOutputFinalProduct(null);
 				}
 				break;
 
@@ -378,8 +430,33 @@ public class ProcessingActionService extends BaseService {
 				// Set the input and output semi-product (the output is the same with the input)
 				inputSemiProduct = semiProductService.fetchSemiProduct(apiProcessingAction.getInputSemiProduct().getId());
 				entity.setInputSemiProduct(inputSemiProduct);
-				entity.setOutputSemiProduct(inputSemiProduct);
+
+				entity.getOutputSemiProducts().clear();
+				ProcessingActionOutputSemiProduct paOSM = new ProcessingActionOutputSemiProduct();
+				paOSM.setProcessingAction(entity);
+				paOSM.setOutputSemiProduct(inputSemiProduct);
+				paOSM.setRepackedOutput(null);
+				paOSM.setMaxOutputWeight(null);
+				entity.getOutputSemiProducts().add(paOSM);
+
+				// Clear input and output final products (if they were set from previous version)
+				entity.setInputFinalProduct(null);
+				entity.setOutputFinalProduct(null);
 		}
+	}
+
+	private void updateValueChains(ApiProcessingAction apiProcessingAction, ProcessingAction entity) throws ApiException {
+
+		entity.getProcessingActionsValueChains().clear();
+
+		for (ApiValueChain apiValueChain : apiProcessingAction.getValueChains()) {
+			ProcessingActionValueChain processingActionValueChain = new ProcessingActionValueChain();
+			ValueChain valueChain = valueChainService.fetchValueChain(apiValueChain.getId());
+			processingActionValueChain.setProcessingAction(entity);
+			processingActionValueChain.setValueChain(valueChain);
+			entity.getProcessingActionsValueChains().add(processingActionValueChain);
+		}
+
 	}
 
 	private void updateRequiredEvidenceFields(ApiProcessingAction apiProcessingAction, ProcessingAction entity) {

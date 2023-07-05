@@ -9,10 +9,12 @@ import com.abelium.inatrace.components.codebook.processing_evidence_type.api.Api
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceType;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceTypeTranslation;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
+import com.abelium.inatrace.types.UserRole;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.Torpedo;
@@ -61,11 +63,18 @@ public class ProcessingEvidenceTypeService extends BaseService {
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdateProcessingEvidenceType(ApiProcessingEvidenceType apiProcessingEvidenceType) throws ApiException {
+	public ApiBaseEntity createOrUpdateProcessingEvidenceType(CustomUserDetails authUser,
+															  ApiProcessingEvidenceType apiProcessingEvidenceType) throws ApiException {
 
 		ProcessingEvidenceType entity;
 
 		if (apiProcessingEvidenceType.getId() != null) {
+
+			// Editing is not permitted for Regional admin
+			if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+				throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
+			}
+
 			entity = fetchProcessingEvidenceType(apiProcessingEvidenceType.getId());
 		} else {
 
@@ -147,4 +156,25 @@ public class ProcessingEvidenceTypeService extends BaseService {
 						.collect(Collectors.toList()), count);
 	}
 
+	public ApiPaginatedList<ApiProcessingEvidenceType> listProcessingEvidenceTypesByValueChainList(
+			List<Long> valueChainIds, ApiPaginatedRequest request, Language language) {
+
+		TypedQuery<ProcessingEvidenceType> processingEvidenceTypesQuery =
+				em.createNamedQuery("ProcessingEvidenceType.getProcessingEvidenceTypesForValueChainIds", ProcessingEvidenceType.class)
+						.setParameter("valueChainIds", valueChainIds)
+						.setFirstResult(request.getOffset())
+						.setMaxResults(request.getLimit());
+
+		List<ProcessingEvidenceType> processingEvidenceTypes = processingEvidenceTypesQuery.getResultList();
+
+		Long count = em.createNamedQuery("ProcessingEvidenceType.countProcessingEvidenceTypesForValueChainIds", Long.class)
+				.setParameter("valueChainIds", valueChainIds)
+				.getSingleResult();
+
+		return new ApiPaginatedList<>(
+				processingEvidenceTypes
+						.stream()
+						.map(processingEvidenceType -> ProcessingEvidenceTypeMapper.toApiProcessingEvidenceTypeBase(processingEvidenceType, language))
+						.collect(Collectors.toList()), count);
+	}
 }

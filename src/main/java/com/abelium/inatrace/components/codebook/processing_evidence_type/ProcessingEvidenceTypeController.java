@@ -3,14 +3,17 @@ package com.abelium.inatrace.components.codebook.processing_evidence_type;
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * REST controller for processing evidence type entity.
@@ -37,6 +40,7 @@ public class ProcessingEvidenceTypeController {
 		return new ApiPaginatedResponse<>(processingEvidenceTypeService.getProcEvidenceTypeList(request, language));
 	}
 
+	@Deprecated
 	@GetMapping("list/value-chain/{id}")
 	@ApiOperation("Get a list of processing evidence types by value chain ID.")
 	public ApiPaginatedResponse<ApiProcessingEvidenceType> listProcessingEvidenceTypesByValueChain(
@@ -45,6 +49,16 @@ public class ProcessingEvidenceTypeController {
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
 
 		return new ApiPaginatedResponse<>(processingEvidenceTypeService.listProcessingEvidenceTypesByValueChain(valueChainId, request, language));
+	}
+
+	@GetMapping("list/by-value-chains")
+	@ApiOperation("Get a list of processing evidence types by value chain ID list.")
+	public ApiPaginatedResponse<ApiProcessingEvidenceType> listProcessingEvidenceTypesByValueChains(
+			@ApiParam(value = "Value chain IDs", required = true) @RequestParam(value = "valueChainIds") List<Long> valueChainIds,
+			@Valid ApiPaginatedRequest request,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
+
+		return new ApiPaginatedResponse<>(processingEvidenceTypeService.listProcessingEvidenceTypesByValueChainList(valueChainIds, request, language));
 	}
 
 	@GetMapping("{id}")
@@ -57,17 +71,18 @@ public class ProcessingEvidenceTypeController {
 	}
 
 	@PutMapping
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
 	@ApiOperation("Create or update processing evidence type. If ID is provided, the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateProcessingEvidenceType(
+			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid @RequestBody ApiProcessingEvidenceType apiProcessingEvidenceType) throws ApiException {
 
 		return new ApiResponse<>(
-				processingEvidenceTypeService.createOrUpdateProcessingEvidenceType(apiProcessingEvidenceType));
+				processingEvidenceTypeService.createOrUpdateProcessingEvidenceType(authUser, apiProcessingEvidenceType));
 	}
 
 	@DeleteMapping("{id}")
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@ApiOperation("Deletes a processing evidence type with the provided ID.")
 	public ApiDefaultResponse deleteProcessingEvidenceType(
 			@Valid @ApiParam(value = "Processing evidence type ID", required = true) @PathVariable("id") Long id) throws ApiException {

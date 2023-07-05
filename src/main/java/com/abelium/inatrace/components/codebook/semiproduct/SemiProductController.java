@@ -3,14 +3,17 @@ package com.abelium.inatrace.components.codebook.semiproduct;
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * REST controller for semi products.
@@ -37,6 +40,16 @@ public class SemiProductController {
 		return new ApiPaginatedResponse<>(semiProductService.getSemiProductList(request, language));
 	}
 
+	@GetMapping("list/by-value-chains")
+	@ApiOperation("Get a paginated list of semi products for given value-chain list")
+	public ApiPaginatedResponse<ApiSemiProduct> getSemiProductListByValueChains(
+			@ApiParam(value = "Value chain IDs", required = true) @RequestParam(value = "valueChainIds") List<Long> valueChainIds,
+			@Valid ApiPaginatedRequest request,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
+
+		return new ApiPaginatedResponse<>(semiProductService.getSemiProductListByValueChains(request, valueChainIds, language));
+	}
+
 	@GetMapping("{id}")
 	@ApiOperation("Get a single semi product with the provided ID.")
 	public ApiResponse<ApiSemiProduct> getSemiProduct(
@@ -55,15 +68,17 @@ public class SemiProductController {
 	}
 
 	@PutMapping
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
 	@ApiOperation("Create or update semi product. If ID is provided, the entity with the provided ID is updated.")
-	public ApiResponse<ApiBaseEntity> createOrUpdateSemiProduct(@Valid @RequestBody ApiSemiProduct apiSemiProduct) throws ApiException {
+	public ApiResponse<ApiBaseEntity> createOrUpdateSemiProduct(
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid @RequestBody ApiSemiProduct apiSemiProduct) throws ApiException {
 
-		return new ApiResponse<>(semiProductService.createOrUpdateSemiProduct(apiSemiProduct));
+		return new ApiResponse<>(semiProductService.createOrUpdateSemiProduct(authUser, apiSemiProduct));
 	}
 
 	@DeleteMapping("{id}")
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@ApiOperation("Deletes a semi product with the provided ID.")
 	public ApiDefaultResponse deleteSemiProduct(@Valid @ApiParam(value = "Semi product ID", required = true) @PathVariable("id") Long id) throws ApiException {
 

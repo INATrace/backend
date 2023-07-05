@@ -18,6 +18,7 @@ import com.abelium.inatrace.components.currencies.CurrencyService;
 import com.abelium.inatrace.components.facility.FacilityService;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.payment.api.ApiPayment;
+import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
 import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.stockorder.api.*;
@@ -62,6 +63,7 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -112,6 +114,21 @@ public class StockOrderService extends BaseService {
         PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(stockOrder.getCompany().getId()), user);
 
         return StockOrderMapper.toApiStockOrder(stockOrder, user.getUserId(), language, withProcessingOrder);
+    }
+
+    public ApiProcessingOrder getStockOrderProcessingOrder(long id, CustomUserDetails user, Language language) throws ApiException {
+
+        StockOrder stockOrder = fetchEntity(id, StockOrder.class);
+
+        // Check that the request user is form a company which is connected to the company that owns the quote order (or is a user of that company)
+        PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(stockOrder.getCompany().getId()), user);
+
+        // If Stock order has no Processing order set, exit with exception
+        if (stockOrder.getProcessingOrder() == null) {
+            throw new ApiException(ApiStatus.INVALID_REQUEST, "The Stock order with ID: " + id + " doesn't have Processing order.");
+        }
+
+        return ProcessingOrderMapper.toApiProcessingOrder(stockOrder.getProcessingOrder(), language);
     }
 
     public ApiPaginatedList<ApiStockOrder> getAvailableStockOrderListForFacility(ApiPaginatedRequest request,
@@ -446,7 +463,7 @@ public class StockOrderService extends BaseService {
                             apiPayment.getCurrency(),
                             "USD",
                             apiPayment.getAmount(),
-                            Date.from(apiPayment.getFormalCreationTime())
+                            Date.from(apiPayment.getFormalCreationTime().atStartOfDay().toInstant(ZoneOffset.UTC))
                     );
 
                     // Accumulate payments
@@ -536,7 +553,7 @@ public class StockOrderService extends BaseService {
                                     apiPayment.getCurrency(),
                                     "USD",
                                     apiPayment.getAmount(),
-                                    Date.from(apiPayment.getFormalCreationTime())
+                                    Date.from(apiPayment.getFormalCreationTime().atStartOfDay().toInstant(ZoneOffset.UTC))
                             )
                     );
                 }
@@ -857,7 +874,12 @@ public class StockOrderService extends BaseService {
                                                        ProcessingOrder processingOrder) throws ApiException {
 
         // Check that the request user is form a company which is connected to the company that owns the quote order (or is a user of that company)
-        PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(apiStockOrder.getCompany().getId()), user);
+        if (apiStockOrder.getCompany() != null && apiStockOrder.getCompany().getId() != null) {
+            PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(apiStockOrder.getCompany().getId()), user);
+        } else {
+            // When creating a new Quote order, the underlying stock order has not yet set company
+            PermissionsUtil.checkUserIfConnectedWithProducts(companyQueries.fetchCompanyProducts(processingOrder.getProcessingAction().getCompany().getId()), user);
+        }
 
         return createOrUpdateStockOrder(apiStockOrder, user, processingOrder, false);
     }
@@ -871,9 +893,9 @@ public class StockOrderService extends BaseService {
 
     @Transactional
     public ApiBaseEntity createOrUpdateStockOrder(ApiStockOrder apiStockOrder,
-                                                   CustomUserDetails user,
-                                                   ProcessingOrder processingOrder,
-                                                   boolean checkCompanyEnrolment) throws ApiException {
+                                                  CustomUserDetails user,
+                                                  ProcessingOrder processingOrder,
+                                                  boolean checkCompanyEnrolment) throws ApiException {
 
         StockOrder entity;
 
@@ -912,6 +934,7 @@ public class StockOrderService extends BaseService {
         entity.setIdentifier(apiStockOrder.getIdentifier());
         entity.setPreferredWayOfPayment(apiStockOrder.getPreferredWayOfPayment());
         entity.setSacNumber(apiStockOrder.getSacNumber());
+        entity.setRepackedOriginStockOrderId(apiStockOrder.getRepackedOriginStockOrderId());
         entity.setProductionDate(apiStockOrder.getProductionDate());
         entity.setDeliveryTime(apiStockOrder.getDeliveryTime());
         entity.setComments(apiStockOrder.getComments());
@@ -1179,7 +1202,7 @@ public class StockOrderService extends BaseService {
             BigDecimal expectedTotalQuantityPerUnit = procAction.getEstimatedOutputQuantityPerUnit();
 
             if (procAction.getType().equals(ProcessingActionType.PROCESSING) &&
-                    BooleanUtils.isFalse(procAction.getRepackedOutputs()) && expectedTotalQuantityPerUnit != null) {
+                    BooleanUtils.isFalse(procAction.getRepackedOutputFinalProducts()) && expectedTotalQuantityPerUnit != null) {
 
                 // Calculate the total input quantity (summed up input transactions from the processing order)
                 List<Transaction> inputTxs = processingOrder.getInputTransactions();
@@ -1189,7 +1212,10 @@ public class StockOrderService extends BaseService {
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 BigDecimal inputUnitWeight = procAction.getInputSemiProduct().getMeasurementUnitType().getWeight();
-                BigDecimal outputUnitWeight = procAction.getOutputSemiProduct().getMeasurementUnitType().getWeight();
+
+                // TODO: check this if correct after added multiple outputs support
+                BigDecimal outputUnitWeight = stockOrder.getSemiProduct().getMeasurementUnitType().getWeight();
+                // BigDecimal outputUnitWeight = procAction.getOutputSemiProduct().getMeasurementUnitType().getWeight();
 
                 // Calculate the input quantity normalized in the output measuring unit (important when we have different input and output measure units)
                 BigDecimal totalInputQuantityNormalized = totalInputQuantity.divide(inputUnitWeight,

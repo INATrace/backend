@@ -6,9 +6,11 @@ import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.tomcat.jni.Local;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +20,7 @@ public class ApiGroupStockOrder extends ApiBaseEntity {
     public ApiGroupStockOrder() {}
     public ApiGroupStockOrder(
             String groupedIds,
-            Instant productionDate,
+            LocalDate productionDate,
             String internalLotNumber,
             Long noOfSacs,
             OrderType orderType,
@@ -28,7 +30,7 @@ public class ApiGroupStockOrder extends ApiBaseEntity {
             BigDecimal fulfilledQuantity,
             BigDecimal availableQuantity,
             String unitLabel,
-            Instant deliveryTime,
+            LocalDate deliveryTime,
             Instant updateTimestamp,
             Boolean isAvailable
     ) {
@@ -52,9 +54,7 @@ public class ApiGroupStockOrder extends ApiBaseEntity {
     private List<Long> groupedIds;
 
     @ApiModelProperty(value = "Production date")
-    @JsonSerialize(converter = SimpleDateConverter.Serialize.class)
-    @JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
-    private Instant productionDate;
+    private LocalDate productionDate;
 
     @ApiModelProperty(value = "Timestamp indicates when process order have been updated")
     private Instant updateTimestamp;
@@ -87,7 +87,7 @@ public class ApiGroupStockOrder extends ApiBaseEntity {
     private String unitLabel;
 
     @ApiModelProperty(value = "Delivery time")
-    private Instant deliveryTime;
+    private LocalDate deliveryTime;
 
     @ApiModelProperty(value = "Is stock available")
     private Boolean isAvailable;
@@ -156,11 +156,11 @@ public class ApiGroupStockOrder extends ApiBaseEntity {
         this.unitLabel = unitLabel;
     }
 
-    public Instant getDeliveryTime() {
+    public LocalDate getDeliveryTime() {
         return deliveryTime;
     }
 
-    public void setDeliveryTime(Instant deliveryTime) {
+    public void setDeliveryTime(LocalDate deliveryTime) {
         this.deliveryTime = deliveryTime;
     }
 
@@ -172,11 +172,11 @@ public class ApiGroupStockOrder extends ApiBaseEntity {
         isAvailable = available;
     }
 
-    public Instant getProductionDate() {
+    public LocalDate getProductionDate() {
         return productionDate;
     }
 
-    public void setProductionDate(Instant productionDate) {
+    public void setProductionDate(LocalDate productionDate) {
         this.productionDate = productionDate;
     }
 

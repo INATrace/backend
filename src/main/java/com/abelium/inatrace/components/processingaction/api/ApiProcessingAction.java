@@ -2,11 +2,11 @@ package com.abelium.inatrace.components.processingaction.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.api.ApiProcessingEvidenceType;
+import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.processingactiontranslation.api.ApiProcessingActionTranslation;
-import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiProcessingEvidenceField;
 import com.abelium.inatrace.components.product.api.ApiFinalProduct;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.types.Language;
@@ -40,12 +40,6 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	@ApiModelProperty(value = "Processing action prefix")
 	private String prefix;
 
-	@ApiModelProperty(value = "Processing action repacked outputs")
-	private Boolean repackedOutputs;
-	
-	@ApiModelProperty(value = "Processing action maximum output weight")
-	private BigDecimal maxOutputWeight;
-
 	@ApiModelProperty(value = "The estimated output quantity per unit for this processing action")
 	private BigDecimal estimatedOutputQuantityPerUnit;
 	
@@ -60,15 +54,21 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	
 	@ApiModelProperty(value = "Processing action input semi product")
 	private ApiSemiProduct inputSemiProduct;
-	
-	@ApiModelProperty(value = "Processing action input semi product")
-	private ApiSemiProduct outputSemiProduct;
+
+	@ApiModelProperty(value = "List of supported output semi-products")
+	private List<ApiProcessingActionOutputSemiProduct> outputSemiProducts;
 
 	@ApiModelProperty(value = "The input Final product")
 	private ApiFinalProduct inputFinalProduct;
 
 	@ApiModelProperty(value = "The output final product")
 	private ApiFinalProduct outputFinalProduct;
+
+	@ApiModelProperty(value = "Processing action repacked outputs when using output final product")
+	private Boolean repackedOutputFinalProducts;
+
+	@ApiModelProperty(value = "Processing action maximum output weight when repacked outputs for final product is set to 'true'")
+	private BigDecimal maxOutputWeight;
 
 	@ApiModelProperty(value = "The Final product for which the QR code tag will be generated (used with action type GENERATE_QR_CODE)")
 	private ApiFinalProduct qrCodeForFinalProduct;
@@ -82,9 +82,9 @@ public class ApiProcessingAction extends ApiBaseEntity {
 	@ApiModelProperty(value = "Denoting if this processing action is Transfer or Quote of a Final product")
 	private Boolean finalProductAction;
 
-	@ApiModelProperty(value = "The value chain that this Processing action supports")
-	private ApiValueChain valueChain;
-	
+	@ApiModelProperty(value = "List of value chains for this processing action")
+	private List<ApiValueChain> valueChains;
+
 	@ApiModelProperty(value = "Processing action required document types")
 	private List<ApiProcessingEvidenceType> requiredDocumentTypes = new ArrayList<>();
 	
@@ -141,12 +141,12 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		this.prefix = prefix;
 	}
 
-	public Boolean getRepackedOutputs() {
-		return repackedOutputs;
+	public Boolean getRepackedOutputFinalProducts() {
+		return repackedOutputFinalProducts;
 	}
 
-	public void setRepackedOutputs(Boolean repackedOutputs) {
-		this.repackedOutputs = repackedOutputs;
+	public void setRepackedOutputFinalProducts(Boolean repackedOutputFinalProducts) {
+		this.repackedOutputFinalProducts = repackedOutputFinalProducts;
 	}
 
 	public BigDecimal getMaxOutputWeight() {
@@ -197,12 +197,12 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		this.inputSemiProduct = inputSemiProduct;
 	}
 
-	public ApiSemiProduct getOutputSemiProduct() {
-		return outputSemiProduct;
+	public List<ApiProcessingActionOutputSemiProduct> getOutputSemiProducts() {
+		return outputSemiProducts;
 	}
 
-	public void setOutputSemiProduct(ApiSemiProduct outputSemiProduct) {
-		this.outputSemiProduct = outputSemiProduct;
+	public void setOutputSemiProducts(List<ApiProcessingActionOutputSemiProduct> outputSemiProducts) {
+		this.outputSemiProducts = outputSemiProducts;
 	}
 
 	public ApiFinalProduct getInputFinalProduct() {
@@ -253,12 +253,12 @@ public class ApiProcessingAction extends ApiBaseEntity {
 		this.finalProductAction = finalProductAction;
 	}
 
-	public ApiValueChain getValueChain() {
-		return valueChain;
+	public List<ApiValueChain> getValueChains() {
+		return valueChains;
 	}
 
-	public void setValueChain(ApiValueChain valueChain) {
-		this.valueChain = valueChain;
+	public void setValueChains(List<ApiValueChain> valueChains) {
+		this.valueChains = valueChains;
 	}
 
 	public List<ApiProcessingEvidenceType> getRequiredDocumentTypes() {

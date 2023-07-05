@@ -3,10 +3,12 @@ package com.abelium.inatrace.components.codebook.facility_type;
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -43,16 +45,17 @@ public class FacilityTypeController {
 	}
 
 	@PutMapping
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
 	@ApiOperation("Create or update facility type. If ID is provided, the entity entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateFacilityType(
+			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid @RequestBody ApiFacilityType apiFacilityType) throws ApiException {
 
-		return new ApiResponse<>(facilityTypeService.createOrUpdateFacilityType(apiFacilityType));
+		return new ApiResponse<>(facilityTypeService.createOrUpdateFacilityType(authUser, apiFacilityType));
 	}
 
 	@DeleteMapping("{id}")
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@ApiOperation("Deletes a facility type with the provided ID.")
 	public ApiDefaultResponse deleteFacilityType(
 			@Valid @ApiParam(value = "Facility type ID", required = true) @PathVariable("id") Long id) throws ApiException {

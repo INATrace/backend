@@ -7,9 +7,10 @@ import com.abelium.inatrace.db.entities.codebook.CurrencyType;
 import com.abelium.inatrace.db.entities.common.Address;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.facility.Facility;
-import com.abelium.inatrace.db.entities.payment.BulkPayment;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
+import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+import com.abelium.inatrace.db.entities.value_chain.CompanyValueChain;
 import com.abelium.inatrace.types.CompanyStatus;
 
 import javax.persistence.*;
@@ -35,13 +36,11 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	/**
 	 * company name
 	 */
-	@Column(length = Lengths.DEFAULT)
 	private String name;
 	
 	/**
 	 * company abbreviation
 	 */
-	@Column(length = Lengths.DEFAULT)
 	private String abbreviation;
 
 	/**
@@ -70,7 +69,7 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	/**
 	 * name of manager / CEO
 	 */
-	@Column(length = Lengths.DEFAULT)
+	@Column
 	private String manager;
 
 	/**
@@ -153,18 +152,21 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	 */
 	@OneToMany(mappedBy = "company")
 	private List<StockOrder> stockOrders = new ArrayList<>();
-	
+
 	/**
-	 * bulk payments
+	 * A list of supported value chains for the company (filter)
 	 */
-	@OneToMany(mappedBy = "payingCompany")
-	private List<BulkPayment> bulkPayments = new ArrayList<>();
+	@OneToMany(mappedBy = "company")
+	private List<CompanyValueChain> valueChains;
 	
-	@ManyToOne()
+	@ManyToOne
 	private CurrencyType currency;
 
 	@Column
 	private Boolean allowBeycoIntegration;
+
+	@OneToMany(mappedBy = "company")
+	private List<ProductCompany> companyRoles;
 
 	public CompanyStatus getStatus() {
 		return status;
@@ -348,5 +350,24 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 
 	public void setAllowBeycoIntegration(Boolean allowBeycoIntegration) {
 		this.allowBeycoIntegration = allowBeycoIntegration;
+	}
+
+	public List<ProductCompany> getCompanyRoles() {
+		return companyRoles;
+	}
+
+	public void setCompanyRoles(List<ProductCompany> companyRoles) {
+		this.companyRoles = companyRoles;
+	}
+
+	public List<CompanyValueChain> getValueChains() {
+		if (valueChains == null) {
+			valueChains = new ArrayList<>();
+		}
+		return valueChains;
+	}
+
+	public void setValueChains(List<CompanyValueChain> valueChains) {
+		this.valueChains = valueChains;
 	}
 }

@@ -1,9 +1,6 @@
 package com.abelium.inatrace.components.company;
 
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiPaginatedList;
-import com.abelium.inatrace.api.ApiPaginatedRequest;
-import com.abelium.inatrace.api.ApiStatus;
+import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.CommonService;
@@ -14,13 +11,21 @@ import com.abelium.inatrace.components.common.api.ApiUserCustomerImportResponse;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.company.types.CompanyAction;
+import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
+import com.abelium.inatrace.components.product.api.ApiFarmPlantInformation;
+import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.components.user.UserQueries;
+import com.abelium.inatrace.components.value_chain.ValueChainMapper;
+import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
+import com.abelium.inatrace.db.entities.codebook.ProductType;
 import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.product.ProductCompany;
+import com.abelium.inatrace.db.entities.value_chain.CompanyValueChain;
+import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
@@ -128,6 +133,7 @@ public class CompanyService extends BaseService {
 
 	@Transactional
 	public ApiBaseEntity createCompany(Long userId, ApiCompany request) throws ApiException {
+
 		User user = Queries.get(em, User.class, userId);
 		Company company = new Company();
 		CompanyUser companyUser = new CompanyUser();
@@ -137,7 +143,13 @@ public class CompanyService extends BaseService {
 
 		companyUser.setUser(user);
 		companyUser.setCompany(company);
+		companyUser.setRole(CompanyUserRole.COMPANY_ADMIN);
 		em.persist(companyUser);
+
+		if (request.valueChains != null) {
+			// update value chains
+			companyApiTools.updateCompanyValueChains(request, company);
+		}
 
 		return new ApiBaseEntity(company);
 	}
@@ -150,11 +162,13 @@ public class CompanyService extends BaseService {
 
 		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(c.getUsers(), authUser);
 
+		List<ApiValueChain> valueChains = companyQueries.fetchCompanyValueChains(id);
+
 		List<CompanyAction> actions = new ArrayList<>();
 		actions.add(CompanyAction.VIEW_COMPANY_PROFILE);
 		actions.add(CompanyAction.UPDATE_COMPANY_PROFILE);
 
-		if (authUser.getUserRole() == UserRole.ADMIN) {
+		if (authUser.getUserRole() == UserRole.SYSTEM_ADMIN) {
 			switch (c.getStatus()) {
 				case REGISTERED:
 					actions.addAll(Arrays.asList(CompanyAction.ACTIVATE_COMPANY, CompanyAction.DEACTIVATE_COMPANY));
@@ -174,7 +188,16 @@ public class CompanyService extends BaseService {
 			actions.add(CompanyAction.MERGE_TO_COMPANY);
 		}
 
-		return companyApiTools.toApiCompanyGet(authUser.getUserId(), c, language, actions, users);
+		return companyApiTools.toApiCompanyGet(authUser.getUserId(), c, language, actions, users, valueChains);
+	}
+
+	public ApiCompanyName getCompanyName(CustomUserDetails authUser, long id) throws ApiException {
+
+		Company c = companyQueries.fetchCompany(id);
+
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(c.getUsers(), authUser);
+
+		return companyApiTools.toApiCompanyName(c);
 	}
 
 	public List<ApiCompanyUser> getCompanyUsers(Long id, CustomUserDetails user) throws ApiException {
@@ -189,12 +212,36 @@ public class CompanyService extends BaseService {
 	@Transactional
 	public void updateCompany(CustomUserDetails authUser, ApiCompanyUpdate ac) throws ApiException {
 		Company c = companyQueries.fetchCompany(authUser, ac.id);
+
+		// Check that the user is company enrolled and Company admin
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(c.getUsers(), authUser);
+
 		companyApiTools.updateCompanyWithUsers(authUser.getUserId(), c, ac);
+
+		if (ac.valueChains != null) {
+			// update value chains
+			companyApiTools.updateCompanyValueChains(ac, c);
+		}
 	}
 
 	@Transactional
-	public void executeAction(ApiCompanyActionRequest request, CompanyAction action) throws ApiException {
+	public void executeAction(CustomUserDetails authUser, ApiCompanyActionRequest request, CompanyAction action) throws ApiException {
+
 		Company c = companyQueries.fetchCompany(request.companyId);
+
+		// Check if requesting user is authorized for the company
+		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+			PermissionsUtil.checkUserIfCompanyEnrolled(c.getUsers(), authUser);
+
+			// Check if action is 'DEACTIVATE_COMPANY' or 'MERGE_TO_COMPANY' - this is not allowed by the Regional admin
+			if (action == CompanyAction.DEACTIVATE_COMPANY || action == CompanyAction.MERGE_TO_COMPANY) {
+				throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
+			}
+
+		} else if (authUser.getUserRole() != UserRole.SYSTEM_ADMIN) {
+			isCompanyAdmin(authUser, c.getId());
+		}
+
 		switch (action) {
 			case ACTIVATE_COMPANY:
 				activateCompany(c);
@@ -219,12 +266,12 @@ public class CompanyService extends BaseService {
 		}
 	}
 
-	public ApiUserCustomer getUserCustomer(Long id, CustomUserDetails user) throws ApiException {
+	public ApiUserCustomer getUserCustomer(Long id, CustomUserDetails user, Language language) throws ApiException {
 
 		UserCustomer userCustomer = fetchUserCustomer(id);
 		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), user);
 
-		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId());
+		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId(), language);
 	}
 
 	public boolean existsUserCustomer(ApiUserCustomer apiUserCustomer) {
@@ -239,18 +286,19 @@ public class CompanyService extends BaseService {
 	public ApiPaginatedList<ApiUserCustomer> getUserCustomersForCompanyAndType(Long companyId,
 	                                                                           UserCustomerType type,
 	                                                                           ApiListFarmersRequest request,
-	                                                                           CustomUserDetails user) throws ApiException {
+	                                                                           CustomUserDetails user,
+	                                                                           Language language) throws ApiException {
 
 		Company company = companyQueries.fetchCompany(companyId);
 		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request,
 				() -> userCustomerListQueryObject(companyId, type, request),
-				uc -> companyApiTools.toApiUserCustomer(uc, user.getUserId()));
+				uc -> companyApiTools.toApiUserCustomer(uc, user.getUserId(), language));
 	}
 
 	@Transactional
-	public ApiUserCustomer addUserCustomer(Long companyId, ApiUserCustomer apiUserCustomer, CustomUserDetails user) throws ApiException {
+	public ApiUserCustomer addUserCustomer(Long companyId, ApiUserCustomer apiUserCustomer, CustomUserDetails user, Language language) throws ApiException {
 
 		Company company = companyQueries.fetchCompany(companyId);
 		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
@@ -278,8 +326,6 @@ public class CompanyService extends BaseService {
 			userCustomer.setFarm(new FarmInformation());
 			userCustomer.getFarm().setAreaUnit(apiUserCustomer.getFarm().getAreaUnit());
 			userCustomer.getFarm().setAreaOrganicCertified(apiUserCustomer.getFarm().getAreaOrganicCertified());
-			userCustomer.getFarm().setCoffeeCultivatedArea(apiUserCustomer.getFarm().getCoffeeCultivatedArea());
-			userCustomer.getFarm().setNumberOfTrees(apiUserCustomer.getFarm().getNumberOfTrees());
 			userCustomer.getFarm().setOrganic(apiUserCustomer.getFarm().getOrganic());
 			userCustomer.getFarm().setStartTransitionToOrganic(apiUserCustomer.getFarm().getStartTransitionToOrganic());
 			userCustomer.getFarm().setTotalCultivatedArea(apiUserCustomer.getFarm().getTotalCultivatedArea());
@@ -310,6 +356,31 @@ public class CompanyService extends BaseService {
 
 		userCustomer.setUserCustomerLocation(userCustomerLocation);
 		em.persist(userCustomer);
+
+		// Set product types
+		if (apiUserCustomer.getProductTypes() != null) {
+			for(ApiProductType apiProductType: apiUserCustomer.getProductTypes()){
+				UserCustomerProductType userCustomerProductType = new UserCustomerProductType();
+				userCustomerProductType.setProductType(fetchProductType(apiProductType.getId()));
+				userCustomerProductType.setUserCustomer(userCustomer);
+				em.persist(userCustomerProductType);
+			}
+		}
+
+		// Set farm plants information
+		if (apiUserCustomer.getFarm() != null && !apiUserCustomer.getFarm().getFarmPlantInformationList().isEmpty()) {
+			userCustomer.setFarmPlantInformationList(new ArrayList<>());
+
+			for(ApiFarmPlantInformation apiPlantInfo: apiUserCustomer.getFarm().getFarmPlantInformationList()) {
+				FarmPlantInformation farmPlantInformation = new FarmPlantInformation();
+				farmPlantInformation.setNumberOfPlants(apiPlantInfo.getNumberOfPlants());
+				farmPlantInformation.setPlantCultivatedArea(apiPlantInfo.getPlantCultivatedArea());
+				farmPlantInformation.setProductType(fetchProductType(apiPlantInfo.getProductType().getId()));
+				farmPlantInformation.setUserCustomer(userCustomer);
+
+				userCustomer.getFarmPlantInformationList().add(farmPlantInformation);
+			}
+		}
 
 		// Set associations
 		userCustomer.setAssociations(new ArrayList<>());
@@ -349,11 +420,11 @@ public class CompanyService extends BaseService {
 			}
 		}
 
-		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId());
+		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId(), language);
 	}
 
 	@Transactional
-	public ApiUserCustomer updateUserCustomer(ApiUserCustomer apiUserCustomer, CustomUserDetails user) throws ApiException {
+	public ApiUserCustomer updateUserCustomer(ApiUserCustomer apiUserCustomer, CustomUserDetails user, Language language) throws ApiException {
 
 		if (apiUserCustomer == null) {
 			return null;
@@ -384,8 +455,6 @@ public class CompanyService extends BaseService {
 		}
 		userCustomer.getFarm().setAreaUnit(apiUserCustomer.getFarm().getAreaUnit());
 		userCustomer.getFarm().setAreaOrganicCertified(apiUserCustomer.getFarm().getAreaOrganicCertified());
-		userCustomer.getFarm().setCoffeeCultivatedArea(apiUserCustomer.getFarm().getCoffeeCultivatedArea());
-		userCustomer.getFarm().setNumberOfTrees(apiUserCustomer.getFarm().getNumberOfTrees());
 		userCustomer.getFarm().setOrganic(apiUserCustomer.getFarm().getOrganic());
 		userCustomer.getFarm().setStartTransitionToOrganic(apiUserCustomer.getFarm().getStartTransitionToOrganic());
 		userCustomer.getFarm().setTotalCultivatedArea(apiUserCustomer.getFarm().getTotalCultivatedArea());
@@ -408,6 +477,16 @@ public class CompanyService extends BaseService {
 		userCustomer.getUserCustomerLocation().setLatitude(apiUserCustomer.getLocation().getLatitude());
 		userCustomer.getUserCustomerLocation().setLongitude(apiUserCustomer.getLocation().getLongitude());
 		userCustomer.getUserCustomerLocation().setPubliclyVisible(apiUserCustomer.getLocation().getPubliclyVisible());
+
+		// Set product types
+		if (apiUserCustomer.getProductTypes() != null) {
+			updateUserCustomerProductTypes(apiUserCustomer, userCustomer);
+		}
+
+		// Update farm plant information
+		if (apiUserCustomer.getFarm() != null && !apiUserCustomer.getFarm().getFarmPlantInformationList().isEmpty()) {
+			updateUserCustomerPlantInformation(apiUserCustomer, userCustomer);
+		}
 
 		if (userCustomer.getAssociations() == null) {
 			userCustomer.setAssociations(new ArrayList<>());
@@ -462,7 +541,37 @@ public class CompanyService extends BaseService {
 			certification.setValidity(apiCertification.getValidity());
 		}
 
-		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId());
+		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId(), language);
+	}
+
+	private void updateUserCustomerProductTypes(ApiUserCustomer apiUserCustomer, UserCustomer userCustomer) throws ApiException {
+
+		userCustomer.getProductTypes().clear();
+
+		for (ApiProductType apiProductType : apiUserCustomer.getProductTypes()) {
+			UserCustomerProductType userCustomerProductType = new UserCustomerProductType();
+			userCustomerProductType.setProductType(fetchProductType(apiProductType.getId()));
+			userCustomerProductType.setUserCustomer(userCustomer);
+
+			userCustomer.getProductTypes().add(userCustomerProductType);
+		}
+	}
+
+	private void updateUserCustomerPlantInformation(ApiUserCustomer apiUserCustomer, UserCustomer userCustomer) throws ApiException {
+
+		// remove all old data
+		userCustomer.getFarmPlantInformationList().clear();
+
+		// add new
+		for (ApiFarmPlantInformation apiPlantInfo: apiUserCustomer.getFarm().getFarmPlantInformationList()) {
+			FarmPlantInformation farmPlantInformation = new FarmPlantInformation();
+			farmPlantInformation.setNumberOfPlants(apiPlantInfo.getNumberOfPlants());
+			farmPlantInformation.setPlantCultivatedArea(apiPlantInfo.getPlantCultivatedArea());
+			farmPlantInformation.setProductType(fetchProductType(apiPlantInfo.getProductType().getId()));
+			farmPlantInformation.setUserCustomer(userCustomer);
+
+			userCustomer.getFarmPlantInformationList().add(farmPlantInformation);
+		}
 	}
 
 	@Transactional
@@ -595,6 +704,16 @@ public class CompanyService extends BaseService {
 		}
 
 		return userCustomer;
+	}
+
+	private ProductType fetchProductType(Long id) throws ApiException {
+
+		ProductType productType = em.find(ProductType.class, id);
+		if (productType == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid product type ID");
+		}
+
+		return productType;
 	}
 
 	@Transactional
@@ -755,20 +874,105 @@ public class CompanyService extends BaseService {
 	}
 
 	public boolean isSystemAdmin(CustomUserDetails customUserDetails) {
-		return UserRole.ADMIN.equals(customUserDetails.getUserRole());
+		return UserRole.SYSTEM_ADMIN.equals(customUserDetails.getUserRole());
 	}
 
 	public boolean isCompanyAdmin(CustomUserDetails customUserDetails, Long companyId) {
 		CompanyUser companyUser = Torpedo.from(CompanyUser.class);
 		Torpedo.where(companyUser.getCompany().getId()).eq(companyId).
 				and(companyUser.getUser().getId()).eq(customUserDetails.getUserId()).
-				and(companyUser.getRole()).eq(CompanyUserRole.ADMIN);
+				and(companyUser.getRole()).eq(CompanyUserRole.COMPANY_ADMIN);
 		List<CompanyUser> companyUserList = Torpedo.select(companyUser).list(em);
 		return !companyUserList.isEmpty();
 	}
 
-	public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, CustomUserDetails user) throws ApiException {
-		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId, user);
+	public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, CustomUserDetails authUser, Language language) throws ApiException {
+
+		// If importing as a Regional admin, check that it is enrolled in the company
+		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+			Company company = companyQueries.fetchCompany(companyId);
+			PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
+		}
+
+		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId, authUser, language);
 	}
+
+	public ApiPaginatedList<ApiValueChain> getCompanyValueChainList(Long companyId, ApiPaginatedRequest request, CustomUserDetails authUser) throws ApiException {
+
+		// user permissions check
+		Company company = companyQueries.fetchCompany(companyId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
+
+		return PaginationTools.createPaginatedResponse(em, request, () -> getCompanyValueChains(companyId, request),
+				ValueChainMapper::toApiValueChainBase);
+	}
+
+	public ValueChain getCompanyValueChains(Long companyId, ApiPaginatedRequest request) {
+
+		CompanyValueChain companyValueChainProxy = Torpedo.from(CompanyValueChain.class);
+		OnGoingLogicalCondition companyCondition = Torpedo.condition(companyValueChainProxy.getCompany().getId()).eq(companyId);
+		Torpedo.where(companyCondition);
+		List<Long> valueChainIds = Torpedo.select(companyValueChainProxy.getValueChain().getId()).list(em);
+
+		ValueChain valueChainProxy = Torpedo.from(ValueChain.class);
+		OnGoingLogicalCondition valueChainCondition = Torpedo.condition().and(valueChainProxy.getId()).in(valueChainIds);
+		Torpedo.where(valueChainCondition);
+
+		switch (request.sortBy) {
+			case "name":
+				QueryTools.orderBy(request.sort, valueChainProxy.getName());
+				break;
+			case "description":
+				QueryTools.orderBy(request.sort, valueChainProxy.getDescription());
+				break;
+			default:
+				QueryTools.orderBy(request.sort, valueChainProxy.getId());
+		}
+
+		return valueChainProxy;
+	}
+
+	public ApiPaginatedList<ApiProductType> getCompanyProductTypesList(Long companyId, ApiPaginatedRequest request, CustomUserDetails authUser, Language language) throws ApiException {
+
+		// user permissions check
+		Company company = companyQueries.fetchCompany(companyId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
+
+		return PaginationTools.createPaginatedResponse(em, request, () -> getCompanyProductTypes(companyId, request),
+				apt -> ProductTypeMapper.toApiProductType(apt, language));
+	}
+
+	public ProductType getCompanyProductTypes(Long companyId, ApiPaginatedRequest request) {
+
+		CompanyValueChain companyValueChainProxy = Torpedo.from(CompanyValueChain.class);
+		OnGoingLogicalCondition companyCondition = Torpedo.condition(companyValueChainProxy.getCompany().getId()).eq(companyId);
+		Torpedo.where(companyCondition);
+		List<Long> productTypeIds = Torpedo.select(companyValueChainProxy.getValueChain().getProductType().getId()).list(em);
+
+		if (productTypeIds != null) {
+			// calc distinct ids
+			productTypeIds = productTypeIds.stream().distinct().collect(Collectors.toList());
+		}
+
+		ProductType productTypeProxy = Torpedo.from(ProductType.class);
+		OnGoingLogicalCondition productTypeCondition = Torpedo.condition().and(productTypeProxy.getId()).in(productTypeIds);
+		Torpedo.where(productTypeCondition);
+
+		if (request != null) {
+			switch (request.sortBy) {
+				case "name":
+					QueryTools.orderBy(request.sort, productTypeProxy.getName());
+					break;
+				case "description":
+					QueryTools.orderBy(request.sort, productTypeProxy.getDescription());
+					break;
+				default:
+					QueryTools.orderBy(request.sort, productTypeProxy.getId());
+			}
+		}
+
+		return productTypeProxy;
+	}
+
 
 }

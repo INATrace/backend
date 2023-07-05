@@ -4,13 +4,11 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
-import com.abelium.inatrace.tools.converters.SimpleDateConverter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +25,7 @@ public class ApiProductOrder extends ApiBaseEntity {
 	private ApiFacility facility;
 
 	@ApiModelProperty(value = "The delivery deadline of this order")
-	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
-	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
-	private Instant deliveryDeadline;
+	private LocalDate deliveryDeadline;
 
 	@ApiModelProperty(value = "The company customer for whom this order is placed")
 	private ApiCompanyCustomer customer;
@@ -67,11 +63,11 @@ public class ApiProductOrder extends ApiBaseEntity {
 		this.facility = facility;
 	}
 
-	public Instant getDeliveryDeadline() {
+	public LocalDate getDeliveryDeadline() {
 		return deliveryDeadline;
 	}
 
-	public void setDeliveryDeadline(Instant deliveryDeadline) {
+	public void setDeliveryDeadline(LocalDate deliveryDeadline) {
 		this.deliveryDeadline = deliveryDeadline;
 	}
 

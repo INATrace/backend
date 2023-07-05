@@ -4,6 +4,7 @@ import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+import com.abelium.inatrace.db.entities.value_chain.FacilityValueChain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,7 +15,8 @@ import java.util.List;
 @NamedQueries({
 	@NamedQuery(name = "Facility.listCollectingFacilitiesByCompany",
 				query = "SELECT f FROM Facility f INNER JOIN FETCH f.facilityTranslations t INNER JOIN f.company c WHERE c.id = :companyId AND f.isCollectionFacility = true AND t.language = :language AND (f.isDeactivated IS NULL OR f.isDeactivated = false)"),
-	@NamedQuery(name = "Facility.countCollectingFacilitiesByCompany", query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId AND f.isCollectionFacility = true AND (f.isDeactivated IS NULL OR f.isDeactivated = false)")
+	@NamedQuery(name = "Facility.countCollectingFacilitiesByCompany",
+				query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId AND f.isCollectionFacility = true AND (f.isDeactivated IS NULL OR f.isDeactivated = false)")
 })
 public class Facility extends TimestampEntity {
 
@@ -68,6 +70,9 @@ public class Facility extends TimestampEntity {
 
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<FacilityFinalProduct> facilityFinalProducts;
+
+	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<FacilityValueChain> facilityValueChains;
 	
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL)
 	private List<StockOrder> stockOrders;
@@ -203,6 +208,17 @@ public class Facility extends TimestampEntity {
 
 	public List<StockOrder> getStockOrders() {
 		return stockOrders;
+	}
+
+	public List<FacilityValueChain> getFacilityValueChains() {
+		if (facilityValueChains == null) {
+			facilityValueChains = new ArrayList<>();
+		}
+		return facilityValueChains;
+	}
+
+	public void setFacilityValueChains(List<FacilityValueChain> facilityValueChains) {
+		this.facilityValueChains = facilityValueChains;
 	}
 
 	public void setStockOrders(List<StockOrder> stockOrders) {

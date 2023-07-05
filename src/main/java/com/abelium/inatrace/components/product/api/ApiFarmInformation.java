@@ -4,7 +4,9 @@ import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Validated
 public class ApiFarmInformation {
@@ -15,11 +17,8 @@ public class ApiFarmInformation {
     @ApiModelProperty(value = "Total cultivated area (ha)")
     public BigDecimal totalCultivatedArea;
 
-    @ApiModelProperty(value = "Area cultivated with coffee (ha)")
-    public BigDecimal coffeeCultivatedArea;
-
-    @ApiModelProperty(value = "Number of trees")
-    public Integer numberOfTrees;
+    @ApiModelProperty(value = "List of plant information")
+    public List<ApiFarmPlantInformation> farmPlantInformationList;
 
     @ApiModelProperty(value = "Organic")
     public Boolean organic;
@@ -38,20 +37,15 @@ public class ApiFarmInformation {
         this.totalCultivatedArea = totalCultivatedArea;
     }
 
-    public BigDecimal getCoffeeCultivatedArea() {
-        return coffeeCultivatedArea;
+    public List<ApiFarmPlantInformation> getFarmPlantInformationList() {
+        if (farmPlantInformationList == null) {
+            farmPlantInformationList = new ArrayList<>();
+        }
+        return farmPlantInformationList;
     }
 
-    public void setCoffeeCultivatedArea(BigDecimal coffeeCultivatedArea) {
-        this.coffeeCultivatedArea = coffeeCultivatedArea;
-    }
-
-    public Integer getNumberOfTrees() {
-        return numberOfTrees;
-    }
-
-    public void setNumberOfTrees(Integer numberOfTrees) {
-        this.numberOfTrees = numberOfTrees;
+    public void setFarmPlantInformationList(List<ApiFarmPlantInformation> farmPlantInformationList) {
+        this.farmPlantInformationList = farmPlantInformationList;
     }
 
     public Boolean getOrganic() {

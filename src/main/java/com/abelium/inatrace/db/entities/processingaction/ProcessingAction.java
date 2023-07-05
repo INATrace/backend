@@ -5,7 +5,7 @@ import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
-import com.abelium.inatrace.db.entities.value_chain.ValueChain;
+import com.abelium.inatrace.db.entities.value_chain.ProcessingActionValueChain;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
 
@@ -18,9 +18,7 @@ import java.util.List;
 @Table
 @NamedQueries({
 	@NamedQuery(name = "ProcessingAction.countProcessingActions",
-			query = "SELECT COUNT(pa) FROM ProcessingAction pa "
-					+ "INNER JOIN pa.processingActionTranslations t "
-					+ "WHERE t.language = :language")
+				query = "SELECT COUNT(pa) FROM ProcessingAction pa INNER JOIN pa.processingActionTranslations t WHERE t.language = :language")
 })
 public class ProcessingAction extends TimestampEntity {
 
@@ -32,12 +30,6 @@ public class ProcessingAction extends TimestampEntity {
 
 	@Column
 	private String prefix;
-	
-	@Column
-	private Boolean repackedOutputs;
-
-	@Column
-	private BigDecimal maxOutputWeight;
 
 	@Column
 	private BigDecimal estimatedOutputQuantityPerUnit;
@@ -52,10 +44,11 @@ public class ProcessingAction extends TimestampEntity {
 	private SemiProduct inputSemiProduct;
 
 	/**
-	 * Used when we have action types: PROCESSING, QUOTE, TRANSFER, GENERATE_QR_CODE
+	 * Used when we have action types: PROCESSING, QUOTE, TRANSFER, GENERATE_QR_CODE.
+	 * If type is PROCESSING, we can have one or more output semi-products. In the other case only one output semi-product is allowed.
 	 */
-	@ManyToOne
-	private SemiProduct outputSemiProduct;
+	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProcessingActionOutputSemiProduct> outputSemiProducts = new ArrayList<>();
 
 	/**
 	 * Used when we have action types QUOTE or TRANSFER and finalProductAction value to true
@@ -70,8 +63,20 @@ public class ProcessingAction extends TimestampEntity {
 	private FinalProduct outputFinalProduct;
 
 	/**
+	 * Specified if the output of the final product should be repacked. It's used only when 'outputFinalProduct' is set.
+	 */
+	@Column
+	private Boolean repackedOutputFinalProducts;
+
+	/**
+	 * Specifies the maximum output weight when using 'repackedOutputFinalProducts' (set value to 'true').
+	 */
+	@Column
+	private BigDecimal maxOutputWeight;
+
+	/**
 	 * Used when we have action type GENERATE_QR_CODE. It holds the reference to the Final product
-	 * that will be tagged by the generated QR code tag. This is used to to connect the QR code tag with the Final product QR labels.
+	 * that will be tagged by the generated QR code tag. This is used to connect the QR code tag with the Final product QR labels.
 	 */
 	@ManyToOne
 	private FinalProduct qrCodeForFinalProduct;
@@ -97,10 +102,10 @@ public class ProcessingAction extends TimestampEntity {
 	private Boolean finalProductAction;
 
 	/**
-	 * The value chain that this Processing action supports - used to source semi-products, proc. evidence types and proc. evidence fields
+	 * The value chains that this Processing action supports - used to source semi-products, proc. evidence types and proc. evidence fields
 	 */
-	@ManyToOne
-	private ValueChain valueChain;
+	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProcessingActionValueChain> processingActionsValueChains = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProcessingActionPET> requiredDocumentTypes = new ArrayList<>();
@@ -134,12 +139,12 @@ public class ProcessingAction extends TimestampEntity {
 		this.prefix = prefix;
 	}
 
-	public Boolean getRepackedOutputs() {
-		return repackedOutputs;
+	public Boolean getRepackedOutputFinalProducts() {
+		return repackedOutputFinalProducts;
 	}
 
-	public void setRepackedOutputs(Boolean repackedOutputs) {
-		this.repackedOutputs = repackedOutputs;
+	public void setRepackedOutputFinalProducts(Boolean repackedOutputFinalProducts) {
+		this.repackedOutputFinalProducts = repackedOutputFinalProducts;
 	}
 
 	public BigDecimal getMaxOutputWeight() {
@@ -174,12 +179,12 @@ public class ProcessingAction extends TimestampEntity {
 		this.inputSemiProduct = inputSemiProduct;
 	}
 
-	public SemiProduct getOutputSemiProduct() {
-		return outputSemiProduct;
+	public List<ProcessingActionOutputSemiProduct> getOutputSemiProducts() {
+		return outputSemiProducts;
 	}
 
-	public void setOutputSemiProduct(SemiProduct outputSemiProduct) {
-		this.outputSemiProduct = outputSemiProduct;
+	public void setOutputSemiProducts(List<ProcessingActionOutputSemiProduct> outputSemiProducts) {
+		this.outputSemiProducts = outputSemiProducts;
 	}
 
 	public FinalProduct getInputFinalProduct() {
@@ -246,12 +251,15 @@ public class ProcessingAction extends TimestampEntity {
 		this.finalProductAction = finalProductAction;
 	}
 
-	public ValueChain getValueChain() {
-		return valueChain;
+	public List<ProcessingActionValueChain> getProcessingActionsValueChains() {
+		if (processingActionsValueChains == null) {
+			processingActionsValueChains = new ArrayList<>();
+		}
+		return processingActionsValueChains;
 	}
 
-	public void setValueChain(ValueChain valueChain) {
-		this.valueChain = valueChain;
+	public void setProcessingActionsValueChains(List<ProcessingActionValueChain> processingActionsValueChains) {
+		this.processingActionsValueChains = processingActionsValueChains;
 	}
 
 	public List<ProcessingActionPET> getRequiredDocumentTypes() {
@@ -285,5 +293,5 @@ public class ProcessingAction extends TimestampEntity {
 	public void setProcessingActionTranslations(List<ProcessingActionTranslation> processingActionTranslations) {
 		this.processingActionTranslations = processingActionTranslations;
 	}
-	
+
 }

@@ -1,9 +1,6 @@
 package com.abelium.inatrace.components.value_chain;
 
-import com.abelium.inatrace.api.ApiBaseEntity;
-import com.abelium.inatrace.api.ApiDefaultResponse;
-import com.abelium.inatrace.api.ApiPaginatedResponse;
-import com.abelium.inatrace.api.ApiResponse;
+import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChainListRequest;
@@ -51,17 +48,17 @@ public class ValueChainController {
 	}
 
 	@PutMapping
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
 	@ApiOperation("Create or update value chain. If ID is provided, the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateValueChain(
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid @RequestBody ApiValueChain apiValueChain) throws ApiException {
 
-		return new ApiResponse<>(valueChainService.createOrUpdateValueChain(authUser.getUserId(), apiValueChain));
+		return new ApiResponse<>(valueChainService.createOrUpdateValueChain(authUser, apiValueChain));
 	}
 
 	@PostMapping("{id}/enable")
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@ApiOperation("Set the status of the value chain with the provided ID as 'ENABLED'.")
 	public ApiResponse<ApiBaseEntity> enableValueChain(
 			@Valid @ApiParam(value = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {
@@ -70,7 +67,7 @@ public class ValueChainController {
 	}
 
 	@PostMapping("{id}/disable")
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@ApiOperation("Set the status of the value chain with the provided ID as 'DISABLED'.")
 	public ApiResponse<ApiBaseEntity> disableValueChain(
 			@Valid @ApiParam(value = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {
@@ -79,7 +76,7 @@ public class ValueChainController {
 	}
 
 	@DeleteMapping("{id}")
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@ApiOperation("Deletes a value chain with the provided ID.")
 	public ApiDefaultResponse deleteValueChain(
 			@Valid @ApiParam(value = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {

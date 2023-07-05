@@ -1,40 +1,23 @@
 package com.abelium.inatrace.components.user;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.abelium.inatrace.api.ApiDefaultResponse;
 import com.abelium.inatrace.api.ApiPaginatedResponse;
 import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.ApiUserRole;
 import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.user.api.ApiAdminUserUpdate;
-import com.abelium.inatrace.components.user.api.ApiCreateUserRequest;
-import com.abelium.inatrace.components.user.api.ApiEmail;
-import com.abelium.inatrace.components.user.api.ApiListUsersRequest;
-import com.abelium.inatrace.components.user.api.ApiLoginRequest;
-import com.abelium.inatrace.components.user.api.ApiResetPasswordRequest;
-import com.abelium.inatrace.components.user.api.ApiToken;
-import com.abelium.inatrace.components.user.api.ApiUser;
-import com.abelium.inatrace.components.user.api.ApiUserBase;
-import com.abelium.inatrace.components.user.api.ApiUserGet;
-import com.abelium.inatrace.components.user.api.ApiUserUpdate;
+import com.abelium.inatrace.components.user.api.*;
 import com.abelium.inatrace.components.user.types.UserAction;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/user")
@@ -69,11 +52,20 @@ public class UserController {
     }
     
     @GetMapping(value = "/admin/list")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @ApiOperation(value = "Lists all users. Must be an administrator. Sorting: email, surname or default")
     public ApiPaginatedResponse<ApiUserBase> adminListUsers(@Valid ApiListUsersRequest request) {
     	return new ApiPaginatedResponse<>(userEngine.adminListUsers(request));
     }
+
+	@GetMapping(value = "/regional-admin/list")
+	@PreAuthorize("hasAuthority('REGIONAL_ADMIN')")
+	@ApiOperation(value = "Lists all available users for the requesting Regional admin. It also contains all users that are not yet part of any company.")
+	public ApiPaginatedResponse<ApiUserBase> regionalAdminListUsers(
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid ApiListUsersRequest request) {
+		return new ApiPaginatedResponse<>(userEngine.regionalAdminListUsers(authUser, request));
+	}
 
     @GetMapping(value = "/list")
     @ApiOperation(value = "Lists all users in the logged-in user's companies")
@@ -101,22 +93,22 @@ public class UserController {
     }
 
     @PostMapping(value = "/admin/execute/{action}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @ApiOperation(value = "Execute user (status, role) action. Must be an administrator")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
+    @ApiOperation(value = "Execute user (status, role) action. Must be a System admin or Regional admin (Regional admin has limited actions available)")
     public ApiDefaultResponse activateUser(
     		@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @RequestBody ApiUserRole request, 
-    		@Valid @PathVariable(value = "action", required = true) UserAction action) throws ApiException {
+    		@Valid @PathVariable(value = "action") UserAction action) throws ApiException {
     	userEngine.changeUserStatus(authUser, request, action);
     	return new ApiDefaultResponse();
     }
     
     @GetMapping(value = "/admin/profile/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
     @ApiOperation(value = "Get profile of a user. Must be an administrator")
     public ApiResponse<ApiUser> getProfileForAdmin(
     		@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @PathVariable(value = "id", required = true) Long userId) throws ApiException {
+    		@Valid @PathVariable(value = "id") Long userId) throws ApiException {
     	return new ApiResponse<>(userEngine.getProfileForAdmin(authUser, userId));
     }
     
@@ -129,15 +121,15 @@ public class UserController {
     @PutMapping(value = "/profile")
     @ApiOperation(value = "Update profile of the currently logged in user")
     public ApiDefaultResponse updateProfile(@AuthenticationPrincipal CustomUserDetails authUser, @Valid @RequestBody ApiUserUpdate request) throws ApiException {
-    	userEngine.updateProfile(authUser.getUserId(), request);
+    	userEngine.updateProfile(authUser, authUser.getUserId(), request);
     	return new ApiDefaultResponse();
     }
     
     @PutMapping(value = "/admin/profile")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
     @ApiOperation(value = "Update profile of a user. Must be admin")
-    public ApiDefaultResponse adminUpdateProfile(@Valid @RequestBody ApiAdminUserUpdate request) throws ApiException {
-    	userEngine.updateProfile(request.id, request);
+    public ApiDefaultResponse adminUpdateProfile(@AuthenticationPrincipal CustomUserDetails authUser, @Valid @RequestBody ApiAdminUserUpdate request) throws ApiException {
+    	userEngine.updateProfile(authUser, request.id, request);
     	return new ApiDefaultResponse();
     }     
        

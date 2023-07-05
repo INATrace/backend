@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 
 public class ApiPayment extends ApiBaseEntity {
 
@@ -77,18 +78,14 @@ public class ApiPayment extends ApiBaseEntity {
 	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
     private Instant paymentConfirmedAtTime;
 
-	@ApiModelProperty(value = "Formal creation time (for example: date on receipt)")
-	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
-	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
-	private Instant formalCreationTime;
+	@ApiModelProperty(value = "Formal creation date (for example: date on receipt)")
+	private LocalDate formalCreationTime;
 	
 	@ApiModelProperty(value = "Preferred way of payment")
 	private PreferredWayOfPayment preferredWayOfPayment;
 	
 	@ApiModelProperty(value = "Production date")
-	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
-	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
-    private Instant productionDate;
+    private LocalDate productionDate;
 
 	@ApiModelProperty(value = "Paying company")
 	private ApiCompany payingCompany;
@@ -248,11 +245,11 @@ public class ApiPayment extends ApiBaseEntity {
 		this.paymentConfirmedAtTime = paymentConfirmedAtTime;
 	}
 
-	public Instant getFormalCreationTime() {
+	public LocalDate getFormalCreationTime() {
 		return formalCreationTime;
 	}
 
-	public void setFormalCreationTime(Instant formalCreationTime) {
+	public void setFormalCreationTime(LocalDate formalCreationTime) {
 		this.formalCreationTime = formalCreationTime;
 	}
 
@@ -264,11 +261,11 @@ public class ApiPayment extends ApiBaseEntity {
 		this.preferredWayOfPayment = preferredWayOfPayment;
 	}
 
-	public Instant getProductionDate() {
+	public LocalDate getProductionDate() {
 		return productionDate;
 	}
 
-	public void setProductionDate(Instant productionDate) {
+	public void setProductionDate(LocalDate productionDate) {
 		this.productionDate = productionDate;
 	}
 

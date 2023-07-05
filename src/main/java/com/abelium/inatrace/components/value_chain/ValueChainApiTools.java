@@ -24,9 +24,5 @@ public class ValueChainApiTools {
         avc.setName(vc.getName());
         avc.setDescription(vc.getDescription());
         avc.setValueChainStatus(vc.getValueChainStatus());
-//        avc.setFacilityTypes();
-//        avc.setGradeAbbreviations();
-//        avc.setMeasureUnitTypes();
-//        avc.setSemiProducts();
     }
 }

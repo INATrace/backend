@@ -4,7 +4,6 @@ import com.abelium.inatrace.db.entities.company.Company;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,16 +48,10 @@ public class ProductLabelContent extends ProductContent {
 		plc.setName(p.getName());
 		plc.setPhoto(p.getPhoto());
 		plc.setDescription(p.getDescription());
-		plc.setIngredients(p.getIngredients());
-		plc.setNutritionalValue(p.getNutritionalValue());
-		plc.setHowToUse(p.getHowToUse());
 		plc.setOriginText(p.getOriginText());
-		plc.setKeyMarketsShare(new HashMap<>(p.getKeyMarketsShare()));
 		plc.setProcess(p.getProcess().copy());
 		plc.setResponsibility(p.getResponsibility().copy());
 		plc.setSustainability(p.getSustainability().copy());
-		plc.setSpecialityDocument(p.getSpecialityDocument());
-		plc.setSpecialityDescription(p.getSpecialityDescription());
 		plc.setSettings(p.getSettings().copy());
 		plc.setCompany(p.getCompany()); // no copy -- read only!
 		plc.setOriginLocations(p.getOriginLocations().stream().map(ProductLocation::copy).collect(Collectors.toList()));

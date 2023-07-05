@@ -13,24 +13,6 @@ import java.util.Map;
 public class ProductSettings extends BaseEntity {
 
 	/**
-	 * check authenticity
-	 */
-	@Column
-	private Boolean checkAuthenticity;
-
-	/**
-	 * trace origin
-	 */
-	@Column
-	private Boolean traceOrigin;
-	
-	/**
-	 * give feedback
-	 */
-	@Column
-	private Boolean giveFeedback;
-
-	/**
 	 * cost breakdown
 	 */
 	@Column
@@ -81,30 +63,6 @@ public class ProductSettings extends BaseEntity {
 	 */
 	@Lob
 	private String termsOfUseText;
-
-	public Boolean getCheckAuthenticity() {
-		return checkAuthenticity;
-	}
-
-	public void setCheckAuthenticity(Boolean checkAuthenticity) {
-		this.checkAuthenticity = checkAuthenticity;
-	}
-
-	public Boolean getTraceOrigin() {
-		return traceOrigin;
-	}
-
-	public void setTraceOrigin(Boolean traceOrigin) {
-		this.traceOrigin = traceOrigin;
-	}
-
-	public Boolean getGiveFeedback() {
-		return giveFeedback;
-	}
-
-	public void setGiveFeedback(Boolean giveFeedback) {
-		this.giveFeedback = giveFeedback;
-	}
 
 	public Boolean getCostBreakdown() {
 		return costBreakdown;
@@ -172,9 +130,6 @@ public class ProductSettings extends BaseEntity {
 
 	public ProductSettings copy() {
 		ProductSettings s = new ProductSettings();
-		s.setCheckAuthenticity(getCheckAuthenticity());
-		s.setTraceOrigin(getTraceOrigin());
-		s.setGiveFeedback(getGiveFeedback());
 		s.setCostBreakdown(getCostBreakdown());
 		s.setPricingTransparency(new HashMap<>(getPricingTransparency()));
 		s.setIncomeIncreaseDescription(getIncomeIncreaseDescription());
@@ -186,4 +141,3 @@ public class ProductSettings extends BaseEntity {
 		return s;
 	}
 }
-

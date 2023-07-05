@@ -24,7 +24,7 @@ INATrace.database.name =
 INATrace.database.hostname = localhost
 INATrace.database.port = 3306
 
-spring.datasource.url = jdbc:mysql://${INATrace.database.hostname}:${INATrace.database.port}/${INATrace.database.name}?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+spring.datasource.url = jdbc:mysql://${INATrace.database.hostname}:${INATrace.database.port}/${INATrace.database.name}?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
 spring.datasource.username =
 spring.datasource.password =
 # spring.jpa.show-sql = true
@@ -56,7 +56,7 @@ spring.flyway.validate-on-migrate = false
 spring.flyway.check-location = false
 spring.flyway.table = schema_version
 spring.flyway.ignore-missing-migrations = true
-spring.flyway.locations = com.abelium.inatrace.db.migrations
+spring.flyway.locations = com.abelium.inatrace.db.migrations,classpath:/db/migrations
 
 spring.jackson.serialization.write-dates-as-timestamps = false
 spring.jackson.serialization.write-date-timestamps-as-nanoseconds = false

@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.stockorder.mappers;
 
 import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
+import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.mappers.ActivityProofMapper;
 import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
@@ -41,7 +42,12 @@ public class StockOrderMapper {
         apiStockOrder.setOrderType(entity.getOrderType());
         apiStockOrder.setMeasureUnitType(
                 MeasureUnitTypeMapper.toApiMeasureUnitType(entity.getMeasurementUnitType()));
-        apiStockOrder.setQrCodeTag(entity.getQrCodeTag());
+
+        // If present map the QR code tag and the Final product for which the QR code tag was generated
+        if (entity.getQrCodeTag() != null) {
+            apiStockOrder.setQrCodeTag(entity.getQrCodeTag());
+            apiStockOrder.setQrCodeTagFinalProduct(ProductApiTools.toApiFinalProductBase(entity.getQrCodeTagFinalProduct()));
+        }
 
         // Map women share and organic only
         apiStockOrder.setWomenShare(entity.getWomenShare());
@@ -101,7 +107,7 @@ public class StockOrderMapper {
         entity.getDocumentRequirements().forEach(stockOrderPETypeValue -> {
 
             ApiStockOrderEvidenceTypeValue apiEvidenceTypeValue = StockOrderEvidenceTypeValueMapper.toApiStockOrderEvidenceTypeValue(
-                    stockOrderPETypeValue, userId);
+                    stockOrderPETypeValue, userId, language);
 
             if (BooleanUtils.isTrue(stockOrderPETypeValue.getOtherEvidence())) {
                 apiStockOrder.getOtherEvidenceDocuments().add(apiEvidenceTypeValue);
@@ -111,7 +117,7 @@ public class StockOrderMapper {
         });
 
         // Map the semi-product that is represented by this stock order
-        apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct(), language));
+        apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProduct(entity.getSemiProduct(), ApiSemiProduct.class, language));
 
         apiStockOrder.setPriceDeterminedLater(entity.getPriceDeterminedLater());
 
@@ -170,6 +176,7 @@ public class StockOrderMapper {
         apiStockOrder.setLotPrefix(entity.getLotPrefix());
         apiStockOrder.setInternalLotNumber(setupInternalLotNumberForSacked(entity.getInternalLotNumber(), entity.getSacNumber()));
         apiStockOrder.setSacNumber(entity.getSacNumber());
+        apiStockOrder.setRepackedOriginStockOrderId(entity.getRepackedOriginStockOrderId());
         apiStockOrder.setPurchaseOrder(entity.getPurchaseOrder());
 
         // Set other data fields
@@ -269,14 +276,14 @@ public class StockOrderMapper {
             apiStockOrder.setBalance(entity.getBalance());
         }
 
-        apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProductBase(entity.getSemiProduct(), language));
+        apiStockOrder.setSemiProduct(SemiProductMapper.toApiSemiProductBase(entity.getSemiProduct(), ApiSemiProduct.class, language));
         apiStockOrder.setFinalProduct(ProductApiTools.toApiFinalProductBase(entity.getFinalProduct()));
 
         return apiStockOrder;
     }
 
     private static String setupInternalLotNumberForSacked(String internalLotNumber, Integer sacNumber) {
-        if(internalLotNumber == null || sacNumber == null || internalLotNumber.endsWith(String.format("/%d", sacNumber))) {
+        if(internalLotNumber == null || sacNumber == null) {
             return internalLotNumber;
         }
         return String.format("%s/%d", internalLotNumber, sacNumber);

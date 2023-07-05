@@ -7,16 +7,14 @@ import com.abelium.inatrace.components.payment.api.ApiPayment;
 import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
-import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * REST controller for payment entity.
@@ -59,8 +57,8 @@ public class PaymentController {
 			@Valid @ApiParam(value = "Purchase ID", required = true) @PathVariable("id") Long purchaseId,
 			@Valid @ApiParam(value = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
 			@Valid @ApiParam(value = "Payment status") @RequestParam(value = "paymentStatus", required = false) PaymentStatus paymentStatus,
-			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
-			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
+			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
 			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws ApiException {
 
 		return new ApiPaginatedResponse<>(paymentService.getPaymentList(
@@ -70,8 +68,8 @@ public class PaymentController {
 						purchaseId,
 						preferredWayOfPayment,
 						paymentStatus,
-						productionDateStart != null ? productionDateStart.toInstant() : null,
-						productionDateEnd != null ? productionDateEnd.toInstant() : null,
+						productionDateStart,
+						productionDateEnd,
 						farmerName,
 						null,
 						null
@@ -88,11 +86,11 @@ public class PaymentController {
 			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
 			@Valid @ApiParam(value = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
 			@Valid @ApiParam(value = "Payment status") @RequestParam(value = "paymentStatus", required = false) PaymentStatus paymentStatus,
-			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateStart,
-			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) @DateTimeFormat(pattern = SimpleDateConverter.SIMPLE_DATE_FORMAT) Date productionDateEnd,
+			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
 			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName,
 			@Valid @ApiParam(value = "Search by farmer id") @RequestParam(value = "farmerId", required = false) Long farmerId,
-			@Valid @ApiParam(value = "Search by representative of farmer id") @RequestParam(value = "representativeOfRecepientUserCustomerId", required = false) Long representativeOfRecepientUserCustomerId) throws ApiException {
+			@Valid @ApiParam(value = "Search by representative of farmer id") @RequestParam(value = "representativeOfRecipientUserCustomerId", required = false) Long representativeOfRecipientUserCustomerId) throws ApiException {
 
 		return new ApiPaginatedResponse<>(paymentService.getPaymentList(
 				request,
@@ -101,11 +99,11 @@ public class PaymentController {
 						null,
 						preferredWayOfPayment,
 						paymentStatus,
-						productionDateStart != null ? productionDateStart.toInstant() : null,
-						productionDateEnd != null ? productionDateEnd.toInstant() : null,
+						productionDateStart,
+						productionDateEnd,
 						farmerName,
 						farmerId,
-						representativeOfRecepientUserCustomerId
+						representativeOfRecipientUserCustomerId
 				), authUser
 		));
 	}

@@ -10,6 +10,7 @@ import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.facility.api.ApiFacilityLocation;
 import com.abelium.inatrace.components.facility.api.ApiFacilityTranslation;
 import com.abelium.inatrace.components.product.ProductApiTools;
+import com.abelium.inatrace.components.value_chain.ValueChainMapper;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.facility.FacilitySemiProduct;
 import com.abelium.inatrace.db.entities.facility.FacilityTranslation;
@@ -113,13 +114,17 @@ public final class FacilityMapper {
 		// Map facility semi-products
 		List<ApiSemiProduct> apiSemiProductList = new ArrayList<>();
 		for (FacilitySemiProduct facilitySemiProduct : entity.getFacilitySemiProducts()) {
-			apiSemiProductList.add(SemiProductMapper.toApiSemiProductBase(facilitySemiProduct.getSemiProduct(), language));
+			apiSemiProductList.add(SemiProductMapper.toApiSemiProductBase(facilitySemiProduct.getSemiProduct(), ApiSemiProduct.class, language));
 		}
 		apiFacility.setFacilitySemiProductList(apiSemiProductList);
 
 		// Map the facility final products
 		apiFacility.setFacilityFinalProducts(entity.getFacilityFinalProducts().stream()
 				.map(ffp -> ProductApiTools.toApiFinalProduct(ffp.getFinalProduct())).collect(Collectors.toList()));
+
+		// Map the api facility value chain
+		apiFacility.setFacilityValueChains(entity.getFacilityValueChains().stream()
+				.map(fvc -> ValueChainMapper.toApiValueChainBase(fvc.getValueChain())).collect(Collectors.toList()));
 
 		return apiFacility;
 	}

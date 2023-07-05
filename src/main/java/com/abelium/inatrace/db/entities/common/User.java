@@ -2,6 +2,7 @@ package com.abelium.inatrace.db.entities.common;
 
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
+import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserRole;
 import com.abelium.inatrace.types.UserStatus;
@@ -10,8 +11,9 @@ import org.hibernate.envers.NotAudited;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Audited
@@ -66,6 +68,13 @@ public class User extends TimestampEntity {
     @Enumerated(EnumType.STRING)
     @Column(length = Lengths.ENUM)
 	private UserRole role = UserRole.USER;
+
+	/**
+	 * User connected companies
+	 */
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+	@NotAudited
+	private List<CompanyUser> userCompanies;
 
     public String getEmail() {
 		return email;
@@ -124,7 +133,15 @@ public class User extends TimestampEntity {
 	}
 
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return Arrays.asList(getRole());
+		return Collections.singletonList(getRole());
 	}
-    
+
+	public List<CompanyUser> getUserCompanies() {
+		return userCompanies;
+	}
+
+	public void setUserCompanies(List<CompanyUser> userCompanies) {
+		this.userCompanies = userCompanies;
+	}
+
 }

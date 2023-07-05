@@ -4,12 +4,10 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.transaction.api.ApiTransaction;
-import com.abelium.inatrace.tools.converters.SimpleDateConverter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,18 +23,10 @@ public class ApiProcessingOrder extends ApiBaseEntity {
     public ApiProcessingAction processingAction;
 
     @ApiModelProperty(value = "Processing date")
-    @JsonSerialize(converter = SimpleDateConverter.Serialize.class)
-    @JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
-    public Instant processingDate;
+    public LocalDate processingDate;
 
     @ApiModelProperty(value = "Input transactions")
     public List<ApiTransaction> inputTransactions;
-
-    // Output transactions are not stored in DB,
-    // is only mapped when needed, for ex. in aggregations - order history.
-    // also outputTransactions[0].targetStockOrder is set, enabling link to next order
-    @ApiModelProperty(value = "Output transactions")
-    public List<ApiTransaction> outputTransactions;
 
     @ApiModelProperty(value = "Target stock orders")
     public List<ApiStockOrder> targetStockOrders;
@@ -65,11 +55,11 @@ public class ApiProcessingOrder extends ApiBaseEntity {
         this.processingAction = processingAction;
     }
 
-    public Instant getProcessingDate() {
+    public LocalDate getProcessingDate() {
         return processingDate;
     }
 
-    public void setProcessingDate(Instant processingDate) {
+    public void setProcessingDate(LocalDate processingDate) {
         this.processingDate = processingDate;
     }
 
@@ -82,17 +72,6 @@ public class ApiProcessingOrder extends ApiBaseEntity {
 
     public void setInputTransactions(List<ApiTransaction> inputTransactions) {
         this.inputTransactions = inputTransactions;
-    }
-
-    public List<ApiTransaction> getOutputTransactions() {
-        if (outputTransactions == null) {
-            outputTransactions = new ArrayList<>();
-        }
-        return outputTransactions;
-    }
-
-    public void setOutputTransactions(List<ApiTransaction> outputTransactions) {
-        this.outputTransactions = outputTransactions;
     }
 
     public List<ApiStockOrder> getTargetStockOrders() {

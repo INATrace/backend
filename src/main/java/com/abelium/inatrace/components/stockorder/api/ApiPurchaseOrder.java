@@ -6,13 +6,11 @@ import com.abelium.inatrace.components.company.api.ApiUserCustomer;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
-import com.abelium.inatrace.tools.converters.SimpleDateConverter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Validated
@@ -31,12 +29,10 @@ public class ApiPurchaseOrder extends ApiBaseEntity {
 	private ApiUser updatedBy;
 
 	@ApiModelProperty(value = "Delivery date")
-	private Instant deliveryTime;
+	private LocalDate deliveryTime;
 
 	@ApiModelProperty(value = "Production date")
-	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
-	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
-	public Instant productionDate;
+	public LocalDate productionDate;
 
 	@ApiModelProperty(value = "Currency")
 	public String currency;
@@ -87,19 +83,19 @@ public class ApiPurchaseOrder extends ApiBaseEntity {
 		this.updatedBy = updatedBy;
 	}
 
-	public Instant getDeliveryTime() {
+	public LocalDate getDeliveryTime() {
 		return deliveryTime;
 	}
 
-	public void setDeliveryTime(Instant deliveryTime) {
+	public void setDeliveryTime(LocalDate deliveryTime) {
 		this.deliveryTime = deliveryTime;
 	}
 
-	public Instant getProductionDate() {
+	public LocalDate getProductionDate() {
 		return productionDate;
 	}
 
-	public void setProductionDate(Instant productionDate) {
+	public void setProductionDate(LocalDate productionDate) {
 		this.productionDate = productionDate;
 	}
 

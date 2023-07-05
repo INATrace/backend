@@ -6,8 +6,6 @@ import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.facility_type.FacilityTypeService;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
-import com.abelium.inatrace.components.codebook.grade_abbreviation.GradeAbbreviationService;
-import com.abelium.inatrace.components.codebook.grade_abbreviation.api.ApiGradeAbbreviation;
 import com.abelium.inatrace.components.codebook.measure_unit_type.MeasureUnitTypeService;
 import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
 import com.abelium.inatrace.components.codebook.processing_evidence_type.ProcessingEvidenceTypeService;
@@ -24,10 +22,12 @@ import com.abelium.inatrace.db.entities.codebook.*;
 import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.value_chain.*;
 import com.abelium.inatrace.db.entities.value_chain.enums.ValueChainStatus;
+import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
+import com.abelium.inatrace.types.UserRole;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -51,7 +51,6 @@ public class ValueChainService extends BaseService {
 	private final UserService userService;
 	private final FacilityTypeService facilityTypeService;
 	private final MeasureUnitTypeService measureUnitTypeService;
-	private final GradeAbbreviationService gradeAbbreviationService;
 	private final ProcessingEvidenceTypeService procEvidenceTypeService;
 	private final ProcessingEvidenceFieldService procEvidenceFieldService;
 	private final SemiProductService semiProductService;
@@ -60,14 +59,12 @@ public class ValueChainService extends BaseService {
 	public ValueChainService(UserService userService,
 	                         FacilityTypeService facilityTypeService,
 	                         MeasureUnitTypeService measureUnitTypeService,
-	                         GradeAbbreviationService gradeAbbreviationService,
 	                         ProcessingEvidenceTypeService procEvidenceTypeService,
 	                         ProcessingEvidenceFieldService procEvidenceFieldService,
 	                         SemiProductService semiProductService) {
 		this.userService = userService;
 		this.facilityTypeService = facilityTypeService;
 		this.measureUnitTypeService = measureUnitTypeService;
-		this.gradeAbbreviationService = gradeAbbreviationService;
 		this.procEvidenceTypeService = procEvidenceTypeService;
 		this.procEvidenceFieldService = procEvidenceFieldService;
 		this.semiProductService = semiProductService;
@@ -90,6 +87,9 @@ public class ValueChainService extends BaseService {
 		}
 		if (request.getValueChainStatus() != null) {
 			condition = condition.and(valueChainProxy.getValueChainStatus()).eq(request.getValueChainStatus());
+		}
+		if (request.getProductTypeId() != null) {
+			condition = condition.and(valueChainProxy.getProductType().getId()).eq(request.getProductTypeId());
 		}
 
 		Torpedo.where(condition);
@@ -116,12 +116,18 @@ public class ValueChainService extends BaseService {
 	}
 
 	@Transactional
-	public ApiBaseEntity createOrUpdateValueChain(Long userId, ApiValueChain apiValueChain) throws ApiException {
+	public ApiBaseEntity createOrUpdateValueChain(CustomUserDetails authUser, ApiValueChain apiValueChain) throws ApiException {
 
-		User user = userService.fetchUserById(userId);
+		User user = userService.fetchUserById(authUser.getUserId());
 		ValueChain entity;
 
 		if (apiValueChain.getId() != null) {
+
+			// Editing is not permitted for Regional admin
+			if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+				throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
+			}
+
 			entity = fetchValueChain(apiValueChain.getId());
 
 			if (entity.getValueChainStatus().equals(ValueChainStatus.DISABLED)) {
@@ -145,9 +151,6 @@ public class ValueChainService extends BaseService {
 		// Update measuring unit types
 		updateVCMeasureUnitTypes(entity, apiValueChain);
 
-		// Update grade abbreviations
-		updateVCGradeAbbreviations(entity, apiValueChain);
-
 		// Update processing evidence types
 		updateVCProcEvidenceTypes(entity, apiValueChain);
 
@@ -156,6 +159,9 @@ public class ValueChainService extends BaseService {
 
 		// Update semi-products
 		updateVCSemiProducts(entity, apiValueChain);
+
+		// Update product type
+		updateProductType(entity, apiValueChain);
 
 		if (entity.getId() == null) {
 			em.persist(entity);
@@ -232,23 +238,6 @@ public class ValueChainService extends BaseService {
 		currentVCMeasureUnits.values().forEach(vcMUT -> entity.getMeasureUnitTypes().remove(vcMUT));
 	}
 
-	private void updateVCGradeAbbreviations(ValueChain entity, ApiValueChain apiValueChain) throws ApiException {
-
-		Map<Long, ValueChainGradeAbbreviation> currentVCGradeAbbreviations = entity.getGradeAbbreviations().stream()
-				.collect(Collectors.toMap(vcGA -> vcGA.getGradeAbbreviationType().getId(), vcGA -> vcGA));
-		for (ApiGradeAbbreviation apiGradeAbbreviation : apiValueChain.getGradeAbbreviations()) {
-			ValueChainGradeAbbreviation vcGA = currentVCGradeAbbreviations.get(apiGradeAbbreviation.getId());
-			if (vcGA == null) {
-				GradeAbbreviationType gradeAbbreviationType = gradeAbbreviationService.fetchGradeAbbreviationType(
-						apiGradeAbbreviation.getId());
-				entity.getGradeAbbreviations().add(new ValueChainGradeAbbreviation(entity, gradeAbbreviationType));
-			} else {
-				currentVCGradeAbbreviations.remove(apiGradeAbbreviation.getId());
-			}
-		}
-		currentVCGradeAbbreviations.values().forEach(vcGA -> entity.getGradeAbbreviations().remove(vcGA));
-	}
-
 	private void updateVCProcEvidenceTypes(ValueChain entity, ApiValueChain apiValueChain) throws ApiException {
 
 		Map<Long, ValueChainProcEvidenceType> currentVCProcEvidenceTypes = entity.getProcEvidenceTypes().stream()
@@ -297,6 +286,19 @@ public class ValueChainService extends BaseService {
 			}
 		}
 		currentVCSemiProducts.values().forEach(vcSP -> entity.getSemiProducts().remove(vcSP));
+	}
+
+	private void updateProductType(ValueChain entity, ApiValueChain apiValueChain) throws ApiException {
+
+		if (apiValueChain.getProductType() == null || apiValueChain.getProductType().getId() == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Product type id must be specified");
+		}
+		ProductType productType = em.find(ProductType.class, apiValueChain.getProductType().getId());
+		if (productType == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Product type with given id does not exist");
+		}
+
+		entity.setProductType(productType);
 	}
 
 }

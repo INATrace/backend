@@ -3,7 +3,7 @@ package com.abelium.inatrace.components.stockorder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 public class StockOrderQueryRequest {
 
@@ -23,8 +23,8 @@ public class StockOrderQueryRequest {
     public Boolean organicOnly;
     public String internalLotName;
     public PreferredWayOfPayment wayOfPayment;
-    public Instant productionDateStart;
-    public Instant productionDateEnd;
+    public LocalDate productionDateStart;
+    public LocalDate productionDateEnd;
     public String producerUserCustomerName;
     public Boolean isAvailable;
     public Boolean isOpenOnly;
@@ -52,8 +52,8 @@ public class StockOrderQueryRequest {
                                   Boolean isWomenShare,
                                   Boolean organicOnly,
                                   String internalLotName,
-                                  Instant productionDateStart,
-                                  Instant productionDateEnd) {
+                                  LocalDate productionDateStart,
+                                  LocalDate productionDateEnd) {
         this.facilityId = facilityId;
         this.semiProductId = semiProductId;
         this.finalProductId = finalProductId;
@@ -76,8 +76,8 @@ public class StockOrderQueryRequest {
                                   Boolean isWomenShare,
                                   PreferredWayOfPayment wayOfPayment,
                                   OrderType orderType,
-                                  Instant productionDateStart,
-                                  Instant productionDateEnd,
+                                  LocalDate productionDateStart,
+                                  LocalDate productionDateEnd,
                                   String producerUserCustomerName) {
         this.companyId = companyId;
         this.facilityId = facilityId;

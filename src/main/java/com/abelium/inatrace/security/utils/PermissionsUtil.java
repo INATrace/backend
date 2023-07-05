@@ -9,6 +9,7 @@ import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.CompanyUserRole;
 import com.abelium.inatrace.types.UserRole;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -36,23 +37,8 @@ public final class PermissionsUtil {
 	 * Checks if the requesting user is part of a particular company or a System admin.
 	 */
 	public static void checkUserIfCompanyEnrolledOrSystemAdmin(List<CompanyUser> companyUsers, CustomUserDetails userToCheck) throws ApiException {
-		if (!UserRole.ADMIN.equals(userToCheck.getUserRole()) && companyUsers.stream().noneMatch(cu -> cu.getUser().getId().equals(userToCheck.getUserId()))) {
+		if (!UserRole.SYSTEM_ADMIN.equals(userToCheck.getUserRole()) && companyUsers.stream().noneMatch(cu -> cu.getUser().getId().equals(userToCheck.getUserId()))) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "Unknown user company or not system admin!");
-		}
-	}
-
-	/**
-	 * Checks if the requesting user is a Company admin or a System admin.
-	 */
-	public static void checkUserIfCompanyAdminOrSystemAdmin(List<CompanyUser> companyUsers, CustomUserDetails userToCheck) throws ApiException {
-
-		if (UserRole.ADMIN.equals(userToCheck.getUserRole())) {
-			return;
-		}
-
-		CompanyUser companyUser = findCompanyUser(userToCheck.getUserId(), companyUsers);
-		if (!CompanyUserRole.ADMIN.equals(companyUser.getRole())) {
-			throw new ApiException(ApiStatus.UNAUTHORIZED, "User doesn't have required permission!");
 		}
 	}
 
@@ -63,7 +49,7 @@ public final class PermissionsUtil {
 
 		CompanyUser companyUser = findCompanyUser(userToCheck.getUserId(), companyUsers);
 
-		if (!UserRole.ADMIN.equals(userToCheck.getUserRole()) && !CompanyUserRole.ADMIN.equals(companyUser.getRole())) {
+		if (!UserRole.SYSTEM_ADMIN.equals(userToCheck.getUserRole()) && !CompanyUserRole.COMPANY_ADMIN.equals(companyUser.getRole())) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "User doesn't have required permission!");
 		}
 	}
@@ -93,6 +79,15 @@ public final class PermissionsUtil {
 
 		if (!userIsAssociatedWithOneOfTheProducts) {
 			throw new ApiException(ApiStatus.UNAUTHORIZED, "User doesn't have required permission!");
+		}
+	}
+
+	/**
+	 * Checks if Regional admin is connected with the user's companies for whom requests access.
+	 */
+	public static void checkRegionalAdminIfConnectedWithUser(List<Long> regionalAdminCompanyIds, List<Long> userCompanyIds) throws ApiException {
+		if (!CollectionUtils.containsAny(userCompanyIds, regionalAdminCompanyIds)) {
+			throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
 		}
 	}
 

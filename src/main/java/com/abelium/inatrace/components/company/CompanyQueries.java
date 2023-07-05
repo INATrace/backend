@@ -4,10 +4,14 @@ import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.company.api.ApiCompanyUser;
+import com.abelium.inatrace.components.value_chain.ValueChainMapper;
+import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyTranslation;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.db.entities.product.Product;
+import com.abelium.inatrace.db.entities.value_chain.CompanyValueChain;
+import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.CompanyStatus;
@@ -16,6 +20,7 @@ import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserRole;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.persistence.TypedQuery;
@@ -65,10 +70,26 @@ public class CompanyQueries extends BaseService {
 		return Torpedo.select(cuProxy).map(em, CompanyApiTools::toApiCompanyUser);
 	}
 
+	public List<ApiValueChain> fetchCompanyValueChains(Long companyId) {
+
+		CompanyValueChain companyValueChainProxy = Torpedo.from(CompanyValueChain.class);
+		OnGoingLogicalCondition companyCondition = Torpedo.condition(companyValueChainProxy.getCompany().getId()).eq(companyId);
+		Torpedo.where(companyCondition);
+		List<Long> valueChainIds = Torpedo.select(companyValueChainProxy.getValueChain().getId()).list(em);
+
+		ValueChain valueChainProxy = Torpedo.from(ValueChain.class);
+		OnGoingLogicalCondition valueChainCondition = Torpedo.condition().and(valueChainProxy.getId()).in(valueChainIds);
+		Torpedo.where(valueChainCondition);
+
+		return Torpedo.select(valueChainProxy).map(em, ValueChainMapper::toApiValueChainBase);
+	}
+
 	@Transactional
 	public Company fetchCompany(CustomUserDetails authUser, Long companyId) throws ApiException {
-		if (authUser.getUserRole() == UserRole.ADMIN)
+
+		if (authUser.getUserRole() == UserRole.SYSTEM_ADMIN) {
 			return fetchCompany(companyId);
+		}
 
 		CompanyUser cuProxy = Torpedo.from(CompanyUser.class);
 		Torpedo.where(cuProxy.getCompany().getId()).eq(companyId).
@@ -98,7 +119,7 @@ public class CompanyQueries extends BaseService {
 	public List<Long> fetchCompanyIdsForUserAdmin(Long userId) {
 		CompanyUser companyUser = Torpedo.from(CompanyUser.class);
 		Torpedo.where(companyUser.getUser().getId()).eq(userId).
-				and(companyUser.getRole()).eq(CompanyUserRole.ADMIN);
+				and(companyUser.getRole()).eq(CompanyUserRole.COMPANY_ADMIN);
 		return Torpedo.select(companyUser.getCompany().getId()).list(em);
 	}
 

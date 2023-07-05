@@ -14,9 +14,11 @@ import com.abelium.inatrace.components.user.types.UserAction;
 import com.abelium.inatrace.db.entities.auth.AuthenticationToken;
 import com.abelium.inatrace.db.entities.auth.ConfirmationToken;
 import com.abelium.inatrace.db.entities.common.User;
+import com.abelium.inatrace.db.entities.common.UserCustomer;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.PasswordTools;
 import com.abelium.inatrace.tools.Queries;
@@ -46,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Lazy
 @Service
@@ -90,6 +93,16 @@ public class UserService extends BaseService {
 		}
 
 		return user;
+	}
+
+	private UserCustomer fetchUserCustomerById(Long id) throws ApiException {
+
+		UserCustomer userCustomer = Queries.get(em, UserCustomer.class, id);
+		if (userCustomer == null) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user customer ID");
+		}
+
+		return userCustomer;
 	}
 
 	@Transactional
@@ -249,13 +262,25 @@ public class UserService extends BaseService {
 				CompanyUser companyUser = new CompanyUser();
 				companyUser.setUser(user);
 				companyUser.setCompany(c);
-				companyUser.setRole(CompanyUserRole.ADMIN);
+				companyUser.setRole(CompanyUserRole.COMPANY_ADMIN);
 				em.persist(companyUser);
 			});
 		}
 	}
+
+	public ApiPaginatedList<ApiUserBase> adminListUsers(ApiListUsersRequest request) {
+		return PaginationTools.createPaginatedResponse(em, request, () -> adminUserListQueryObject(request),
+				UserApiTools::toApiUserBase);
+	}
+
+	public ApiPaginatedList<ApiUserBase> regionalAdminListUsers(CustomUserDetails authUser, ApiListUsersRequest request) {
+		return PaginationTools.createPaginatedResponse1(em, request, () -> regionalAdminUserListQueryObject(
+						authUser.getUserId(), request),
+				UserApiTools::toApiUserBase);
+	}
 	
     private User adminUserListQueryObject(ApiListUsersRequest request) {
+
         User uProxy = Torpedo.from(User.class);
         
         OnGoingLogicalCondition condition = Torpedo.condition(); // .Torpedo conditions = new ArrayList<>();
@@ -284,18 +309,67 @@ public class UserService extends BaseService {
         switch (request.sortBy) {
 	        case "email": QueryTools.orderBy(request.sort, uProxy.getEmail()); break;
 	        case "surname": QueryTools.orderBy(request.sort, uProxy.getSurname()); break;
-	        default: QueryTools.orderBy(request.sort, uProxy.getId());
+	        default: QueryTools.orderBy(request.sort, uProxy.getName());
         }
         return uProxy;
-    }	
+    }
 
-    @Transactional
-	public ApiPaginatedList<ApiUserBase> adminListUsers(ApiListUsersRequest request) {
-    	return PaginationTools.createPaginatedResponse(em, request, () -> adminUserListQueryObject(request), 
-    			UserApiTools::toApiUserBase); 
+	private Function<User> regionalAdminUserListQueryObject(Long userId, ApiListUsersRequest request) {
+
+		List<Long> companyIds = companyQueries.fetchCompanyIdsForUser(userId, List.of(CompanyStatus.ACTIVE));
+
+		User uProxy = Torpedo.from(User.class);
+		CompanyUser cuProxy = Torpedo.leftJoin(uProxy.getUserCompanies());
+
+		OnGoingLogicalCondition condition = Torpedo.condition();
+
+		OnGoingLogicalCondition connectedOrUnassignedCondition = Torpedo
+				.condition(uProxy.getUserCompanies()).isEmpty()
+				.or(cuProxy.getCompany().getId()).in(companyIds);
+		condition = condition.and(connectedOrUnassignedCondition);
+
+		OnGoingLogicalCondition statusCondition = Torpedo
+				.condition(uProxy.getStatus()).eq(UserStatus.ACTIVE)
+				.or(uProxy.getStatus()).eq(UserStatus.CONFIRMED_EMAIL)
+				.or(uProxy.getStatus()).eq(UserStatus.UNCONFIRMED);
+		condition = condition.and(statusCondition);
+
+		if (StringUtils.isNotBlank(request.query)) {
+			OnGoingLogicalCondition queryCondition = Torpedo
+					.condition(uProxy.getName()).like().any(request.query)
+					.or(uProxy.getSurname()).like().any(request.query)
+					.or(uProxy.getEmail()).like().any(request.query);
+			condition = condition.and(queryCondition);
+		} else {
+			if (StringUtils.isNotBlank(request.email)) {
+				condition = condition.and(uProxy.getEmail()).like().any(request.email);
+			}
+			if (StringUtils.isNotBlank(request.surname)) {
+				condition = condition.and(uProxy.getSurname()).like().any(request.surname);
+			}
+		}
+
+		if (request.status != null) {
+			condition = condition.and(Torpedo.condition(uProxy.getStatus()).eq(request.status));
+		}
+
+		if (request.role != null) {
+			condition = condition.and(Torpedo.condition(uProxy.getRole()).eq(request.role));
+		}
+
+		Torpedo.where(condition);
+
+		switch (request.sortBy) {
+			case "email": QueryTools.orderBy(request.sort, uProxy.getEmail()); break;
+			case "surname": QueryTools.orderBy(request.sort, uProxy.getSurname()); break;
+			default: QueryTools.orderBy(request.sort, uProxy.getName());
+		}
+
+		return Torpedo.distinct(uProxy);
 	}
 
     private Function<User> userListQueryObject(Long userId, ApiListUsersRequest request) {
+
     	List<Long> companyIds = companyQueries.fetchCompanyIdsForUser(userId, List.of(CompanyStatus.ACTIVE));
     	
     	CompanyUser cuProxy = Torpedo.from(CompanyUser.class);
@@ -326,10 +400,10 @@ public class UserService extends BaseService {
         switch (request.sortBy) {
 	        case "email": QueryTools.orderBy(request.sort, cuProxy.getUser().getEmail()); break;
 	        case "surname": QueryTools.orderBy(request.sort, cuProxy.getUser().getSurname()); break;
-	        default: QueryTools.orderBy(request.sort, cuProxy.getUser().getSurname());
+	        default: QueryTools.orderBy(request.sort, cuProxy.getUser().getName());
         }
         return Torpedo.distinct(cuProxy.getUser());
-    }	
+    }
     
     @Transactional
 	public ApiPaginatedList<ApiUserBase> listUsers(CustomUserDetails authUser, ApiListUsersRequest request) {
@@ -390,37 +464,41 @@ public class UserService extends BaseService {
 		if (user.getStatus() != UserStatus.ACTIVE && user.getStatus() != UserStatus.CONFIRMED_EMAIL) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user status");
 		}
-		if (user.getRole() == UserRole.ADMIN) {
+		if (user.getRole() == UserRole.SYSTEM_ADMIN) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Cannot change status");
 		}
 		user.setStatus(UserStatus.DEACTIVATED);
 	}
 	
-	public void setUserAdmin(User user) throws ApiException {
+	private void setUserSystemAdmin(User user) throws ApiException {
 		if (user.getStatus() != UserStatus.ACTIVE) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user status");
 		}
-		if (user.getRole() == UserRole.ADMIN) {
+		if (user.getRole() == UserRole.SYSTEM_ADMIN) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user role");
 		}
-		user.setRole(UserRole.ADMIN);
-	}
-	
-	public void setUserRole(User user, UserRole role) throws ApiException {
-		if (user.getStatus() != UserStatus.ACTIVE) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user status");
-		}
-		if (user.getRole() == UserRole.ADMIN) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user role");
-		}
-		if (role == null) {
-			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid role");
-		}
-		user.setRole(role);
+		user.setRole(UserRole.SYSTEM_ADMIN);
 	}
 
-	public void unsetUserAdmin(User user) throws ApiException {
-		if (user.getRole() != UserRole.ADMIN) {
+	private void setUserRegionalAdmin(User user) throws ApiException {
+		if (user.getStatus() != UserStatus.ACTIVE) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user status");
+		}
+		if (user.getRole() == UserRole.REGIONAL_ADMIN) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user role");
+		}
+		user.setRole(UserRole.REGIONAL_ADMIN);
+	}
+
+	private void unsetUserSystemAdmin(User user) throws ApiException {
+		if (user.getRole() != UserRole.SYSTEM_ADMIN) {
+			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user role");
+		}
+		user.setRole(UserRole.USER);
+	}
+
+	private void unsetUserRegionalAdmin(User user) throws ApiException {
+		if (user.getRole() != UserRole.REGIONAL_ADMIN) {
 			throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user role");
 		}
 		user.setRole(UserRole.USER);
@@ -428,6 +506,7 @@ public class UserService extends BaseService {
 	
     @Transactional
 	public ApiUserGet getProfileForUser(Long userId) throws ApiException {
+
     	User user = userQueries.fetchUser(userId);
     	List<UserAction> actions = new ArrayList<>();
 
@@ -446,24 +525,58 @@ public class UserService extends BaseService {
     
     @Transactional
 	public ApiUser getProfileForAdmin(CustomUserDetails authUser, Long userId) throws ApiException {
+
     	User user = userQueries.fetchUser(userId);
     	List<UserAction> actions = new ArrayList<>();
-
-    	actions.add(UserAction.VIEW_USER_PROFILE);
-		actions.add(UserAction.UPDATE_USER_PROFILE);
 		
 		List<Long> companyIds = companyQueries.fetchCompanyIdsForUser(userId, 
 				Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED));
 
-		List<Long> companyIdsAdmin = companyQueries.fetchCompanyIdsForUserAdmin(userId);
+	    List<Long> companyIdsAdmin = companyQueries.fetchCompanyIdsForUserAdmin(userId);
+
+		// If regional admin, check that it's connected with the user profile (connected through company)
+		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+
+			// If user is assigned to any company, check that the Regional admin has access to these companies
+			if (!user.getUserCompanies().isEmpty()) {
+
+				// Company IDs where the Regional admin is enrolled into
+				List<Long> regionalAdminCompanyIds = companyQueries.fetchCompanyIdsForUser(authUser.getUserId(),
+						Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED));
+
+				PermissionsUtil.checkRegionalAdminIfConnectedWithUser(regionalAdminCompanyIds, companyIds);
+
+				// Filter the user's company IDs lists (only the company IDs where both the User and the Regional admin are enrolled into should be present)
+				companyIds = companyIds.stream().filter(cID -> regionalAdminCompanyIds.stream().anyMatch(cID::equals)).collect(
+						Collectors.toList());
+
+				companyIdsAdmin = companyIdsAdmin.stream().filter(cAdminID -> regionalAdminCompanyIds.stream().anyMatch(cAdminID::equals)).collect(
+						Collectors.toList());
+			}
+		}
+
+	    actions.add(UserAction.VIEW_USER_PROFILE);
+	    actions.add(UserAction.UPDATE_USER_PROFILE);
 
 		if (!authUser.getUserId().equals(userId)) {
 			switch (user.getStatus()) {
 				case ACTIVE: 
 					actions.add(UserAction.DEACTIVATE_USER);
-					actions.add(UserAction.SET_USER_ROLE);
-					if (user.getRole() == UserRole.ADMIN) actions.add(UserAction.UNSET_USER_ADMIN);
-					else actions.add(UserAction.SET_USER_ADMIN);
+
+					// If Regional admin don't set any additional actions
+					if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+						break;
+					}
+
+					if (user.getRole() == UserRole.SYSTEM_ADMIN) {
+						actions.add(UserAction.UNSET_USER_SYSTEM_ADMIN);
+					} else if (user.getRole() == UserRole.REGIONAL_ADMIN) {
+						actions.add(UserAction.UNSET_USER_REGIONAL_ADMIN);
+					} else {
+						actions.add(UserAction.SET_USER_SYSTEM_ADMIN);
+						actions.add(UserAction.SET_USER_REGIONAL_ADMIN);
+					}
+
 					break;
 				case CONFIRMED_EMAIL: actions.addAll(Arrays.asList(UserAction.DEACTIVATE_USER, UserAction.ACTIVATE_USER)); break;
 				case DEACTIVATED: actions.add(UserAction.ACTIVATE_USER); break;
@@ -475,7 +588,15 @@ public class UserService extends BaseService {
 	}
 
     @Transactional
-	public void updateProfile(Long userId, ApiUserUpdate request) throws ApiException {
+	public void updateProfile(CustomUserDetails authUser, Long userId, ApiUserUpdate request) throws ApiException {
+
+		// Check if Regional admin has access to the requested user
+		if (!authUser.getUserId().equals(userId) && authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+			PermissionsUtil.checkRegionalAdminIfConnectedWithUser(
+					companyQueries.fetchCompanyIdsForUser(authUser.getUserId(), Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED)),
+					companyQueries.fetchCompanyIdsForUser(userId, Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED)));
+		}
+
     	User user = userQueries.fetchUser(userId);
 		user.setName(request.name);
 		user.setSurname(request.surname);
@@ -484,19 +605,37 @@ public class UserService extends BaseService {
 
     @Transactional
 	public void changeUserStatus(CustomUserDetails authUser, ApiUserRole request, UserAction action) throws ApiException {
+
     	if (authUser.getUserId().equals(request.id)) {
     		throw new ApiException(ApiStatus.INVALID_REQUEST, "Cannot change status/role for this user");
     	}
-    	
+
 		User user = userQueries.fetchUser(request.id);
+
+		// Check if Regional admin has access to the requested user
+		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+
+			// Check if action is 'DEACTIVATE_USER' - this is not allowed by the Regional admin
+			if (action == UserAction.DEACTIVATE_USER) {
+				throw new ApiException(ApiStatus.UNAUTHORIZED, "Regional admin not authorized!");
+			}
+
+			// If user is assigned to any company, check that the Regional admin has access to these companies
+			if (!user.getUserCompanies().isEmpty()) {
+				PermissionsUtil.checkRegionalAdminIfConnectedWithUser(
+						companyQueries.fetchCompanyIdsForUser(authUser.getUserId(), Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED)),
+						companyQueries.fetchCompanyIdsForUser(request.id, Arrays.asList(CompanyStatus.ACTIVE, CompanyStatus.REGISTERED)));
+			}
+		}
 		
 		switch (action) {
 			case ACTIVATE_USER: activateUser(user); break;
 			case DEACTIVATE_USER: deactivateUser(user); break;
-			case SET_USER_ADMIN: setUserAdmin(user); break;
-			case UNSET_USER_ADMIN: unsetUserAdmin(user); break;
+			case SET_USER_SYSTEM_ADMIN: setUserSystemAdmin(user); break;
+			case UNSET_USER_SYSTEM_ADMIN: unsetUserSystemAdmin(user); break;
+			case SET_USER_REGIONAL_ADMIN: setUserRegionalAdmin(user); break;
+			case UNSET_USER_REGIONAL_ADMIN: unsetUserRegionalAdmin(user); break;
 			case CONFIRM_USER_EMAIL: confirmUserEmail(user); break;
-			case SET_USER_ROLE: setUserRole(user, request.role); break;
 			default: throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid user status");
 		}
 	}
@@ -516,6 +655,4 @@ public class UserService extends BaseService {
 			throw new ApiException(ApiStatus.AUTH_ERROR, "Invalid or expired refresh token");
 		}
 	}
-
-
 }

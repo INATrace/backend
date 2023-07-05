@@ -18,7 +18,7 @@ import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,7 +123,6 @@ public class StockOrder extends TimestampEntity {
 
 	/**
 	 * User entered Order ID - relevant for Quote orders.
-	 *
 	 * Can be set only when productOrder is not provided. If productOrder is set, then
 	 * the user entered Order ID in the ProductOrder should be used.
  	 */
@@ -143,12 +142,18 @@ public class StockOrder extends TimestampEntity {
 
 	@Column
 	private BigDecimal availableQuantity;
-	
+
+	/**
+	 * This should be saved as dated, without any time, so we don't have issues with different client timezones.
+	 */
 	@Column
-	private Instant productionDate;
-	
+	private LocalDate productionDate;
+
+	/**
+	 * This should be saved as dated, without any time, so we don't have issues with different client timezones.
+	 */
 	@Column
-	private Instant deliveryTime;
+	private LocalDate deliveryTime;
 	
 	@Column
 	private BigDecimal pricePerUnit;
@@ -242,6 +247,10 @@ public class StockOrder extends TimestampEntity {
 	// The final product for which the QR code tag is generated
 	@ManyToOne(fetch = FetchType.LAZY)
 	private FinalProduct qrCodeTagFinalProduct;
+
+	// Generated ID provided by the client; This is used to group repacked stock orders when doing repacking with multiple outputs
+	@Column
+	private String repackedOriginStockOrderId;
 
 	public User getCreatedBy() {
 		return createdBy;
@@ -421,19 +430,19 @@ public class StockOrder extends TimestampEntity {
 		this.outQuantityNotInRange = outQuantityNotInRange;
 	}
 
-	public Instant getProductionDate() {
+	public LocalDate getProductionDate() {
 		return productionDate;
 	}
 
-	public void setProductionDate(Instant productionDate) {
+	public void setProductionDate(LocalDate productionDate) {
 		this.productionDate = productionDate;
 	}
 
-	public Instant getDeliveryTime() {
+	public LocalDate getDeliveryTime() {
 		return deliveryTime;
 	}
 
-	public void setDeliveryTime(Instant deliveryTime) {
+	public void setDeliveryTime(LocalDate deliveryTime) {
 		this.deliveryTime = deliveryTime;
 	}
 
@@ -632,6 +641,14 @@ public class StockOrder extends TimestampEntity {
 
 	public void setQrCodeTagFinalProduct(FinalProduct qrCodeTagFinalProduct) {
 		this.qrCodeTagFinalProduct = qrCodeTagFinalProduct;
+	}
+
+	public String getRepackedOriginStockOrderId() {
+		return repackedOriginStockOrderId;
+	}
+
+	public void setRepackedOriginStockOrderId(String repackedOriginStockOrder) {
+		this.repackedOriginStockOrderId = repackedOriginStockOrder;
 	}
 
 	public StockOrderLocation getProductionLocation() {

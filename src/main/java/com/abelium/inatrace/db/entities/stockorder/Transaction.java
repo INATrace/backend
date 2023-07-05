@@ -2,7 +2,6 @@ package com.abelium.inatrace.db.entities.stockorder;
 
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
-import com.abelium.inatrace.db.entities.codebook.GradeAbbreviationType;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
 import com.abelium.inatrace.db.entities.company.Company;
@@ -35,10 +34,6 @@ public class Transaction extends TimestampEntity {
 	@OneToOne
 	private StockOrder sourceStockOrder;
 
-	// Used when ProcessingActionType is TRANSFER
-	@OneToOne
-	private StockOrder targetStockOrder;
-
 	@ManyToOne(fetch = FetchType.LAZY)
 	private ProcessingOrder targetProcessingOrder;
 
@@ -53,9 +48,6 @@ public class Transaction extends TimestampEntity {
 	@ManyToOne
 	private Facility sourceFacility;
 
-	@ManyToOne
-	private Facility targetFacility;
-
 	@Column
 	private Boolean isProcessing;
 	
@@ -68,9 +60,6 @@ public class Transaction extends TimestampEntity {
 
 	@OneToOne
 	private MeasureUnitType inputMeasureUnitType;
-
-	@OneToOne
-	private MeasureUnitType outputMeasureUnitType;
 	
 	@Column
 	private BigDecimal inputQuantity;
@@ -83,9 +72,6 @@ public class Transaction extends TimestampEntity {
 	
 	@Column
 	private String currency;
-	
-	@OneToOne
-	private GradeAbbreviationType gradeAbbreviation;
 	
 	@Column
 	private String rejectComment;
@@ -112,14 +98,6 @@ public class Transaction extends TimestampEntity {
 
 	public void setSourceStockOrder(StockOrder sourceStockOrder) {
 		this.sourceStockOrder = sourceStockOrder;
-	}
-
-	public StockOrder getTargetStockOrder() {
-		return targetStockOrder;
-	}
-
-	public void setTargetStockOrder(StockOrder targetStockOrder) {
-		this.targetStockOrder = targetStockOrder;
 	}
 
 	public ProcessingOrder getTargetProcessingOrder() {
@@ -154,14 +132,6 @@ public class Transaction extends TimestampEntity {
 		this.sourceFacility = sourceFacility;
 	}
 
-	public Facility getTargetFacility() {
-		return targetFacility;
-	}
-
-	public void setTargetFacility(Facility targetFacility) {
-		this.targetFacility = targetFacility;
-	}
-
 	public Boolean getIsProcessing() {
 		return isProcessing;
 	}
@@ -194,14 +164,6 @@ public class Transaction extends TimestampEntity {
 		this.inputMeasureUnitType = inputMeasureUnitType;
 	}
 
-	public MeasureUnitType getOutputMeasureUnitType() {
-		return outputMeasureUnitType;
-	}
-
-	public void setOutputMeasureUnitType(MeasureUnitType outputMeasureUnitType) {
-		this.outputMeasureUnitType = outputMeasureUnitType;
-	}
-
 	public BigDecimal getInputQuantity() {
 		return inputQuantity;
 	}
@@ -232,14 +194,6 @@ public class Transaction extends TimestampEntity {
 
 	public void setCurrency(String currency) {
 		this.currency = currency;
-	}
-
-	public GradeAbbreviationType getGradeAbbreviation() {
-		return gradeAbbreviation;
-	}
-
-	public void setGradeAbbreviation(GradeAbbreviationType gradeAbbreviation) {
-		this.gradeAbbreviation = gradeAbbreviation;
 	}
 
 	public String getRejectComment() {

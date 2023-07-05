@@ -29,7 +29,7 @@ public class AnalyticsEngine {
 	
 	@Scheduled(initialDelay = 60 * 1000, fixedDelay = 60 * 1000)
 	public void aggregateAll() {
-		logger.info("Running aggregations");
+		logger.debug("Running aggregations");
 		Instant from = Instant.ofEpochMilli(0);
 		AnalyticsAggregate ag = analyticsQueries.fetchUniqueByKey("lastTimestamp");
 		
@@ -53,7 +53,7 @@ public class AnalyticsEngine {
 				List.of(new LatLonAggregator(), new CountryAggregator(), new SuccessAggregator())));
 		
 		analyticsQueries.updateAggregates(maxTimestamp.get(), updaters);
-		logger.info("Finished running aggregations");
+		logger.debug("Finished running aggregations");
 	}
 	
 	public ApiProductLabelAnalytics createAnalyticsForLabel(String labelUid) {

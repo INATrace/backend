@@ -17,32 +17,6 @@ public class Responsibility extends BaseEntity {
 	 */
 	@Lob
 	private String laborPolicies;
-
-	/**
-	 * relationship with farmers - Describe your working relationship with your farmers and suppliers. 
-	 * Do you support farmers’ livelihoods in any special way (e.g. trainings, Inputs, agriculture 
-	 * extensions, education for their kids, employment of women etc.)?
-	 */
-	@Lob
-	private String relationship;
-	
-	/**
-	 * farmers story - farmer or community
-	 */
-	@Column(length = Lengths.DEFAULT)
-	private String farmer;
-	
-	/**
-	 * farmers story - pictures
-	 */
-	@OneToMany(mappedBy = "responsibility", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ResponsibilityFarmerPicture> pictures = new ArrayList<>();
-	
-	/**
-	 * farmers story - text
-	 */
-	@Lob
-	private String story;
 	
 	public String getLaborPolicies() {
 		return laborPolicies;
@@ -52,44 +26,8 @@ public class Responsibility extends BaseEntity {
 		this.laborPolicies = laborPolicies;
 	}
 
-	public String getRelationship() {
-		return relationship;
-	}
-
-	public void setRelationship(String relationship) {
-		this.relationship = relationship;
-	}
-
-	public String getFarmer() {
-		return farmer;
-	}
-
-	public void setFarmer(String farmer) {
-		this.farmer = farmer;
-	}
-	
-	public List<ResponsibilityFarmerPicture> getPictures() {
-		return pictures;
-	}
-
-	public void setPictures(List<ResponsibilityFarmerPicture> pictures) {
-		this.pictures = pictures;
-	}
-
-	public String getStory() {
-		return story;
-	}
-
-	public void setStory(String story) {
-		this.story = story;
-	}
-	
 	public Responsibility copy() {
-		Responsibility r = new Responsibility();
-		r.setRelationship(getRelationship());
-		r.setFarmer(getFarmer());
-		r.setPictures(getPictures().stream().map(ResponsibilityFarmerPicture::copy).collect(Collectors.toList()));
-		r.setStory(getStory());
-		return r;
+		return new Responsibility();
 	}
+
 }

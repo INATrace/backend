@@ -12,6 +12,7 @@ import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Table
@@ -119,14 +120,14 @@ public class Payment extends TimestampEntity {
     private Instant paymentConfirmedAtTime;
 
     @Column
-	private Instant formalCreationTime;
+	private LocalDate formalCreationTime;
 
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
 	private PreferredWayOfPayment preferredWayOfPayment;
 	
 	@Column
-    private Instant productionDate;
+    private LocalDate productionDate;
 	
 	public String getOrderReference() {
 		return orderReference;
@@ -328,11 +329,11 @@ public class Payment extends TimestampEntity {
 		this.paymentConfirmedAtTime = paymentConfirmedAtTime;
 	}
 
-	public Instant getFormalCreationTime() {
+	public LocalDate getFormalCreationTime() {
 		return formalCreationTime;
 	}
 
-	public void setFormalCreationTime(Instant formalCreationTime) {
+	public void setFormalCreationTime(LocalDate formalCreationTime) {
 		this.formalCreationTime = formalCreationTime;
 	}
 
@@ -344,11 +345,11 @@ public class Payment extends TimestampEntity {
 		this.preferredWayOfPayment = preferredWayOfPayment;
 	}
 
-	public Instant getProductionDate() {
+	public LocalDate getProductionDate() {
 		return productionDate;
 	}
 
-	public void setProductionDate(Instant productionDate) {
+	public void setProductionDate(LocalDate productionDate) {
 		this.productionDate = productionDate;
 	}
 	

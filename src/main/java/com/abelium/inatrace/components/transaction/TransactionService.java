@@ -42,7 +42,7 @@ public class TransactionService extends BaseService {
      * @param stockOrderId Stock order ID.
      * @return List of transactions.
      */
-    public ApiPaginatedList<ApiTransaction> getStockOrderInputTransactions(Long stockOrderId, CustomUserDetails user) throws ApiException {
+    public ApiPaginatedList<ApiTransaction> getStockOrderInputTransactions(Long stockOrderId, CustomUserDetails user, Language language) throws ApiException {
 
         // Fetch the stock order
         StockOrder stockOrder = stockOrderService.fetchEntity(stockOrderId, StockOrder.class);
@@ -57,7 +57,7 @@ public class TransactionService extends BaseService {
         PermissionsUtil.checkUserIfCompanyEnrolled(stockOrder.getCompany().getUsers(), user);
 
         return new ApiPaginatedList<>(
-                processingOrder.getInputTransactions().stream().map(TransactionMapper::toApiTransactionBase)
+                processingOrder.getInputTransactions().stream().map(t -> TransactionMapper.toApiTransactionBase(t, language))
                         .collect(Collectors.toList()), processingOrder.getInputTransactions().size());
     }
 
@@ -88,7 +88,6 @@ public class TransactionService extends BaseService {
         transaction.setInputMeasureUnitType(transaction.getSourceStockOrder().getMeasurementUnitType());
         transaction.setSemiProduct(transaction.getSourceStockOrder().getSemiProduct());
         transaction.setFinalProduct(transaction.getSourceStockOrder().getFinalProduct());
-        transaction.setOutputMeasureUnitType(transaction.getInputMeasureUnitType());
 
         if (transaction.getSemiProduct() == null && transaction.getFinalProduct() == null) {
             throw new ApiException(ApiStatus.VALIDATION_ERROR, "Semi-product or Final prodcut is required.");
@@ -188,7 +187,6 @@ public class TransactionService extends BaseService {
     private void revertQuantities(Transaction transaction, CustomUserDetails user, Language language, boolean checkCompanyEnrolment) throws ApiException {
 
         StockOrder sourceStockOrder = transaction.getSourceStockOrder();
-        StockOrder targetStockOrder = transaction.getTargetStockOrder();
 
         // Set source StockOrder available quantity
         if (sourceStockOrder != null) {
@@ -198,16 +196,6 @@ public class TransactionService extends BaseService {
                     user,
                     null,
                     checkCompanyEnrolment
-            );
-        }
-
-        // Set target StockOrder fulfilled quantity
-        if (!transaction.getIsProcessing() && targetStockOrder != null) {
-            targetStockOrder.setFulfilledQuantity(targetStockOrder.getFulfilledQuantity().subtract(transaction.getOutputQuantity()));
-            stockOrderService.createOrUpdateStockOrder(
-                    StockOrderMapper.toApiStockOrder(targetStockOrder, user.getUserId(), language),
-                    user,
-                    null
             );
         }
     }

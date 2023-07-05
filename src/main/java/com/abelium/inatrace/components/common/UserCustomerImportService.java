@@ -9,15 +9,22 @@ import com.abelium.inatrace.components.company.api.ApiUserCustomer;
 import com.abelium.inatrace.components.company.api.ApiUserCustomerAssociation;
 import com.abelium.inatrace.components.company.api.ApiUserCustomerLocation;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
+import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.product.api.ApiBankInformation;
 import com.abelium.inatrace.components.product.api.ApiFarmInformation;
+import com.abelium.inatrace.components.product.api.ApiFarmPlantInformation;
+import com.abelium.inatrace.components.product.api.ApiProductType;
+import com.abelium.inatrace.db.entities.codebook.ProductType;
 import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Gender;
+import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserCustomerType;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +36,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Lazy
 @Service
@@ -43,7 +49,7 @@ public class UserCustomerImportService extends BaseService {
     @Autowired
     private StorageService storageService;
 
-    public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, CustomUserDetails user) throws ApiException {
+    public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, CustomUserDetails user, Language language) throws ApiException {
         DocumentData documentData = storageService.downloadDocument(em.find(Document.class, documentId).getStorageKey());
         InputStream inputStream;
         XSSFWorkbook mainWorkbook;
@@ -57,9 +63,21 @@ public class UserCustomerImportService extends BaseService {
 
         XSSFSheet mainSheet = mainWorkbook.getSheetAt(0);
 
+        // boolean means that the second product is also present in the Excel
+        boolean hasSecondProductType = checkSecondProductType(mainSheet);
+
         int rowIndex = 5;
         int successful = 0;
         List<ApiUserCustomer> duplicates = new ArrayList<>();
+
+        // company product types (first two)
+        List<ApiProductType> companyProductTypes = readCompanyProductTypes(companyId, language);
+
+        // if only first product type is given in Excel,
+        // then take only the first element from company product types list
+        if (!hasSecondProductType) {
+            companyProductTypes = companyProductTypes.subList(0, 1);
+        }
 
         while (true) {
             Row row = mainSheet.getRow(rowIndex);
@@ -71,22 +89,40 @@ public class UserCustomerImportService extends BaseService {
 
                 // Bank info
                 apiUserCustomer.setBank(new ApiBankInformation());
-                apiUserCustomer.getBank().setAccountHolderName(getStringOrNumeric(row.getCell(29)));
-                apiUserCustomer.getBank().setAccountNumber(getStringOrNumeric(row.getCell(28)));
-                apiUserCustomer.getBank().setAdditionalInformation(getStringOrNumeric(row.getCell(31)));
-                apiUserCustomer.getBank().setBankName(getStringOrNumeric(row.getCell(30)));
+                apiUserCustomer.getBank().setAccountHolderName(getStringOrNumeric(row.getCell(31)));
+                apiUserCustomer.getBank().setAccountNumber(getStringOrNumeric(row.getCell(30)));
+                apiUserCustomer.getBank().setAdditionalInformation(getStringOrNumeric(row.getCell(33)));
+                apiUserCustomer.getBank().setBankName(getStringOrNumeric(row.getCell(32)));
 
                 apiUserCustomer.setCompanyId(companyId);
                 apiUserCustomer.setEmail(getString(row.getCell(17)));
 
                 // Farm info
                 apiUserCustomer.setFarm(new ApiFarmInformation());
-                apiUserCustomer.getFarm().setAreaOrganicCertified(getNumericBigDecimal(row.getCell(26)));
+                apiUserCustomer.getFarm().setAreaOrganicCertified(getNumericBigDecimal(row.getCell(28)));
                 apiUserCustomer.getFarm().setAreaUnit(getString(row.getCell(21)));
-                apiUserCustomer.getFarm().setCoffeeCultivatedArea(getNumericBigDecimal(row.getCell(23)));
-                apiUserCustomer.getFarm().setNumberOfTrees(getNumericInteger(row.getCell(24)));
-                apiUserCustomer.getFarm().setOrganic(getBoolean(row.getCell(25)));
-                apiUserCustomer.getFarm().setStartTransitionToOrganic(getDate(row.getCell(27)));
+
+                apiUserCustomer.getFarm().setFarmPlantInformationList(new ArrayList<>());
+
+                // Farm plant info for the first company's product type
+                ApiFarmPlantInformation apiPlant1Information = new ApiFarmPlantInformation();
+                apiPlant1Information.setProductType(companyProductTypes.get(0));
+                apiPlant1Information.setPlantCultivatedArea(getNumericBigDecimal(row.getCell(23)));
+                apiPlant1Information.setNumberOfPlants(getNumericInteger(row.getCell(24)));
+                apiUserCustomer.getFarm().getFarmPlantInformationList().add(apiPlant1Information);
+
+                // Farm plant info for the second company's product type
+                if (hasSecondProductType && companyProductTypes.get(1) != null) {
+                    ApiFarmPlantInformation apiPlant2Information = new ApiFarmPlantInformation();
+                    apiPlant2Information.setProductType(companyProductTypes.get(1));
+                    apiPlant2Information.setPlantCultivatedArea(getNumericBigDecimal(row.getCell(25)));
+                    apiPlant2Information.setNumberOfPlants(getNumericInteger(row.getCell(26)));
+                    apiUserCustomer.getFarm().getFarmPlantInformationList().add(apiPlant2Information);
+                }
+
+                // set product
+                apiUserCustomer.getFarm().setOrganic(getBoolean(row.getCell(27)));
+                apiUserCustomer.getFarm().setStartTransitionToOrganic(getDate(row.getCell(29)));
                 apiUserCustomer.getFarm().setTotalCultivatedArea(getNumericBigDecimal(row.getCell(22)));
 
                 apiUserCustomer.setFarmerCompanyInternalId(getStringOrNumeric(row.getCell(0)));
@@ -115,6 +151,8 @@ public class UserCustomerImportService extends BaseService {
                 apiUserCustomer.setSurname(getString(row.getCell(1)));
                 apiUserCustomer.setType(UserCustomerType.FARMER);
 
+                apiUserCustomer.setProductTypes(companyProductTypes);
+
                 // Member of associations
                 if (!emptyCell(row.getCell(20))) {
                     String content = getString(row.getCell(20));
@@ -137,7 +175,7 @@ public class UserCustomerImportService extends BaseService {
                 if (companyService.existsUserCustomer(apiUserCustomer)) {
                     duplicates.add(apiUserCustomer);
                 } else {
-                    companyService.addUserCustomer(companyId, apiUserCustomer, user);
+                    companyService.addUserCustomer(companyId, apiUserCustomer, user, language);
                     successful++;
                 }
             }
@@ -150,6 +188,46 @@ public class UserCustomerImportService extends BaseService {
         response.setDuplicates(duplicates);
 
         return response;
+    }
+
+    /**
+     * Checks if second product type exist. Checks if title of the second product type is present in the Excel.
+     *
+     * @param xssfSheet - xsssheet
+     * @return if second product header cell is set
+     */
+    private boolean checkSecondProductType(XSSFSheet xssfSheet) {
+
+        // Column headers are present in the row with index 4
+        int rowIndex = 4;
+
+        Row row = xssfSheet.getRow(rowIndex);
+
+        // check for 25th cell if second product type is specified with title
+        int colIndex = 25;
+
+        return !emptyCell(row.getCell(colIndex));
+    }
+
+    /**
+     * List of company product types.
+     *
+     * @param companyId - used for retrieving company product types
+     * @param language - request language
+     * @return - list of product types.
+     */
+    private List<ApiProductType> readCompanyProductTypes(Long companyId, Language language) {
+
+        ProductType productTypeProxy = companyService.getCompanyProductTypes(companyId, null);
+
+        // currently max of 2 product types are supported
+        int numberOfMaxSupportedProductTypes = 2;
+
+        return  Torpedo.select(productTypeProxy).list(em)
+                .stream()
+                .limit(numberOfMaxSupportedProductTypes)
+                .map(pt -> ProductTypeMapper.toApiProductTypeDetailed(pt, language))
+                .collect(Collectors.toList());
     }
 
     private boolean emptyRow(Row row) {
@@ -192,15 +270,17 @@ public class UserCustomerImportService extends BaseService {
                 validCell(row.getCell(20), List.of(CellType.STRING)) &&                     // Member of associations
                 validCell(row.getCell(21), List.of(CellType.STRING)) &&                     // Area unit
                 validCell(row.getCell(22), List.of(CellType.NUMERIC)) &&                    // Total cultivated area
-                validCell(row.getCell(23), List.of(CellType.NUMERIC)) &&                    // Area cultivated with coffee
-                validCell(row.getCell(24), List.of(CellType.NUMERIC)) &&                    // Number of coffee trees
-                validCell(row.getCell(25), List.of(CellType.STRING)) &&                     // Organic production (EU)
-                validCell(row.getCell(26), List.of(CellType.NUMERIC)) &&                    // Area organic certified
-                validCell(row.getCell(27), List.of(CellType.NUMERIC)) &&                    // Start date of transitioning to organic
-                validCell(row.getCell(28), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Account number
-                validCell(row.getCell(29), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Account holder's name
-                validCell(row.getCell(30), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Bank name
-                validCell(row.getCell(31), List.of(CellType.STRING, CellType.NUMERIC));     // Additional information
+                validCell(row.getCell(23), List.of(CellType.NUMERIC)) &&                    // Area cultivated with first plant
+                validCell(row.getCell(24), List.of(CellType.NUMERIC)) &&                    // Number of (first plant) trees
+                validCell(row.getCell(25), List.of(CellType.NUMERIC)) &&                    // Area cultivated with second plant
+                validCell(row.getCell(26), List.of(CellType.NUMERIC)) &&                    // Number of (second plant) trees
+                validCell(row.getCell(27), List.of(CellType.STRING)) &&                     // Organic production (EU)
+                validCell(row.getCell(28), List.of(CellType.NUMERIC)) &&                    // Area organic certified
+                validCell(row.getCell(29), List.of(CellType.NUMERIC)) &&                    // Start date of transitioning to organic
+                validCell(row.getCell(30), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Account number
+                validCell(row.getCell(31), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Account holder's name
+                validCell(row.getCell(32), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Bank name
+                validCell(row.getCell(33), List.of(CellType.STRING, CellType.NUMERIC));     // Additional information
     }
 
     private boolean validCell(Cell cell, List<CellType> cellTypeList) {
@@ -246,6 +326,8 @@ public class UserCustomerImportService extends BaseService {
                 return Gender.MALE;
             case "F":
                 return Gender.FEMALE;
+            case "N/A":
+                return Gender.N_A;
             default:
                 return null;
         }

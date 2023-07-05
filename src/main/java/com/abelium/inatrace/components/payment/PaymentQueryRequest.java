@@ -3,7 +3,7 @@ package com.abelium.inatrace.components.payment;
 import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 public class PaymentQueryRequest {
 
@@ -17,11 +17,11 @@ public class PaymentQueryRequest {
                                Long purchaseId,
                                PreferredWayOfPayment preferredWayOfPayment,
                                PaymentStatus paymentStatus,
-                               Instant productionDateStart,
-                               Instant productionDateEnd,
+                               LocalDate productionDateStart,
+                               LocalDate productionDateEnd,
                                String farmerName,
                                Long farmerId,
-                               Long representativeOfRecepientUserCustomerId) {
+                               Long representativeOfRecipientUserCustomerId) {
         this.companyId = companyId;
         this.purchaseId = purchaseId;
         this.preferredWayOfPayment = preferredWayOfPayment;
@@ -30,18 +30,18 @@ public class PaymentQueryRequest {
         this.productionDateEnd = productionDateEnd;
         this.farmerName = farmerName;
         this.farmerId = farmerId;
-        this.representativeOfRecepientUserCustomerId = representativeOfRecepientUserCustomerId;
+        this.representativeOfRecipientUserCustomerId = representativeOfRecipientUserCustomerId;
     }
 
     public Long companyId;
     public Long purchaseId; // StockOrder.id
     public PreferredWayOfPayment preferredWayOfPayment;
     public PaymentStatus paymentStatus;
-    public Instant productionDateStart;
-    public Instant productionDateEnd;
+    public LocalDate productionDateStart;
+    public LocalDate productionDateEnd;
     public String farmerName; // RepresentativeOfRecipientUserCustomer.name
     public Long farmerId;
-    public Long representativeOfRecepientUserCustomerId;
+    public Long representativeOfRecipientUserCustomerId;
 
     @Override
     public String toString() {
@@ -54,7 +54,7 @@ public class PaymentQueryRequest {
                 ", productionDateEnd=" + productionDateEnd +
                 ", farmerName='" + farmerName + '\'' +
                 ", farmerId='" + farmerId + '\'' +
-                ", representativeOfRecepientUserCustomerId='" + representativeOfRecepientUserCustomerId + '\'' +
+                ", representativeOfRecipientUserCustomerId='" + representativeOfRecipientUserCustomerId + '\'' +
                 '}';
     }
 }
