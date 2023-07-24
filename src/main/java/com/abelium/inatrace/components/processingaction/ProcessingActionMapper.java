@@ -102,30 +102,7 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setQrCodeForFinalProduct(ProductApiTools.toApiFinalProduct(entity.getQrCodeForFinalProduct()));
 
 		// Processing evidence fields
-		List<ApiProcessingEvidenceField> apiRequiredEvidenceFields = new ArrayList<>();
-		List<ProcessingActionPEF> processingActionProcessingEvidenceFields = entity.getProcessingEvidenceFields();
-		processingActionProcessingEvidenceFields.forEach(
-			processingActionProcessingEvidenceField -> {
-
-				// Get the translation for the request lang - if value is not present return the EN value which is required
-				ProcessingEvidenceField procEvidenceField = processingActionProcessingEvidenceField.getProcessingEvidenceField();
-				ProcessingEvidenceFieldTranslation translation = procEvidenceField.getTranslations().stream()
-						.filter(t -> t.getLanguage().equals(language)).findFirst().orElseGet(
-								() -> procEvidenceField.getTranslations().stream()
-										.filter(t -> t.getLanguage().equals(Language.EN)).findAny()
-										.orElse(new ProcessingEvidenceFieldTranslation()));
-
-				ApiProcessingEvidenceField apiProcessingEvidenceField = new ApiProcessingEvidenceField();
-				apiProcessingEvidenceField.setId(procEvidenceField.getId());
-				apiProcessingEvidenceField.setFieldName(procEvidenceField.getFieldName());
-				apiProcessingEvidenceField.setLabel(translation.getLabel());
-				apiProcessingEvidenceField.setType(procEvidenceField.getType());
-				apiProcessingEvidenceField.setMandatory(processingActionProcessingEvidenceField.getMandatory());
-				apiProcessingEvidenceField.setRequiredOnQuote(processingActionProcessingEvidenceField.getRequiredOnQuote());
-				apiRequiredEvidenceFields.add(apiProcessingEvidenceField);
-			}
-		);
-		apiProcessingAction.setRequiredEvidenceFields(apiRequiredEvidenceFields);
+		apiProcessingAction.setRequiredEvidenceFields(ProcessingActionMapper.mapProcessingEvidenceFields(entity, language));
 
 		List<ApiProcessingEvidenceType> apiRequiredDocumentTypes = new ArrayList<>();
 
@@ -154,7 +131,7 @@ public final class ProcessingActionMapper {
 		);
 		apiProcessingAction.setRequiredDocumentTypes(apiRequiredDocumentTypes);
 
-		// Map the suppoerted facilities for this
+		// Map the supported facilities for this
 		List<ApiFacility> supportedFacilities = new ArrayList<>();
 		List<ProcessingActionFacility> processingActionFacilities = entity.getProcessingActionFacilities();
 		processingActionFacilities.forEach(processingActionFacility -> {
@@ -223,6 +200,9 @@ public final class ProcessingActionMapper {
 		apiProcessingAction.setInputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getInputFinalProduct()));
 		apiProcessingAction.setOutputFinalProduct(ProductApiTools.toApiFinalProduct(entity.getOutputFinalProduct()));
 
+		// Map the processing evidence fields
+		apiProcessingAction.setRequiredEvidenceFields(ProcessingActionMapper.mapProcessingEvidenceFields(entity, language));
+
 		return apiProcessingAction;
 	}
 
@@ -236,6 +216,35 @@ public final class ProcessingActionMapper {
 		}
 
 		return apiPaOSM;
+	}
+
+	private static List<ApiProcessingEvidenceField> mapProcessingEvidenceFields(ProcessingAction entity, Language language) {
+
+		List<ApiProcessingEvidenceField> apiRequiredEvidenceFields = new ArrayList<>();
+		List<ProcessingActionPEF> processingActionProcessingEvidenceFields = entity.getProcessingEvidenceFields();
+		processingActionProcessingEvidenceFields.forEach(
+				processingActionProcessingEvidenceField -> {
+
+					// Get the translation for the request lang - if value is not present return the EN value which is required
+					ProcessingEvidenceField procEvidenceField = processingActionProcessingEvidenceField.getProcessingEvidenceField();
+					ProcessingEvidenceFieldTranslation translation = procEvidenceField.getTranslations().stream()
+							.filter(t -> t.getLanguage().equals(language)).findFirst().orElseGet(
+									() -> procEvidenceField.getTranslations().stream()
+											.filter(t -> t.getLanguage().equals(Language.EN)).findAny()
+											.orElse(new ProcessingEvidenceFieldTranslation()));
+
+					ApiProcessingEvidenceField apiProcessingEvidenceField = new ApiProcessingEvidenceField();
+					apiProcessingEvidenceField.setId(procEvidenceField.getId());
+					apiProcessingEvidenceField.setFieldName(procEvidenceField.getFieldName());
+					apiProcessingEvidenceField.setLabel(translation.getLabel());
+					apiProcessingEvidenceField.setType(procEvidenceField.getType());
+					apiProcessingEvidenceField.setMandatory(processingActionProcessingEvidenceField.getMandatory());
+					apiProcessingEvidenceField.setRequiredOnQuote(processingActionProcessingEvidenceField.getRequiredOnQuote());
+					apiRequiredEvidenceFields.add(apiProcessingEvidenceField);
+				}
+		);
+
+		return apiRequiredEvidenceFields;
 	}
 
 }

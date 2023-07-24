@@ -14,6 +14,12 @@ public class ApiStockOrderHistoryTimelineItem extends ApiBaseEntity {
 	@ApiModelProperty(value = "The Processing order representing this processing step (used when not Purchase order)")
 	private ApiProcessingOrder processingOrder;
 
+	@ApiModelProperty(value = "Processing evidence types stored values for this stock order")
+	private List<ApiStockOrderEvidenceTypeValue> requiredEvidenceDocuments;
+
+	@ApiModelProperty(value = "Other processing evidence documents - evidence types that can be provided but are not mandatory")
+	private List<ApiStockOrderEvidenceTypeValue> otherEvidenceDocuments;
+
 	@ApiModelProperty(value = "Stock order representing this processing step (used in Purchase orders)")
 	private ApiStockOrder stockOrder;
 
@@ -29,6 +35,28 @@ public class ApiStockOrderHistoryTimelineItem extends ApiBaseEntity {
 
 	public void setProcessingOrder(ApiProcessingOrder processingOrder) {
 		this.processingOrder = processingOrder;
+	}
+
+	public List<ApiStockOrderEvidenceTypeValue> getRequiredEvidenceDocuments() {
+		if (requiredEvidenceDocuments == null) {
+			requiredEvidenceDocuments = new ArrayList<>();
+		}
+		return requiredEvidenceDocuments;
+	}
+
+	public void setRequiredEvidenceDocuments(List<ApiStockOrderEvidenceTypeValue> requiredEvidenceDocuments) {
+		this.requiredEvidenceDocuments = requiredEvidenceDocuments;
+	}
+
+	public List<ApiStockOrderEvidenceTypeValue> getOtherEvidenceDocuments() {
+		if (otherEvidenceDocuments == null) {
+			otherEvidenceDocuments = new ArrayList<>();
+		}
+		return otherEvidenceDocuments;
+	}
+
+	public void setOtherEvidenceDocuments(List<ApiStockOrderEvidenceTypeValue> otherEvidenceDocuments) {
+		this.otherEvidenceDocuments = otherEvidenceDocuments;
 	}
 
 	public ApiStockOrder getStockOrder() {
