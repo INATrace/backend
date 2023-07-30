@@ -17,7 +17,6 @@ if [ "$repoName" == "" ] || [ "$tag" == "" ]; then
   exit 1
 fi
 
-mvn clean package
 docker build -t $repoName:$tag .
 
 if [ "$push" == "push" ]; then
