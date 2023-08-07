@@ -196,8 +196,6 @@ public class StockOrderMapper {
         apiStockOrder.setQrCodeTag(entity.getQrCodeTag());
         apiStockOrder.setQrCodeTagFinalProduct(ProductApiTools.toApiFinalProductBase(entity.getQrCodeTagFinalProduct()));
 
-//        apiStockOrder.setRequiredWomensCoffee(entity.getRequiredWomensCoffee());
-
         // If requested mapping with Processing order, map the Processing order that created this stock order
         if (BooleanUtils.isTrue(withProcessingOrder)) {
             apiStockOrder.setProcessingOrder(ProcessingOrderMapper.toApiProcessingOrderBase(entity.getProcessingOrder()));
@@ -218,6 +216,7 @@ public class StockOrderMapper {
         apiStockOrder.setId(entity.getId());
         apiStockOrder.setIdentifier(entity.getIdentifier());
         apiStockOrder.setInternalLotNumber(setupInternalLotNumberForSacked(entity.getInternalLotNumber(), entity.getSacNumber()));
+        apiStockOrder.setSacNumber(entity.getSacNumber());
         apiStockOrder.setProductionDate(entity.getProductionDate());
         apiStockOrder.setCreationTimestamp(entity.getCreationTimestamp());
 

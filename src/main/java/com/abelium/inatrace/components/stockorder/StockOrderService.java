@@ -22,6 +22,7 @@ import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.processingorder.mappers.ProcessingOrderMapper;
 import com.abelium.inatrace.components.product.FinalProductService;
 import com.abelium.inatrace.components.stockorder.api.*;
+import com.abelium.inatrace.components.stockorder.mappers.StockOrderEvidenceTypeValueMapper;
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.components.transaction.api.ApiTransaction;
 import com.abelium.inatrace.components.transaction.mappers.TransactionMapper;
@@ -654,7 +655,12 @@ public class StockOrderService extends BaseService {
         ApiStockOrderHistory stockOrderHistory = new ApiStockOrderHistory();
 
         // Recursively add history, starting from depth 0
-        List<ApiStockOrderHistoryTimelineItem> historyTimeline = addNextAggregationLevels(0, stockOrder, language);
+        List<ApiStockOrderHistoryTimelineItem> historyTimeline;
+        if (user != null) {
+            historyTimeline = addNextAggregationLevels(0, stockOrder, language, user.getUserId());
+        } else {
+            historyTimeline = addNextAggregationLevels(0, stockOrder, language, null);
+        }
         historyTimeline.sort(Comparator.comparingInt(ApiStockOrderHistoryTimelineItem::getDepth));
 
         // Prepare aggregated Purchase orders (group all into single history timeline item)
@@ -733,7 +739,7 @@ public class StockOrderService extends BaseService {
      *
      */
     private List<ApiStockOrderHistoryTimelineItem> addNextAggregationLevels(int currentDepth,
-                                                                StockOrder stockOrder, Language language) {
+                                                                StockOrder stockOrder, Language language, Long userId) {
 
         if (stockOrder != null) {
 
@@ -763,22 +769,37 @@ public class StockOrderService extends BaseService {
                 nextHistory.getProcessingOrder().setTargetStockOrders(targetStockOrders);
                 nextHistory.setDepth(currentDepth);
 
+                // Set the required and other evidence documents (applicable only if requesting by logged-in user)
+                if (userId != null) {
+                    stockOrder.getProcessingOrder().getTargetStockOrders().stream().findAny().ifPresent(so -> {
+                        so.getDocumentRequirements().forEach(docRequirement -> {
+                            if (BooleanUtils.isTrue(docRequirement.getOtherEvidence())) {
+                                nextHistory.getOtherEvidenceDocuments().add(
+                                        StockOrderEvidenceTypeValueMapper.toApiStockOrderEvidenceTypeValue(docRequirement, userId, language));
+                            } else {
+                                nextHistory.getRequiredEvidenceDocuments().add(
+                                        StockOrderEvidenceTypeValueMapper.toApiStockOrderEvidenceTypeValue(docRequirement, userId, language));
+                            }
+                        });
+                    });
+                }
+
                 // next recursion for every child element
                 if (inputStockOrders.get(0).getSacNumber() != null) {
 
                     // if sac number present, proceed with only first item leaves
                     historyTimeline.addAll(
-                            addNextAggregationLevels(currentDepth + 1, inputStockOrders.get(0), language));
+                            addNextAggregationLevels(currentDepth + 1, inputStockOrders.get(0), language, userId));
                 } else if (OrderType.TRANSFER_ORDER.equals(inputStockOrders.get(0).getOrderType())) {
 
                     // if transfer order, go through with first item leaves
                     historyTimeline.addAll(
-                            addNextAggregationLevels(currentDepth + 1, inputStockOrders.get(0), language));
+                            addNextAggregationLevels(currentDepth + 1, inputStockOrders.get(0), language, userId));
                 } else {
 
                     // proceed recursion with all leaves
                     inputStockOrders.forEach(sourceOrder -> historyTimeline.addAll(
-                            addNextAggregationLevels(currentDepth + 1, sourceOrder, language)));
+                            addNextAggregationLevels(currentDepth + 1, sourceOrder, language, userId)));
                 }
 
             } else {
@@ -950,7 +971,7 @@ public class StockOrderService extends BaseService {
             entity.setProductOrder(fetchEntity(apiStockOrder.getProductOrder().getId(), ProductOrder.class));
         }
 
-        // Set price per unit for end customer (and currency) - this is used when placing Quote order for final products for a end customer
+        // Set price per unit for end customer (and currency) - this is used when placing Quote order for final products for an end customer
         entity.setPricePerUnitForEndCustomer(apiStockOrder.getPricePerUnitForEndCustomer());
         entity.setCurrencyForEndCustomer(apiStockOrder.getCurrencyForEndCustomer());
 
@@ -1212,10 +1233,7 @@ public class StockOrderService extends BaseService {
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 BigDecimal inputUnitWeight = procAction.getInputSemiProduct().getMeasurementUnitType().getWeight();
-
-                // TODO: check this if correct after added multiple outputs support
                 BigDecimal outputUnitWeight = stockOrder.getSemiProduct().getMeasurementUnitType().getWeight();
-                // BigDecimal outputUnitWeight = procAction.getOutputSemiProduct().getMeasurementUnitType().getWeight();
 
                 // Calculate the input quantity normalized in the output measuring unit (important when we have different input and output measure units)
                 BigDecimal totalInputQuantityNormalized = totalInputQuantity.divide(inputUnitWeight,
