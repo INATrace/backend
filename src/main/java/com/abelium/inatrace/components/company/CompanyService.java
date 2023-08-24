@@ -1,10 +1,12 @@
 package com.abelium.inatrace.components.company;
 
-import com.abelium.inatrace.api.*;
+import com.abelium.inatrace.api.ApiBaseEntity;
+import com.abelium.inatrace.api.ApiPaginatedList;
+import com.abelium.inatrace.api.ApiPaginatedRequest;
+import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.CommonService;
-import com.abelium.inatrace.components.common.StorageKeyCache;
 import com.abelium.inatrace.components.common.UserCustomerImportService;
 import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.common.api.ApiUserCustomerImportResponse;
@@ -12,8 +14,8 @@ import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.ProductTypeMapper;
-import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
 import com.abelium.inatrace.components.product.api.ApiFarmPlantInformation;
+import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
 import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.components.user.UserQueries;
 import com.abelium.inatrace.components.value_chain.ValueChainMapper;
@@ -95,8 +97,9 @@ public class CompanyService extends BaseService {
 				CompanyApiTools::toApiCompanyListResponse);
 	}
 
-	private TorpedoProjector<CompanyUser, ApiCompanyListResponse> userCompanyListQueryObject(Long userId,
+	private Function<Company> userCompanyListQueryObject(Long userId,
 			ApiListCompaniesRequest request) {
+
 		CompanyUser cuProxy = Torpedo.from(CompanyUser.class);
 
 		Company cProxy = Torpedo.innerJoin(cuProxy.getCompany());
@@ -108,8 +111,9 @@ public class CompanyService extends BaseService {
 		if (request.status != null) {
 			condition = condition.and(cProxy.getStatus()).eq(request.status);
 		}
-		Document dProxy = Torpedo.leftJoin(cProxy.getLogo());
+
 		Torpedo.where(condition);
+
 		switch (request.sortBy) {
 			case "name":
 				QueryTools.orderBy(request.sort, cProxy.getName());
@@ -120,15 +124,13 @@ public class CompanyService extends BaseService {
 			default:
 				QueryTools.orderBy(request.sort, cProxy.getId());
 		}
-		return new TorpedoProjector<>(cuProxy, ApiCompanyListResponse.class)
-				.add(cProxy.getId(), ApiCompanyListResponse::setId)
-				.add(cProxy.getStatus(), ApiCompanyListResponse::setStatus)
-				.add(cProxy.getName(), ApiCompanyListResponse::setName)
-				.add(dProxy.getStorageKey(), (r, s) -> r.setLogoStorageKey(StorageKeyCache.put(s, userId)));
+
+		return Torpedo.distinct(cuProxy.getCompany());
 	}
 
 	public ApiPaginatedList<ApiCompanyListResponse> listUserCompanies(Long userId, ApiListCompaniesRequest request) {
-		return PaginationTools.createPaginatedResponse(em, request, () -> userCompanyListQueryObject(userId, request));
+		return PaginationTools.createPaginatedResponse1(em, request, () -> userCompanyListQueryObject(userId, request),
+				CompanyApiTools::toApiCompanyListResponse);
 	}
 
 	@Transactional
