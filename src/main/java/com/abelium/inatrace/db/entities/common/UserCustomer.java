@@ -41,7 +41,7 @@ public class UserCustomer extends BaseEntity {
 	 */
 	@Enumerated(EnumType.STRING)
 	@Column(length = Lengths.ENUM)
-	private UserCustomerType type;	
+	private UserCustomerType type;
 	
 	/**
 	 * name
@@ -106,6 +106,9 @@ public class UserCustomer extends BaseEntity {
 
 	@OneToMany(mappedBy = "userCustomer", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<FarmPlantInformation> farmPlantInformationList;
+
+	@OneToMany(mappedBy = "farmer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	private List<Plot> plots;
 	
 	public UserCustomerType getType() {
 		return type;
@@ -258,6 +261,17 @@ public class UserCustomer extends BaseEntity {
 
 	public void setFarmPlantInformationList(List<FarmPlantInformation> farmPlantInformationList) {
 		this.farmPlantInformationList = farmPlantInformationList;
+	}
+
+	public List<Plot> getPlots() {
+		if (plots == null) {
+			plots = new ArrayList<>();
+		}
+		return plots;
+	}
+
+	public void setPlots(List<Plot> plots) {
+		this.plots = plots;
 	}
 
 	public String getLocation() {

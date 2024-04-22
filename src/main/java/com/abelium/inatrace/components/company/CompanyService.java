@@ -5,6 +5,8 @@ import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.components.agstack.AgStackClientService;
+import com.abelium.inatrace.components.agstack.api.ApiRegisterFieldBoundaryResponse;
 import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.common.CommonService;
 import com.abelium.inatrace.components.common.UserCustomerImportService;
@@ -12,6 +14,7 @@ import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.common.api.ApiUserCustomerImportResponse;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.mappers.CompanyCustomerMapper;
+import com.abelium.inatrace.components.company.mappers.PlotMapper;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.product.api.ApiFarmPlantInformation;
@@ -66,6 +69,9 @@ public class CompanyService extends BaseService {
 
 	@Autowired
 	private UserCustomerImportService userCustomerImportService;
+
+	@Autowired
+	private AgStackClientService agStackClientService;
 
 	private Company companyListQueryObject(ApiListCompaniesRequest request) {
 		Company cProxy = Torpedo.from(Company.class);
@@ -423,6 +429,34 @@ public class CompanyService extends BaseService {
 			}
 		}
 
+		// If user customer is of type add plots
+		if (apiUserCustomer.getType().equals(UserCustomerType.FARMER) && !CollectionUtils.isEmpty(apiUserCustomer.getPlots())) {
+			for (ApiPlot apiPlot : apiUserCustomer.getPlots()) {
+				Plot plot = new Plot();
+				plot.setPlotName(apiPlot.getPlotName());
+				plot.setCrop(fetchProductType(apiPlot.getCrop().getId()));
+				plot.setNumberOfPlants(apiPlot.getNumberOfPlants());
+				plot.setUnit(apiPlot.getUnit());
+				plot.setSize(apiPlot.getSize());
+				plot.setOrganicStartOfTransition(apiPlot.getOrganicStartOfTransition());
+				plot.setFarmer(userCustomer);
+
+				for (ApiPlotCoordinate apiPlotCoordinate : apiPlot.getCoordinates()) {
+					PlotCoordinate plotCoordinate = new PlotCoordinate();
+					plotCoordinate.setLatitude(apiPlotCoordinate.getLatitude());
+					plotCoordinate.setLongitude(apiPlotCoordinate.getLongitude());
+					plotCoordinate.setPlot(plot);
+					plot.getCoordinates().add(plotCoordinate);
+
+				}
+
+				// Generate Plot GeoID
+				plot.setGeoId(generatePlotGeoID(plot.getCoordinates()));
+
+				userCustomer.getPlots().add(plot);
+			}
+		}
+
 		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId(), language);
 	}
 
@@ -586,6 +620,50 @@ public class CompanyService extends BaseService {
 		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), user);
 
 		em.remove(userCustomer);
+	}
+
+	@Transactional
+	public ApiPlot createUserCustomerPlot(Long userCustomerId,
+	                                   CustomUserDetails user,
+	                                   Language language,
+	                                   ApiPlot request) throws ApiException {
+
+		UserCustomer userCustomer = fetchUserCustomer(userCustomerId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), user);
+
+		Plot plot = new Plot();
+		plot.setPlotName(request.getPlotName());
+		plot.setCrop(fetchProductType(request.getCrop().getId()));
+		plot.setNumberOfPlants(request.getNumberOfPlants());
+		plot.setUnit(request.getUnit());
+		plot.setSize(request.getSize());
+		plot.setOrganicStartOfTransition(request.getOrganicStartOfTransition());
+		plot.setFarmer(userCustomer);
+
+		for (ApiPlotCoordinate apiPlotCoordinate : request.getCoordinates()) {
+			PlotCoordinate plotCoordinate = new PlotCoordinate();
+			plotCoordinate.setLatitude(apiPlotCoordinate.getLatitude());
+			plotCoordinate.setLongitude(apiPlotCoordinate.getLongitude());
+			plotCoordinate.setPlot(plot);
+			plot.getCoordinates().add(plotCoordinate);
+		}
+
+		// Generate Plot GeoID
+		plot.setGeoId(generatePlotGeoID(plot.getCoordinates()));
+
+		em.persist(plot);
+
+		return PlotMapper.toApiPlot(plot, language);
+	}
+
+	private String generatePlotGeoID(List<PlotCoordinate> coordinates) {
+
+		ApiRegisterFieldBoundaryResponse response = agStackClientService.registerFieldBoundaryResponse(coordinates);
+		if (StringUtils.isNotBlank(response.getMatchedGeoID())) {
+			return response.getMatchedGeoID();
+		} else {
+			return response.getGeoID();
+		}
 	}
 
 	public Company getAssociationByName(String name) {

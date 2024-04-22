@@ -148,6 +148,16 @@ public class CompanyController {
         return new ApiDefaultResponse();
     }
 
+    @PostMapping(value = "/userCustomers/{id}/plots/add")
+    @ApiOperation(value = "Add new plot for the provided user customer")
+    public ApiResponse<ApiPlot> createUserCustomerPlot(
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "User customer ID", required = true) @PathVariable("id") Long id,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
+            @Valid @RequestBody ApiPlot request) throws ApiException {
+        return new ApiResponse<>(companyService.createUserCustomerPlot(id, authUser, language, request));
+    }
+
     @GetMapping(value = "/companyCustomers/list/{companyId}")
     @ApiOperation(value = "List company customers for company")
     public ApiPaginatedResponse<ApiCompanyCustomer> getCompanyCustomersList(
