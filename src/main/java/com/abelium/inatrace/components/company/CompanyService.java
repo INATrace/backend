@@ -347,6 +347,7 @@ public class CompanyService extends BaseService {
 				userCustomerLocation.getAddress().setSector(apiUserCustomer.getLocation().getAddress().getSector());
 				userCustomerLocation.getAddress().setState(apiUserCustomer.getLocation().getAddress().getState());
 				userCustomerLocation.getAddress().setVillage(apiUserCustomer.getLocation().getAddress().getVillage());
+				userCustomerLocation.getAddress().setOtherAddress(apiUserCustomer.getLocation().getAddress().getOtherAddress());
 				userCustomerLocation.getAddress().setZip(apiUserCustomer.getLocation().getAddress().getZip());
 				userCustomerLocation.getAddress().setHondurasDepartment(apiUserCustomer.getLocation().getAddress().getHondurasDepartment());
 				userCustomerLocation.getAddress().setHondurasFarm(apiUserCustomer.getLocation().getAddress().getHondurasFarm());
@@ -470,6 +471,8 @@ public class CompanyService extends BaseService {
 		userCustomer.getUserCustomerLocation().getAddress().setAddress(apiUserCustomer.getLocation().getAddress().getAddress());
 		userCustomer.getUserCustomerLocation().getAddress().setCell(apiUserCustomer.getLocation().getAddress().getCell());
 		userCustomer.getUserCustomerLocation().getAddress().setCity(apiUserCustomer.getLocation().getAddress().getCity());
+		userCustomer.getUserCustomerLocation().getAddress().setOtherAddress(apiUserCustomer.getLocation().getAddress().getOtherAddress());
+
 		Country country = getCountry(apiUserCustomer.getLocation().getAddress().getCountry().getId());
 		userCustomer.getUserCustomerLocation().getAddress().setCountry(country);
 		userCustomer.getUserCustomerLocation().getAddress().setHondurasDepartment(apiUserCustomer.getLocation().getAddress().getHondurasDepartment());

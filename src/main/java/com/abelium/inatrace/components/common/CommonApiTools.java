@@ -103,6 +103,7 @@ public class CommonApiTools {
         aa.cell = address.getCell();
         aa.sector = address.getSector();
         aa.village = address.getVillage();
+        aa.otherAddress = address.getOtherAddress();
         aa.hondurasDepartment = address.getHondurasDepartment();
         aa.hondurasFarm = address.getHondurasFarm();
         aa.hondurasMunicipality = address.getHondurasMunicipality();

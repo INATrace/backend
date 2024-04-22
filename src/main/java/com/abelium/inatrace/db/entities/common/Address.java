@@ -54,6 +54,12 @@ public class Address {
 	private String village;
 
 	/**
+	 * Additional/other address field; If provided, other address fields are not mandatory.
+	 */
+	@Column(length = Lengths.OTHER_ADDRESS)
+	private String otherAddress;
+
+	/**
 	 * Honduras farm name
 	 */
 	@Column(length = Lengths.DEFAULT)
@@ -137,6 +143,14 @@ public class Address {
 
 	public void setVillage(String village) {
 		this.village = village;
+	}
+
+	public String getOtherAddress() {
+		return otherAddress;
+	}
+
+	public void setOtherAddress(String otherAddress) {
+		this.otherAddress = otherAddress;
 	}
 
 	public Country getCountry() {

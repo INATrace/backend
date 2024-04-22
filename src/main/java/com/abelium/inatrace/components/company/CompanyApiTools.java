@@ -155,6 +155,7 @@ public class CompanyApiTools {
 		geoAddress.setSector(apiGeoAddress.getSector());
 		geoAddress.setState(apiGeoAddress.getState());
 		geoAddress.setVillage(apiGeoAddress.getVillage());
+		geoAddress.setOtherAddress(apiGeoAddress.getOtherAddress());
 		geoAddress.setZip(apiGeoAddress.getZip());
 	}
 
@@ -508,6 +509,7 @@ public class CompanyApiTools {
 		apiAddress.setSector(address.getSector());
 		apiAddress.setState(address.getState());
 		apiAddress.setVillage(address.getVillage());
+		apiAddress.setOtherAddress(address.getOtherAddress());
 		apiAddress.setZip(address.getZip());
 
 		return apiAddress;

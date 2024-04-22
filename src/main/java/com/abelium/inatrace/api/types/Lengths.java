@@ -55,6 +55,7 @@ public class Lengths
     public static final int CITY = DEFAULT;	
     public static final int STATE = DEFAULT;	
     public static final int ZIPCODE = 50;
+    public static final int OTHER_ADDRESS = 1000;
 
     /**
      * Cell, sector, village

@@ -15,6 +15,7 @@ public class AddressMapper {
 
         apiAddress.setCell(entity.getCell());
         apiAddress.setVillage(entity.getVillage());
+        apiAddress.setOtherAddress(entity.getOtherAddress());
 
         apiAddress.setHondurasMunicipality(entity.getHondurasMunicipality());
         apiAddress.setHondurasVillage(entity.getHondurasVillage());

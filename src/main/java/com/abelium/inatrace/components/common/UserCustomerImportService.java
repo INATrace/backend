@@ -120,7 +120,7 @@ public class UserCustomerImportService extends BaseService {
                     apiUserCustomer.getFarm().getFarmPlantInformationList().add(apiPlant2Information);
                 }
 
-                // set product
+                // Set product
                 apiUserCustomer.getFarm().setOrganic(getBoolean(row.getCell(27)));
                 apiUserCustomer.getFarm().setStartTransitionToOrganic(getDate(row.getCell(29)));
                 apiUserCustomer.getFarm().setTotalCultivatedArea(getNumericBigDecimal(row.getCell(22)));
@@ -135,6 +135,7 @@ public class UserCustomerImportService extends BaseService {
                 apiUserCustomer.getLocation().getAddress().setAddress(getString(row.getCell(10)));
                 apiUserCustomer.getLocation().getAddress().setCell(getString(row.getCell(4)));
                 apiUserCustomer.getLocation().getAddress().setCity(getString(row.getCell(11)));
+
                 // Country data - specified by code
                 apiUserCustomer.getLocation().getAddress().setCountry(CommonApiTools.toApiCountry(getCountryByCode(getString(row.getCell(14)))));
                 apiUserCustomer.getLocation().getAddress().getCountry().setCode(getString(row.getCell(14)));
@@ -328,6 +329,8 @@ public class UserCustomerImportService extends BaseService {
                 return Gender.FEMALE;
             case "N/A":
                 return Gender.N_A;
+            case "DIVERSE":
+                return Gender.DIVERSE;
             default:
                 return null;
         }
