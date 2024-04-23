@@ -624,9 +624,9 @@ public class CompanyService extends BaseService {
 
 	@Transactional
 	public ApiPlot createUserCustomerPlot(Long userCustomerId,
-	                                   CustomUserDetails user,
-	                                   Language language,
-	                                   ApiPlot request) throws ApiException {
+										  CustomUserDetails user,
+										  Language language,
+										  ApiPlot request) throws ApiException {
 
 		UserCustomer userCustomer = fetchUserCustomer(userCustomerId);
 		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), user);
@@ -652,6 +652,28 @@ public class CompanyService extends BaseService {
 		plot.setGeoId(generatePlotGeoID(plot.getCoordinates()));
 
 		em.persist(plot);
+
+		return PlotMapper.toApiPlot(plot, language);
+	}
+
+	@Transactional
+	public ApiPlot refreshGeoIDForUserCustomerPlot(Long userCustomerId,
+												   Long plotId,
+												   CustomUserDetails user,
+												   Language language) throws ApiException {
+
+		UserCustomer userCustomer = fetchUserCustomer(userCustomerId);
+		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), user);
+
+		Plot plot = userCustomer.getPlots()
+				.stream()
+				.filter(p -> p.getId().equals(plotId))
+				.findAny()
+				.orElseThrow(() -> new ApiException(ApiStatus.INVALID_REQUEST, "Invalid Plot ID"));
+
+		if (StringUtils.isBlank(plot.getGeoId())) {
+			plot.setGeoId(generatePlotGeoID(plot.getCoordinates()));
+		}
 
 		return PlotMapper.toApiPlot(plot, language);
 	}
