@@ -3,6 +3,8 @@ package com.abelium.inatrace.components.agstack.api;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 
+import java.util.List;
+
 @ApiModel(description = "API model for AgStack register field boundary call.")
 public class ApiRegisterFieldBoundaryResponse {
 
@@ -10,7 +12,7 @@ public class ApiRegisterFieldBoundaryResponse {
 	private String geoID;
 
 	@JsonProperty("matched geo ids")
-	private String matchedGeoID;
+	private List<String> matchedGeoIDs;
 
 	public String getGeoID() {
 		return geoID;
@@ -20,12 +22,12 @@ public class ApiRegisterFieldBoundaryResponse {
 		this.geoID = geoID;
 	}
 
-	public String getMatchedGeoID() {
-		return matchedGeoID;
+	public List<String> getMatchedGeoIDs() {
+		return matchedGeoIDs;
 	}
 
-	public void setMatchedGeoID(String matchedGeoID) {
-		this.matchedGeoID = matchedGeoID;
+	public void setMatchedGeoIDs(List<String> matchedGeoIDs) {
+		this.matchedGeoIDs = matchedGeoIDs;
 	}
 
 }

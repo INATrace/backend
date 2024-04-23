@@ -140,3 +140,8 @@ beyco.oauth2.clientSecret =
 beyco.oauth2.url =
 
 beyco.integration.url =
+
+#AgStack integration
+INATrace.agstack.apiKey =
+INATrace.agstack.clientSecret =
+INATrace.agstack.baseURL =
