@@ -658,12 +658,20 @@ public class CompanyService extends BaseService {
 
 	private String generatePlotGeoID(List<PlotCoordinate> coordinates) {
 
-		ApiRegisterFieldBoundaryResponse response = agStackClientService.registerFieldBoundaryResponse(coordinates);
-		if (!CollectionUtils.isEmpty(response.getMatchedGeoIDs())) {
-			return response.getMatchedGeoIDs().stream().findFirst().orElse(null);
-		} else {
-			return response.getGeoID();
+		try {
+
+			ApiRegisterFieldBoundaryResponse response = agStackClientService.registerFieldBoundaryResponse(coordinates);
+			if (!CollectionUtils.isEmpty(response.getMatchedGeoIDs())) {
+				return response.getMatchedGeoIDs().stream().findFirst().orElse(null);
+			} else {
+				return response.getGeoID();
+			}
+
+		} catch (Exception e) {
+			logger.error("Error while generating plot geoid");
 		}
+
+		return null;
 	}
 
 	public Company getAssociationByName(String name) {
