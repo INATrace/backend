@@ -28,7 +28,7 @@ public class NotificationService extends BaseService {
         context.setVariable("greeting", "Dear " + name + " " + surname);
         context.setVariable("message", 
         	"<p>We received your details and will get back to you as soon as possible.</p>" + 
-        	"<p>As soon as we verified and activated your profile, you can login into your INATrace dashborard using the email and password you used to register.<p>");
+        	"<p>As soon as we verified and activated your profile, you can login into your INATrace dashboard using the email and password you used to register.<p>");
         context.setVariable("signatureMessage", "");
         context.setVariable("signature", "Best Regards,");
         context.setVariable("INATraceTeam", "Team INATrace");
