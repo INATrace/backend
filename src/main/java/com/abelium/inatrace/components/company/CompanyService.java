@@ -561,6 +561,51 @@ public class CompanyService extends BaseService {
 			}
 		}
 
+		userCustomer.getPlots().removeIf(
+				plot -> apiUserCustomer.getPlots().stream().noneMatch(apiPlot -> plot.getId().equals(apiPlot.getId())));
+
+		for (ApiPlot apiPlot: apiUserCustomer.getPlots()) {
+
+			Plot plot = userCustomer.getPlots().stream()
+					.filter(p -> p.getId().equals(apiPlot.getId())).findFirst()
+					.orElse(new Plot());
+
+			plot.getCoordinates().removeIf(coordinate -> apiPlot.getCoordinates().stream()
+					.noneMatch(apiCoordinate -> coordinate.getId().equals(apiCoordinate.getId())));
+
+			for (ApiPlotCoordinate apiPlotCoordinate : apiPlot.getCoordinates()) {
+				PlotCoordinate plotCoordinate = plot.getCoordinates().stream()
+						.filter(p -> p.getId() != null && p.getId()
+								.equals(apiPlotCoordinate.getId()))
+						.findFirst()
+						.orElse(new PlotCoordinate());
+
+				plotCoordinate.setLatitude(apiPlotCoordinate.getLatitude());
+				plotCoordinate.setLongitude(apiPlotCoordinate.getLongitude());
+
+				if (plotCoordinate.getId() == null) {
+					plotCoordinate.setPlot(plot);
+					plot.getCoordinates().add(plotCoordinate);
+				}
+			}
+
+
+			plot.setPlotName(apiPlot.getPlotName());
+			plot.setLastUpdated(new Date());
+			if (plot.getId() != null) {
+				refreshGeoIDForUserCustomerPlot(userCustomer.getId(), plot.getId(), user, language);
+			}
+
+			if (apiPlot.getCrop() != null) {
+				plot.setCrop(fetchProductType(apiPlot.getCrop().getId()));
+			}
+
+			if (plot.getId() == null) {
+				plot.setFarmer(userCustomer);
+				userCustomer.getPlots().add(plot);
+			}
+		}
+
 		// Update user customer certifications
 		userCustomer.getCertifications().removeIf(ucc -> apiUserCustomer.getCertifications().stream().noneMatch(apiUCC -> ucc.getId().equals(apiUCC.getId())));
 		for (ApiCertification apiCertification : apiUserCustomer.getCertifications()) {
