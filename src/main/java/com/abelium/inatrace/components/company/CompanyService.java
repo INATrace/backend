@@ -440,6 +440,7 @@ public class CompanyService extends BaseService {
 				plot.setSize(apiPlot.getSize());
 				plot.setOrganicStartOfTransition(apiPlot.getOrganicStartOfTransition());
 				plot.setFarmer(userCustomer);
+				plot.setLastUpdated(new Date());
 
 				for (ApiPlotCoordinate apiPlotCoordinate : apiPlot.getCoordinates()) {
 					PlotCoordinate plotCoordinate = new PlotCoordinate();
@@ -639,6 +640,7 @@ public class CompanyService extends BaseService {
 		plot.setSize(request.getSize());
 		plot.setOrganicStartOfTransition(request.getOrganicStartOfTransition());
 		plot.setFarmer(userCustomer);
+		plot.setLastUpdated(new Date());
 
 		for (ApiPlotCoordinate apiPlotCoordinate : request.getCoordinates()) {
 			PlotCoordinate plotCoordinate = new PlotCoordinate();

@@ -29,6 +29,7 @@ public class PlotMapper {
 		apiPlot.setOrganicStartOfTransition(plot.getOrganicStartOfTransition());
 		apiPlot.setCoordinates(
 				plot.getCoordinates().stream().map(PlotMapper::toApiPlotCoordinate).collect(Collectors.toList()));
+		apiPlot.setLastUpdated(plot.getLastUpdated());
 
 		return apiPlot;
 	}
