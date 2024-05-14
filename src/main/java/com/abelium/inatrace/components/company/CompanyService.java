@@ -589,7 +589,6 @@ public class CompanyService extends BaseService {
 				}
 			}
 
-
 			plot.setPlotName(apiPlot.getPlotName());
 			plot.setNumberOfPlants(apiPlot.getNumberOfPlants());
 			plot.setSize(apiPlot.getSize());
@@ -599,6 +598,8 @@ public class CompanyService extends BaseService {
 
 			if (plot.getId() != null) {
 				refreshGeoIDForUserCustomerPlot(userCustomer.getId(), plot.getId(), user, language);
+			} else {
+				plot.setGeoId(generatePlotGeoID(plot.getCoordinates()));
 			}
 
 			if (apiPlot.getCrop() != null) {
