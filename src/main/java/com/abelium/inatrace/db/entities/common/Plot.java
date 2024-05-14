@@ -37,6 +37,9 @@ public class Plot extends BaseEntity {
 	@Column
 	private Date organicStartOfTransition;
 
+	@Column
+	private Date lastUpdated;
+
 	@OneToMany(mappedBy = "plot", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<PlotCoordinate> coordinates;
 
@@ -97,6 +100,14 @@ public class Plot extends BaseEntity {
 
 	public void setOrganicStartOfTransition(Date organicStartOfTransition) {
 		this.organicStartOfTransition = organicStartOfTransition;
+	}
+
+	public Date getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public void setLastUpdated(Date lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 
 	public List<PlotCoordinate> getCoordinates() {

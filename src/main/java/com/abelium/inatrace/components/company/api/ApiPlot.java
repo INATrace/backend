@@ -35,6 +35,9 @@ public class ApiPlot extends ApiBaseEntity {
 	@ApiModelProperty(value = "The list of coordinates of the plot", position = 8)
 	private List<ApiPlotCoordinate> coordinates;
 
+	@ApiModelProperty(value = "Date of last update", position = 9)
+	private Date lastUpdated;
+
 	public String getPlotName() {
 		return plotName;
 	}
@@ -99,4 +102,11 @@ public class ApiPlot extends ApiBaseEntity {
 		this.coordinates = coordinates;
 	}
 
+	public Date getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public void setLastUpdated(Date lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
 }
