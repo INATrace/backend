@@ -567,7 +567,7 @@ public class CompanyService extends BaseService {
 		for (ApiPlot apiPlot: apiUserCustomer.getPlots()) {
 
 			Plot plot = userCustomer.getPlots().stream()
-					.filter(p -> p.getId().equals(apiPlot.getId())).findFirst()
+					.filter(p -> p.getId() !=  null && p.getId().equals(apiPlot.getId())).findFirst()
 					.orElse(new Plot());
 
 			plot.getCoordinates().removeIf(coordinate -> apiPlot.getCoordinates().stream()
