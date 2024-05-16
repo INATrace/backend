@@ -26,10 +26,7 @@ import com.abelium.inatrace.components.stockorder.mappers.StockOrderEvidenceType
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.components.transaction.api.ApiTransaction;
 import com.abelium.inatrace.components.transaction.mappers.TransactionMapper;
-import com.abelium.inatrace.db.entities.common.ActivityProof;
-import com.abelium.inatrace.db.entities.common.Document;
-import com.abelium.inatrace.db.entities.common.User;
-import com.abelium.inatrace.db.entities.common.UserCustomer;
+import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCertification;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
@@ -52,6 +49,10 @@ import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.ProductCompanyType;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1400,4 +1401,53 @@ public class StockOrderService extends BaseService {
         }
     }
 
+    public byte[] createGeoJsonFromDeliveries(List<ApiStockOrderHistoryTimelineItem> timelineItems) throws ApiException {
+
+        // Read all userCustomers, from timeline item, and set ids in a Set
+        Set<Long> customerIds = new HashSet<>();
+        for (ApiStockOrderHistoryTimelineItem timelineItem: timelineItems) {
+            timelineItem.getPurchaseOrders().forEach(po -> {
+                if (po.getProducerUserCustomer() != null) {
+                    customerIds.add(po.getProducerUserCustomer().getId());
+                }
+            });
+        }
+
+        // Get all plots for given farmers
+        Plot pcProxy = Torpedo.from(Plot.class);
+        Torpedo.where(pcProxy.getFarmer().getId()).in(customerIds);
+        List<Plot> plotList = Torpedo.select(pcProxy).list(em);
+
+        // Convert plot values into GeoJson coordinates
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode root = mapper.createObjectNode();
+        root.set("type", mapper.convertValue("Feature", JsonNode.class));
+
+        ObjectNode geometry = mapper.createObjectNode();
+        geometry.set("type", mapper.convertValue("MultiPolygon", JsonNode.class));
+        root.set("geometry", geometry);
+
+        List<List<List<List<Double>>>> plotCoordinatesList = new ArrayList<>();
+        plotList.forEach(plot -> {
+            List<List<List<Double>>> plotCoordinatesListArray = new ArrayList<>();
+            List<List<Double>> coordinatesList = new ArrayList<>();
+            plot.getCoordinates().forEach(plotCoordinate -> {
+                List<Double> cList = new ArrayList<>();
+                cList.add(plotCoordinate.getLongitude());
+                cList.add(plotCoordinate.getLatitude());
+                coordinatesList.add(cList);
+            });
+            plotCoordinatesListArray.add(coordinatesList);
+            plotCoordinatesList.add(plotCoordinatesListArray);
+        });
+
+        geometry.set("coordinates", mapper.convertValue(plotCoordinatesList, JsonNode.class));
+
+        try {
+           return mapper.writer().writeValueAsBytes(root);
+        } catch (JsonProcessingException e) {
+            logger.error("Error while generating geoJson file", e);
+            throw new ApiException(ApiStatus.ERROR, "Error while generating geojson file");
+        }
+    }
 }
