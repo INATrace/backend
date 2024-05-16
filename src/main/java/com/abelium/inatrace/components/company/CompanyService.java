@@ -733,6 +733,7 @@ public class CompanyService extends BaseService {
 	private String generatePlotGeoID(List<PlotCoordinate> coordinates) {
 
 		try {
+			fixCoordinatesForApiCall(coordinates);
 
 			ApiRegisterFieldBoundaryResponse response = agStackClientService.registerFieldBoundaryResponse(coordinates);
 			if (!CollectionUtils.isEmpty(response.getMatchedGeoIDs())) {
@@ -742,10 +743,30 @@ public class CompanyService extends BaseService {
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			logger.error("Error while generating plot geoid");
 		}
 
 		return null;
+	}
+
+	/**
+	 * If first coordinate is not equal to last, add first coordinate to list, becouse of the geo API
+	 * @param coordinates - coordinates list
+	 */
+	private void fixCoordinatesForApiCall(List<PlotCoordinate> coordinates) {
+		if (coordinates != null && !coordinates.isEmpty() && coordinates.size() > 2) {
+			int lastIndex = coordinates.size() - 1;
+			if (coordinates.get(0).getLatitude() != null && coordinates.get(lastIndex).getLatitude()!=null &&
+					coordinates.get(0).getLongitude() != null && coordinates.get(lastIndex).getLongitude()!=null) {
+				if (!coordinates.get(0).getLatitude().equals(coordinates.get(lastIndex).getLatitude()) ||
+						!coordinates.get(0).getLongitude().equals(coordinates.get(lastIndex).getLongitude())
+				) {
+					// if coordinates not equal, add first as last
+					coordinates.add(coordinates.get(0));
+				}
+			}
+		}
 	}
 
 	public Company getAssociationByName(String name) {
