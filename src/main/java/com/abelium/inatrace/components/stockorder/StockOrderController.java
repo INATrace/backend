@@ -13,6 +13,7 @@ import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -245,6 +246,19 @@ public class StockOrderController {
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
     ) throws ApiException {
         return new ApiResponse<>(stockOrderService.getStockOrderAggregatedHistoryList(id, language, authUser, true));
+    }
+
+    @GetMapping(value = "{id}/exportGeoData", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @ApiOperation("Generate a geoJSON file with a list of polygons.")
+    public @ResponseBody byte[] exportGeoData(
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "StockOrder ID", required = true) @PathVariable("id") Long id,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
+
+        ApiStockOrderHistory apiStockOrderHistory =
+                stockOrderService.getStockOrderAggregatedHistoryList(id, language, authUser, true);
+
+        return stockOrderService.createGeoJsonFromDeliveries(apiStockOrderHistory.getTimelineItems());
     }
 
 }
