@@ -1413,6 +1413,9 @@ public class StockOrderService extends BaseService {
             });
         }
 
+        if (customerIds.isEmpty()) {
+            return new byte[0];
+        }
         // Get all plots for given farmers
         Plot pcProxy = Torpedo.from(Plot.class);
         Torpedo.where(pcProxy.getFarmer().getId()).in(customerIds);
@@ -1437,11 +1440,23 @@ public class StockOrderService extends BaseService {
                 cList.add(plotCoordinate.getLatitude());
                 coordinatesList.add(cList);
             });
+
+            // polygons must follow right-hand rule (counter-clockwise)
+            if (!isPolygonCounterClockwise(coordinatesList)) {
+                Collections.reverse(coordinatesList);
+            }
+
+            if (!coordinatesList.get(0).equals(coordinatesList.get(coordinatesList.size()-1))) {
+                // add first as last
+                coordinatesList.add(coordinatesList.get(0));
+            }
             plotCoordinatesListArray.add(coordinatesList);
             plotCoordinatesList.add(plotCoordinatesListArray);
         });
 
         geometry.set("coordinates", mapper.convertValue(plotCoordinatesList, JsonNode.class));
+
+        root.set("properties",mapper.createObjectNode());
 
         try {
            return mapper.writer().writeValueAsBytes(root);
@@ -1449,5 +1464,22 @@ public class StockOrderService extends BaseService {
             logger.error("Error while generating geoJson file", e);
             throw new ApiException(ApiStatus.ERROR, "Error while generating geojson file");
         }
+    }
+
+    private boolean isPolygonCounterClockwise(List<List<Double>> coordinatesList) {
+        // calculate area
+        double areaSum = 0.0;
+        for (int i=0; i<coordinatesList.size(); i++){
+            if (i == coordinatesList.size()-1) {
+                // last coordinate calc
+                areaSum += (coordinatesList.get(0).get(0) - coordinatesList.get(i).get(0)) *
+                        (coordinatesList.get(0).get(1) + coordinatesList.get(i).get(1));
+            } else {
+                areaSum += (coordinatesList.get(i + 1).get(0) - coordinatesList.get(i).get(0)) *
+                        (coordinatesList.get(i + 1).get(1) + coordinatesList.get(i).get(1));
+            }
+        }
+        // if areaSum is < 0, polygon order is counter-clockwise
+        return areaSum < 0;
     }
 }
