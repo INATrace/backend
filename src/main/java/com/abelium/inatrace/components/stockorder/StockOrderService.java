@@ -785,22 +785,21 @@ public class StockOrderService extends BaseService {
                     });
                 }
 
-                // next recursion for every child element
-                if (inputStockOrders.get(0).getSacNumber() != null) {
+                if (!inputStockOrders.isEmpty()) {
+                    // next recursion for every child element
+                    if (inputStockOrders.get(0).getSacNumber() != null) {
 
-                    // if sac number present, proceed with only first item leaves
-                    historyTimeline.addAll(
-                            addNextAggregationLevels(currentDepth + 1, inputStockOrders.get(0), language, userId));
-                } else if (OrderType.TRANSFER_ORDER.equals(inputStockOrders.get(0).getOrderType())) {
+                        // if sac number present, proceed with only first item leaves
+                        historyTimeline.addAll(addNextAggregationLevels(currentDepth + 1, inputStockOrders.get(0), language, userId));
+                    } else if (OrderType.TRANSFER_ORDER.equals(inputStockOrders.get(0).getOrderType())) {
 
-                    // if transfer order, go through with first item leaves
-                    historyTimeline.addAll(
-                            addNextAggregationLevels(currentDepth + 1, inputStockOrders.get(0), language, userId));
-                } else {
+                        // if transfer order, go through with first item leaves
+                        historyTimeline.addAll(addNextAggregationLevels(currentDepth + 1, inputStockOrders.get(0), language, userId));
+                    } else {
 
-                    // proceed recursion with all leaves
-                    inputStockOrders.forEach(sourceOrder -> historyTimeline.addAll(
-                            addNextAggregationLevels(currentDepth + 1, sourceOrder, language, userId)));
+                        // proceed recursion with all leaves
+                        inputStockOrders.forEach(sourceOrder -> historyTimeline.addAll(addNextAggregationLevels(currentDepth + 1, sourceOrder, language, userId)));
+                    }
                 }
 
             } else {
