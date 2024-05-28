@@ -391,6 +391,15 @@ public class CompanyService extends BaseService {
 			}
 		}
 
+		// Add the company as default cooperative
+		userCustomer.setCooperatives(new ArrayList<>());
+		UserCustomerCooperative userCustomerCooperative = new UserCustomerCooperative();
+		userCustomerCooperative.setCompany(company);
+		userCustomerCooperative.setRole(apiUserCustomer.getType());
+		userCustomerCooperative.setUserCustomer(userCustomer);
+		userCustomer.getCooperatives().add(userCustomerCooperative);
+		em.persist(userCustomerCooperative);
+
 		// Set associations
 		userCustomer.setAssociations(new ArrayList<>());
 		if (apiUserCustomer.getAssociations() != null) {
@@ -400,19 +409,6 @@ public class CompanyService extends BaseService {
 				userCustomerAssociation.setUserCustomer(userCustomer);
 				userCustomer.getAssociations().add(userCustomerAssociation);
 				em.persist(userCustomerAssociation);
-			}
-		}
-
-		// Set cooperatives
-		userCustomer.setCooperatives(new ArrayList<>());
-		if (apiUserCustomer.getCooperatives() != null) {
-			for (ApiUserCustomerCooperative apiUserCustomerCooperative : apiUserCustomer.getCooperatives()) {
-				UserCustomerCooperative userCustomerCooperative = new UserCustomerCooperative();
-				userCustomerCooperative.setCompany(em.find(Company.class, apiUserCustomerCooperative.getCompany().getId()));
-				userCustomerCooperative.setRole(apiUserCustomerCooperative.getUserCustomerType());
-				userCustomerCooperative.setUserCustomer(userCustomer);
-				userCustomer.getCooperatives().add(userCustomerCooperative);
-				em.persist(userCustomerCooperative);
 			}
 		}
 

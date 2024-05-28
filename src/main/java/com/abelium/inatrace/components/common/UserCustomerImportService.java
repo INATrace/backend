@@ -6,9 +6,7 @@ import com.abelium.inatrace.components.common.api.ApiUserCustomerImportResponse;
 import com.abelium.inatrace.components.company.CompanyService;
 import com.abelium.inatrace.components.company.api.ApiAddress;
 import com.abelium.inatrace.components.company.api.ApiUserCustomer;
-import com.abelium.inatrace.components.company.api.ApiUserCustomerAssociation;
 import com.abelium.inatrace.components.company.api.ApiUserCustomerLocation;
-import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.product.ProductTypeMapper;
 import com.abelium.inatrace.components.product.api.ApiBankInformation;
 import com.abelium.inatrace.components.product.api.ApiFarmInformation;
@@ -17,7 +15,6 @@ import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.db.entities.codebook.ProductType;
 import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.common.Document;
-import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Gender;
 import com.abelium.inatrace.types.Language;
@@ -36,7 +33,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Lazy
@@ -80,98 +79,83 @@ public class UserCustomerImportService extends BaseService {
         }
 
         while (true) {
+
             Row row = mainSheet.getRow(rowIndex);
+
             if (emptyRow(row)) {
                 break;
             }
+
             if (validRow(row)) {
+
                 ApiUserCustomer apiUserCustomer = new ApiUserCustomer();
-
-                // Bank info
-                apiUserCustomer.setBank(new ApiBankInformation());
-                apiUserCustomer.getBank().setAccountHolderName(getStringOrNumeric(row.getCell(31)));
-                apiUserCustomer.getBank().setAccountNumber(getStringOrNumeric(row.getCell(30)));
-                apiUserCustomer.getBank().setAdditionalInformation(getStringOrNumeric(row.getCell(33)));
-                apiUserCustomer.getBank().setBankName(getStringOrNumeric(row.getCell(32)));
-
                 apiUserCustomer.setCompanyId(companyId);
-                apiUserCustomer.setEmail(getString(row.getCell(17)));
+                apiUserCustomer.setType(UserCustomerType.FARMER);
+                apiUserCustomer.setProductTypes(companyProductTypes);
+
+                // ID (company-internal)
+                apiUserCustomer.setFarmerCompanyInternalId(getStringOrNumeric(row.getCell(0)));
+
+                // Personal data (name, surname, email, phone, etc.)
+                apiUserCustomer.setSurname(getString(row.getCell(1)));
+                apiUserCustomer.setName(getString(row.getCell(2)));
+                apiUserCustomer.setGender(getGender(row.getCell(16)));
+                apiUserCustomer.setPhone(getStringOrNumeric(row.getCell(17)));
+                apiUserCustomer.setEmail(getStringOrNumeric(row.getCell(18)));
+                apiUserCustomer.setHasSmartphone(getBoolean(row.getCell(19)));
+
+                // Address data - location info
+                apiUserCustomer.setLocation(new ApiUserCustomerLocation());
+                apiUserCustomer.getLocation().setAddress(new ApiAddress());
+                apiUserCustomer.getLocation().getAddress().setVillage(getString(row.getCell(3)));
+                apiUserCustomer.getLocation().getAddress().setCell(getString(row.getCell(4)));
+                apiUserCustomer.getLocation().getAddress().setSector(getString(row.getCell(5)));
+                apiUserCustomer.getLocation().getAddress().setHondurasFarm(getString(row.getCell(6)));
+                apiUserCustomer.getLocation().getAddress().setHondurasVillage(getString(row.getCell(7)));
+                apiUserCustomer.getLocation().getAddress().setHondurasMunicipality(getString(row.getCell(8)));
+                apiUserCustomer.getLocation().getAddress().setHondurasDepartment(getString(row.getCell(9)));
+                apiUserCustomer.getLocation().getAddress().setAddress(getString(row.getCell(10)));
+                apiUserCustomer.getLocation().getAddress().setCity(getString(row.getCell(11)));
+                apiUserCustomer.getLocation().getAddress().setState(getString(row.getCell(12)));
+                apiUserCustomer.getLocation().getAddress().setZip(getStringOrNumeric(row.getCell(13)));
+                apiUserCustomer.getLocation().getAddress().setOtherAddress(getString(row.getCell(14)));
+                apiUserCustomer.getLocation().getAddress().setCountry(CommonApiTools.toApiCountry(getCountryByCode(getString(row.getCell(15)))));
+                apiUserCustomer.getLocation().getAddress().getCountry().setCode(getString(row.getCell(15)));
 
                 // Farm info
                 apiUserCustomer.setFarm(new ApiFarmInformation());
-                apiUserCustomer.getFarm().setAreaOrganicCertified(getNumericBigDecimal(row.getCell(28)));
-                apiUserCustomer.getFarm().setAreaUnit(getString(row.getCell(21)));
-
                 apiUserCustomer.getFarm().setFarmPlantInformationList(new ArrayList<>());
+                apiUserCustomer.getFarm().setAreaUnit(getString(row.getCell(22)));
+                apiUserCustomer.getFarm().setTotalCultivatedArea(getNumericBigDecimal(row.getCell(23)));
 
-                // Farm plant info for the first company's product type
                 ApiFarmPlantInformation apiPlant1Information = new ApiFarmPlantInformation();
                 apiPlant1Information.setProductType(companyProductTypes.get(0));
-                apiPlant1Information.setPlantCultivatedArea(getNumericBigDecimal(row.getCell(23)));
-                apiPlant1Information.setNumberOfPlants(getNumericInteger(row.getCell(24)));
+                apiPlant1Information.setPlantCultivatedArea(getNumericBigDecimal(row.getCell(24)));
+                apiPlant1Information.setNumberOfPlants(getNumericInteger(row.getCell(25)));
                 apiUserCustomer.getFarm().getFarmPlantInformationList().add(apiPlant1Information);
 
-                // Farm plant info for the second company's product type
                 if (hasSecondProductType && companyProductTypes.get(1) != null) {
                     ApiFarmPlantInformation apiPlant2Information = new ApiFarmPlantInformation();
                     apiPlant2Information.setProductType(companyProductTypes.get(1));
-                    apiPlant2Information.setPlantCultivatedArea(getNumericBigDecimal(row.getCell(25)));
-                    apiPlant2Information.setNumberOfPlants(getNumericInteger(row.getCell(26)));
+                    apiPlant2Information.setPlantCultivatedArea(getNumericBigDecimal(row.getCell(26)));
+                    apiPlant2Information.setNumberOfPlants(getNumericInteger(row.getCell(27)));
                     apiUserCustomer.getFarm().getFarmPlantInformationList().add(apiPlant2Information);
                 }
 
-                // Set product
-                apiUserCustomer.getFarm().setOrganic(getBoolean(row.getCell(27)));
-                apiUserCustomer.getFarm().setStartTransitionToOrganic(getDate(row.getCell(29)));
-                apiUserCustomer.getFarm().setTotalCultivatedArea(getNumericBigDecimal(row.getCell(22)));
-
-                apiUserCustomer.setFarmerCompanyInternalId(getStringOrNumeric(row.getCell(0)));
-                apiUserCustomer.setGender(getGender(row.getCell(15)));
-                apiUserCustomer.setHasSmartphone(getBoolean(row.getCell(18)));
-
-                // Location info
-                apiUserCustomer.setLocation(new ApiUserCustomerLocation());
-                apiUserCustomer.getLocation().setAddress(new ApiAddress());
-                apiUserCustomer.getLocation().getAddress().setAddress(getString(row.getCell(10)));
-                apiUserCustomer.getLocation().getAddress().setCell(getString(row.getCell(4)));
-                apiUserCustomer.getLocation().getAddress().setCity(getString(row.getCell(11)));
-
-                // Country data - specified by code
-                apiUserCustomer.getLocation().getAddress().setCountry(CommonApiTools.toApiCountry(getCountryByCode(getString(row.getCell(14)))));
-                apiUserCustomer.getLocation().getAddress().getCountry().setCode(getString(row.getCell(14)));
-                apiUserCustomer.getLocation().getAddress().setHondurasDepartment(getString(row.getCell(9)));
-                apiUserCustomer.getLocation().getAddress().setHondurasFarm(getString(row.getCell(6)));
-                apiUserCustomer.getLocation().getAddress().setHondurasMunicipality(getString(row.getCell(8)));
-                apiUserCustomer.getLocation().getAddress().setHondurasVillage(getString(row.getCell(7)));
-                apiUserCustomer.getLocation().getAddress().setSector(getString(row.getCell(5)));
-                apiUserCustomer.getLocation().getAddress().setState(getString(row.getCell(12)));
-                apiUserCustomer.getLocation().getAddress().setVillage(getString(row.getCell(3)));
-                apiUserCustomer.getLocation().getAddress().setZip(getStringOrNumeric(row.getCell(13)));
-                apiUserCustomer.setName(getString(row.getCell(2)));
-                apiUserCustomer.setPhone(getStringOrNumeric(row.getCell(16)));
-                apiUserCustomer.setSurname(getString(row.getCell(1)));
-                apiUserCustomer.setType(UserCustomerType.FARMER);
-
-                apiUserCustomer.setProductTypes(companyProductTypes);
-
-                // Member of associations
-                if (!emptyCell(row.getCell(20))) {
-                    String content = getString(row.getCell(20));
-                    if (content != null) {
-                        String[] names = content.split(",");
-                        List<ApiUserCustomerAssociation> apiUserCustomerAssociationList = new ArrayList<>();
-                        for (String name : names) {
-                            Company association = companyService.getAssociationByName(name);
-                            if (association != null) {
-                                ApiUserCustomerAssociation apiUserCustomerAssociation = new ApiUserCustomerAssociation();
-                                apiUserCustomerAssociation.setCompany(CompanyMapper.toApiCompanyBase(association));
-                                apiUserCustomerAssociation.setUserCustomer(apiUserCustomer);
-                                apiUserCustomerAssociationList.add(apiUserCustomerAssociation);
-                            }
-                        }
-                        apiUserCustomer.setAssociations(apiUserCustomerAssociationList);
-                    }
+                apiUserCustomer.getFarm().setOrganic(getBoolean(row.getCell(28)));
+                if (apiUserCustomer.getFarm().getOrganic() == null) {
+                    apiUserCustomer.getFarm().setOrganic(false);
                 }
+
+                apiUserCustomer.getFarm().setAreaOrganicCertified(getNumericBigDecimal(row.getCell(29)));
+                apiUserCustomer.getFarm().setStartTransitionToOrganic(getDate(row.getCell(30)));
+
+                // Bank info
+                apiUserCustomer.setBank(new ApiBankInformation());
+                apiUserCustomer.getBank().setAccountNumber(getStringOrNumeric(row.getCell(31)));
+                apiUserCustomer.getBank().setAccountHolderName(getStringOrNumeric(row.getCell(32)));
+                apiUserCustomer.getBank().setBankName(getStringOrNumeric(row.getCell(33)));
+                apiUserCustomer.getBank().setAdditionalInformation(getStringOrNumeric(row.getCell(34)));
 
                 if (companyService.existsUserCustomer(apiUserCustomer)) {
                     duplicates.add(apiUserCustomer);
@@ -205,7 +189,7 @@ public class UserCustomerImportService extends BaseService {
         Row row = xssfSheet.getRow(rowIndex);
 
         // check for 25th cell if second product type is specified with title
-        int colIndex = 25;
+        int colIndex = 26;
 
         return !emptyCell(row.getCell(colIndex));
     }
@@ -258,30 +242,31 @@ public class UserCustomerImportService extends BaseService {
                 validCell(row.getCell(7), List.of(CellType.STRING)) &&                      // Aldea
                 validCell(row.getCell(8), List.of(CellType.STRING)) &&                      // Municipio
                 validCell(row.getCell(9), List.of(CellType.STRING)) &&                      // Departamento
-                validCell(row.getCell(10), List.of(CellType.STRING)) &&                     // Address
-                validCell(row.getCell(11), List.of(CellType.STRING)) &&                     // City
-                validCell(row.getCell(12), List.of(CellType.STRING)) &&                     // State
-                validCell(row.getCell(13), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Zip
-                validCell(row.getCell(14), CellType.STRING) &&                              // Country
-                validCell(row.getCell(15), CellType.STRING) &&                              // Gender
-                validCell(row.getCell(16), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Phone number
-                validCell(row.getCell(17), List.of(CellType.STRING)) &&                     // E-mail
-                validCell(row.getCell(18), List.of(CellType.STRING)) &&                     // Smartphone
-                validCell(row.getCell(19), List.of(CellType.STRING)) &&                     // Supplier of
-                validCell(row.getCell(20), List.of(CellType.STRING)) &&                     // Member of associations
-                validCell(row.getCell(21), List.of(CellType.STRING)) &&                     // Area unit
-                validCell(row.getCell(22), List.of(CellType.NUMERIC)) &&                    // Total cultivated area
-                validCell(row.getCell(23), List.of(CellType.NUMERIC)) &&                    // Area cultivated with first plant
-                validCell(row.getCell(24), List.of(CellType.NUMERIC)) &&                    // Number of (first plant) trees
-                validCell(row.getCell(25), List.of(CellType.NUMERIC)) &&                    // Area cultivated with second plant
-                validCell(row.getCell(26), List.of(CellType.NUMERIC)) &&                    // Number of (second plant) trees
-                validCell(row.getCell(27), List.of(CellType.STRING)) &&                     // Organic production (EU)
-                validCell(row.getCell(28), List.of(CellType.NUMERIC)) &&                    // Area organic certified
-                validCell(row.getCell(29), List.of(CellType.NUMERIC)) &&                    // Start date of transitioning to organic
-                validCell(row.getCell(30), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Account number
-                validCell(row.getCell(31), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Account holder's name
-                validCell(row.getCell(32), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Bank name
-                validCell(row.getCell(33), List.of(CellType.STRING, CellType.NUMERIC));     // Additional information
+                validCell(row.getCell(10), List.of(CellType.STRING)) &&                     // Street Address
+                validCell(row.getCell(11), List.of(CellType.STRING)) &&                     // City / Town / Village
+                validCell(row.getCell(12), List.of(CellType.STRING)) &&                     // State / Province / Region
+                validCell(row.getCell(13), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Zip / Postal Code / P.O. Box
+                validCell(row.getCell(14), List.of(CellType.STRING)) &&                     // Additional / Other address
+                validCell(row.getCell(15), CellType.STRING) &&                              // Country
+                validCell(row.getCell(16), CellType.STRING) &&                              // Gender
+                validCell(row.getCell(17), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Phone number
+                validCell(row.getCell(18), List.of(CellType.STRING)) &&                     // E-mail
+                validCell(row.getCell(19), List.of(CellType.STRING)) &&                     // Smartphone
+                validCell(row.getCell(20), List.of(CellType.STRING)) &&                     // Supplier of
+                validCell(row.getCell(21), List.of(CellType.STRING)) &&                     // Member of associations
+                validCell(row.getCell(22), List.of(CellType.STRING)) &&                     // Area unit
+                validCell(row.getCell(23), List.of(CellType.NUMERIC)) &&                    // Total cultivated area
+                validCell(row.getCell(24), List.of(CellType.NUMERIC)) &&                    // Area cultivated with first plant
+                validCell(row.getCell(25), List.of(CellType.NUMERIC)) &&                    // Number of (first plant) trees
+                validCell(row.getCell(26), List.of(CellType.NUMERIC)) &&                    // Area cultivated with second plant
+                validCell(row.getCell(27), List.of(CellType.NUMERIC)) &&                    // Number of (second plant) trees
+                validCell(row.getCell(28), List.of(CellType.STRING)) &&                     // Organic production (EU)
+                validCell(row.getCell(29), List.of(CellType.NUMERIC)) &&                    // Area organic certified
+                validCell(row.getCell(30), List.of(CellType.NUMERIC)) &&                    // Start date of transitioning to organic
+                validCell(row.getCell(31), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Account number
+                validCell(row.getCell(32), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Account holder's name
+                validCell(row.getCell(33), List.of(CellType.STRING, CellType.NUMERIC)) &&   // Bank name
+                validCell(row.getCell(34), List.of(CellType.STRING, CellType.NUMERIC));     // Additional information
     }
 
     private boolean validCell(Cell cell, List<CellType> cellTypeList) {
