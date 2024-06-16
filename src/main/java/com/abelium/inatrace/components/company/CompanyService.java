@@ -728,6 +728,10 @@ public class CompanyService extends BaseService {
 	}
 
 	private String generatePlotGeoID(List<PlotCoordinate> coordinates) {
+		
+		if (coordinates.isEmpty() || coordinates.size() < 3) {
+			return null;
+		}
 
 		try {
 			fixCoordinatesForApiCall(coordinates);

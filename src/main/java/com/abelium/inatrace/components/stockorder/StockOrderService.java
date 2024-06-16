@@ -1422,43 +1422,84 @@ public class StockOrderService extends BaseService {
 
         // Convert plot values into GeoJson coordinates
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode root = mapper.createObjectNode();
-        root.set("type", mapper.convertValue("Feature", JsonNode.class));
+        
+        // FeatureCollection, combines Multipoint feature and Multipolygon feature
+        ObjectNode rootFeatureCollection = mapper.createObjectNode();
+        rootFeatureCollection.set("type", mapper.convertValue("FeatureCollection", JsonNode.class));
+        
+        // Multi points
+        ObjectNode rootMultiPoint = mapper.createObjectNode();
+        rootMultiPoint.set("type", mapper.convertValue("Feature", JsonNode.class));
+        
+        ObjectNode geometryMultiPoint = mapper.createObjectNode();
+        geometryMultiPoint.set("type", mapper.convertValue("MultiPoint", JsonNode.class));
+        rootMultiPoint.set("geometry", geometryMultiPoint);
 
-        ObjectNode geometry = mapper.createObjectNode();
-        geometry.set("type", mapper.convertValue("MultiPolygon", JsonNode.class));
-        root.set("geometry", geometry);
+        List<List<Double>> pointCoordinatesList = new ArrayList<>();
+        plotList.forEach(plot -> {
+            // if point (less than 3 coordinates)
+            if (!plot.getCoordinates().isEmpty() && plot.getCoordinates().size() < 3) {
+                plot.getCoordinates().forEach(plotCoordinate -> {
+                    List<Double> cList = new ArrayList<>();
+                    cList.add(plotCoordinate.getLongitude());
+                    cList.add(plotCoordinate.getLatitude());
+                    pointCoordinatesList.add(cList);
+                });
+            }
+        });
+
+        geometryMultiPoint.set("coordinates", mapper.convertValue(pointCoordinatesList, JsonNode.class));
+        rootMultiPoint.set("properties",mapper.createObjectNode());
+        
+        // Multi polygon
+        ObjectNode rootMultiPolygon = mapper.createObjectNode();
+        rootMultiPolygon.set("type", mapper.convertValue("Feature", JsonNode.class));
+
+        ObjectNode geometryMultiPolygon = mapper.createObjectNode();
+        geometryMultiPolygon.set("type", mapper.convertValue("MultiPolygon", JsonNode.class));
+        rootMultiPolygon.set("geometry", geometryMultiPolygon);
 
         List<List<List<List<Double>>>> plotCoordinatesList = new ArrayList<>();
         plotList.forEach(plot -> {
-            List<List<List<Double>>> plotCoordinatesListArray = new ArrayList<>();
-            List<List<Double>> coordinatesList = new ArrayList<>();
-            plot.getCoordinates().forEach(plotCoordinate -> {
-                List<Double> cList = new ArrayList<>();
-                cList.add(plotCoordinate.getLongitude());
-                cList.add(plotCoordinate.getLatitude());
-                coordinatesList.add(cList);
-            });
+            // if polygon (more than 3 coordinates)
+            if (!plot.getCoordinates().isEmpty() && plot.getCoordinates().size() > 2) {
+                List<List<List<Double>>> plotCoordinatesListArray = new ArrayList<>();
+                List<List<Double>> coordinatesList = new ArrayList<>();
 
-            // polygons must follow right-hand rule (counter-clockwise)
-            if (!isPolygonCounterClockwise(coordinatesList)) {
-                Collections.reverse(coordinatesList);
-            }
+                plot.getCoordinates().forEach(plotCoordinate -> {
+                    List<Double> cList = new ArrayList<>();
+                    cList.add(plotCoordinate.getLongitude());
+                    cList.add(plotCoordinate.getLatitude());
+                    coordinatesList.add(cList);
+                });
 
-            if (!coordinatesList.get(0).equals(coordinatesList.get(coordinatesList.size()-1))) {
-                // add first as last
-                coordinatesList.add(coordinatesList.get(0));
+                // polygons must follow right-hand rule (counter-clockwise)
+                if (!isPolygonCounterClockwise(coordinatesList)) {
+                    Collections.reverse(coordinatesList);
+                }
+
+                if (!coordinatesList.get(0).equals(coordinatesList.get(coordinatesList.size() - 1))) {
+                    // add first as last
+                    coordinatesList.add(coordinatesList.get(0));
+                }
+                plotCoordinatesListArray.add(coordinatesList);
+                plotCoordinatesList.add(plotCoordinatesListArray);
             }
-            plotCoordinatesListArray.add(coordinatesList);
-            plotCoordinatesList.add(plotCoordinatesListArray);
         });
 
-        geometry.set("coordinates", mapper.convertValue(plotCoordinatesList, JsonNode.class));
+        geometryMultiPolygon.set("coordinates", mapper.convertValue(plotCoordinatesList, JsonNode.class));
 
-        root.set("properties",mapper.createObjectNode());
+        rootMultiPolygon.set("properties",mapper.createObjectNode());
+        
+        // combine MultiPolygon and Multipoint features
+        List<ObjectNode> featureList = new ArrayList<>();
+        featureList.add(rootMultiPoint);
+        featureList.add(rootMultiPolygon);
+        
+        rootFeatureCollection.set("features", mapper.convertValue(featureList, JsonNode.class));
 
         try {
-           return mapper.writer().writeValueAsBytes(root);
+           return mapper.writer().writeValueAsBytes(rootFeatureCollection);
         } catch (JsonProcessingException e) {
             logger.error("Error while generating geoJson file", e);
             throw new ApiException(ApiStatus.ERROR, "Error while generating geojson file");
