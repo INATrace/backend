@@ -1,19 +1,17 @@
 package com.abelium.inatrace.tools;
 
+import com.abelium.inatrace.api.ApiPaginatedList;
+import com.abelium.inatrace.api.ApiPaginatedRequest;
+import com.abelium.inatrace.types.PaginatedRequestType;
+import org.torpedoquery.jpa.Torpedo;
+
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaQuery;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaQuery;
-
-import org.torpedoquery.jpa.Torpedo;
-
-import com.abelium.inatrace.api.ApiPaginatedList;
-import com.abelium.inatrace.api.ApiPaginatedRequest;
-import com.abelium.inatrace.types.PaginatedRequestType;
 
 
 public class PaginationTools 
@@ -82,24 +80,6 @@ public class PaginationTools
         return new ApiPaginatedList<>(items, count);
     }
     
-    
-	//    public static <T> ApiPaginatedList<T> createPaginatedResponse(List<T> values, ApiPaginatableQueryStringRequest request) {
-	//        List<T> items;
-	//        long count;
-	//        
-	//        if (request.requestType == PaginatedRequestType .COUNT) {
-	//            items = Collections.emptyList();
-	//        } else {
-	//            items = values;
-	//        }
-	//        if (request.requestType == PaginatedRequestType .FETCH) {
-	//            count = 0;
-	//        } else {
-	//            count = items.size();
-	//        }
-	//        return new ApiPaginatedList<>(values, count);
-	//    }
-    
     public static <DBT, APIT> ApiPaginatedList<APIT> createPaginatedResponse(EntityManager em, ApiPaginatedRequest request,
             CriteriaQuery<DBT> query, CriteriaQuery<Long> queryCount, Function<DBT, APIT> typeConverter) {
         List<APIT> items;
@@ -119,30 +99,5 @@ public class PaginationTools
         }
         return new ApiPaginatedList<>(items, count);
     }
-    
-	//    public static <T extends Enum<T> & HasLabel> ApiPaginatedList<ApiEnumWithLabel<T>> createPaginatedEnumResponse(Class<T> clazz, ApiPaginatableQueryStringRequest request) {
-	//        List<T> values = Arrays.asList(clazz.getEnumConstants());
-	//        return createPaginatedEnumResponse(values, request);
-	//    }
-	//    
-	//    public static <T extends Enum<T> & HasLabel> ApiPaginatedList<ApiEnumWithLabel<T>> createPaginatedEnumResponse(List<T> values, ApiPaginatableQueryStringRequest request) {        
-	//        if (StringUtils.isNotBlank(request.queryString)) {
-	//            values = values.stream().filter(v -> StringUtils.containsIgnoreCase(v.label(), request.queryString)).
-	//                collect(Collectors.toList());
-	//        }
-	//        if (request.sortBy == GeneralSortBy.NAME) {
-	//            if (request.sort == SortDirection.ASC) { 
-	//                values.sort((s1, s2) -> s1.compareTo(s2));
-	//            } else {
-	//                values.sort((s1, s2) -> s2.compareTo(s1));
-	//            }
-	//        }
-	//        List<ApiEnumWithLabel<T>> items = values.stream().
-	//                skip(request.offset).
-	//                limit(request.limit).
-	//                map(ApiEnumWithLabel::new).
-	//                collect(Collectors.toList());
-	//        return new ApiPaginatedList<>(items, items.size());
-	//    }
     
 }

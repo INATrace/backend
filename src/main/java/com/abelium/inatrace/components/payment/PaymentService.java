@@ -24,15 +24,26 @@ import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+import com.abelium.inatrace.tools.TranslateTools;
+import com.abelium.inatrace.types.Language;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
 import org.torpedoquery.jpa.Torpedo;
 
 import javax.transaction.Transactional;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 /**
  * Service for payment entity.
@@ -49,13 +60,17 @@ public class PaymentService extends BaseService {
 
 	private final StockOrderService stockOrderService;
 
+	private final MessageSource messageSource;
+
 	@Autowired
 	public PaymentService(UserService userService,
-						  CompanyQueries companyQueries,
-						  StockOrderService stockOrderService) {
+	                      CompanyQueries companyQueries,
+	                      StockOrderService stockOrderService,
+	                      MessageSource messageSource) {
 		this.userService = userService;
 		this.companyQueries = companyQueries;
 		this.stockOrderService = stockOrderService;
+		this.messageSource = messageSource;
 	}
 
 	public ApiPayment getPayment(Long id, CustomUserDetails user) throws ApiException {
@@ -95,6 +110,119 @@ public class PaymentService extends BaseService {
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> paymentQueryObject(
 				request, queryRequest), payment -> PaymentMapper.toApiPayment(payment, user.getUserId()));
+	}
+
+	public byte[] exportPaymentsByCompany(CustomUserDetails authUser, Long companyId, Language language) throws IOException, ApiException {
+
+		// Get the payments list
+		ApiPaginatedRequest request = new ApiPaginatedRequest();
+		request.setLimit(10000);
+
+		List<ApiPayment> payments = getPaymentList(request, new PaymentQueryRequest(companyId), authUser).items;
+
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+
+			// Create date cell style
+			CellStyle dateCellStyle = workbook.createCellStyle();
+			dateCellStyle.setDataFormat((short) 14);
+
+			// Create Excel sheet
+			XSSFSheet sheet = workbook.createSheet(TranslateTools.getTranslatedValue(
+					messageSource, "export.payments.sheet.name", language
+			));
+
+			// Prepare the header
+			Row headerRow = sheet.createRow(0);
+			headerRow.createCell(0, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+					messageSource, "export.payments.column.paymentPurposeType.label", language
+			));
+			headerRow.createCell(1, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+					messageSource, "export.payments.column.amount.label", language
+			));
+			headerRow.createCell(2, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+					messageSource, "export.payments.column.currency.label", language
+			));
+			headerRow.createCell(3, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+					messageSource, "export.payments.column.farmerName.label", language
+			));
+			headerRow.createCell(4, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+					messageSource, "export.payments.column.companyName.label", language
+			));
+			headerRow.createCell(5, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+					messageSource, "export.payments.column.deliveryDate.label", language
+			));
+			headerRow.createCell(6, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+					messageSource, "export.payments.column.paymentDate.label", language
+			));
+			headerRow.createCell(7, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+					messageSource, "export.payments.column.preferredWayOfPayment.label", language
+			));
+			headerRow.createCell(8, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+					messageSource, "export.payments.column.receiptNumber.label", language
+			));
+
+			int rowNum = 1;
+			for (ApiPayment apiPayment : payments) {
+
+				Row row = sheet.createRow(rowNum++);
+
+				// Create payment purpose type column
+				row.createCell(0, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+						messageSource, "export.payments.column.paymentPurposeType.value." + apiPayment.getPaymentPurposeType().toString(), language
+				));
+				sheet.autoSizeColumn(0);
+
+				// Create amount column
+				row.createCell(1, CellType.NUMERIC).setCellValue(apiPayment.getAmount().doubleValue());
+				sheet.autoSizeColumn(1);
+
+				// Create currency column
+				row.createCell(2, CellType.STRING).setCellValue(apiPayment.getCurrency());
+				sheet.autoSizeColumn(2);
+
+				// Create farmer name column (cell is populated only recipient user customer is of type FARMER)
+				row.createCell(3, CellType.STRING);
+
+				// Create recipient company column
+				row.createCell(4, CellType.STRING);
+
+				// Depending on the recipient type (farmer of company) create the appropriate column
+				switch (apiPayment.getRecipientType()) {
+					case USER_CUSTOMER:
+						row.getCell(3).setCellValue(apiPayment.getRecipientUserCustomer().getName() + " " + apiPayment.getRecipientUserCustomer().getSurname());
+						sheet.autoSizeColumn(3);
+						break;
+					case COMPANY:
+						row.getCell(4).setCellValue(apiPayment.getRecipientCompany().getName());
+						sheet.autoSizeColumn(4);
+				}
+
+				// Create delivery date column
+				row.createCell(5, CellType.NUMERIC).setCellValue(apiPayment.getProductionDate());
+				row.getCell(5).setCellStyle(dateCellStyle);
+				sheet.autoSizeColumn(5);
+
+				// Create payment date column
+				row.createCell(6, CellType.NUMERIC).setCellValue(apiPayment.getFormalCreationTime());
+				row.getCell(6).setCellStyle(dateCellStyle);
+				sheet.autoSizeColumn(6);
+
+				// Create preferred way of payment column
+				row.createCell(7, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+						messageSource, "export.payments.column.preferredWayOfPayment.value." + apiPayment.getPreferredWayOfPayment().toString(), language
+				));
+				sheet.autoSizeColumn(7);
+
+				// Create receipt number column
+				row.createCell(8, CellType.STRING).setCellValue(apiPayment.getReceiptNumber());
+				sheet.autoSizeColumn(8);
+			}
+
+			workbook.write(byteArrayOutputStream);
+		}
+
+		return byteArrayOutputStream.toByteArray();
 	}
 
 	private Payment paymentQueryObject(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {
@@ -162,6 +290,66 @@ public class PaymentService extends BaseService {
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> bulkPaymentQueryObject(
 				request, queryRequest), bulkPayment -> BulkPaymentMapper.toApiBulkPaymentBase(bulkPayment, user.getUserId()));
+	}
+
+	public byte[] exportBulkPaymentsByCompany(CustomUserDetails authUser, Long companyId, Language language) throws IOException, ApiException {
+
+		ApiPaginatedRequest request = new ApiPaginatedRequest();
+		request.setLimit(10000);
+
+		List<ApiBulkPayment> bulkPayments = listBulkPayments(request, new PaymentQueryRequest(companyId), authUser).items;
+
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+
+			// Create Excel sheet
+			XSSFSheet sheet = workbook.createSheet(TranslateTools.getTranslatedValue(
+					messageSource, "export.bulkPayments.sheet.name", language
+			));
+
+			// Prepare the header
+			Row headerRow = sheet.createRow(0);
+			headerRow.createCell(0, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+					messageSource, "export.bulkPayments.column.paymentPurposeType.label", language
+			));
+			headerRow.createCell(1, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+					messageSource, "export.bulkPayments.column.receiptNumber.label", language
+			));
+			headerRow.createCell(2, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+					messageSource, "export.bulkPayments.column.totalAmount.label", language
+			));
+			headerRow.createCell(3, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+					messageSource, "export.bulkPayments.column.currency.label", language
+			));
+
+			int rowNum = 1;
+			for (ApiBulkPayment apiBulkPayment : bulkPayments) {
+
+				Row row = sheet.createRow(rowNum++);
+
+				// Create payment purpose type column
+				row.createCell(0, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+						messageSource, "export.payments.column.paymentPurposeType.value." + apiBulkPayment.getPaymentPurposeType().toString(), language
+				));
+				sheet.autoSizeColumn(0);
+
+				// Create receipt number column
+				row.createCell(1, CellType.STRING).setCellValue(apiBulkPayment.getReceiptNumber());
+				sheet.autoSizeColumn(1);
+
+				// Create total amount column
+				row.createCell(2, CellType.NUMERIC).setCellValue(apiBulkPayment.getTotalAmount().doubleValue());
+				sheet.autoSizeColumn(2);
+
+				// Create bulk payment currency column
+				row.createCell(3, CellType.STRING).setCellValue(apiBulkPayment.getCurrency());
+				sheet.autoSizeColumn(3);
+			}
+
+			workbook.write(byteArrayOutputStream);
+		}
+
+		return byteArrayOutputStream.toByteArray();
 	}
 
 	private BulkPayment bulkPaymentQueryObject(ApiPaginatedRequest request, PaymentQueryRequest queryRequest) {

@@ -559,9 +559,9 @@ public class DashboardService extends BaseService {
 
             List<String> headerRecord = new ArrayList<>();
 
-            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.date", language));
-            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.totalQuantity", language));
-            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.measuringUnit", language));
+            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.date", language));
+            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.totalQuantity", language));
+            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.measuringUnit", language));
 
             // Add additional  filters
             headerRecord.addAll(additionalFilters.keySet());
@@ -597,11 +597,11 @@ public class DashboardService extends BaseService {
         Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request, language);
 
         List<String> headerCells = new ArrayList<>();
-        headerCells.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.date", language));
+        headerCells.add(TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.date", language));
         headerCells.add(
-                TranslateTools.getTranslatedValue(messageSource, "export.column.label.totalQuantity", language));
+                TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.totalQuantity", language));
         headerCells.add(
-                TranslateTools.getTranslatedValue(messageSource, "export.column.label.measuringUnit", language));
+                TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.measuringUnit", language));
         headerCells.addAll(additionalFilters.keySet());
 
         PdfPTable table = new PdfPTable(headerCells.size());
@@ -653,16 +653,16 @@ public class DashboardService extends BaseService {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet(
-                    TranslateTools.getTranslatedValue(messageSource, "export.sheet.name.deliveries", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.sheet.name.deliveries", language));
 
             // generate header
             Row headerRow = sheet.createRow(0);
             headerRow.createCell(0, CellType.STRING).setCellValue(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.date", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.date", language));
             headerRow.createCell(1, CellType.STRING).setCellValue(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.totalQuantity", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.totalQuantity", language));
             headerRow.createCell(2, CellType.STRING).setCellValue(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.measuringUnit", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.measuringUnit", language));
 
             int headerColumnIndex = 3;
             // additional selected filters
@@ -712,14 +712,14 @@ public class DashboardService extends BaseService {
 
             List<String> headerRecord = new ArrayList<>();
 
-            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.date", language));
+            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.date", language));
             headerRecord.add(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.inputQuantity", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.inputQuantity", language));
             headerRecord.add(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.outputQuantity", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.outputQuantity", language));
             headerRecord.add(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.measuringUnit", language));
-            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.ratio", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.measuringUnit", language));
+            headerRecord.add(TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.ratio", language));
 
             // Add additional  filters
             headerRecord.addAll(additionalFilters.keySet());
@@ -757,14 +757,14 @@ public class DashboardService extends BaseService {
         Map<String, String> additionalFilters = createAdditionalFiltersFromRequest(request, language);
 
         List<String> headerCells = new ArrayList<>();
-        headerCells.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.date", language));
+        headerCells.add(TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.date", language));
         headerCells.add(
-                TranslateTools.getTranslatedValue(messageSource, "export.column.label.inputQuantity", language));
+                TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.inputQuantity", language));
         headerCells.add(
-                TranslateTools.getTranslatedValue(messageSource, "export.column.label.outputQuantity", language));
+                TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.outputQuantity", language));
         headerCells.add(
-                TranslateTools.getTranslatedValue(messageSource, "export.column.label.measuringUnit", language));
-        headerCells.add(TranslateTools.getTranslatedValue(messageSource, "export.column.label.ratio", language));
+                TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.measuringUnit", language));
+        headerCells.add(TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.ratio", language));
         headerCells.addAll(additionalFilters.keySet());
 
         PdfPTable table = new PdfPTable(headerCells.size());
@@ -815,21 +815,21 @@ public class DashboardService extends BaseService {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet(
-                    TranslateTools.getTranslatedValue(messageSource, "export.sheet.name.processingPerformance",
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.sheet.name.processingPerformance",
                             language));
 
             // generate header
             Row headerRow = sheet.createRow(0);
             headerRow.createCell(0, CellType.STRING).setCellValue(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.date", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.date", language));
             headerRow.createCell(1, CellType.STRING).setCellValue(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.inputQuantity", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.inputQuantity", language));
             headerRow.createCell(2, CellType.STRING).setCellValue(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.outputQuantity", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.outputQuantity", language));
             headerRow.createCell(3, CellType.STRING).setCellValue(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.measuringUnit", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.measuringUnit", language));
             headerRow.createCell(4, CellType.STRING).setCellValue(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.ratio", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.ratio", language));
 
             int headerColumnIndex = 5;
             // additional selected filters
@@ -877,7 +877,7 @@ public class DashboardService extends BaseService {
 
         if (queryRequest.getCompanyId() != null) {
             additionalFiltersMap.put(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.company", language),
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.company", language),
                     getCompanyTranslationName(queryRequest.getCompanyId(), language));
         }
         if (queryRequest.getFacilityIds() != null) {
@@ -891,41 +891,41 @@ public class DashboardService extends BaseService {
             }
 
             additionalFiltersMap.put(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.facilities", language),
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.facilities", language),
                     facilities);
         }
         if (queryRequest.getFarmerId() != null) {
             UserCustomer userCustomer = Queries.get(em, UserCustomer.class, queryRequest.getFarmerId());
             additionalFiltersMap.put(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.farmer", language),
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.farmer", language),
                     userCustomer.getName() + " " + userCustomer.getSurname());
         }
         if (queryRequest.getRepresentativeOfProducerUserCustomerId() != null) {
             UserCustomer representativeCustomer = Queries.get(em, UserCustomer.class,
                     queryRequest.getRepresentativeOfProducerUserCustomerId());
             additionalFiltersMap.put(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.collector", language),
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.collector", language),
                     representativeCustomer.getName() + " " + representativeCustomer.getSurname());
         }
         if (queryRequest.getSemiProductId() != null) {
             additionalFiltersMap.put(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.semiProduct", language),
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.semiProduct", language),
                     getSemiProductTranslationName(queryRequest.getSemiProductId(), language));
         }
         if (queryRequest.getOrganicOnly() != null && queryRequest.getOrganicOnly()) {
             additionalFiltersMap.put(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.organic", language),
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.value.yes", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.organic", language),
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.yes", language));
         }
         if (queryRequest.getWomenShare() != null && queryRequest.getWomenShare()) {
             additionalFiltersMap.put(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.womenOnly", language),
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.value.yes", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.womenOnly", language),
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.yes", language));
         }
         if (queryRequest.getPriceDeterminedLater() != null && queryRequest.getPriceDeterminedLater()) {
             additionalFiltersMap.put(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.productInDeposit", language),
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.value.yes", language));
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.productInDeposit", language),
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.yes", language));
         }
 
         return additionalFiltersMap;
@@ -942,17 +942,17 @@ public class DashboardService extends BaseService {
 
         if (queryRequest.getCompanyId() != null) {
             additionalFiltersMap.put(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.company", language),
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.company", language),
                     getCompanyTranslationName(queryRequest.getCompanyId(), language));
         }
         if (queryRequest.getFacilityId() != null) {
             additionalFiltersMap.put(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.facility", language),
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.facility", language),
                     getFacilityTranslationName(queryRequest.getFacilityId(), language));
         }
         if (queryRequest.getProcessActionId() != null) {
             additionalFiltersMap.put(
-                    TranslateTools.getTranslatedValue(messageSource, "export.column.label.process", language),
+                    TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.label.process", language),
                     getProcessingActionTranslationName(queryRequest.getProcessActionId(), language));
         }
         queryRequest.getEvidenceFields().forEach(evidenceField -> {
@@ -1196,7 +1196,7 @@ public class DashboardService extends BaseService {
      */
     private String translateWeek(String unit, Language language) {
         if (unit != null) {
-            return TranslateTools.getTranslatedValue(messageSource, "export.column.value.week", language) + "-" + unit;
+            return TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.week", language) + "-" + unit;
         }
         return null;
     }
@@ -1209,40 +1209,40 @@ public class DashboardService extends BaseService {
     private String translateMonth(String monthNum, Language language) {
         switch (monthNum) {
             case "1":
-                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.january", language)
+                return TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.january", language)
                         .substring(0, 3);
             case "2":
-                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.february", language)
+                return TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.february", language)
                         .substring(0, 3);
             case "3":
-                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.march", language)
+                return TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.march", language)
                         .substring(0, 3);
             case "4":
-                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.april", language)
+                return TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.april", language)
                         .substring(0, 3);
             case "5":
-                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.may", language)
+                return TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.may", language)
                         .substring(0, 3);
             case "6":
-                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.june", language)
+                return TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.june", language)
                         .substring(0, 3);
             case "7":
-                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.july", language)
+                return TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.july", language)
                         .substring(0, 3);
             case "8":
-                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.august", language)
+                return TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.august", language)
                         .substring(0, 3);
             case "9":
-                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.september", language)
+                return TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.september", language)
                         .substring(0, 3);
             case "10":
-                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.october", language)
+                return TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.october", language)
                         .substring(0, 3);
             case "11":
-                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.november", language)
+                return TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.november", language)
                         .substring(0, 3);
             case "12":
-                return TranslateTools.getTranslatedValue(messageSource, "export.column.value.december", language)
+                return TranslateTools.getTranslatedValue(messageSource, "export.dashboard.column.value.december", language)
                         .substring(0, 3);
             default:
                 return null;

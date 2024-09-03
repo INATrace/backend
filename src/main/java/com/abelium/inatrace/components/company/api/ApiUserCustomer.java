@@ -72,6 +72,10 @@ public class ApiUserCustomer extends ApiBaseEntity {
 	@Valid
 	public List<ApiProductType> productTypes;
 
+	@ApiModelProperty(value = "Plots in possession of the user customer (only applicable for type FARMER)", position = 16)
+	@Valid
+	public List<ApiPlot> plots;
+
 	public Long getCompanyId() {
 		return companyId;
 	}
@@ -199,4 +203,13 @@ public class ApiUserCustomer extends ApiBaseEntity {
 	public void setProductTypes(List<ApiProductType> productTypes) {
 		this.productTypes = productTypes;
 	}
+
+	public List<ApiPlot> getPlots() {
+		return plots;
+	}
+
+	public void setPlots(List<ApiPlot> plots) {
+		this.plots = plots;
+	}
+
 }

@@ -26,10 +26,7 @@ import com.abelium.inatrace.components.stockorder.mappers.StockOrderEvidenceType
 import com.abelium.inatrace.components.stockorder.mappers.StockOrderMapper;
 import com.abelium.inatrace.components.transaction.api.ApiTransaction;
 import com.abelium.inatrace.components.transaction.mappers.TransactionMapper;
-import com.abelium.inatrace.db.entities.common.ActivityProof;
-import com.abelium.inatrace.db.entities.common.Document;
-import com.abelium.inatrace.db.entities.common.User;
-import com.abelium.inatrace.db.entities.common.UserCustomer;
+import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.company.CompanyCertification;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
@@ -49,12 +46,23 @@ import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+import com.abelium.inatrace.tools.TranslateTools;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.ProductCompanyType;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
@@ -62,6 +70,8 @@ import org.torpedoquery.jpa.Torpedo;
 
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.ZoneOffset;
@@ -90,6 +100,8 @@ public class StockOrderService extends BaseService {
 
     private final CompanyQueries companyQueries;
 
+    private final MessageSource messageSource;
+
     @Autowired
     public StockOrderService(FacilityService facilityService,
                              ProcessingEvidenceFieldService procEvidenceFieldService,
@@ -97,7 +109,8 @@ public class StockOrderService extends BaseService {
                              SemiProductService semiProductService,
                              FinalProductService finalProductService,
                              CurrencyService currencyService,
-                             CompanyQueries companyQueries) {
+                             CompanyQueries companyQueries,
+                             MessageSource messageSource) {
         this.facilityService = facilityService;
         this.procEvidenceFieldService = procEvidenceFieldService;
         this.procEvidenceTypeService = procEvidenceTypeService;
@@ -105,6 +118,7 @@ public class StockOrderService extends BaseService {
         this.finalProductService = finalProductService;
         this.currencyService = currencyService;
         this.companyQueries = companyQueries;
+        this.messageSource = messageSource;
     }
 
     public ApiStockOrder getStockOrder(long id, CustomUserDetails user, Language language, Boolean withProcessingOrder) throws ApiException {
@@ -784,22 +798,21 @@ public class StockOrderService extends BaseService {
                     });
                 }
 
-                // next recursion for every child element
-                if (inputStockOrders.get(0).getSacNumber() != null) {
+                if (!inputStockOrders.isEmpty()) {
+                    // next recursion for every child element
+                    if (inputStockOrders.get(0).getSacNumber() != null) {
 
-                    // if sac number present, proceed with only first item leaves
-                    historyTimeline.addAll(
-                            addNextAggregationLevels(currentDepth + 1, inputStockOrders.get(0), language, userId));
-                } else if (OrderType.TRANSFER_ORDER.equals(inputStockOrders.get(0).getOrderType())) {
+                        // if sac number present, proceed with only first item leaves
+                        historyTimeline.addAll(addNextAggregationLevels(currentDepth + 1, inputStockOrders.get(0), language, userId));
+                    } else if (OrderType.TRANSFER_ORDER.equals(inputStockOrders.get(0).getOrderType())) {
 
-                    // if transfer order, go through with first item leaves
-                    historyTimeline.addAll(
-                            addNextAggregationLevels(currentDepth + 1, inputStockOrders.get(0), language, userId));
-                } else {
+                        // if transfer order, go through with first item leaves
+                        historyTimeline.addAll(addNextAggregationLevels(currentDepth + 1, inputStockOrders.get(0), language, userId));
+                    } else {
 
-                    // proceed recursion with all leaves
-                    inputStockOrders.forEach(sourceOrder -> historyTimeline.addAll(
-                            addNextAggregationLevels(currentDepth + 1, sourceOrder, language, userId)));
+                        // proceed recursion with all leaves
+                        inputStockOrders.forEach(sourceOrder -> historyTimeline.addAll(addNextAggregationLevels(currentDepth + 1, sourceOrder, language, userId)));
+                    }
                 }
 
             } else {
@@ -1400,4 +1413,309 @@ public class StockOrderService extends BaseService {
         }
     }
 
+    public byte[] createGeoJsonFromDeliveries(List<ApiStockOrderHistoryTimelineItem> timelineItems) throws ApiException {
+
+        // Read all userCustomers, from timeline item, and set ids in a Set
+        Set<Long> customerIds = new HashSet<>();
+        for (ApiStockOrderHistoryTimelineItem timelineItem: timelineItems) {
+            timelineItem.getPurchaseOrders().forEach(po -> {
+                if (po.getProducerUserCustomer() != null) {
+                    customerIds.add(po.getProducerUserCustomer().getId());
+                }
+            });
+        }
+
+        if (customerIds.isEmpty()) {
+            return new byte[0];
+        }
+
+        // Get all plots for given farmers
+        Plot pcProxy = Torpedo.from(Plot.class);
+        Torpedo.where(pcProxy.getFarmer().getId()).in(customerIds);
+        List<Plot> plotList = Torpedo.select(pcProxy).list(em);
+
+        // Convert plot values into GeoJson coordinates
+        ObjectMapper mapper = new ObjectMapper();
+        
+        // FeatureCollection, combines Multipoint feature and Multipolygon feature
+        ObjectNode rootFeatureCollection = mapper.createObjectNode();
+        rootFeatureCollection.set("type", mapper.convertValue("FeatureCollection", JsonNode.class));
+        
+        // Multi points
+        ObjectNode rootMultiPoint = mapper.createObjectNode();
+        rootMultiPoint.set("type", mapper.convertValue("Feature", JsonNode.class));
+        
+        ObjectNode geometryMultiPoint = mapper.createObjectNode();
+        geometryMultiPoint.set("type", mapper.convertValue("MultiPoint", JsonNode.class));
+        rootMultiPoint.set("geometry", geometryMultiPoint);
+
+        List<List<Double>> pointCoordinatesList = new ArrayList<>();
+        plotList.forEach(plot -> {
+            // if point (less than 3 coordinates)
+            if (!plot.getCoordinates().isEmpty() && plot.getCoordinates().size() < 3) {
+                plot.getCoordinates().forEach(plotCoordinate -> {
+                    List<Double> cList = new ArrayList<>();
+                    cList.add(plotCoordinate.getLongitude());
+                    cList.add(plotCoordinate.getLatitude());
+                    pointCoordinatesList.add(cList);
+                });
+            }
+        });
+
+        geometryMultiPoint.set("coordinates", mapper.convertValue(pointCoordinatesList, JsonNode.class));
+        rootMultiPoint.set("properties",mapper.createObjectNode());
+        
+        // Multi polygon
+        ObjectNode rootMultiPolygon = mapper.createObjectNode();
+        rootMultiPolygon.set("type", mapper.convertValue("Feature", JsonNode.class));
+
+        ObjectNode geometryMultiPolygon = mapper.createObjectNode();
+        geometryMultiPolygon.set("type", mapper.convertValue("MultiPolygon", JsonNode.class));
+        rootMultiPolygon.set("geometry", geometryMultiPolygon);
+
+        List<List<List<List<Double>>>> plotCoordinatesList = new ArrayList<>();
+        plotList.forEach(plot -> {
+            // if polygon (more than 3 coordinates)
+            if (!plot.getCoordinates().isEmpty() && plot.getCoordinates().size() > 2) {
+                List<List<List<Double>>> plotCoordinatesListArray = new ArrayList<>();
+                List<List<Double>> coordinatesList = new ArrayList<>();
+
+                plot.getCoordinates().forEach(plotCoordinate -> {
+                    List<Double> cList = new ArrayList<>();
+                    cList.add(plotCoordinate.getLongitude());
+                    cList.add(plotCoordinate.getLatitude());
+                    coordinatesList.add(cList);
+                });
+
+                // polygons must follow right-hand rule (counter-clockwise)
+                if (!isPolygonCounterClockwise(coordinatesList)) {
+                    Collections.reverse(coordinatesList);
+                }
+
+                if (!coordinatesList.get(0).equals(coordinatesList.get(coordinatesList.size() - 1))) {
+                    // add first as last
+                    coordinatesList.add(coordinatesList.get(0));
+                }
+                plotCoordinatesListArray.add(coordinatesList);
+                plotCoordinatesList.add(plotCoordinatesListArray);
+            }
+        });
+
+        geometryMultiPolygon.set("coordinates", mapper.convertValue(plotCoordinatesList, JsonNode.class));
+
+        rootMultiPolygon.set("properties",mapper.createObjectNode());
+        
+        // combine MultiPolygon and Multipoint features
+        List<ObjectNode> featureList = new ArrayList<>();
+        featureList.add(rootMultiPoint);
+        featureList.add(rootMultiPolygon);
+        
+        rootFeatureCollection.set("features", mapper.convertValue(featureList, JsonNode.class));
+
+        try {
+           return mapper.writer().writeValueAsBytes(rootFeatureCollection);
+        } catch (JsonProcessingException e) {
+            logger.error("Error while generating geoJson file", e);
+            throw new ApiException(ApiStatus.ERROR, "Error while generating geojson file");
+        }
+    }
+
+    public byte[] exportDeliveriesByCompany(CustomUserDetails authUser, Long companyId, Language language) throws IOException, ApiException {
+
+        // Get the deliveries list (PURCHASE_ORDER stock orders)
+        ApiPaginatedRequest request = new ApiPaginatedRequest();
+        request.setLimit(10000);
+
+        // Prepare the query request for deliveries
+        StockOrderQueryRequest queryRequest = new StockOrderQueryRequest(
+                companyId,
+                null,
+                null,
+                null,
+                null,
+                true,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        List<ApiStockOrder> apiDeliveries = getStockOrderListForCompany(request, queryRequest, authUser, language).items;
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+
+            // Create date cell style
+            CellStyle dateCellStyle = workbook.createCellStyle();
+            dateCellStyle.setDataFormat((short) 14);
+
+            // Create Excel sheet
+            XSSFSheet sheet = workbook.createSheet(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.sheet.name", language
+            ));
+
+            // Prepare the header
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.deliveryDate.label", language
+            ));
+            headerRow.createCell(1, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.identifier.label", language
+            ));
+            headerRow.createCell(2, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.farmer.label", language
+            ));
+            headerRow.createCell(3, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.semiProduct.label", language
+            ));
+            headerRow.createCell(4, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.quantity.label", language
+            ));
+            headerRow.createCell(5, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.totalGrossQuantity.label", language
+            ));
+            headerRow.createCell(6, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.tare.label", language
+            ));
+            headerRow.createCell(7, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.damagedWeightDeduction.label", language
+            ));
+            headerRow.createCell(8, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.unit.label", language
+            ));
+            headerRow.createCell(9, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.pricePerUnit.label", language
+            ));
+            headerRow.createCell(10, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.damagedPriceDeduction.label", language
+            ));
+            headerRow.createCell(11, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.payable.label", language
+            ));
+            headerRow.createCell(12, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.balance.label", language
+            ));
+            headerRow.createCell(13, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.currency.label", language
+            ));
+            headerRow.createCell(14, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.preferredWayOfPayment.label", language
+            ));
+
+            int rowNum = 1;
+            for (ApiStockOrder apiDelivery : apiDeliveries) {
+
+                Row row = sheet.createRow(rowNum++);
+
+                // Create delivery date column
+                row.createCell(0, CellType.NUMERIC).setCellValue(apiDelivery.getProductionDate());
+                row.getCell(0).setCellStyle(dateCellStyle);
+                sheet.autoSizeColumn(0);
+
+                // Create column identifier
+                row.createCell(1, CellType.STRING).setCellValue(apiDelivery.getIdentifier());
+                sheet.autoSizeColumn(1);
+
+                // Create farmer column
+                row.createCell(2, CellType.STRING).setCellValue(apiDelivery.getProducerUserCustomer().getName() + " " + apiDelivery.getProducerUserCustomer().getSurname());
+                sheet.autoSizeColumn(2);
+
+                // Create semi-product column
+                row.createCell(3, CellType.STRING).setCellValue(apiDelivery.getSemiProduct().getName());
+                sheet.autoSizeColumn(3);
+
+                // Create quantity column
+                row.createCell(4, CellType.NUMERIC).setCellValue(apiDelivery.getTotalQuantity().doubleValue());
+                sheet.autoSizeColumn(4);
+
+                // Create gross quantity column
+                row.createCell(5, CellType.NUMERIC);
+                if (apiDelivery.getTotalGrossQuantity() != null) {
+                    row.getCell(5).setCellValue(apiDelivery.getTotalGrossQuantity().doubleValue());
+                }
+                sheet.autoSizeColumn(5);
+
+                // Create tare column
+                row.createCell(6, CellType.NUMERIC);
+                if (apiDelivery.getTare() != null) {
+                    row.getCell(6).setCellValue(apiDelivery.getTare().doubleValue());
+                }
+                sheet.autoSizeColumn(6);
+
+                // Create damaged weight deduction column
+                row.createCell(7, CellType.NUMERIC);
+                if (apiDelivery.getDamagedWeightDeduction() != null) {
+                    row.getCell(7).setCellValue(apiDelivery.getDamagedWeightDeduction().doubleValue());
+                }
+                sheet.autoSizeColumn(7);
+
+                // Create unit column
+                row.createCell(8, CellType.STRING).setCellValue(apiDelivery.getMeasureUnitType().getLabel());
+                sheet.autoSizeColumn(8);
+
+                // Create price per unit column
+                row.createCell(9, CellType.NUMERIC);
+                if (apiDelivery.getPricePerUnit() != null) {
+                    row.getCell(9).setCellValue(apiDelivery.getPricePerUnit().doubleValue());
+                }
+                sheet.autoSizeColumn(9);
+
+                // Create damaged price deduction column
+                row.createCell(10, CellType.NUMERIC);
+                if (apiDelivery.getDamagedPriceDeduction() != null) {
+                    row.getCell(10).setCellValue(apiDelivery.getDamagedPriceDeduction().doubleValue());
+                }
+                sheet.autoSizeColumn(10);
+
+                // Create payable column
+                row.createCell(11, CellType.NUMERIC);
+                if (apiDelivery.getCost() != null) {
+                    row.getCell(11).setCellValue(apiDelivery.getCost().doubleValue());
+                }
+                sheet.autoSizeColumn(11);
+
+                // Create balance column
+                row.createCell(12, CellType.NUMERIC);
+                if (apiDelivery.getBalance() != null) {
+                    row.getCell(12).setCellValue(apiDelivery.getBalance().doubleValue());
+                }
+                sheet.autoSizeColumn(12);
+
+                // Create currency column
+                row.createCell(13, CellType.STRING).setCellValue(apiDelivery.getCurrency());
+                sheet.autoSizeColumn(13);
+
+                // Create preferred way of payment column
+                row.createCell(14, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                        messageSource, "export.payments.column.preferredWayOfPayment.value." + apiDelivery.getPreferredWayOfPayment().toString(), language
+                ));
+                sheet.autoSizeColumn(14);
+            }
+
+            workbook.write(byteArrayOutputStream);
+        }
+
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    private boolean isPolygonCounterClockwise(List<List<Double>> coordinatesList) {
+        // calculate area
+        double areaSum = 0.0;
+        for (int i = 0; i < coordinatesList.size(); i++){
+            if (i == coordinatesList.size() -1) {
+                // last coordinate calc
+                areaSum += (coordinatesList.get(0).get(0) - coordinatesList.get(i).get(0)) *
+                        (coordinatesList.get(0).get(1) + coordinatesList.get(i).get(1));
+            } else {
+                areaSum += (coordinatesList.get(i + 1).get(0) - coordinatesList.get(i).get(0)) *
+                        (coordinatesList.get(i + 1).get(1) + coordinatesList.get(i).get(1));
+            }
+        }
+        // if areaSum is < 0, polygon order is counter-clockwise
+        return areaSum < 0;
+    }
 }

@@ -97,6 +97,7 @@ public class ProductMapper extends BaseService {
             userCustomerLocation.getAddress().setSector(apiUserCustomerLocation.getAddress().getSector());
             userCustomerLocation.getAddress().setState(apiUserCustomerLocation.getAddress().getState());
             userCustomerLocation.getAddress().setVillage(apiUserCustomerLocation.getAddress().getVillage());
+            userCustomerLocation.getAddress().setOtherAddress(apiUserCustomerLocation.getAddress().getOtherAddress());
             userCustomerLocation.getAddress().setZip(apiUserCustomerLocation.getAddress().getZip());
             userCustomerLocation.setLatitude(apiUserCustomerLocation.getLatitude());
             userCustomerLocation.setLongitude(apiUserCustomerLocation.getLongitude());

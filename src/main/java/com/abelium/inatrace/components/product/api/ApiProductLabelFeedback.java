@@ -1,14 +1,13 @@
 package com.abelium.inatrace.components.product.api;
 
-import java.util.Map;
-
-import org.hibernate.validator.constraints.Length;
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.types.ProductLabelFeedbackType;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.validator.constraints.Length;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.Map;
 
 @Validated
 public class ApiProductLabelFeedback extends ApiBaseEntity {
@@ -37,7 +36,10 @@ public class ApiProductLabelFeedback extends ApiBaseEntity {
 	public Boolean termsOfUseConsent;
 	
 	@ApiModelProperty(value = "questionnaire answers - key-answer map", position = 9)
-    public Map<String, String> questionnaireAnswers;	
+    public Map<String, String> questionnaireAnswers;
+
+	@ApiModelProperty(value = "The product name of label for which the feedback was provided", position = 10)
+	private String productName;
 	
 	public Long getLabelId() {
 		return labelId;
@@ -102,5 +104,12 @@ public class ApiProductLabelFeedback extends ApiBaseEntity {
 	public void setQuestionnaireAnswers(Map<String, String> questionnaireAnswers) {
 		this.questionnaireAnswers = questionnaireAnswers;
 	}
-	
+
+	public String getProductName() {
+		return productName;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
 }

@@ -7,13 +7,17 @@ import com.abelium.inatrace.components.payment.api.ApiPayment;
 import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.types.Language;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.LocalDate;
 
 /**
@@ -108,6 +112,26 @@ public class PaymentController {
 		));
 	}
 
+	@GetMapping("export/company/{id}")
+	@ApiOperation("Export payments for provided company ID")
+	public ResponseEntity<byte[]> exportPaymentsByCompany(
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
+	) throws ApiException {
+
+		byte[] response;
+		try {
+			response = paymentService.exportPaymentsByCompany(authUser, companyId, language);
+		} catch (IOException e) {
+			throw new ApiException(ApiStatus.ERROR, "Error while exporting file!");
+		}
+
+		return ResponseEntity.ok()
+				.contentType(MediaType.APPLICATION_OCTET_STREAM)
+				.body(response);
+	}
+
 	@GetMapping("list/bulk-payment/company/{id}")
 	@ApiOperation("Get a list of bulk payments by company ID.")
 	public ApiPaginatedResponse<ApiBulkPayment> listBulkPaymentsByCompany(
@@ -120,6 +144,26 @@ public class PaymentController {
 				new PaymentQueryRequest(companyId),
 				authUser)
 		);
+	}
+
+	@GetMapping("export/bulk-payment/company/{id}")
+	@ApiOperation("Export bulk-payments for provided company ID")
+	public ResponseEntity<byte[]> exportBulkPaymentsByCompany(
+			@AuthenticationPrincipal CustomUserDetails authUser,
+			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
+	) throws ApiException {
+
+		byte[] response;
+		try {
+			response = paymentService.exportBulkPaymentsByCompany(authUser, companyId, language);
+		} catch (IOException e) {
+			throw new ApiException(ApiStatus.ERROR, "Error while exporting file!");
+		}
+
+		return ResponseEntity.ok()
+				.contentType(MediaType.APPLICATION_OCTET_STREAM)
+				.body(response);
 	}
 
 	@PutMapping

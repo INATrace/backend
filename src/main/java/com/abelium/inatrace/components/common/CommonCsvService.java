@@ -17,10 +17,12 @@ import java.util.List;
  *
  * @author Rene Flores, Sunesis d.o.o.
  */
+@Deprecated
 @Lazy
 @Service
 public class CommonCsvService extends BaseService {
-	
+
+	@Deprecated
 	public byte[] createPaymentsByCompanyCsv(List<ApiPayment> apiPayments) throws IOException {
 		
 		// Create CSV byte array
@@ -47,7 +49,8 @@ public class CommonCsvService extends BaseService {
 		
 		return bytes.toByteArray();
 	}
-	
+
+	@Deprecated
 	public byte[] createPurchasesByCompanyCsv(List<ApiStockOrder> apiStockOrders) throws IOException {
 		
 		// Create CSV byte array
