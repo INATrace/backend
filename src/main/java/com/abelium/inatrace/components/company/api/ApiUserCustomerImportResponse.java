@@ -1,13 +1,14 @@
-package com.abelium.inatrace.components.common.api;
+package com.abelium.inatrace.components.company.api;
 
-import com.abelium.inatrace.components.company.api.ApiUserCustomer;
-
+import java.util.ArrayList;
 import java.util.List;
 
 public class ApiUserCustomerImportResponse {
 
     private Integer successful;
     private List<ApiUserCustomer> duplicates;
+
+    private List<ApiUserCustomerImportRowValidationError> validationErrors;
 
     public Integer getSuccessful() {
         return successful;
@@ -24,4 +25,12 @@ public class ApiUserCustomerImportResponse {
     public void setDuplicates(List<ApiUserCustomer> duplicates) {
         this.duplicates = duplicates;
     }
+
+    public List<ApiUserCustomerImportRowValidationError> getValidationErrors() {
+        if (validationErrors == null) {
+            validationErrors = new ArrayList<ApiUserCustomerImportRowValidationError>();
+        }
+        return validationErrors;
+    }
+
 }

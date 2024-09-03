@@ -30,6 +30,7 @@ import java.util.List;
  *
  * @author Rene Flores, Sunesis d.o.o.
  */
+@Deprecated
 @RestController
 @RequestMapping("/chain/csv")
 public class CommonCsvController {
@@ -44,7 +45,8 @@ public class CommonCsvController {
 		this.stockOrderService = stockOrderService;
 		this.commonCsvService = paymentCsvService;
 	}
-	
+
+	@Deprecated
 	@PostMapping(value = "payments/company/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	@ApiOperation("Generate a csv file with a list of filtered payments by companyId.")
 	public @ResponseBody byte[] generatePaymentsByCompanyCsv(
@@ -80,7 +82,8 @@ public class CommonCsvController {
 
 		return commonCsvService.createPaymentsByCompanyCsv(apiPayments);
 	}
-	
+
+	@Deprecated
 	@PostMapping(value = "purchases/company/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	@ApiOperation("Generate a csv file with a list of filtered purchases by companyId.")
 	public @ResponseBody byte[] generatePurchasesByCompanyCsv(

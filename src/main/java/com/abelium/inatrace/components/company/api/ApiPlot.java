@@ -38,6 +38,9 @@ public class ApiPlot extends ApiBaseEntity {
 	@ApiModelProperty(value = "Date of last update", position = 9)
 	private Date lastUpdated;
 
+	@ApiModelProperty(value = "Date of last update", position = 10)
+	private Long farmerId;
+
 	public String getPlotName() {
 		return plotName;
 	}
@@ -109,4 +112,13 @@ public class ApiPlot extends ApiBaseEntity {
 	public void setLastUpdated(Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
+
+	public Long getFarmerId() {
+		return farmerId;
+	}
+
+	public void setFarmerId(Long farmerId) {
+		this.farmerId = farmerId;
+	}
+
 }
