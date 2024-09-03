@@ -1614,86 +1614,86 @@ public class StockOrderService extends BaseService {
                 // Create delivery date column
                 row.createCell(0, CellType.NUMERIC).setCellValue(apiDelivery.getProductionDate());
                 row.getCell(0).setCellStyle(dateCellStyle);
-                sheet.autoSizeColumn(0);
+                // sheet.autoSizeColumn(0);
 
                 // Create column identifier
                 row.createCell(1, CellType.STRING).setCellValue(apiDelivery.getIdentifier());
-                sheet.autoSizeColumn(1);
+                // sheet.autoSizeColumn(1);
 
                 // Create farmer column
                 row.createCell(2, CellType.STRING).setCellValue(apiDelivery.getProducerUserCustomer().getName() + " " + apiDelivery.getProducerUserCustomer().getSurname());
-                sheet.autoSizeColumn(2);
+                // sheet.autoSizeColumn(2);
 
                 // Create semi-product column
                 row.createCell(3, CellType.STRING).setCellValue(apiDelivery.getSemiProduct().getName());
-                sheet.autoSizeColumn(3);
+                // sheet.autoSizeColumn(3);
 
                 // Create quantity column
                 row.createCell(4, CellType.NUMERIC).setCellValue(apiDelivery.getTotalQuantity().doubleValue());
-                sheet.autoSizeColumn(4);
+                // sheet.autoSizeColumn(4);
 
                 // Create gross quantity column
                 row.createCell(5, CellType.NUMERIC);
                 if (apiDelivery.getTotalGrossQuantity() != null) {
                     row.getCell(5).setCellValue(apiDelivery.getTotalGrossQuantity().doubleValue());
                 }
-                sheet.autoSizeColumn(5);
+                // sheet.autoSizeColumn(5);
 
                 // Create tare column
                 row.createCell(6, CellType.NUMERIC);
                 if (apiDelivery.getTare() != null) {
                     row.getCell(6).setCellValue(apiDelivery.getTare().doubleValue());
                 }
-                sheet.autoSizeColumn(6);
+                // sheet.autoSizeColumn(6);
 
                 // Create damaged weight deduction column
                 row.createCell(7, CellType.NUMERIC);
                 if (apiDelivery.getDamagedWeightDeduction() != null) {
                     row.getCell(7).setCellValue(apiDelivery.getDamagedWeightDeduction().doubleValue());
                 }
-                sheet.autoSizeColumn(7);
+                // sheet.autoSizeColumn(7);
 
                 // Create unit column
                 row.createCell(8, CellType.STRING).setCellValue(apiDelivery.getMeasureUnitType().getLabel());
-                sheet.autoSizeColumn(8);
+                // sheet.autoSizeColumn(8);
 
                 // Create price per unit column
                 row.createCell(9, CellType.NUMERIC);
                 if (apiDelivery.getPricePerUnit() != null) {
                     row.getCell(9).setCellValue(apiDelivery.getPricePerUnit().doubleValue());
                 }
-                sheet.autoSizeColumn(9);
+                // sheet.autoSizeColumn(9);
 
                 // Create damaged price deduction column
                 row.createCell(10, CellType.NUMERIC);
                 if (apiDelivery.getDamagedPriceDeduction() != null) {
                     row.getCell(10).setCellValue(apiDelivery.getDamagedPriceDeduction().doubleValue());
                 }
-                sheet.autoSizeColumn(10);
+                // sheet.autoSizeColumn(10);
 
                 // Create payable column
                 row.createCell(11, CellType.NUMERIC);
                 if (apiDelivery.getCost() != null) {
                     row.getCell(11).setCellValue(apiDelivery.getCost().doubleValue());
                 }
-                sheet.autoSizeColumn(11);
+                // sheet.autoSizeColumn(11);
 
                 // Create balance column
                 row.createCell(12, CellType.NUMERIC);
                 if (apiDelivery.getBalance() != null) {
                     row.getCell(12).setCellValue(apiDelivery.getBalance().doubleValue());
                 }
-                sheet.autoSizeColumn(12);
+                // sheet.autoSizeColumn(12);
 
                 // Create currency column
                 row.createCell(13, CellType.STRING).setCellValue(apiDelivery.getCurrency());
-                sheet.autoSizeColumn(13);
+                // sheet.autoSizeColumn(13);
 
                 // Create preferred way of payment column
                 row.createCell(14, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
                         messageSource, "export.payments.column.preferredWayOfPayment.value." + apiDelivery.getPreferredWayOfPayment().toString(), language
                 ));
-                sheet.autoSizeColumn(14);
+                // sheet.autoSizeColumn(14);
             }
 
             workbook.write(byteArrayOutputStream);
