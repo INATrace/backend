@@ -2,7 +2,7 @@ package com.abelium.inatrace.components.company;
 
 import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.components.common.api.ApiUserCustomerImportResponse;
+import com.abelium.inatrace.components.company.api.ApiUserCustomerImportResponse;
 import com.abelium.inatrace.components.company.api.*;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.product.api.ApiListCustomersRequest;
@@ -14,11 +14,15 @@ import com.abelium.inatrace.types.UserCustomerType;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -118,6 +122,35 @@ public class CompanyController {
                 authUser, language));
     }
 
+    @GetMapping(value = "/userCustomers/{companyId}/plots")
+    @ApiOperation(value = "Get all user customers plots that are part of the company with the provided ID")
+    public ApiResponse<List<ApiPlot>> getUserCustomersPlotsForCompany(
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
+        return companyService.getUserCustomersPlotsForCompany(authUser, companyId, language);
+    }
+
+    @GetMapping("/userCustomers/{companyId}/exportFarmerData")
+    @ApiOperation("Export payments for provided company ID")
+    public ResponseEntity<byte[]> exportFarmerDataByCompany(
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
+    ) throws ApiException {
+
+        byte[] response;
+        try {
+            response = companyService.exportFarmerDataByCompany(authUser, companyId, language);
+        } catch (IOException e) {
+            throw new ApiException(ApiStatus.ERROR, "Error while exporting file!");
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(response);
+    }
+
     @PostMapping(value = "/userCustomers/add/{companyId}")
     @ApiOperation(value = "Add new user customer for given company ID")
     public ApiResponse<ApiUserCustomer> addUserCustomer(
@@ -137,6 +170,31 @@ public class CompanyController {
             @Valid @RequestBody ApiUserCustomer request
     ) throws ApiException {
         return new ApiResponse<>(companyService.updateUserCustomer(request, authUser, language));
+    }
+
+    @GetMapping(value = "/userCustomers/{id}/exportGeoData")
+    @ApiOperation(value = "Export the Geo-data for the user customer with the provided ID")
+    public ResponseEntity<byte[]> exportUserCustomerGeoData(
+            @Valid @ApiParam(value = "User customer ID", required = true) @PathVariable("id") Long id,
+            @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
+
+        byte[] response = companyService.exportUserCustomerGeoData(authUser, id);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(response);
+    }
+
+    @PostMapping(value = "/userCustomers/{id}/uploadGeoData")
+    @ApiOperation(value = "Upload Geo-data for the user customer with the provided ID")
+    public ApiDefaultResponse uploadUserCustomerGeoData(
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "User customer ID", required = true) @PathVariable("id") Long id,
+            @RequestParam("file") MultipartFile file) throws ApiException {
+
+        companyService.uploadUserCustomerGeoData(authUser, id, file);
+
+        return new ApiDefaultResponse();
     }
 
     @DeleteMapping(value = "/userCustomers/{id}")

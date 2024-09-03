@@ -14,10 +14,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.LocalDate;
 
 @RestController
@@ -259,6 +261,25 @@ public class StockOrderController {
                 stockOrderService.getStockOrderAggregatedHistoryList(id, language, authUser, true);
 
         return stockOrderService.createGeoJsonFromDeliveries(apiStockOrderHistory.getTimelineItems());
+    }
+
+    @GetMapping(value = "export/deliveries/company/{companyId}")
+    @ApiOperation("Export deliveries (stock orders of type PURCHASE_ORDER) for the provided company ID")
+    public ResponseEntity<byte[]> exportDeliveriesByCompany(
+            @AuthenticationPrincipal CustomUserDetails authUser,
+            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
+
+        byte[] response;
+        try {
+            response = stockOrderService.exportDeliveriesByCompany(authUser, companyId, language);
+        } catch (IOException e) {
+            throw new ApiException(ApiStatus.ERROR, "Error while exporting file!");
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(response);
     }
 
 }

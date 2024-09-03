@@ -46,6 +46,7 @@ import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
+import com.abelium.inatrace.tools.TranslateTools;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.ProductCompanyType;
@@ -55,7 +56,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.torpedoquery.jpa.OnGoingLogicalCondition;
@@ -63,6 +70,8 @@ import org.torpedoquery.jpa.Torpedo;
 
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.ZoneOffset;
@@ -91,6 +100,8 @@ public class StockOrderService extends BaseService {
 
     private final CompanyQueries companyQueries;
 
+    private final MessageSource messageSource;
+
     @Autowired
     public StockOrderService(FacilityService facilityService,
                              ProcessingEvidenceFieldService procEvidenceFieldService,
@@ -98,7 +109,8 @@ public class StockOrderService extends BaseService {
                              SemiProductService semiProductService,
                              FinalProductService finalProductService,
                              CurrencyService currencyService,
-                             CompanyQueries companyQueries) {
+                             CompanyQueries companyQueries,
+                             MessageSource messageSource) {
         this.facilityService = facilityService;
         this.procEvidenceFieldService = procEvidenceFieldService;
         this.procEvidenceTypeService = procEvidenceTypeService;
@@ -106,6 +118,7 @@ public class StockOrderService extends BaseService {
         this.finalProductService = finalProductService;
         this.currencyService = currencyService;
         this.companyQueries = companyQueries;
+        this.messageSource = messageSource;
     }
 
     public ApiStockOrder getStockOrder(long id, CustomUserDetails user, Language language, Boolean withProcessingOrder) throws ApiException {
@@ -1415,6 +1428,7 @@ public class StockOrderService extends BaseService {
         if (customerIds.isEmpty()) {
             return new byte[0];
         }
+
         // Get all plots for given farmers
         Plot pcProxy = Torpedo.from(Plot.class);
         Torpedo.where(pcProxy.getFarmer().getId()).in(customerIds);
@@ -1506,11 +1520,193 @@ public class StockOrderService extends BaseService {
         }
     }
 
+    public byte[] exportDeliveriesByCompany(CustomUserDetails authUser, Long companyId, Language language) throws IOException, ApiException {
+
+        // Get the deliveries list (PURCHASE_ORDER stock orders)
+        ApiPaginatedRequest request = new ApiPaginatedRequest();
+        request.setLimit(10000);
+
+        // Prepare the query request for deliveries
+        StockOrderQueryRequest queryRequest = new StockOrderQueryRequest(
+                companyId,
+                null,
+                null,
+                null,
+                null,
+                true,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        List<ApiStockOrder> apiDeliveries = getStockOrderListForCompany(request, queryRequest, authUser, language).items;
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+
+            // Create date cell style
+            CellStyle dateCellStyle = workbook.createCellStyle();
+            dateCellStyle.setDataFormat((short) 14);
+
+            // Create Excel sheet
+            XSSFSheet sheet = workbook.createSheet(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.sheet.name", language
+            ));
+
+            // Prepare the header
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.deliveryDate.label", language
+            ));
+            headerRow.createCell(1, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.identifier.label", language
+            ));
+            headerRow.createCell(2, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.farmer.label", language
+            ));
+            headerRow.createCell(3, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.semiProduct.label", language
+            ));
+            headerRow.createCell(4, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.quantity.label", language
+            ));
+            headerRow.createCell(5, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.totalGrossQuantity.label", language
+            ));
+            headerRow.createCell(6, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.tare.label", language
+            ));
+            headerRow.createCell(7, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.damagedWeightDeduction.label", language
+            ));
+            headerRow.createCell(8, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.unit.label", language
+            ));
+            headerRow.createCell(9, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.pricePerUnit.label", language
+            ));
+            headerRow.createCell(10, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.damagedPriceDeduction.label", language
+            ));
+            headerRow.createCell(11, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.payable.label", language
+            ));
+            headerRow.createCell(12, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.balance.label", language
+            ));
+            headerRow.createCell(13, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.currency.label", language
+            ));
+            headerRow.createCell(14, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                    messageSource, "export.deliveries.column.preferredWayOfPayment.label", language
+            ));
+
+            int rowNum = 1;
+            for (ApiStockOrder apiDelivery : apiDeliveries) {
+
+                Row row = sheet.createRow(rowNum++);
+
+                // Create delivery date column
+                row.createCell(0, CellType.NUMERIC).setCellValue(apiDelivery.getProductionDate());
+                row.getCell(0).setCellStyle(dateCellStyle);
+                sheet.autoSizeColumn(0);
+
+                // Create column identifier
+                row.createCell(1, CellType.STRING).setCellValue(apiDelivery.getIdentifier());
+                sheet.autoSizeColumn(1);
+
+                // Create farmer column
+                row.createCell(2, CellType.STRING).setCellValue(apiDelivery.getProducerUserCustomer().getName() + " " + apiDelivery.getProducerUserCustomer().getSurname());
+                sheet.autoSizeColumn(2);
+
+                // Create semi-product column
+                row.createCell(3, CellType.STRING).setCellValue(apiDelivery.getSemiProduct().getName());
+                sheet.autoSizeColumn(3);
+
+                // Create quantity column
+                row.createCell(4, CellType.NUMERIC).setCellValue(apiDelivery.getTotalQuantity().doubleValue());
+                sheet.autoSizeColumn(4);
+
+                // Create gross quantity column
+                row.createCell(5, CellType.NUMERIC);
+                if (apiDelivery.getTotalGrossQuantity() != null) {
+                    row.getCell(5).setCellValue(apiDelivery.getTotalGrossQuantity().doubleValue());
+                }
+                sheet.autoSizeColumn(5);
+
+                // Create tare column
+                row.createCell(6, CellType.NUMERIC);
+                if (apiDelivery.getTare() != null) {
+                    row.getCell(6).setCellValue(apiDelivery.getTare().doubleValue());
+                }
+                sheet.autoSizeColumn(6);
+
+                // Create damaged weight deduction column
+                row.createCell(7, CellType.NUMERIC);
+                if (apiDelivery.getDamagedWeightDeduction() != null) {
+                    row.getCell(7).setCellValue(apiDelivery.getDamagedWeightDeduction().doubleValue());
+                }
+                sheet.autoSizeColumn(7);
+
+                // Create unit column
+                row.createCell(8, CellType.STRING).setCellValue(apiDelivery.getMeasureUnitType().getLabel());
+                sheet.autoSizeColumn(8);
+
+                // Create price per unit column
+                row.createCell(9, CellType.NUMERIC);
+                if (apiDelivery.getPricePerUnit() != null) {
+                    row.getCell(9).setCellValue(apiDelivery.getPricePerUnit().doubleValue());
+                }
+                sheet.autoSizeColumn(9);
+
+                // Create damaged price deduction column
+                row.createCell(10, CellType.NUMERIC);
+                if (apiDelivery.getDamagedPriceDeduction() != null) {
+                    row.getCell(10).setCellValue(apiDelivery.getDamagedPriceDeduction().doubleValue());
+                }
+                sheet.autoSizeColumn(10);
+
+                // Create payable column
+                row.createCell(11, CellType.NUMERIC);
+                if (apiDelivery.getCost() != null) {
+                    row.getCell(11).setCellValue(apiDelivery.getCost().doubleValue());
+                }
+                sheet.autoSizeColumn(11);
+
+                // Create balance column
+                row.createCell(12, CellType.NUMERIC);
+                if (apiDelivery.getBalance() != null) {
+                    row.getCell(12).setCellValue(apiDelivery.getBalance().doubleValue());
+                }
+                sheet.autoSizeColumn(12);
+
+                // Create currency column
+                row.createCell(13, CellType.STRING).setCellValue(apiDelivery.getCurrency());
+                sheet.autoSizeColumn(13);
+
+                // Create preferred way of payment column
+                row.createCell(14, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
+                        messageSource, "export.payments.column.preferredWayOfPayment.value." + apiDelivery.getPreferredWayOfPayment().toString(), language
+                ));
+                sheet.autoSizeColumn(14);
+            }
+
+            workbook.write(byteArrayOutputStream);
+        }
+
+        return byteArrayOutputStream.toByteArray();
+    }
+
     private boolean isPolygonCounterClockwise(List<List<Double>> coordinatesList) {
         // calculate area
         double areaSum = 0.0;
-        for (int i=0; i<coordinatesList.size(); i++){
-            if (i == coordinatesList.size()-1) {
+        for (int i = 0; i < coordinatesList.size(); i++){
+            if (i == coordinatesList.size() -1) {
                 // last coordinate calc
                 areaSum += (coordinatesList.get(0).get(0) - coordinatesList.get(i).get(0)) *
                         (coordinatesList.get(0).get(1) + coordinatesList.get(i).get(1));
