@@ -697,6 +697,7 @@ public class ProductApiTools {
 		afb.privacyPolicyConsent = fb.getPrivacyPolicyConsent();
 		afb.termsOfUseConsent = fb.getTermsOfUseConsent();
 		afb.questionnaireAnswers = fb.getQuestionnaireAnswers();
+		afb.setProductName(fb.getLabel().getProduct().getName());
 		return afb;
 	}	
 

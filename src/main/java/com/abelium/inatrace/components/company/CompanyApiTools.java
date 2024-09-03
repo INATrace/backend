@@ -9,6 +9,7 @@ import com.abelium.inatrace.components.common.CommonService;
 import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.common.mappers.CountryMapper;
 import com.abelium.inatrace.components.company.api.*;
+import com.abelium.inatrace.components.company.mappers.PlotMapper;
 import com.abelium.inatrace.components.company.types.CompanyAction;
 import com.abelium.inatrace.components.company.types.CompanyTranslatables;
 import com.abelium.inatrace.components.product.ProductTypeMapper;
@@ -155,6 +156,7 @@ public class CompanyApiTools {
 		geoAddress.setSector(apiGeoAddress.getSector());
 		geoAddress.setState(apiGeoAddress.getState());
 		geoAddress.setVillage(apiGeoAddress.getVillage());
+		geoAddress.setOtherAddress(apiGeoAddress.getOtherAddress());
 		geoAddress.setZip(apiGeoAddress.getZip());
 	}
 
@@ -409,11 +411,15 @@ public class CompanyApiTools {
 
 		}).collect(Collectors.toList()));
 
-		// Product types if Farmer
+		// If user customer is of type FARMER, map Product types and Plots
 		if (UserCustomerType.FARMER.equals(apiUserCustomer.getType())) {
+
 			apiUserCustomer.setProductTypes(userCustomer.getProductTypes().stream()
 					.map(ucpt -> ProductTypeMapper.toApiProductType(ucpt.getProductType(), language))
 					.collect(Collectors.toList()));
+
+			apiUserCustomer.setPlots(
+					userCustomer.getPlots().stream().map(plot -> PlotMapper.toApiPlot(plot, language)).collect(Collectors.toList()));
 		}
 
 		return apiUserCustomer;
@@ -508,6 +514,7 @@ public class CompanyApiTools {
 		apiAddress.setSector(address.getSector());
 		apiAddress.setState(address.getState());
 		apiAddress.setVillage(address.getVillage());
+		apiAddress.setOtherAddress(address.getOtherAddress());
 		apiAddress.setZip(address.getZip());
 
 		return apiAddress;

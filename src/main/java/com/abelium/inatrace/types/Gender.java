@@ -6,5 +6,6 @@ package com.abelium.inatrace.types;
 public enum Gender {
 	FEMALE,
 	MALE,
-	N_A
+	N_A,
+	DIVERSE
 }

@@ -39,25 +39,28 @@ public class ApiAddress {
 	@ApiModelProperty(value = "Village name", position = 7)
 	public String village;
 
+	@Length(max = Lengths.OTHER_ADDRESS)
+	@ApiModelProperty(value = "Other/additional address field", position = 8)
+	public String otherAddress;
+
 	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "Honduras farm name", position = 8)
+	@ApiModelProperty(value = "Honduras farm name", position = 9)
 	public String hondurasFarm;
 
 	@Length(max = Lengths.VILLAGE)
-	@ApiModelProperty(value = "Honduras village name", position = 9)
+	@ApiModelProperty(value = "Honduras village name", position = 10)
 	public String hondurasVillage;
 
 	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "Honduras municipality name", position = 10)
+	@ApiModelProperty(value = "Honduras municipality name", position = 11)
 	public String hondurasMunicipality;
 
 	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "Honduras department name", position = 11)
+	@ApiModelProperty(value = "Honduras department name", position = 12)
 	public String hondurasDepartment;
 
-    @ApiModelProperty(value = "country", position = 12)
+    @ApiModelProperty(value = "country", position = 13)
 	public ApiCountry country;
-
 
 	public String getAddress() {
 		return address;
@@ -113,6 +116,14 @@ public class ApiAddress {
 
 	public void setVillage(String village) {
 		this.village = village;
+	}
+
+	public String getOtherAddress() {
+		return otherAddress;
+	}
+
+	public void setOtherAddress(String otherAddress) {
+		this.otherAddress = otherAddress;
 	}
 
 	public String getHondurasFarm() {

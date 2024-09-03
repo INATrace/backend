@@ -29,6 +29,7 @@ public final class BulkPaymentMapper {
 		apiBulkPayment.setPaymentPurposeType(entity.getPaymentPurposeType());
 		apiBulkPayment.setReceiptNumber(entity.getReceiptNumber());
 		apiBulkPayment.setTotalAmount(entity.getTotalAmount());
+		apiBulkPayment.setCurrency(entity.getCurrency());
 		return apiBulkPayment;
 	}
 

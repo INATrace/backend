@@ -57,6 +57,7 @@ public class CompanyCustomerMapper {
 		apiGeoAddress.setSector(geoAddress.getSector());
 		apiGeoAddress.setState(geoAddress.getState());
 		apiGeoAddress.setVillage(geoAddress.getVillage());
+		apiGeoAddress.setOtherAddress(geoAddress.getOtherAddress());
 		apiGeoAddress.setZip(geoAddress.getZip());
 
 		return apiGeoAddress;
