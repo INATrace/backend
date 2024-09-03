@@ -171,15 +171,15 @@ public class PaymentService extends BaseService {
 				row.createCell(0, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
 						messageSource, "export.payments.column.paymentPurposeType.value." + apiPayment.getPaymentPurposeType().toString(), language
 				));
-				sheet.autoSizeColumn(0);
+				// sheet.autoSizeColumn(0);
 
 				// Create amount column
 				row.createCell(1, CellType.NUMERIC).setCellValue(apiPayment.getAmount().doubleValue());
-				sheet.autoSizeColumn(1);
+				// sheet.autoSizeColumn(1);
 
 				// Create currency column
 				row.createCell(2, CellType.STRING).setCellValue(apiPayment.getCurrency());
-				sheet.autoSizeColumn(2);
+				// sheet.autoSizeColumn(2);
 
 				// Create farmer name column (cell is populated only recipient user customer is of type FARMER)
 				row.createCell(3, CellType.STRING);
@@ -191,32 +191,32 @@ public class PaymentService extends BaseService {
 				switch (apiPayment.getRecipientType()) {
 					case USER_CUSTOMER:
 						row.getCell(3).setCellValue(apiPayment.getRecipientUserCustomer().getName() + " " + apiPayment.getRecipientUserCustomer().getSurname());
-						sheet.autoSizeColumn(3);
+						// sheet.autoSizeColumn(3);
 						break;
 					case COMPANY:
 						row.getCell(4).setCellValue(apiPayment.getRecipientCompany().getName());
-						sheet.autoSizeColumn(4);
+						// sheet.autoSizeColumn(4);
 				}
 
 				// Create delivery date column
 				row.createCell(5, CellType.NUMERIC).setCellValue(apiPayment.getProductionDate());
 				row.getCell(5).setCellStyle(dateCellStyle);
-				sheet.autoSizeColumn(5);
+				// sheet.autoSizeColumn(5);
 
 				// Create payment date column
 				row.createCell(6, CellType.NUMERIC).setCellValue(apiPayment.getFormalCreationTime());
 				row.getCell(6).setCellStyle(dateCellStyle);
-				sheet.autoSizeColumn(6);
+				// sheet.autoSizeColumn(6);
 
 				// Create preferred way of payment column
 				row.createCell(7, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
 						messageSource, "export.payments.column.preferredWayOfPayment.value." + apiPayment.getPreferredWayOfPayment().toString(), language
 				));
-				sheet.autoSizeColumn(7);
+				// sheet.autoSizeColumn(7);
 
 				// Create receipt number column
 				row.createCell(8, CellType.STRING).setCellValue(apiPayment.getReceiptNumber());
-				sheet.autoSizeColumn(8);
+				// sheet.autoSizeColumn(8);
 			}
 
 			workbook.write(byteArrayOutputStream);
@@ -331,19 +331,19 @@ public class PaymentService extends BaseService {
 				row.createCell(0, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
 						messageSource, "export.payments.column.paymentPurposeType.value." + apiBulkPayment.getPaymentPurposeType().toString(), language
 				));
-				sheet.autoSizeColumn(0);
+				// sheet.autoSizeColumn(0);
 
 				// Create receipt number column
 				row.createCell(1, CellType.STRING).setCellValue(apiBulkPayment.getReceiptNumber());
-				sheet.autoSizeColumn(1);
+				// sheet.autoSizeColumn(1);
 
 				// Create total amount column
 				row.createCell(2, CellType.NUMERIC).setCellValue(apiBulkPayment.getTotalAmount().doubleValue());
-				sheet.autoSizeColumn(2);
+				// sheet.autoSizeColumn(2);
 
 				// Create bulk payment currency column
 				row.createCell(3, CellType.STRING).setCellValue(apiBulkPayment.getCurrency());
-				sheet.autoSizeColumn(3);
+				// sheet.autoSizeColumn(3);
 			}
 
 			workbook.write(byteArrayOutputStream);

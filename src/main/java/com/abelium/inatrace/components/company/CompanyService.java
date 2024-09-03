@@ -554,85 +554,85 @@ public class CompanyService extends BaseService {
 
 		// Create farmer ID column
 		farmerRow.createCell(0, CellType.STRING).setCellValue(apiUserCustomer.getId());
-		farmersSheet.autoSizeColumn(0);
+		// farmersSheet.autoSizeColumn(0);
 
 		// Create company internal ID column
 		farmerRow.createCell(1, CellType.STRING).setCellValue(apiUserCustomer.getFarmerCompanyInternalId());
-		farmersSheet.autoSizeColumn(1);
+		// farmersSheet.autoSizeColumn(1);
 
 		// Create last name column
 		farmerRow.createCell(2, CellType.STRING).setCellValue(apiUserCustomer.getSurname());
-		farmersSheet.autoSizeColumn(2);
+		// farmersSheet.autoSizeColumn(2);
 
 		// Create first name column
 		farmerRow.createCell(3, CellType.STRING).setCellValue(apiUserCustomer.getName());
-		farmersSheet.autoSizeColumn(3);
+		// farmersSheet.autoSizeColumn(3);
 
 		// Create village column
 		farmerRow.createCell(4, CellType.STRING).setCellValue(apiUserCustomer.getLocation().getAddress().getVillage());
-		farmersSheet.autoSizeColumn(4);
+		// farmersSheet.autoSizeColumn(4);
 
 		// Create cell column
 		farmerRow.createCell(5, CellType.STRING).setCellValue(apiUserCustomer.getLocation().getAddress().getCell());
-		farmersSheet.autoSizeColumn(5);
+		// farmersSheet.autoSizeColumn(5);
 
 		// Create sector column
 		farmerRow.createCell(6, CellType.STRING).setCellValue(apiUserCustomer.getLocation().getAddress().getSector());
-		farmersSheet.autoSizeColumn(6);
+		// farmersSheet.autoSizeColumn(6);
 
 		// Create Honduras farm column
 		farmerRow.createCell(7, CellType.STRING).setCellValue(apiUserCustomer.getLocation().getAddress().getHondurasFarm());
-		farmersSheet.autoSizeColumn(7);
+		// farmersSheet.autoSizeColumn(7);
 
 		// Create Honduras village column
 		farmerRow.createCell(8, CellType.STRING).setCellValue(apiUserCustomer.getLocation().getAddress().getHondurasVillage());
-		farmersSheet.autoSizeColumn(8);
+		// farmersSheet.autoSizeColumn(8);
 
 		// Create Honduras municipality column
 		farmerRow.createCell(9, CellType.STRING).setCellValue(apiUserCustomer.getLocation().getAddress().getHondurasMunicipality());
-		farmersSheet.autoSizeColumn(9);
+		// farmersSheet.autoSizeColumn(9);
 
 		// Create Honduras department column
 		farmerRow.createCell(10, CellType.STRING).setCellValue(apiUserCustomer.getLocation().getAddress().getHondurasDepartment());
-		farmersSheet.autoSizeColumn(10);
+		// farmersSheet.autoSizeColumn(10);
 
 		// Create street address column
 		farmerRow.createCell(11, CellType.STRING).setCellValue(apiUserCustomer.getLocation().getAddress().getAddress());
-		farmersSheet.autoSizeColumn(11);
+		// farmersSheet.autoSizeColumn(11);
 
 		// Create city/town/village column
 		farmerRow.createCell(12, CellType.STRING).setCellValue(apiUserCustomer.getLocation().getAddress().getCity());
-		farmersSheet.autoSizeColumn(12);
+		// farmersSheet.autoSizeColumn(12);
 
 		// Create state/province/region column
 		farmerRow.createCell(13, CellType.STRING).setCellValue(apiUserCustomer.getLocation().getAddress().getState());
-		farmersSheet.autoSizeColumn(13);
+		// farmersSheet.autoSizeColumn(13);
 
 		// Create ZIP/postal code column
 		farmerRow.createCell(14, CellType.STRING).setCellValue(apiUserCustomer.getLocation().getAddress().getZip());
-		farmersSheet.autoSizeColumn(14);
+		// farmersSheet.autoSizeColumn(14);
 
 		// Create additional address column
 		farmerRow.createCell(15, CellType.STRING).setCellValue(apiUserCustomer.getLocation().getAddress().getOtherAddress());
-		farmersSheet.autoSizeColumn(15);
+		// farmersSheet.autoSizeColumn(15);
 
 		// Create country column
 		farmerRow.createCell(16, CellType.STRING).setCellValue(apiUserCustomer.getLocation().getAddress().getCountry().getName());
-		farmersSheet.autoSizeColumn(16);
+		// farmersSheet.autoSizeColumn(16);
 
 		// Create gender column
 		farmerRow.createCell(17, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
 				messageSource, "export.farmers.column.gender.value." + apiUserCustomer.getGender().toString(), Language.EN
 		));
-		farmersSheet.autoSizeColumn(17);
+		// farmersSheet.autoSizeColumn(17);
 
 		// Create phone number column
 		farmerRow.createCell(18, CellType.STRING).setCellValue(apiUserCustomer.getPhone());
-		farmersSheet.autoSizeColumn(18);
+		// farmersSheet.autoSizeColumn(18);
 
 		// Create email column
 		farmerRow.createCell(19, CellType.STRING).setCellValue(apiUserCustomer.getEmail());
-		farmersSheet.autoSizeColumn(19);
+		// farmersSheet.autoSizeColumn(19);
 
 		// Create area unit column
 		farmerRow.createCell(20, CellType.STRING);
@@ -654,23 +654,23 @@ public class CompanyService extends BaseService {
 		if (apiUserCustomer.getFarm() != null) {
 
 			farmerRow.getCell(20).setCellValue(apiUserCustomer.getFarm().getAreaUnit());
-			farmersSheet.autoSizeColumn(20);
+			// farmersSheet.autoSizeColumn(20);
 
 			if (apiUserCustomer.getFarm().getTotalCultivatedArea() != null) {
 				farmerRow.getCell(21).setCellValue(apiUserCustomer.getFarm().getTotalCultivatedArea().doubleValue());
-				farmersSheet.autoSizeColumn(21);
+				// farmersSheet.autoSizeColumn(21);
 			}
 
 			farmerRow.getCell(22).setCellValue(BooleanUtils.isTrue(apiUserCustomer.getFarm().getOrganic()) ? "Y" : "N");
-			farmersSheet.autoSizeColumn(22);
+			// farmersSheet.autoSizeColumn(22);
 
 			if (apiUserCustomer.getFarm().getAreaOrganicCertified() != null) {
 				farmerRow.getCell(23).setCellValue(apiUserCustomer.getFarm().getAreaOrganicCertified().doubleValue());
-				farmersSheet.autoSizeColumn(23);
+				// farmersSheet.autoSizeColumn(23);
 			}
 
 			farmerRow.getCell(24).setCellValue(apiUserCustomer.getFarm().getStartTransitionToOrganic());
-			farmersSheet.autoSizeColumn(24);
+			// farmersSheet.autoSizeColumn(24);
 		}
 
 		// Create account number column
@@ -689,16 +689,16 @@ public class CompanyService extends BaseService {
 		if (apiUserCustomer.getBank() != null) {
 
 			farmerRow.getCell(25).setCellValue(apiUserCustomer.getBank().getAccountNumber());
-			farmersSheet.autoSizeColumn(25);
+			// farmersSheet.autoSizeColumn(25);
 
 			farmerRow.getCell(26).setCellValue(apiUserCustomer.getBank().getAccountHolderName());
-			farmersSheet.autoSizeColumn(26);
+			// farmersSheet.autoSizeColumn(26);
 
 			farmerRow.getCell(27).setCellValue(apiUserCustomer.getBank().getBankName());
-			farmersSheet.autoSizeColumn(27);
+			// farmersSheet.autoSizeColumn(27);
 
 			farmerRow.getCell(28).setCellValue(apiUserCustomer.getBank().getAdditionalInformation());
-			farmersSheet.autoSizeColumn(28);
+			// farmersSheet.autoSizeColumn(28);
 		}
 
 		// Fill farmer's plots data
@@ -708,49 +708,49 @@ public class CompanyService extends BaseService {
 
 			// Create farmer ID column (used to connect the farmer data from the Farmers sheet and the plot data in the Plots sheet)
 			plotRow.createCell(0, CellType.STRING).setCellValue(apiUserCustomer.getId());
-			plotsSheet.autoSizeColumn(0);
+			// plotsSheet.autoSizeColumn(0);
 
 			// Create plot ID column
 			plotRow.createCell(1, CellType.STRING).setCellValue(apiPlot.getId());
-			plotsSheet.autoSizeColumn(1);
+			// plotsSheet.autoSizeColumn(1);
 
 			// Create plot name column
 			plotRow.createCell(2, CellType.STRING).setCellValue(apiPlot.getPlotName());
-			plotsSheet.autoSizeColumn(2);
+			// plotsSheet.autoSizeColumn(2);
 
 			// Create plot crop column
 			plotRow.createCell(3, CellType.STRING);
 			if (apiPlot.getCrop() != null) {
 				plotRow.getCell(3).setCellValue(apiPlot.getCrop().getName());
-				plotsSheet.autoSizeColumn(3);
+				// plotsSheet.autoSizeColumn(3);
 			}
 
 			// Create number of plants column
 			plotRow.createCell(4, CellType.NUMERIC);
 			if (apiPlot.getNumberOfPlants() != null) {
 				plotRow.getCell(4).setCellValue(apiPlot.getNumberOfPlants());
-				plotsSheet.autoSizeColumn(4);
+				// plotsSheet.autoSizeColumn(4);
 			}
 
 			// Create unit column
 			plotRow.createCell(5, CellType.STRING).setCellValue(apiPlot.getUnit());
-			plotsSheet.autoSizeColumn(5);
+			// plotsSheet.autoSizeColumn(5);
 
 			// Create size column
 			plotRow.createCell(6, CellType.NUMERIC);
 			if (apiPlot.getSize() != null) {
 				plotRow.getCell(6).setCellValue(apiPlot.getSize());
-				plotsSheet.autoSizeColumn(6);
+				// plotsSheet.autoSizeColumn(6);
 			}
 
 			// Create Geo-ID column
 			plotRow.createCell(7, CellType.STRING).setCellValue(apiPlot.getGeoId());
-			plotsSheet.autoSizeColumn(7);
+			// plotsSheet.autoSizeColumn(7);
 
 			// Create date of transition to organic
 			plotRow.createCell(8, CellType.NUMERIC).setCellValue(apiPlot.getOrganicStartOfTransition());
 			plotRow.getCell(8).setCellStyle(dateCellStyle);
-			plotsSheet.autoSizeColumn(8);
+			// plotsSheet.autoSizeColumn(8);
 		}
 
 		return plotsSheetRowNum;
