@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Size;
+
 @Validated
 public class ApiProductLabelBase extends ApiBaseEntity {
 
@@ -20,7 +22,7 @@ public class ApiProductLabelBase extends ApiBaseEntity {
 	@ApiModelProperty(value = "Product label uuid (for url)", position = 4)
 	public String uuid;
 	
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "label title", position = 5)
 	public String title;
 

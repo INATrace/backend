@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Validated
@@ -18,7 +19,7 @@ public class ApiCertification extends ApiBaseEntity {
 	@Valid
 	public ApiDocument certificate;
 	
-	@Length(max = 2000)
+	@Size(max = 2000)
 	@ApiModelProperty(value = "description of this standard and certification", position = 3)
 	public String description;
 	

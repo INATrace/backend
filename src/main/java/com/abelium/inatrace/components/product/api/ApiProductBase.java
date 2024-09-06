@@ -7,15 +7,16 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 public class ApiProductBase extends ApiBaseEntity {
 
 	@NotNull
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "product name", position = 2)
 	public String name;
 
-	@Length(max = 2000)
+	@Size(max = 2000)
 	@ApiModelProperty(value = "product description", position = 4)
 	public String description;
 

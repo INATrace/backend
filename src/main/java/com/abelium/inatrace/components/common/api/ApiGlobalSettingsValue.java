@@ -5,11 +5,13 @@ import org.springframework.validation.annotation.Validated;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.Size;
+
 @Validated
 public class ApiGlobalSettingsValue {
 
     @ApiModelProperty(value = "Global settings value", position = 0)
-    @Length(max = 1000)
+    @Size(max = 1000)
     public String value;
 
     @ApiModelProperty(value = "Can be accessed via public api", position = 1)

@@ -1,21 +1,19 @@
 package com.abelium.inatrace.components.user.api;
 
-import org.hibernate.validator.constraints.Length;
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.types.Language;
-
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.constraints.Size;
 
 @Validated
 public class ApiUserUpdate {
 
-	@Length(max = Lengths.NAME)
+	@Size(max = Lengths.NAME)
 	@ApiModelProperty(value = "Name", position = 1)
 	public String name;
-	
-	@Length(max = Lengths.SURNAME)
+
+	@Size(max = Lengths.SURNAME)
 	@ApiModelProperty(value = "Surname", position = 2)
 	public String surname;
 	

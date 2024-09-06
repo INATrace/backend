@@ -10,6 +10,8 @@ import com.abelium.inatrace.types.KnowledgeBlogType;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.Size;
+
 @Validated
 public class ApiKnowledgeBlogBase extends ApiBaseEntity {
 	
@@ -17,14 +19,14 @@ public class ApiKnowledgeBlogBase extends ApiBaseEntity {
 	public KnowledgeBlogType type;
 	
 	@ApiModelProperty(value = "Name", position = 3)
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	public String title;
 	
 	@ApiModelProperty(value = "Date", position = 6)
 	public LocalDate date;
 
 	@ApiModelProperty(value = "Youtube URL", position = 7)
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	public String youtubeUrl;	
 	
 

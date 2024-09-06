@@ -1,6 +1,7 @@
 package com.abelium.inatrace.components.product.api;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
@@ -12,7 +13,7 @@ import io.swagger.annotations.ApiModelProperty;
 @Validated
 public class ApiProcessDocument {
 	
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "description of this document", position = 1)
 	public String description;
 	

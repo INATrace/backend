@@ -8,54 +8,56 @@ import com.abelium.inatrace.components.common.api.ApiCountry;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.Size;
+
 @Validated
 public class ApiAddress {
 
-	@Length(max = Lengths.ADDRESS)
+	@Size(max = Lengths.ADDRESS)
     @ApiModelProperty(value = "address", position = 1)
 	public String address;
 	
-	@Length(max = Lengths.CITY)
+	@Size(max = Lengths.CITY)
     @ApiModelProperty(value = "city", position = 2)
 	public String city;
 
-	@Length(max = Lengths.STATE)
+	@Size(max = Lengths.STATE)
     @ApiModelProperty(value = "state / province / region", position = 3)
 	public String state;
 
-	@Length(max = Lengths.ZIPCODE)
+	@Size(max = Lengths.ZIPCODE)
     @ApiModelProperty(value = "ZIP / postal code / p.p. box", position = 4)
 	public String zip;
 
-	@Length(max = Lengths.CELL)
+	@Size(max = Lengths.CELL)
 	@ApiModelProperty(value = "Village cell", position = 5)
 	public String cell;
 
-	@Length(max = Lengths.SECTOR)
+	@Size(max = Lengths.SECTOR)
 	@ApiModelProperty(value = "Village sector", position = 6)
 	public String sector;
 
-	@Length(max = Lengths.VILLAGE)
+	@Size(max = Lengths.VILLAGE)
 	@ApiModelProperty(value = "Village name", position = 7)
 	public String village;
 
-	@Length(max = Lengths.OTHER_ADDRESS)
+	@Size(max = Lengths.OTHER_ADDRESS)
 	@ApiModelProperty(value = "Other/additional address field", position = 8)
 	public String otherAddress;
 
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "Honduras farm name", position = 9)
 	public String hondurasFarm;
 
-	@Length(max = Lengths.VILLAGE)
+	@Size(max = Lengths.VILLAGE)
 	@ApiModelProperty(value = "Honduras village name", position = 10)
 	public String hondurasVillage;
 
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "Honduras municipality name", position = 11)
 	public String hondurasMunicipality;
 
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "Honduras department name", position = 12)
 	public String hondurasDepartment;
 

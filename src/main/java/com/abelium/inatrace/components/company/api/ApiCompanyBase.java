@@ -7,15 +7,16 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 import java.util.Map;
 
 public class ApiCompanyBase extends ApiBaseEntity {
 
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "company name", position = 2)
 	public String name;
 
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "company abbreviation", position = 3)
 	public String abbreviation;	
 	
@@ -23,15 +24,15 @@ public class ApiCompanyBase extends ApiBaseEntity {
 	@Valid
 	public ApiAddress headquarters;
 
-	@Length(max = 2000)
+	@Size(max = 2000)
 	@ApiModelProperty(value = "about the company", position = 5)
 	public String about;
 	
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "name of manager / CEO", position = 6)
 	public String manager;
 	
-	@Length(max = Lengths.URL_PATH)
+	@Size(max = Lengths.URL_PATH)
 	@ApiModelProperty(value = "webpage", position = 7)
 	public String webPage;
 
@@ -41,12 +42,12 @@ public class ApiCompanyBase extends ApiBaseEntity {
 	@ApiModelProperty(value = "Enable adding multiple farmers for one proof document on purchase order form")
 	public Boolean purchaseProofDocumentMultipleFarmers;
 	
-	@Length(max = Lengths.EMAIL)
+	@Size(max = Lengths.EMAIL)
 	@Email
 	@ApiModelProperty(value = "email", position = 8)
 	public String email;
 	
-	@Length(max = Lengths.PHONE_NUMBER)
+	@Size(max = Lengths.PHONE_NUMBER)
 	@ApiModelProperty(value = "webpage", position = 9)
 	public String phone;
 	

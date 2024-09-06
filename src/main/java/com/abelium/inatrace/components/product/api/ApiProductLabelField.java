@@ -7,17 +7,19 @@ import com.abelium.inatrace.api.types.Lengths;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.Size;
+
 @Validated
 public class ApiProductLabelField {
 
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "Field name in Product", position = 1)
 	public String name;
 
 	@ApiModelProperty(value = "Visible on FE", position = 2)
 	public Boolean visible = true;
 	
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "Section on FE", position = 3)
 	public String section;
 

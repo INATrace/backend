@@ -4,10 +4,12 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Size;
+
 @Validated
 public class ApiProcess {
 
-	@Length(max = 2000)
+	@Size(max = 2000)
 	@ApiModelProperty(value = "production description - Briefly describe your production process", position = 1)
 	public String production;
 	

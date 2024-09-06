@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Validated
@@ -17,7 +18,7 @@ public class ApiCompany extends ApiCompanyBase {
 	@ApiModelProperty(value = "high-resolution logo of the company (jpeg, jpg, png)", position = 3)
 	public ApiDocument logo;
 	
-	@Length(max = 2000)
+	@Size(max = 2000)
 	@ApiModelProperty(value = "interview", position = 11)
 	public String interview;
 

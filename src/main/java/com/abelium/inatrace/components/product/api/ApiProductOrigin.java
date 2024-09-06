@@ -3,6 +3,7 @@ package com.abelium.inatrace.components.product.api;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
@@ -12,7 +13,7 @@ import io.swagger.annotations.ApiModelProperty;
 @Validated
 public class ApiProductOrigin {
 
-	@Length(max = 2000)
+	@Size(max = 2000)
 	@ApiModelProperty(value = "origin - text and quantity input - Briefly describe where the product or its ingredients are produced", position = 1)
 	public String text;
 

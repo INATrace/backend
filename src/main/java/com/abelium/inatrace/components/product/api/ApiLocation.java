@@ -1,6 +1,7 @@
 package com.abelium.inatrace.components.product.api;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +27,7 @@ public class ApiLocation {
 	@ApiModelProperty(value = "number of farmers at this location", position = 4)
 	public Integer numberOfFarmers;
 
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "pin (location) name", position = 5)
 	public String pinName;
 	

@@ -1,6 +1,7 @@
 package com.abelium.inatrace.components.analytics.api;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
@@ -20,18 +21,17 @@ public class ApiLogRequest {
 	@ApiModelProperty(value = "type", position = 1)
 	public RequestLogType type;
 	
-	@Length(max = Lengths.REQUEST_LOG_KEY)
+	@Size(max = Lengths.REQUEST_LOG_KEY)
 	@ApiModelProperty(value = "log key to store (max 64 chars)", position = 2)
 	public String logKey;
 
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "value 1 (max 255 chars)", position = 3)
 	public String value1;
 
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "value 2 (max 255 chars)", position = 4)
 	public String value2;
-	
 
 	public String getToken() {
 		return token;

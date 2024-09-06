@@ -2,6 +2,7 @@ package com.abelium.inatrace.components.user.api;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
@@ -15,29 +16,28 @@ import io.swagger.annotations.ApiModelProperty;
 public class ApiCreateUserRequest {
 	
     @NotNull
-	@Length(max = Lengths.EMAIL)
+	@Size(max = Lengths.EMAIL)
 	@Email
     @ApiModelProperty(required = true, value = "Email (username).", position = 0)
 	public String email;
 	
     @NotNull
-    @Length(max = Lengths.PASSWORD)
+    @Size(max = Lengths.PASSWORD)
     @ApiModelProperty(required = true, value = "Password.", position = 1)
     public String password = null;
 
     @NotNull
-    @Length(max = Lengths.NAME)
+    @Size(max = Lengths.NAME)
     @ApiModelProperty(required = true, value = "Name.", position = 2)
     public String name = null;
 
     @NotNull
-    @Length(max = Lengths.SURNAME)
+    @Size(max = Lengths.SURNAME)
     @ApiModelProperty(required = true, value = "Surname.", position = 3)
     public String surname = null;
     
 	@ApiModelProperty(value = "language", position = 4)
 	public Language language = Language.EN;
-
     
 	public String getEmail() {
 		return email;

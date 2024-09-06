@@ -6,18 +6,20 @@ import org.springframework.validation.annotation.Validated;
 import com.abelium.inatrace.api.types.Lengths;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.Size;
+
 @Validated
 public class ApiSustainability {
 	
-	@Length(max = 1000)
+	@Size(max = 1000)
 	@ApiModelProperty(value = "environmentally friendly production, max 1000 chars", position = 1)
 	public String production;
 
-	@Length(max = 1000)
+	@Size(max = 1000)
 	@ApiModelProperty(value = "sustainable packaging - Describe the environmental sustainability of your packaging, max 1000 chars", position = 2)
 	public String packaging;
 	
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "CO2 footprint - If you have calculated your company CO2 footprint, please add this information", position = 3)
 	public String co2Footprint;
 

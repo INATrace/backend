@@ -10,6 +10,7 @@ import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 
 @Validated
 public class ApiCompanyDocument extends ApiBaseEntity {
@@ -20,19 +21,19 @@ public class ApiCompanyDocument extends ApiBaseEntity {
 	@ApiModelProperty(value = "document category", position = 2)
 	public CompanyDocumentCategory category;
 
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "name", position = 3)
 	public String name;
 	
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "description of this document", position = 4)
 	public String description;
 
-	@Length(max = 2000)
+	@Size(max = 2000)
 	@ApiModelProperty(value = "quote of this document", position = 5)
 	public String quote;
 	
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	@ApiModelProperty(value = "link", position = 6)
 	public String link;
 	

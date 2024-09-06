@@ -13,6 +13,7 @@ import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Validated
@@ -28,19 +29,19 @@ public class ApiUserCustomer extends ApiBaseEntity {
 	public UserCustomerType type;
 	
 	@ApiModelProperty(value = "Name", position = 3)
-	@Length(max = Lengths.NAME)
+	@Size(max = Lengths.NAME)
 	public String name;
 	
 	@ApiModelProperty(value = "Surname", position = 4)
-	@Length(max = Lengths.SURNAME)
+	@Size(max = Lengths.SURNAME)
 	public String surname;
 	
 	@ApiModelProperty(value = "Phone", position = 5)
-	@Length(max = Lengths.PHONE_NUMBER)
+	@Size(max = Lengths.PHONE_NUMBER)
 	public String phone;
 
 	@ApiModelProperty(value = "Email", position = 6)
-	@Length(max = Lengths.EMAIL)
+	@Size(max = Lengths.EMAIL)
 	public String email;
 
 	@ApiModelProperty(value = "Has smartphone", position = 7)

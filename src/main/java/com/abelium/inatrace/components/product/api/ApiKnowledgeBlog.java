@@ -8,15 +8,17 @@ import org.springframework.validation.annotation.Validated;
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.Size;
+
 @Validated
 public class ApiKnowledgeBlog extends ApiKnowledgeBlogBase {
 	
 	@ApiModelProperty(value = "Abstract (summary)", position = 4)
-	@Length(max = 3000)
+	@Size(max = 3000)
 	public String summary;
 	
 	@ApiModelProperty(value = "Content", position = 5)
-	@Length(max = 5000)
+	@Size(max = 5000)
 	public String content;
 	
 	@ApiModelProperty(value = "Documents", position = 8)

@@ -20,7 +20,7 @@ public class ApiProductLabelBatch extends ApiBaseEntity {
 	public Long labelId;
 
 	@ApiModelProperty(value = "Batch number", position = 2)
-	@Pattern(regexp = "^[\\p{Alnum}]*$")
+	@Pattern(regexp = "^\\p{Alnum}*$")
 	public String number;
 	
 	@ApiModelProperty(value = "Production date", position = 3)

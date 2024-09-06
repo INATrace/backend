@@ -1,6 +1,7 @@
 package com.abelium.inatrace.components.company.api;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
@@ -17,33 +18,32 @@ public class ApiCompanyCustomer extends ApiBaseEntity {
 	public Long companyId;
 	
 	@ApiModelProperty(value = "Name", position = 2)
-	@Length(max = Lengths.NAME)
+	@Size(max = Lengths.NAME)
 	public String name;
 	
 	@ApiModelProperty(value = "Official company name", position = 3)
-	@Length(max = Lengths.NAME)
+	@Size(max = Lengths.NAME)
 	public String officialCompanyName;
 	
 	@ApiModelProperty(value = "Vat id", position = 4)
-	@Length(max = Lengths.VAT_ID)
+	@Size(max = Lengths.VAT_ID)
 	public String vatId;
 
 	@ApiModelProperty(value = "Contact", position = 5)
-	@Length(max = Lengths.DEFAULT)
+	@Size(max = Lengths.DEFAULT)
 	public String contact;
 	
 	@ApiModelProperty(value = "Phone", position = 6)
-	@Length(max = Lengths.PHONE_NUMBER)
+	@Size(max = Lengths.PHONE_NUMBER)
 	public String phone;
 
 	@ApiModelProperty(value = "Email", position = 7)
-	@Length(max = Lengths.EMAIL)
+	@Size(max = Lengths.EMAIL)
 	public String email;
 	
 	@ApiModelProperty(value = "Location", position = 8)
 	@Valid
 	public ApiGeoAddress location;
-
 	
 	public Long getCompanyId() {
 		return companyId;

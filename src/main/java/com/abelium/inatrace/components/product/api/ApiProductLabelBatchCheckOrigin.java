@@ -13,7 +13,7 @@ public class ApiProductLabelBatchCheckOrigin extends ApiBaseEntity {
 
 	@NotNull
 	@ApiModelProperty(value = "Batch number", position = 1)
-	@Pattern(regexp = "^[\\p{Alnum}]*$")
+	@Pattern(regexp = "^\\p{Alnum}*$")
 	public String number;
 	
 	public String getNumber() {

@@ -1,6 +1,7 @@
 package com.abelium.inatrace.components.common.api;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
@@ -18,14 +19,13 @@ public class ApiCountry {
     
     @NotNull
     @ApiModelProperty(required = true, value = "Two letter country code of country (ISO 3166-1 alpha-2 code).", position = 0)
-    @Length(max = Lengths.COUNTRY_CODE)
+    @Size(max = Lengths.COUNTRY_CODE)
     public String code = null;
 
     @NotNull
     @ApiModelProperty(required = true, value = "Country name.", position = 1)
-    @Length(max = Lengths.COUNTRY_NAME)
+    @Size(max = Lengths.COUNTRY_NAME)
     public String name = null;
-
     
     public ApiCountry() {}
 

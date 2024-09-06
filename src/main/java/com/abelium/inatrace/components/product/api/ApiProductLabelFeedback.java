@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Size;
 import java.util.Map;
 
 @Validated
@@ -19,11 +20,11 @@ public class ApiProductLabelFeedback extends ApiBaseEntity {
     public ProductLabelFeedbackType type;
 
 	@ApiModelProperty(value = "Email", position = 4)
-	@Length(max = Lengths.EMAIL)
+	@Size(max = Lengths.EMAIL)
 	public String email;
 	
 	@ApiModelProperty(value = "feedback text", position = 5)
-	@Length(max = 2000)
+	@Size(max = 2000)
 	public String feedback;
 
 	@ApiModelProperty(value = "GDPR consent", position = 6)

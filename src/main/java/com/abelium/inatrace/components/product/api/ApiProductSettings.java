@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Size;
 import java.util.Map;
 
 @Validated
@@ -20,22 +21,22 @@ public class ApiProductSettings {
 	@ApiModelProperty(value = "increase in income - document", position = 7)
 	public ApiDocument incomeIncreaseDocument;
 	
-	@Length(max = 2000)
+	@Size(max = 2000)
 	@ApiModelProperty(value = "increase in income - description", position = 8)
 	public String incomeIncreaseDescription;
 	
 	@ApiModelProperty(value = "language", position = 9)
 	public Language language;
 
-	@Length(max = 2000)
+	@Size(max = 2000)
 	@ApiModelProperty(value = "GDPR text", position = 10)
 	public String gdprText;
 	
-	@Length(max = 50_000)
+	@Size(max = 50_000)
 	@ApiModelProperty(value = "Privacy policy text", position = 11)
 	public String privacyPolicyText;
 	
-	@Length(max = 50_000)
+	@Size(max = 50_000)
 	@ApiModelProperty(value = "Terms of use text", position = 12)
 	public String termsOfUseText;
 
