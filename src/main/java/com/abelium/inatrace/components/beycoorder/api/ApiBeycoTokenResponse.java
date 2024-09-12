@@ -1,24 +1,24 @@
 package com.abelium.inatrace.components.beycoorder.api;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
 public class ApiBeycoTokenResponse {
 
-    @ApiModelProperty(value = "JWT token for authentication")
+    @Schema(description = "JWT token for authentication")
     private String accessToken;
 
-    @ApiModelProperty(value = "Type of token")
+    @Schema(description = "Type of token")
     private String tokenType;
 
-    @ApiModelProperty(value = "Remaining time of token's life")
+    @Schema(description = "Remaining time of token's life")
     private Long expiresIn;
 
-    @ApiModelProperty(value = "Refresh token")
+    @Schema(description = "Refresh token")
     private String refreshToken;
 
-    @ApiModelProperty(value = "Scope of the token")
+    @Schema(description = "Scope of the token")
     private List<String> scope;
 
     public String getAccessToken() {

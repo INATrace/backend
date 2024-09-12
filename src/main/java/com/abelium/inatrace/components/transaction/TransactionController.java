@@ -7,8 +7,8 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.transaction.api.ApiTransaction;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -32,9 +32,9 @@ public class TransactionController {
 	}
 
 	@GetMapping("list/input/stock-order/{stockOrderId}")
-	@ApiOperation("Get a paginated list of input transactions for provided stock order ID.")
+	@Operation(summary = "Get a paginated list of input transactions for provided stock order ID.")
 	public ApiPaginatedResponse<ApiTransaction> getStockOrderInputTransactions(
-			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("stockOrderId") Long stockOrderId,
+			@Valid @Parameter(name = "Company ID", required = true) @PathVariable("stockOrderId") Long stockOrderId,
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
@@ -42,9 +42,9 @@ public class TransactionController {
 	}
 
 	@PutMapping("/{id}/approve")
-	@ApiOperation("Approves transaction with provided ID.")
+	@Operation(summary = "Approves transaction with provided ID.")
 	public ApiDefaultResponse approveTransaction(
-			@Valid @ApiParam(value = "Transaction ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(name = "Transaction ID", required = true) @PathVariable("id") Long id,
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
@@ -53,9 +53,9 @@ public class TransactionController {
 	}
 
 	@PutMapping("/{id}/reject")
-	@ApiOperation("Rejects transaction with provided ID and reverts it's quantities.")
+	@Operation(summary = "Rejects transaction with provided ID and reverts it's quantities.")
 	public ApiDefaultResponse rejectTransaction(
-			@Valid @ApiParam(value = "Transaction ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(name = "Transaction ID", required = true) @PathVariable("id") Long id,
 			@Valid @RequestBody ApiTransaction apiTransaction,
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {

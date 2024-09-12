@@ -1,12 +1,11 @@
 package com.abelium.inatrace.api;
 
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
 
 public class ApiPaginatedQueryStringRequest extends ApiPaginatedRequest {
 	
-    @ApiParam(value = "Generic query string for (a part of) name, email etc.")
+    @Parameter(name = "Generic query string for (a part of) name, email etc.")
     public String queryString;
-
 
     public String getQueryString() {
         return queryString;

@@ -2,8 +2,7 @@ package com.abelium.inatrace.components.product.api;
 
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.types.Language;
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Size;
@@ -12,32 +11,32 @@ import java.util.Map;
 @Validated
 public class ApiProductSettings {
 
-	@ApiModelProperty(value = "cost breakdown", position = 4)
+	@Schema(description = "cost breakdown")
 	public Boolean costBreakdown;
 	
-	@ApiModelProperty(value = "pricing transparency - string-number map", position = 6)
+	@Schema(description = "pricing transparency - string-number map")
     public Map<String, Double> pricingTransparency;
 	
-	@ApiModelProperty(value = "increase in income - document", position = 7)
+	@Schema(description = "increase in income - document")
 	public ApiDocument incomeIncreaseDocument;
 	
 	@Size(max = 2000)
-	@ApiModelProperty(value = "increase in income - description", position = 8)
+	@Schema(description = "increase in income - description", maxLength = 2000)
 	public String incomeIncreaseDescription;
 	
-	@ApiModelProperty(value = "language", position = 9)
+	@Schema(description = "language")
 	public Language language;
 
 	@Size(max = 2000)
-	@ApiModelProperty(value = "GDPR text", position = 10)
+	@Schema(description = "GDPR text", maxLength = 2000)
 	public String gdprText;
 	
 	@Size(max = 50_000)
-	@ApiModelProperty(value = "Privacy policy text", position = 11)
+	@Schema(description = "Privacy policy text", maxLength = 50_000)
 	public String privacyPolicyText;
 	
 	@Size(max = 50_000)
-	@ApiModelProperty(value = "Terms of use text", position = 12)
+	@Schema(description = "Terms of use text", maxLength = 50_000)
 	public String termsOfUseText;
 
 	public Boolean getCostBreakdown() {

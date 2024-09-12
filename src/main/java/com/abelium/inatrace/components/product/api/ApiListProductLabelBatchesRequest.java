@@ -1,15 +1,15 @@
 package com.abelium.inatrace.components.product.api;
 
+import com.abelium.inatrace.api.ApiPaginatedRequest;
+import io.swagger.v3.oas.annotations.Parameter;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.validation.annotation.Validated;
 
-import com.abelium.inatrace.api.ApiPaginatedRequest;
-
-import io.swagger.annotations.ApiParam;
-
 @Validated
+@ParameterObject
 public class ApiListProductLabelBatchesRequest extends ApiPaginatedRequest {
 
-	@ApiParam(value = "Batch number (start of it)")
+	@Parameter(name = "Batch number (start of it)")
 	public String number;
 
 	public String getNumber() {

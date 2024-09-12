@@ -1,20 +1,19 @@
 package com.abelium.inatrace.components.user.api;
 
-import javax.validation.constraints.NotNull;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.NotNull;
 
 @Validated
 public class ApiResetPasswordRequest {
 	
     @NotNull
-    @ApiModelProperty(required = true, value = "Reset password token.", position = 0)
+    @Schema(description = "Reset password token.", requiredMode = Schema.RequiredMode.REQUIRED)
 	public String token;
 	
     @NotNull
-    @ApiModelProperty(required = true, value = "Password.", position = 1)
+    @Schema(description = "Password.", requiredMode = Schema.RequiredMode.REQUIRED)
 	public String password;
 
 	public String getToken() {

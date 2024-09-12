@@ -1,7 +1,7 @@
 package com.abelium.inatrace.components.stockorder.api;
 
 import com.abelium.inatrace.components.common.api.ApiCertification;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,31 +13,31 @@ import java.util.List;
  */
 public class ApiQRTagPublic {
 
-	@ApiModelProperty(value = "The QR code tag")
+	@Schema(description = "The QR code tag")
 	private String qrTag;
 
-	@ApiModelProperty(value = "The global (product) order of the Stock order")
+	@Schema(description = "The global (product) order of the Stock order")
 	private String orderId;
 
-	@ApiModelProperty(value = "The Producer name")
+	@Schema(description = "The Producer name")
 	private String producerName;
 
-	@ApiModelProperty(value = "Price paid to producer in EUR/kg")
+	@Schema(description = "Price paid to producer in EUR/kg")
 	private BigDecimal priceToProducer;
 
-	@ApiModelProperty(value = "Price paid to farmers in EUR/kg")
+	@Schema(description = "Price paid to farmers in EUR/kg")
 	private BigDecimal priceToFarmer;
 
-	@ApiModelProperty(value = "The cupping score entered during one of the processing actions")
+	@Schema(description = "The cupping score entered during one of the processing actions")
 	private BigDecimal cuppingScore;
 
-	@ApiModelProperty(value = "The cupping flavour entered during one of the processing actions")
+	@Schema(description = "The cupping flavour entered during one of the processing actions")
 	private String cuppingFlavour;
 
-	@ApiModelProperty(value = "The roasting profile entered during one of the processing actions")
+	@Schema(description = "The roasting profile entered during one of the processing actions")
 	private String roastingProfile;
 
-	@ApiModelProperty(value = "List of certificates of the participating companies in this Stock order")
+	@Schema(description = "List of certificates of the participating companies in this Stock order")
 	private List<ApiCertification> certificates;
 
 	private ApiHistoryTimeline historyTimeline;

@@ -2,23 +2,23 @@ package com.abelium.inatrace.components.stockorder.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.company.api.ApiAddress;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiStockOrderLocation extends ApiBaseEntity {
 
-    @ApiModelProperty(value = "Location address", position = 1)
+    @Schema(description = "Location address")
     public ApiAddress address;
 
-    @ApiModelProperty(value = "Location latitude", position = 2)
+    @Schema(description = "Location latitude")
     public Double latitude;
 
-    @ApiModelProperty(value = "Location longitude", position = 3)
+    @Schema(description = "Location longitude")
     public Double longitude;
 
-    @ApiModelProperty(value = "Number of frames", position = 4)
+    @Schema(description = "Number of frames")
     public Integer numberOfFarmers;
 
-    @ApiModelProperty(value = "Pin name", position = 5)
+    @Schema(description = "Pin name")
     public String pinName;
 
     public ApiAddress getAddress() {

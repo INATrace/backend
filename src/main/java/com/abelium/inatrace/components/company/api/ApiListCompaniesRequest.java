@@ -1,23 +1,23 @@
 package com.abelium.inatrace.components.company.api;
 
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.types.CompanyStatus;
 import com.abelium.inatrace.types.Language;
-
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.validation.annotation.Validated;
 
 @Validated
+@ParameterObject
 public class ApiListCompaniesRequest extends ApiPaginatedRequest {
 
-	@ApiParam(value = "Language")
+	@Parameter(name = "Language")
 	public Language language = Language.EN;
 	
-	@ApiParam(value = "Company status, sortable")
+	@Parameter(name = "Company status, sortable")
 	public CompanyStatus status;
 	
-	@ApiParam(value = "Company name (start of name), sortable")
+	@Parameter(name = "Company name (start of name), sortable")
 	public String name;
 	
 	public Language getLanguage() {

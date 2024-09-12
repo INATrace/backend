@@ -6,13 +6,13 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiProductLabelUpdateValues extends ApiProductLabelBase {
 	
 	@NotNull
-	@ApiModelProperty(value = "Fields", position = 5)
+	@Schema(description = "Fields")
 	public List<ApiProductLabelFieldValue> fields;
 
 	public List<ApiProductLabelFieldValue> getFields() {

@@ -6,8 +6,8 @@ import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.productorder.api.ApiProductOrder;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -31,16 +31,16 @@ public class ProductOrderController {
 	}
 
 	@GetMapping("{id}")
-	@ApiOperation("Get a single product order with the provided ID.")
+	@Operation(summary = "Get a single product order with the provided ID.")
 	public ApiResponse<ApiProductOrder> getProductOrder(
-			@Valid @ApiParam(value = "Product order ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(name = "Product order ID", required = true) @PathVariable("id") Long id,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
 		return new ApiResponse<>(productOrderService.getProductOrder(id, language));
 	}
 
 	@PostMapping
-	@ApiOperation("Create product order.")
+	@Operation(summary = "Create product order.")
 	public ApiResponse<ApiBaseEntity> createProductOrder(
 			@Valid @RequestBody ApiProductOrder apiProductOrder,
 			@AuthenticationPrincipal CustomUserDetails authUser,

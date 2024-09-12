@@ -63,9 +63,17 @@ public class JpaMigrationResolver implements MigrationResolver {
 
             try {
 
-                Collection<Class<? extends JpaMigration>> classes = new Scanner<>(JpaMigration.class,
-                        List.of(locations), classLoader, StandardCharsets.UTF_8, true, new ResourceNameCache(),
-                        new LocationScannerCache()).getClasses();
+                Collection<Class<? extends JpaMigration>> classes = new Scanner<>(
+                        JpaMigration.class,
+                        List.of(locations),
+                        classLoader,
+                        StandardCharsets.UTF_8,
+                        false,
+                        true,
+                        new ResourceNameCache(),
+                        new LocationScannerCache(),
+                        false
+                ).getClasses();
 
                 for (Class<?> clazz : classes) {
                     JpaMigration migration = ClassUtils.instantiate(clazz.getName(), classLoader);

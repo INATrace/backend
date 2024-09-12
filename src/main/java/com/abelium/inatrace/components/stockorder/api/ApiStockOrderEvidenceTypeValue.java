@@ -4,7 +4,7 @@ import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Instant;
@@ -12,21 +12,21 @@ import java.time.Instant;
 @Validated
 public class ApiStockOrderEvidenceTypeValue {
 
-	@ApiModelProperty(value = "The id of the Processing evidence type from the codebook", position = 1)
+	@Schema(description = "The id of the Processing evidence type from the codebook")
 	private Long evidenceTypeId;
 
-	@ApiModelProperty(value = "The field code of the Processing evidence type from the codebook", position = 2)
+	@Schema(description = "The field code of the Processing evidence type from the codebook")
 	private String evidenceTypeCode;
 
-	@ApiModelProperty(value = "The field label of the Processing evidence type from the codebook")
+	@Schema(description = "The field label of the Processing evidence type from the codebook")
 	private String evidenceTypeLabel;
 
-	@ApiModelProperty(value = "The date of the document upload", position = 1)
+	@Schema(description = "The date of the document upload")
 	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
 	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
 	private Instant date;
 
-	@ApiModelProperty(value = "The attached document reference of the processing evidence", position = 4)
+	@Schema(description = "The attached document reference of the processing evidence")
 	private ApiDocument document;
 
 	public Long getEvidenceTypeId() {

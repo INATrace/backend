@@ -16,10 +16,13 @@ import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.db.entities.codebook.ProductType;
 import com.abelium.inatrace.db.entities.common.Country;
 import com.abelium.inatrace.db.entities.common.Document;
+import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.security.service.CustomUserDetails;
+import com.abelium.inatrace.security.utils.PermissionsUtil;
 import com.abelium.inatrace.types.Gender;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserCustomerType;
+import com.abelium.inatrace.types.UserRole;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -44,12 +47,22 @@ import java.util.stream.Collectors;
 public class UserCustomerImportService extends BaseService {
 
     @Autowired
+    private CompanyQueries companyQueries;
+
+    @Autowired
     private CompanyService companyService;
 
     @Autowired
     private StorageService storageService;
 
-    public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, CustomUserDetails user, Language language) throws ApiException {
+    public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, CustomUserDetails authUser, Language language) throws ApiException {
+
+        // If importing as a Regional admin, check that it is enrolled in the company
+        if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
+            Company company = companyQueries.fetchCompany(companyId);
+            PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
+        }
+
         DocumentData documentData = storageService.downloadDocument(em.find(Document.class, documentId).getStorageKey());
         InputStream inputStream;
         XSSFWorkbook mainWorkbook;
@@ -182,7 +195,7 @@ public class UserCustomerImportService extends BaseService {
         // no user customer should be persisted
         if (response.getValidationErrors().isEmpty()) {
             for (ApiUserCustomer apiUserCustomer : toAdd) {
-                companyService.addUserCustomer(companyId, apiUserCustomer, user, language);
+                companyService.addUserCustomer(companyId, apiUserCustomer, authUser, language);
                 successful++;
             }
 

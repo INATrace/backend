@@ -2,8 +2,7 @@ package com.abelium.inatrace.components.company.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.types.Lengths;
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
@@ -13,45 +12,45 @@ import java.util.Map;
 public class ApiCompanyBase extends ApiBaseEntity {
 
 	@Size(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "company name", position = 2)
+	@Schema(description = "company name", maxLength = Lengths.DEFAULT)
 	public String name;
 
 	@Size(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "company abbreviation", position = 3)
+	@Schema(description = "company abbreviation", maxLength = Lengths.DEFAULT)
 	public String abbreviation;	
 	
-	@ApiModelProperty(value = "headquarters", position = 4)
+	@Schema(description = "headquarters")
 	@Valid
 	public ApiAddress headquarters;
 
 	@Size(max = 2000)
-	@ApiModelProperty(value = "about the company", position = 5)
+	@Schema(description = "about the company", maxLength = 2000)
 	public String about;
 	
 	@Size(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "name of manager / CEO", position = 6)
+	@Schema(description = "name of manager / CEO")
 	public String manager;
 	
 	@Size(max = Lengths.URL_PATH)
-	@ApiModelProperty(value = "webpage", position = 7)
+	@Schema(description = "webpage", maxLength = Lengths.URL_PATH)
 	public String webPage;
 
-	@ApiModelProperty(value = "Display preferred way of payment on purchase order form")
+	@Schema(description = "Display preferred way of payment on purchase order form")
 	public Boolean displayPrefferedWayOfPayment;
 
-	@ApiModelProperty(value = "Enable adding multiple farmers for one proof document on purchase order form")
+	@Schema(description = "Enable adding multiple farmers for one proof document on purchase order form")
 	public Boolean purchaseProofDocumentMultipleFarmers;
 	
 	@Size(max = Lengths.EMAIL)
 	@Email
-	@ApiModelProperty(value = "email", position = 8)
+	@Schema(description = "email", maxLength = Lengths.EMAIL)
 	public String email;
 	
 	@Size(max = Lengths.PHONE_NUMBER)
-	@ApiModelProperty(value = "webpage", position = 9)
+	@Schema(description = "webpage", maxLength = Lengths.PHONE_NUMBER)
 	public String phone;
 	
-	@ApiModelProperty(value = "social media URL links (Facebook, Instagram, Twitter, YouTube, ...)", position = 10)
+	@Schema(description = "social media URL links (Facebook, Instagram, Twitter, YouTube, ...)")
 	public Map<String, String> mediaLinks;
 	
 	public String getName() {

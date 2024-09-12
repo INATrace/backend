@@ -2,7 +2,7 @@ package com.abelium.inatrace.components.product.api;
 
 import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -11,23 +11,23 @@ import java.util.List;
 @Validated
 public class ApiProduct extends ApiProductContent {
 
-	@ApiModelProperty(value = "company", position = 14)
+	@Schema(description = "company")
 	public ApiCompany company;
 	
-	@ApiModelProperty(value = "associated companies", position = 14)
+	@Schema(description = "associated companies")
 	@Valid
 	public List<ApiProductCompany> associatedCompanies;
 	
-	@ApiModelProperty(value = "labels", position = 15)
+	@Schema(description = "labels")
 	public List<ApiProductLabelValues> labels;
 
-	@ApiModelProperty(value = "Value chain")
+	@Schema(description = "Value chain")
 	public ApiValueChain valueChain;
 
-	@ApiModelProperty(value = "Data sharing agreements")
+	@Schema(description = "Data sharing agreements")
 	private List<ApiProductDataSharingAgreement> dataSharingAgreements;
     
-    @ApiModelProperty(value = "Product journey path")
+    @Schema(description = "Product journey path")
     private List<ApiProductJourneyMarker> journeyMarkers;
 
 	public ApiCompany getCompany() {

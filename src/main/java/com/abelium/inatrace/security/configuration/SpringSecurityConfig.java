@@ -13,7 +13,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
@@ -22,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
     prePostEnabled = true
 )
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
-	
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -32,22 +31,17 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     public TokenAuthenticationFilter tokenAuthenticationFilter() {
         return new TokenAuthenticationFilter();
     }
-    
+
     @Bean(BeanIds.AUTHENTICATION_MANAGER)
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-		
-	
-	private static String[] swaggerExceptions = new String[] {
-        "/v2/api-docs",
-        "/swagger-resources",
-        "/swagger-resources/**",
-        "/configuration/ui",
-        "/configuration/security",
-        "/swagger-ui.html",
-        "/webjars/**"
+
+	private static final String[] SWAGGER_EXCEPTIONS = new String[] {
+        "/v3/api-docs",
+        "/v3/api-docs/swagger-config",
+        "/swagger-ui/**"
 	};
 
     @Override
@@ -58,19 +52,17 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             .formLogin().disable()
             .httpBasic().disable()
             .exceptionHandling().authenticationEntryPoint(new RestAuthenticationEntryPoint()).and()
-        	//.and().requestMatchers().antMatchers("/")
         	.authorizeRequests()
-        		.antMatchers("/api/public/**", 
+        		.antMatchers("/api/public/**",
         				"/api/user/login",
         				"/api/user/refresh_authentication",
         				"/api/user/register",
         				"/api/user/request_reset_password",
         				"/api/user/reset_password",
         				"/api/user/confirm_email").permitAll()
-        		.antMatchers(swaggerExceptions).permitAll()
-        		.anyRequest().authenticated();		
+        		.antMatchers(SWAGGER_EXCEPTIONS).permitAll()
+        		.anyRequest().authenticated();
         http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
     }
 
 }

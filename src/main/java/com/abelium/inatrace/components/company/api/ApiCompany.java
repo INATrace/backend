@@ -4,8 +4,7 @@ import com.abelium.inatrace.components.codebook.currencies.api.ApiCurrencyType;
 import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -15,30 +14,30 @@ import java.util.List;
 @Validated
 public class ApiCompany extends ApiCompanyBase {
 
-	@ApiModelProperty(value = "high-resolution logo of the company (jpeg, jpg, png)", position = 3)
+	@Schema(description = "high-resolution logo of the company (jpeg, jpg, png)")
 	public ApiDocument logo;
 	
 	@Size(max = 2000)
-	@ApiModelProperty(value = "interview", position = 11)
+	@Schema(description = "interview", maxLength = 2000)
 	public String interview;
 
-	@ApiModelProperty(value = "company documents", position = 12)
+	@Schema(description = "company documents")
 	@Valid
 	public List<ApiCompanyDocument> documents;	
 
-	@ApiModelProperty(value = "company certifications", position = 13)
+	@Schema(description = "company certifications")
 	@Valid
 	public List<ApiCertification> certifications;
 
-	@ApiModelProperty(value = "company value chains", position = 14)
+	@Schema(description = "company value chains")
 	@Valid
 	public List<ApiValueChain> valueChains;
 
-	@ApiModelProperty(value = "Preferred currency of the company")
+	@Schema(description = "Preferred currency of the company")
 	@Valid
 	public ApiCurrencyType currency;
 
-	@ApiModelProperty(value = "Is company allowed to export orders to Beyco platform")
+	@Schema(description = "Is company allowed to export orders to Beyco platform")
 	@Valid
 	public Boolean allowBeycoIntegration;
 	

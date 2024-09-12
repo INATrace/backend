@@ -2,28 +2,26 @@ package com.abelium.inatrace.components.product.api;
 
 import java.util.List;
 
-import org.hibernate.validator.constraints.Length;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import com.abelium.inatrace.components.common.api.ApiDocument;
-import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.Size;
 
 @Validated
 public class ApiKnowledgeBlog extends ApiKnowledgeBlogBase {
-	
-	@ApiModelProperty(value = "Abstract (summary)", position = 4)
-	@Size(max = 3000)
-	public String summary;
-	
-	@ApiModelProperty(value = "Content", position = 5)
-	@Size(max = 5000)
-	public String content;
-	
-	@ApiModelProperty(value = "Documents", position = 8)
-	public List<ApiDocument> documents;
 
+	@Size(max = 3000)
+	@Schema(description = "Abstract (summary)", maxLength = 3000)
+	public String summary;
+
+	@Size(max = 5000)
+	@Schema(description = "Content", maxLength = 5000)
+	public String content;
+
+	@Schema(description = "Documents")
+	public List<ApiDocument> documents;
 
 	public String getSummary() {
 		return summary;

@@ -8,24 +8,24 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.types.KnowledgeBlogType;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.validation.constraints.Size;
 
 @Validated
 public class ApiKnowledgeBlogBase extends ApiBaseEntity {
 	
-	@ApiModelProperty(value = "Type", position = 2)
+	@Schema(description = "Type")
 	public KnowledgeBlogType type;
 	
-	@ApiModelProperty(value = "Name", position = 3)
+	@Schema(description = "Name")
 	@Size(max = Lengths.DEFAULT)
 	public String title;
 	
-	@ApiModelProperty(value = "Date", position = 6)
+	@Schema(description = "Date")
 	public LocalDate date;
 
-	@ApiModelProperty(value = "Youtube URL", position = 7)
+	@Schema(description = "Youtube URL")
 	@Size(max = Lengths.DEFAULT)
 	public String youtubeUrl;	
 	

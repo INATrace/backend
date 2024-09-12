@@ -4,15 +4,15 @@ import java.util.List;
 
 import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiProductLabel extends ApiProductLabelBase {
 	
-	@ApiModelProperty(value = "Fields", position = 6)
+	@Schema(description = "Fields")
 	public List<ApiProductLabelField> fields;
 
-	@ApiModelProperty(value = "B2C settings")
+	@Schema(description = "B2C settings")
 	private ApiBusinessToCustomerSettings businessToCustomerSettings;
 
 	public List<ApiProductLabelField> getFields() {

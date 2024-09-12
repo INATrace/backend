@@ -1,13 +1,12 @@
 package com.abelium.inatrace.components.user.api;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
-
-import io.swagger.annotations.ApiModelProperty;
 
 @Validated
 public class ApiAdminUserUpdate extends ApiUserUpdate {
 
-	@ApiModelProperty(value = "Name", position = 0)
+	@Schema(description = "Name")
 	public Long id;
 
 	public Long getId() {

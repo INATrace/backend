@@ -8,16 +8,16 @@ import org.springframework.validation.annotation.Validated;
 
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.components.common.api.ApiDocument;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiProcessDocument {
 	
 	@Size(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "description of this document", position = 1)
+	@Schema(description = "description of this document")
 	public String description;
 	
-	@ApiModelProperty(value = "certificate for this document", position = 2)
+	@Schema(description = "certificate for this document")
 	@Valid
 	public ApiDocument document;
 

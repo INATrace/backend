@@ -1,12 +1,9 @@
 package com.abelium.inatrace.components.company.api;
 
-import org.hibernate.validator.constraints.Length;
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.components.common.api.ApiCountry;
-
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Size;
 
@@ -14,54 +11,54 @@ import javax.validation.constraints.Size;
 public class ApiAddress {
 
 	@Size(max = Lengths.ADDRESS)
-    @ApiModelProperty(value = "address", position = 1)
+    @Schema(description = "address", maxLength = Lengths.ADDRESS)
 	public String address;
 	
 	@Size(max = Lengths.CITY)
-    @ApiModelProperty(value = "city", position = 2)
+    @Schema(description = "city", maxLength = Lengths.CITY)
 	public String city;
 
 	@Size(max = Lengths.STATE)
-    @ApiModelProperty(value = "state / province / region", position = 3)
+    @Schema(description = "state / province / region", maxLength = Lengths.STATE)
 	public String state;
 
 	@Size(max = Lengths.ZIPCODE)
-    @ApiModelProperty(value = "ZIP / postal code / p.p. box", position = 4)
+    @Schema(description = "ZIP / postal code / p.p. box", maxLength = Lengths.ZIPCODE)
 	public String zip;
 
 	@Size(max = Lengths.CELL)
-	@ApiModelProperty(value = "Village cell", position = 5)
+	@Schema(description = "Village cell", maxLength = Lengths.CELL)
 	public String cell;
 
 	@Size(max = Lengths.SECTOR)
-	@ApiModelProperty(value = "Village sector", position = 6)
+	@Schema(description = "Village sector", maxLength = Lengths.SECTOR)
 	public String sector;
 
 	@Size(max = Lengths.VILLAGE)
-	@ApiModelProperty(value = "Village name", position = 7)
+	@Schema(description = "Village name", maxLength = Lengths.VILLAGE)
 	public String village;
 
 	@Size(max = Lengths.OTHER_ADDRESS)
-	@ApiModelProperty(value = "Other/additional address field", position = 8)
+	@Schema(description = "Other/additional address field", maxLength = Lengths.OTHER_ADDRESS)
 	public String otherAddress;
 
 	@Size(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "Honduras farm name", position = 9)
+	@Schema(description = "Honduras farm name", maxLength = Lengths.DEFAULT)
 	public String hondurasFarm;
 
 	@Size(max = Lengths.VILLAGE)
-	@ApiModelProperty(value = "Honduras village name", position = 10)
+	@Schema(description = "Honduras village name", maxLength = Lengths.VILLAGE)
 	public String hondurasVillage;
 
 	@Size(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "Honduras municipality name", position = 11)
+	@Schema(description = "Honduras municipality name", maxLength = Lengths.DEFAULT)
 	public String hondurasMunicipality;
 
 	@Size(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "Honduras department name", position = 12)
+	@Schema(description = "Honduras department name", maxLength = Lengths.DEFAULT)
 	public String hondurasDepartment;
 
-    @ApiModelProperty(value = "country", position = 13)
+    @Schema(description = "country")
 	public ApiCountry country;
 
 	public String getAddress() {

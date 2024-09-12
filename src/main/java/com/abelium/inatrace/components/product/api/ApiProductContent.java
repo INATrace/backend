@@ -1,7 +1,7 @@
 package com.abelium.inatrace.components.product.api;
 
 import com.abelium.inatrace.components.common.api.ApiDocument;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -9,26 +9,26 @@ import javax.validation.Valid;
 @Validated
 public class ApiProductContent extends ApiProductBase {
 
-	@ApiModelProperty(value = "high-resolution photo of the product (jpeg, jpg, png), 72dpi and 1200x2000px recommended", position = 3)
+	@Schema(description = "high-resolution photo of the product (jpeg, jpg, png), 72dpi and 1200x2000px recommended")
 	public ApiDocument photo;	
 	
-	@ApiModelProperty(value = "process", position = 11)
+	@Schema(description = "process")
 	@Valid
 	public ApiProcess process;
 	
-	@ApiModelProperty(value = "social responsibility", position = 12)
+	@Schema(description = "social responsibility")
 	@Valid
 	public ApiResponsibility responsibility;
 	
-	@ApiModelProperty(value = "environmental sustainability", position = 13)
+	@Schema(description = "environmental sustainability")
 	@Valid
 	public ApiSustainability sustainability;
 
-	@ApiModelProperty(value = "settings", position = 18)
+	@Schema(description = "settings")
 	@Valid
 	public ApiProductSettings settings;
 
-	@ApiModelProperty(value = "B2C settings", position = 21)
+	@Schema(description = "B2C settings")
 	private ApiBusinessToCustomerSettings businessToCustomerSettings;
 	
 	public ApiDocument getPhoto() {

@@ -9,28 +9,28 @@ import org.springframework.validation.annotation.Validated;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.types.RequestLogType;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiLogRequest {
 
-	@ApiModelProperty(value = "request token", position = 0)
+	@Schema(description = "request token")
 	public String token;
 
 	@NotNull
-	@ApiModelProperty(value = "type", position = 1)
+	@Schema(description = "type")
 	public RequestLogType type;
 	
 	@Size(max = Lengths.REQUEST_LOG_KEY)
-	@ApiModelProperty(value = "log key to store (max 64 chars)", position = 2)
+	@Schema(description = "log key to store (max 64 chars)")
 	public String logKey;
 
 	@Size(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "value 1 (max 255 chars)", position = 3)
+	@Schema(description = "value 1 (max 255 chars)")
 	public String value1;
 
 	@Size(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "value 2 (max 255 chars)", position = 4)
+	@Schema(description = "value 2 (max 255 chars)")
 	public String value2;
 
 	public String getToken() {

@@ -77,9 +77,6 @@ public class CompanyService extends BaseService {
 	private CommonService commonService;
 
 	@Autowired
-	private UserCustomerImportService userCustomerImportService;
-
-	@Autowired
 	private AgStackClientService agStackClientService;
 
 	@Autowired
@@ -1663,17 +1660,6 @@ public class CompanyService extends BaseService {
 				and(companyUser.getRole()).eq(CompanyUserRole.COMPANY_ADMIN);
 		List<CompanyUser> companyUserList = Torpedo.select(companyUser).list(em);
 		return !companyUserList.isEmpty();
-	}
-
-	public ApiUserCustomerImportResponse importFarmersSpreadsheet(Long companyId, Long documentId, CustomUserDetails authUser, Language language) throws ApiException {
-
-		// If importing as a Regional admin, check that it is enrolled in the company
-		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
-			Company company = companyQueries.fetchCompany(companyId);
-			PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
-		}
-
-		return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId, authUser, language);
 	}
 
 	public ApiPaginatedList<ApiValueChain> getCompanyValueChainList(Long companyId, ApiPaginatedRequest request, CustomUserDetails authUser) throws ApiException {

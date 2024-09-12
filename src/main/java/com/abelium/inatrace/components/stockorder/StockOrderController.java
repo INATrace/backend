@@ -10,8 +10,8 @@ import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,10 +34,10 @@ public class StockOrderController {
     }
 
     @GetMapping("{id}")
-    @ApiOperation("Get a single stock order with the provided ID.")
+    @Operation(summary ="Get a single stock order with the provided ID.")
     public ApiResponse<ApiStockOrder> getStockOrder(
-            @Valid @ApiParam(value = "StockOrder ID", required = true) @PathVariable("id") Long id,
-            @Valid @ApiParam(value = "Return the processing order base data") @RequestParam(value = "withProcessingOrder", required = false) Boolean withProcessingOrder,
+            @Valid @Parameter(name = "StockOrder ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(name = "Return the processing order base data") @RequestParam(value = "withProcessingOrder", required = false) Boolean withProcessingOrder,
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
@@ -45,9 +45,9 @@ public class StockOrderController {
     }
 
     @GetMapping("{id}/processing-order")
-    @ApiOperation("Get the Processing order that contains the Stock order with the provided ID.")
+    @Operation(summary ="Get the Processing order that contains the Stock order with the provided ID.")
     public ApiResponse<ApiProcessingOrder> getStockOrderProcessingOrder(
-            @Valid @ApiParam(value = "StockOrder ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(name = "StockOrder ID", required = true) @PathVariable("id") Long id,
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
     ) throws ApiException {
@@ -56,17 +56,17 @@ public class StockOrderController {
     }
 
     @GetMapping("/list/facility/{facilityId}/available")
-    @ApiOperation("Get a paginated list of stock orders for provided facility ID and semi-product or final product ID.")
+    @Operation(summary ="Get a paginated list of stock orders for provided facility ID and semi-product or final product ID.")
     public ApiPaginatedResponse<ApiStockOrder> getAvailableStockForStockUnitInFacility(
             @Valid ApiPaginatedRequest request,
-            @Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("facilityId") Long facilityId,
-            @Valid @ApiParam(value = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
-            @Valid @ApiParam(value = "Final product ID") @RequestParam(value = "finalProductId", required = false) Long finalProductId,
-            @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
-            @Valid @ApiParam(value = "Organic only") @RequestParam(value = "organicOnly", required = false) Boolean organicOnly,
-            @Valid @ApiParam(value = "Internal LOT name") @RequestParam(value = "internalLotName", required = false) String internalLotName,
-            @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
-            @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
+            @Valid @Parameter(name = "Facility ID", required = true) @PathVariable("facilityId") Long facilityId,
+            @Valid @Parameter(name = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+            @Valid @Parameter(name = "Final product ID") @RequestParam(value = "finalProductId", required = false) Long finalProductId,
+            @Valid @Parameter(name = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
+            @Valid @Parameter(name = "Organic only") @RequestParam(value = "organicOnly", required = false) Boolean organicOnly,
+            @Valid @Parameter(name = "Internal LOT name") @RequestParam(value = "internalLotName", required = false) String internalLotName,
+            @Valid @Parameter(name = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+            @Valid @Parameter(name = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
@@ -88,19 +88,19 @@ public class StockOrderController {
     }
 
     @GetMapping("list/facility/{facilityId}")
-    @ApiOperation("Get a paginated list of stock orders by facility ID.")
+    @Operation(summary ="Get a paginated list of stock orders by facility ID.")
     public ApiPaginatedResponse<ApiStockOrder> getStockOrderListByFacilityId(
             @Valid ApiPaginatedRequest request,
-            @Valid @ApiParam(value = "Facility ID", required = true) @PathVariable("facilityId") Long facilityId,
-            @Valid @ApiParam(value = "Is open balance only") @RequestParam(value = "isOpenBalanceOnly", required = false) Boolean isOpenBalanceOnly,
-            @Valid @ApiParam(value = "Is purchase orders only") @RequestParam(value = "isPurchaseOrderOnly", required = false) Boolean isPurchaseOrderOnly,
-            @Valid @ApiParam(value = "Available orders only") @RequestParam(value = "availableOnly", required = false) Boolean availableOnly,
-            @Valid @ApiParam(value = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
-            @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
-            @Valid @ApiParam(value = "Way of payment") @RequestParam(value = "wayOfPayment", required = false) PreferredWayOfPayment wayOfPayment,
-            @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
-            @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
-            @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName,
+            @Valid @Parameter(name = "Facility ID", required = true) @PathVariable("facilityId") Long facilityId,
+            @Valid @Parameter(name = "Is open balance only") @RequestParam(value = "isOpenBalanceOnly", required = false) Boolean isOpenBalanceOnly,
+            @Valid @Parameter(name = "Is purchase orders only") @RequestParam(value = "isPurchaseOrderOnly", required = false) Boolean isPurchaseOrderOnly,
+            @Valid @Parameter(name = "Available orders only") @RequestParam(value = "availableOnly", required = false) Boolean availableOnly,
+            @Valid @Parameter(name = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+            @Valid @Parameter(name = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
+            @Valid @Parameter(name = "Way of payment") @RequestParam(value = "wayOfPayment", required = false) PreferredWayOfPayment wayOfPayment,
+            @Valid @Parameter(name = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+            @Valid @Parameter(name = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
+            @Valid @Parameter(name = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName,
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
@@ -127,13 +127,13 @@ public class StockOrderController {
     }
 
     @GetMapping("list/company/{companyId}/orders-for-customers")
-    @ApiOperation("Get a paginated list of stock orders by facility ID for customers.")
+    @Operation(summary ="Get a paginated list of stock orders by facility ID for customers.")
     public ApiPaginatedResponse<ApiStockOrder> getStockOrdersInFacilityForCustomer(
             @Valid ApiPaginatedRequest request,
-            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
-            @Valid @ApiParam(value = "Facility ID") @RequestParam(value = "facilityId", required = false) Long facilityId,
-            @Valid @ApiParam(value = "Company customer ID") @RequestParam(value = "companyCustomerId", required = false) Long companyCustomerId,
-            @Valid @ApiParam(value = "Return only open stock orders") @RequestParam(value = "openOnly", required = false) Boolean openOnly,
+            @Valid @Parameter(name = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @Parameter(name = "Facility ID") @RequestParam(value = "facilityId", required = false) Long facilityId,
+            @Valid @Parameter(name = "Company customer ID") @RequestParam(value = "companyCustomerId", required = false) Long companyCustomerId,
+            @Valid @Parameter(name = "Return only open stock orders") @RequestParam(value = "openOnly", required = false) Boolean openOnly,
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
@@ -152,10 +152,10 @@ public class StockOrderController {
     @GetMapping("list/company/{companyId}/quote-orders")
     public ApiPaginatedResponse<ApiStockOrder> getQuoteOrdersInFacility(
             @Valid ApiPaginatedRequest request,
-            @Valid @ApiParam(value = "Quote company ID", required = true) @PathVariable("companyId") Long quoteCompanyId,
-            @Valid @ApiParam(value = "Quote facility ID") @RequestParam(value = "facilityId", required = false) Long quoteFacilityId,
-            @Valid @ApiParam(value = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
-            @Valid @ApiParam(value = "Return only open stock orders") @RequestParam(value = "openOnly", required = false) Boolean openOnly,
+            @Valid @Parameter(name = "Quote company ID", required = true) @PathVariable("companyId") Long quoteCompanyId,
+            @Valid @Parameter(name = "Quote facility ID") @RequestParam(value = "facilityId", required = false) Long quoteFacilityId,
+            @Valid @Parameter(name = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+            @Valid @Parameter(name = "Return only open stock orders") @RequestParam(value = "openOnly", required = false) Boolean openOnly,
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
@@ -172,22 +172,22 @@ public class StockOrderController {
     }
 
     @GetMapping("list/company/{companyId}")
-    @ApiOperation("Get a paginated list of stock orders by company ID.")
+    @Operation(summary ="Get a paginated list of stock orders by company ID.")
     public ApiPaginatedResponse<ApiStockOrder> getStockOrderListByCompanyId(
             @Valid ApiPaginatedRequest request,
-            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
-            @Valid @ApiParam(value = "Farmer (UserCustomer) ID") @RequestParam(value = "farmerId", required = false) Long farmerId,
-            @Valid @ApiParam(value = "Representative of farmer (UserCustomer) ID") @RequestParam(value = "representativeOfProducerUserCustomerId", required = false) Long representativeOfProducerUserCustomerId,
-            @Valid @ApiParam(value = "Is open balance only") @RequestParam(value = "isOpenBalanceOnly", required = false) Boolean isOpenBalanceOnly,
-            @Valid @ApiParam(value = "Is purchase orders only") @RequestParam(value = "isPurchaseOrderOnly", required = false) Boolean isPurchaseOrderOnly,
-            @Valid @ApiParam(value = "Available orders only") @RequestParam(value = "availableOnly", required = false) Boolean availableOnly,
-            @Valid @ApiParam(value = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
-            @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
-            @Valid @ApiParam(value = "Way of payment") @RequestParam(value = "wayOfPayment", required = false) PreferredWayOfPayment wayOfPayment,
-            @Valid @ApiParam(value = "Order type") @RequestParam(value = "orderType", required = false) OrderType orderType,
-            @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
-            @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
-            @Valid @ApiParam(value = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName,
+            @Valid @Parameter(name = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @Parameter(name = "Farmer (UserCustomer) ID") @RequestParam(value = "farmerId", required = false) Long farmerId,
+            @Valid @Parameter(name = "Representative of farmer (UserCustomer) ID") @RequestParam(value = "representativeOfProducerUserCustomerId", required = false) Long representativeOfProducerUserCustomerId,
+            @Valid @Parameter(name = "Is open balance only") @RequestParam(value = "isOpenBalanceOnly", required = false) Boolean isOpenBalanceOnly,
+            @Valid @Parameter(name = "Is purchase orders only") @RequestParam(value = "isPurchaseOrderOnly", required = false) Boolean isPurchaseOrderOnly,
+            @Valid @Parameter(name = "Available orders only") @RequestParam(value = "availableOnly", required = false) Boolean availableOnly,
+            @Valid @Parameter(name = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+            @Valid @Parameter(name = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
+            @Valid @Parameter(name = "Way of payment") @RequestParam(value = "wayOfPayment", required = false) PreferredWayOfPayment wayOfPayment,
+            @Valid @Parameter(name = "Order type") @RequestParam(value = "orderType", required = false) OrderType orderType,
+            @Valid @Parameter(name = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+            @Valid @Parameter(name = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
+            @Valid @Parameter(name = "Search by ProducerUserCustomer name") @RequestParam(value = "query", required = false) String producerUserCustomerName,
             @AuthenticationPrincipal CustomUserDetails authUser,
         @RequestHeader(value = "language" ,defaultValue = "EN", required = false) Language language) throws ApiException {
 
@@ -214,7 +214,7 @@ public class StockOrderController {
     }
 
     @PostMapping("bulk-purchase")
-    @ApiOperation("Creates a list of purchase orders.")
+    @Operation(summary ="Creates a list of purchase orders.")
     public ApiResponse<ApiPurchaseOrder> createPurchaseOrderBulk(
             @Valid @RequestBody ApiPurchaseOrder apiPurchaseOrder,
             @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
@@ -223,7 +223,7 @@ public class StockOrderController {
     }
 
     @PutMapping
-    @ApiOperation("Create or update stock order. If the ID is provided, then the entity with the provided ID is updated.")
+    @Operation(summary ="Create or update stock order. If the ID is provided, then the entity with the provided ID is updated.")
     public ApiResponse<ApiBaseEntity> createOrUpdateStockOrder(
             @Valid @RequestBody ApiStockOrder apiStockOrder,
             @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
@@ -232,10 +232,10 @@ public class StockOrderController {
     }
 
     @DeleteMapping("{id}")
-    @ApiOperation("Deletes a stock order with the provided ID.")
+    @Operation(summary ="Deletes a stock order with the provided ID.")
     public ApiDefaultResponse deleteStockOrder(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @ApiParam(value = "StockOrder ID", required = true) @PathVariable("id") Long id) throws ApiException {
+            @Valid @Parameter(name = "StockOrder ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
         stockOrderService.deleteStockOrder(id, authUser);
         return new ApiDefaultResponse();
@@ -243,7 +243,7 @@ public class StockOrderController {
 
     @GetMapping("{id}/aggregated-history")
     public ApiResponse<ApiStockOrderHistory> getStockOrderAggregatedHistory(
-            @Valid @ApiParam(value = "StockOrder ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(name = "StockOrder ID", required = true) @PathVariable("id") Long id,
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
     ) throws ApiException {
@@ -251,10 +251,10 @@ public class StockOrderController {
     }
 
     @GetMapping(value = "{id}/exportGeoData", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @ApiOperation("Generate a geoJSON file with a list of polygons.")
+    @Operation(summary ="Generate a geoJSON file with a list of polygons.")
     public @ResponseBody byte[] exportGeoData(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @ApiParam(value = "StockOrder ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(name = "StockOrder ID", required = true) @PathVariable("id") Long id,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
         ApiStockOrderHistory apiStockOrderHistory =
@@ -264,10 +264,10 @@ public class StockOrderController {
     }
 
     @GetMapping(value = "export/deliveries/company/{companyId}")
-    @ApiOperation("Export deliveries (stock orders of type PURCHASE_ORDER) for the provided company ID")
+    @Operation(summary ="Export deliveries (stock orders of type PURCHASE_ORDER) for the provided company ID")
     public ResponseEntity<byte[]> exportDeliveriesByCompany(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @ApiParam(value = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @Parameter(name = "Company ID", required = true) @PathVariable("companyId") Long companyId,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
         byte[] response;

@@ -1,14 +1,14 @@
 package com.abelium.inatrace.components.beycoorder.api;
 
 import com.abelium.inatrace.types.BeycoVarietyType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiBeycoCoffeeVariety {
 
-    @ApiModelProperty(value = "Variety of coffee beans")
+    @Schema(description = "Variety of coffee beans")
     private BeycoVarietyType type;
 
-    @ApiModelProperty(value = "Optional custom variety of coffee beans")
+    @Schema(description = "Optional custom variety of coffee beans")
     private String customVariety;
 
     public BeycoVarietyType getType() {

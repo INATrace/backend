@@ -1,23 +1,20 @@
 package com.abelium.inatrace.components.product.api;
 
-import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.Length;
-import org.springframework.validation.annotation.Validated;
-
-import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
 
 @Validated
 public class ApiProductOrigin {
 
 	@Size(max = 2000)
-	@ApiModelProperty(value = "origin - text and quantity input - Briefly describe where the product or its ingredients are produced", position = 1)
+	@Schema(description = "origin - text and quantity input - Briefly describe where the product or its ingredients are produced", maxLength = 2000)
 	public String text;
 
-	@ApiModelProperty(value = "origin - farmer location", position = 2)
+	@Schema(description = "origin - farmer location")
 	@Valid
     public List<ApiLocation> locations;
 

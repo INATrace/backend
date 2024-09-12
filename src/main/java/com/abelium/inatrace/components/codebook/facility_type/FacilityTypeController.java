@@ -4,8 +4,8 @@ import com.abelium.inatrace.api.*;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityType;
 import com.abelium.inatrace.security.service.CustomUserDetails;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,23 +30,23 @@ public class FacilityTypeController {
 	}
 
 	@GetMapping("list")
-	@ApiOperation("Get a paginated list of facility types.")
+	@Operation(summary ="Get a paginated list of facility types.")
 	public ApiPaginatedResponse<ApiFacilityType> getFacilityTypeList(@Valid ApiPaginatedRequest request) {
 
 		return new ApiPaginatedResponse<>(facilityTypeService.getFacilityTypeList(request));
 	}
 
 	@GetMapping("{id}")
-	@ApiOperation("Get a single facility type with the provided ID.")
+	@Operation(summary ="Get a single facility type with the provided ID.")
 	public ApiResponse<ApiFacilityType> getFacilityType(
-			@Valid @ApiParam(value = "Facility type ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @Parameter(name = "Facility type ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		return new ApiResponse<>(facilityTypeService.getFacilityType(id));
 	}
 
 	@PutMapping
 	@PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
-	@ApiOperation("Create or update facility type. If ID is provided, the entity entity with the provided ID is updated.")
+	@Operation(summary ="Create or update facility type. If ID is provided, the entity entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateFacilityType(
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid @RequestBody ApiFacilityType apiFacilityType) throws ApiException {
@@ -56,9 +56,9 @@ public class FacilityTypeController {
 
 	@DeleteMapping("{id}")
 	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
-	@ApiOperation("Deletes a facility type with the provided ID.")
+	@Operation(summary ="Deletes a facility type with the provided ID.")
 	public ApiDefaultResponse deleteFacilityType(
-			@Valid @ApiParam(value = "Facility type ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @Parameter(name = "Facility type ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		facilityTypeService.deleteFacilityType(id);
 		return new ApiDefaultResponse();

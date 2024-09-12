@@ -1,15 +1,16 @@
 package com.abelium.inatrace.components.product.api;
 
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.types.KnowledgeBlogType;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.validation.annotation.Validated;
 
 @Validated
+@ParameterObject
 public class ApiListKnowledgeBlogRequest extends ApiPaginatedRequest {
 
-	@ApiParam(value = "knowledge blog type")
+	@Parameter(name = "knowledge blog type")
 	public KnowledgeBlogType type;
 
 	public KnowledgeBlogType getType() {

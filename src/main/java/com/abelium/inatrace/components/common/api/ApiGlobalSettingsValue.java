@@ -3,18 +3,18 @@ package com.abelium.inatrace.components.common.api;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.validation.constraints.Size;
 
 @Validated
 public class ApiGlobalSettingsValue {
 
-    @ApiModelProperty(value = "Global settings value", position = 0)
+    @Schema(description = "Global settings value")
     @Size(max = 1000)
     public String value;
 
-    @ApiModelProperty(value = "Can be accessed via public api", position = 1)
+    @Schema(description = "Can be accessed via public api")
     public Boolean isPublic;
     
     public ApiGlobalSettingsValue() {}

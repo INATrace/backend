@@ -4,7 +4,7 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.tools.converters.InstantConverter;
 import com.abelium.inatrace.types.BeycoPrivacy;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.validation.constraints.Size;
 import java.time.Instant;
@@ -12,21 +12,21 @@ import java.util.List;
 
 public class ApiBeycoOrderFields extends ApiBaseEntity {
 
-    @ApiModelProperty(value = "Title of Beyco coffee order")
+    @Schema(description = "Title of Beyco coffee order")
     @Size(min = 1, max = 70)
     private String title;
 
-    @ApiModelProperty(value = "Privacy of order")
+    @Schema(description = "Privacy of order")
     private BeycoPrivacy privacy;
 
-    @ApiModelProperty(value = "Array of coffee orders")
+    @Schema(description = "Array of coffee orders")
     private List<ApiBeycoOrderCoffees> offerCoffees;
 
-    @ApiModelProperty(value = "When order is available")
+    @Schema(description = "When order is available")
     @JsonSerialize(using = InstantConverter.Serializer.class)
     private Instant availableAt;
 
-    @ApiModelProperty(value = "Location of export")
+    @Schema(description = "Location of export")
     private ApiBeycoPortOfExport portOfExport;
 
     public String getTitle() {

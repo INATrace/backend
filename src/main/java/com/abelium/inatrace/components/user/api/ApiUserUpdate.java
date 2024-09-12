@@ -2,22 +2,23 @@ package com.abelium.inatrace.components.user.api;
 
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.types.Language;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
+
 import javax.validation.constraints.Size;
 
 @Validated
 public class ApiUserUpdate {
 
 	@Size(max = Lengths.NAME)
-	@ApiModelProperty(value = "Name", position = 1)
+	@Schema(description = "Name")
 	public String name;
 
 	@Size(max = Lengths.SURNAME)
-	@ApiModelProperty(value = "Surname", position = 2)
+	@Schema(description = "Surname")
 	public String surname;
 	
-	@ApiModelProperty(value = "language", position = 3)
+	@Schema(description = "language")
 	public Language language = Language.EN;
 	
 	public String getName() {

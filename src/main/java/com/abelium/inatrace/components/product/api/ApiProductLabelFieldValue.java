@@ -1,11 +1,8 @@
 package com.abelium.inatrace.components.product.api;
 
-import org.hibernate.validator.constraints.Length;
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.api.types.Lengths;
-
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Size;
 
@@ -13,14 +10,14 @@ import javax.validation.constraints.Size;
 public class ApiProductLabelFieldValue {
 
 	@Size(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "Field name in Product", position = 1)
+	@Schema(description = "Field name in Product", maxLength = Lengths.DEFAULT)
 	public String name;
 
 	@Size(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "Section on FE", position = 2)
+	@Schema(description = "Section on FE", maxLength = Lengths.DEFAULT)
 	public String section;
 	
-	@ApiModelProperty(value = "Field value in Product", position = 3)
+	@Schema(description = "Field value in Product")
 	public Object value;
 	
 	public ApiProductLabelFieldValue() {

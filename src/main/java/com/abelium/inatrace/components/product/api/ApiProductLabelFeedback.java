@@ -3,7 +3,7 @@ package com.abelium.inatrace.components.product.api;
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.types.ProductLabelFeedbackType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
@@ -13,33 +13,33 @@ import java.util.Map;
 @Validated
 public class ApiProductLabelFeedback extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "Label id", position = 2)
+	@Schema(description = "Label id")
 	public Long labelId;
 	
-	@ApiModelProperty(value = "Feedback type", position = 3)
+	@Schema(description = "Feedback type")
     public ProductLabelFeedbackType type;
 
-	@ApiModelProperty(value = "Email", position = 4)
+	@Schema(description = "Email")
 	@Size(max = Lengths.EMAIL)
 	public String email;
 	
-	@ApiModelProperty(value = "feedback text", position = 5)
+	@Schema(description = "feedback text")
 	@Size(max = 2000)
 	public String feedback;
 
-	@ApiModelProperty(value = "GDPR consent", position = 6)
+	@Schema(description = "GDPR consent")
 	public Boolean gdprConsent;
 	
-	@ApiModelProperty(value = "Privacy policy consent", position = 7)
+	@Schema(description = "Privacy policy consent")
 	public Boolean privacyPolicyConsent;
 
-	@ApiModelProperty(value = "Terms of use consent", position = 8)
+	@Schema(description = "Terms of use consent")
 	public Boolean termsOfUseConsent;
 	
-	@ApiModelProperty(value = "questionnaire answers - key-answer map", position = 9)
+	@Schema(description = "questionnaire answers - key-answer map")
     public Map<String, String> questionnaireAnswers;
 
-	@ApiModelProperty(value = "The product name of label for which the feedback was provided", position = 10)
+	@Schema(description = "The product name of label for which the feedback was provided")
 	private String productName;
 	
 	public Long getLabelId() {

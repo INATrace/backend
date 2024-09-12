@@ -4,13 +4,13 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiEmail {
 	
 	@NotNull
-	@ApiModelProperty(value = "Email", position = 0)
+	@Schema(description = "Email")
 	public String email;
 
 	public String getEmail() {

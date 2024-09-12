@@ -4,13 +4,13 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiDocumentStorageKey {
 
     @NotNull
-    @ApiModelProperty(value = "storage key (file on system, s3, ...).", position = 1)
+    @Schema(description = "storage key (file on system, s3, ...).")
     public String storageKey;
     
     

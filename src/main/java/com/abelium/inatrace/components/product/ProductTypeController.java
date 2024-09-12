@@ -7,7 +7,7 @@ import com.abelium.inatrace.api.ApiResponse;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.types.Language;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +23,7 @@ public class ProductTypeController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('SYSTEM_ADMIN', 'REGIONAL_ADMIN')")
-    @ApiOperation(value = "Create a new product type")
+    @Operation(summary = "Create a new product type")
     public ApiResponse<ApiBaseEntity> createProductType(
             @Valid @RequestBody ApiProductType apiProductType
     ) throws ApiException {
@@ -31,7 +31,7 @@ public class ProductTypeController {
     }
 
     @GetMapping
-    @ApiOperation(value = "Get a list of product types")
+    @Operation(summary = "Get a list of product types")
     public ApiPaginatedResponse<ApiProductType> getProductTypes(
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
     ) {
@@ -39,7 +39,7 @@ public class ProductTypeController {
     }
 
     @GetMapping("/{id}")
-    @ApiOperation(value = "Get product type details")
+    @Operation(summary = "Get product type details")
     public ApiResponse<ApiProductType> getProductType(
             @RequestParam(value = "id") Long id,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
@@ -49,7 +49,7 @@ public class ProductTypeController {
 
     @PutMapping
     @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
-    @ApiOperation(value = "Update a product type")
+    @Operation(summary = "Update a product type")
     public ApiResponse<ApiBaseEntity> updateProductType(
             @Valid @RequestBody ApiProductType apiProductType
     ) throws ApiException {
@@ -58,7 +58,7 @@ public class ProductTypeController {
 
     @DeleteMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
-    @ApiOperation(value = "Delete a product type")
+    @Operation(summary = "Delete a product type")
     public ApiDefaultResponse deleteProductType(
             @RequestParam(value = "id") Long id
     ) throws ApiException {

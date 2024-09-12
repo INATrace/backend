@@ -2,21 +2,20 @@ package com.abelium.inatrace.components.product.api;
 
 import javax.validation.Valid;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import com.abelium.inatrace.components.company.api.ApiCompanyListResponse;
 import com.abelium.inatrace.types.ProductCompanyType;
 
-import io.swagger.annotations.ApiModelProperty;
-
 @Validated
 public class ApiProductCompany {
-	
-	@ApiModelProperty(value = "associated company", position = 1)
+
 	@Valid
+	@Schema(description = "associated company")
 	public ApiCompanyListResponse company;
 	
-	@ApiModelProperty(value = "associated company type", position = 2)
+	@Schema(description = "associated company type")
 	public ProductCompanyType type;
 
 	public ApiCompanyListResponse getCompany() {

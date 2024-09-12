@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
-
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 	
     protected final Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);

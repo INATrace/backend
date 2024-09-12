@@ -15,7 +15,7 @@ import com.abelium.inatrace.components.productorder.api.ApiProductOrder;
 import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
@@ -27,178 +27,178 @@ import java.util.List;
 @Validated
 public class ApiStockOrder extends ApiBaseEntity {
 
-    @ApiModelProperty(value = "Stock order identifier", position = 1)
+    @Schema(description = "Stock order identifier")
     private String identifier;
 
-    @ApiModelProperty(value = "Timestamp indicates when stock order have been created")
+    @Schema(description = "Timestamp indicates when stock order have been created")
     private Instant creationTimestamp;
 
-    @ApiModelProperty(value = "Timestamp indicates when stock order have been updated", position = 2)
+    @Schema(description = "Timestamp indicates when stock order have been updated")
     private Instant updateTimestamp;
 
-    @ApiModelProperty(value = "User that has created StockOrder")
+    @Schema(description = "User that has created StockOrder")
     private ApiUser createdBy;
 
-    @ApiModelProperty(value = "User that has last updated StockOrder")
+    @Schema(description = "User that has last updated StockOrder")
     private ApiUser updatedBy;
 
-    @ApiModelProperty(value = "ID of the user who has created the stock order", position = 3)
+    @Schema(description = "ID of the user who has created the stock order")
     private Long creatorId;
 
     // Relevant only for order type: PURCHASE_ORDER
-    @ApiModelProperty(value = "Representative of producer user customer. E.g. collector.", position = 4)
+    @Schema(description = "Representative of producer user customer. E.g. collector.")
     private ApiUserCustomer representativeOfProducerUserCustomer;
 
     // Relevant only for order type: PURCHASE_ORDER
-    @ApiModelProperty(value = "Id of the person who has produced the entry.", position = 5)
+    @Schema(description = "Id of the person who has produced the entry.")
     private ApiUserCustomer producerUserCustomer;
 
     // Relevant only for order type: PURCHASE_ORDER
-    @ApiModelProperty(value = "Production location", position = 6)
+    @Schema(description = "Production location")
     private ApiStockOrderLocation productionLocation;
 
-    @ApiModelProperty(value = "Activity proofs", position = 7)
+    @Schema(description = "Activity proofs")
     private List<ApiActivityProof> activityProofs;
 
-    @ApiModelProperty(value = "Processing evidence fields stored values for this stock order")
+    @Schema(description = "Processing evidence fields stored values for this stock order")
     private List<ApiStockOrderEvidenceFieldValue> requiredEvidenceFieldValues;
 
-    @ApiModelProperty(value = "Processing evidence types stored values for this stock order")
+    @Schema(description = "Processing evidence types stored values for this stock order")
     private List<ApiStockOrderEvidenceTypeValue> requiredEvidenceTypeValues;
 
-    @ApiModelProperty(value = "Other processing evidence documents - evidence types that can be provided but are not mandatory")
+    @Schema(description = "Other processing evidence documents - evidence types that can be provided but are not mandatory")
     private List<ApiStockOrderEvidenceTypeValue> otherEvidenceDocuments;
 
-    @ApiModelProperty(value = "Semi product", position = 7)
+    @Schema(description = "Semi product")
     private ApiSemiProduct semiProduct;
 
-    @ApiModelProperty(value = "Option to determine price later after taking delivery")
+    @Schema(description = "Option to determine price later after taking delivery")
     private Boolean priceDeterminedLater;
 
-    @ApiModelProperty(value = "Final product")
+    @Schema(description = "Final product")
     private ApiFinalProduct finalProduct;
 
-    @ApiModelProperty(value = "Facility", position = 8)
+    @Schema(description = "Facility")
     private ApiFacility facility;
 
-    @ApiModelProperty(value = "Company", position = 9)
+    @Schema(description = "Company")
     private ApiCompany company;
 
-    @ApiModelProperty(value = "Measurement unit", position = 10)
+    @Schema(description = "Measurement unit")
     private ApiMeasureUnitType measureUnitType;
 
-    @ApiModelProperty(value = "Total quantity", position = 11)
+    @Schema(description = "Total quantity")
     private BigDecimal totalQuantity;
 
-    @ApiModelProperty(value = "Total gross quantity", position = 12)
+    @Schema(description = "Total gross quantity")
     private BigDecimal totalGrossQuantity;
 
-    @ApiModelProperty(value = "Fulfilled quantity", position = 13)
+    @Schema(description = "Fulfilled quantity")
     private BigDecimal fulfilledQuantity;
 
-    @ApiModelProperty(value = "Available quantity", position = 14)
+    @Schema(description = "Available quantity")
     private BigDecimal availableQuantity;
 
-    @ApiModelProperty(value = "Is stock available", position = 15)
+    @Schema(description = "Is stock available")
     public Boolean isAvailable;
 
-    @ApiModelProperty(value = "Total quantity of this stock order is not within the expected range")
+    @Schema(description = "Total quantity of this stock order is not within the expected range")
     public Boolean outQuantityNotInRange;
 
-    @ApiModelProperty(value = "Production date", position = 16)
+    @Schema(description = "Production date")
     private LocalDate productionDate;
 
-    @ApiModelProperty(value = "Delivery time", position = 18)
+    @Schema(description = "Delivery time")
     private LocalDate deliveryTime;
 
-    @ApiModelProperty(value = "The produrct order that triggered creation of this stock order")
+    @Schema(description = "The produrct order that triggered creation of this stock order")
     private ApiProductOrder productOrder;
 
-    @ApiModelProperty(value = "User entered Order ID when placing Quote order")
+    @Schema(description = "User entered Order ID when placing Quote order")
     private String orderId;
 
-    @ApiModelProperty(value = "The processing order that created this stock order")
+    @Schema(description = "The processing order that created this stock order")
     private ApiProcessingOrder processingOrder;
 
-    @ApiModelProperty(value = "Price per unit", position = 21)
+    @Schema(description = "Price per unit")
     private BigDecimal pricePerUnit;
 
-    @ApiModelProperty(value = "Currency", position = 23)
+    @Schema(description = "Currency")
     private String currency;
 
-    @ApiModelProperty(value = "Is order of type PURCHASE_ORDER", position = 25)
+    @Schema(description = "Is order of type PURCHASE_ORDER")
     private Boolean isPurchaseOrder;
 
-    @ApiModelProperty(value = "Order type", position = 26)
+    @Schema(description = "Order type")
     private OrderType orderType;
 
-    @ApiModelProperty(value = "The prefix for the LOT name - retrieved from the Processing action")
+    @Schema(description = "The prefix for the LOT name - retrieved from the Processing action")
     private String lotPrefix;
 
-    @ApiModelProperty(value = "Internal LOT number", position = 27)
+    @Schema(description = "Internal LOT number")
     private String internalLotNumber;
 
-    @ApiModelProperty(value = "Comments", position = 31)
+    @Schema(description = "Comments")
     private String comments;
 
-    @ApiModelProperty(value = "Is women share", position = 33)
+    @Schema(description = "Is women share")
     private Boolean womenShare;
 
-    @ApiModelProperty(value = "Cost", position = 34)
+    @Schema(description = "Cost")
     private BigDecimal cost;
 
-    @ApiModelProperty(value = "Paid", position = 35)
+    @Schema(description = "Paid")
     private BigDecimal paid;
 
-    @ApiModelProperty(value = "Balance", position = 36)
+    @Schema(description = "Balance")
     private BigDecimal balance;
 
-    @ApiModelProperty(value = "Preferred way of payment", position = 41)
+    @Schema(description = "Preferred way of payment")
     private PreferredWayOfPayment preferredWayOfPayment;
 
-    @ApiModelProperty(value = "SAC number", position = 42)
+    @Schema(description = "SAC number")
     private Integer sacNumber;
 
-    @ApiModelProperty(value = "Is order open", position = 43)
+    @Schema(description = "Is order open")
     private Boolean isOpenOrder;
 
-    @ApiModelProperty(value = "Quote facility")
+    @Schema(description = "Quote facility")
     private ApiFacility quoteFacility;
 
-    @ApiModelProperty(value = "Quote company")
+    @Schema(description = "Quote company")
     private ApiCompany quoteCompany;
 
-    @ApiModelProperty(value = "The company customer for whom the stock order is created")
+    @Schema(description = "The company customer for whom the stock order is created")
     private ApiCompanyCustomer consumerCompanyCustomer;
 
-    @ApiModelProperty(value = "Price per unit for end customer", position = 49)
+    @Schema(description = "Price per unit for end customer")
     private BigDecimal pricePerUnitForEndCustomer;
 
-    @ApiModelProperty(value = "Currency for price per unit for end customer")
+    @Schema(description = "Currency for price per unit for end customer")
     private String currencyForEndCustomer;
 
-    @ApiModelProperty(value = "Organic")
+    @Schema(description = "Organic")
     private Boolean organic;
 
-    @ApiModelProperty(value = "Tare")
+    @Schema(description = "Tare")
     private BigDecimal tare;
 
-    @ApiModelProperty(value = "Damaged price deduction")
+    @Schema(description = "Damaged price deduction")
     private BigDecimal damagedPriceDeduction;
 
-    @ApiModelProperty(value = "Damaged weight deduction")
+    @Schema(description = "Damaged weight deduction")
     private BigDecimal damagedWeightDeduction;
 
-    @ApiModelProperty(value = "Generated UUID tag for this stock order QR code")
+    @Schema(description = "Generated UUID tag for this stock order QR code")
     private String qrCodeTag;
 
-    @ApiModelProperty(value = "The final product for which the QR code tag is generated")
+    @Schema(description = "The final product for which the QR code tag is generated")
     private ApiFinalProduct qrCodeTagFinalProduct;
 
-    @ApiModelProperty(value = "Payments for stock order")
+    @Schema(description = "Payments for stock order")
     private List<ApiPayment> payments;
 
-    @ApiModelProperty(value = "The ID from which this repacked stock order was created; This ID is generated and provided by the client; Only applicable for repacked stock orders")
+    @Schema(description = "The ID from which this repacked stock order was created; This ID is generated and provided by the client; Only applicable for repacked stock orders")
     private String repackedOriginStockOrderId;
 
     public String getIdentifier() {

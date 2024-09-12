@@ -6,22 +6,22 @@ import org.springframework.validation.annotation.Validated;
 
 import com.abelium.inatrace.types.CompanyUserRole;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiCompanyActionRequest {
 	
 	@NotNull
-	@ApiModelProperty(value = "Company id", position = 0)
+	@Schema(description = "Company id")
 	public Long companyId;
 	
-	@ApiModelProperty(value = "User id", position = 1)
+	@Schema(description = "User id")
 	public Long userId;
 
-	@ApiModelProperty(value = "Other company id", position = 2)
+	@Schema(description = "Other company id")
 	public Long otherCompanyId;
 	
-	@ApiModelProperty(value = "Company user role", position = 3)
+	@Schema(description = "Company user role")
 	public CompanyUserRole companyUserRole = CompanyUserRole.COMPANY_USER;
 	
 

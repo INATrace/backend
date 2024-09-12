@@ -8,59 +8,59 @@ import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.product.api.ApiFinalProduct;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 
 public class ApiTransaction extends ApiBaseEntity {
 
-    @ApiModelProperty(value = "Company that is part of the transaction", position = 1)
+    @Schema(description = "Company that is part of the transaction")
     private ApiCompany company;
 
-    @ApiModelProperty(value = "Initiator user ID", position = 2)
+    @Schema(description = "Initiator user ID")
     private Long initiationUserId;
 
-    @ApiModelProperty(value = "Source stock order", position = 3)
+    @Schema(description = "Source stock order")
     private ApiStockOrder sourceStockOrder;
 
     // Used when retrieving Stock order history - using this we can navigate to the next processing
-    @ApiModelProperty(value = "Target stock order", position = 4)
+    @Schema(description = "Target stock order")
     private ApiStockOrder targetStockOrder;
 
-    @ApiModelProperty(value = "Semi product", position = 5)
+    @Schema(description = "Semi product")
     private ApiSemiProduct semiProduct;
 
-    @ApiModelProperty(value = "Final product")
+    @Schema(description = "Final product")
     private ApiFinalProduct finalProduct;
 
-    @ApiModelProperty(value = "Source facility", position = 6)
+    @Schema(description = "Source facility")
     private ApiFacility sourceFacility;
 
-    @ApiModelProperty(value = "Is order of type processing", position = 8)
+    @Schema(description = "Is order of type processing")
     private Boolean isProcessing;
 
-    @ApiModelProperty(value = "Transaction status", position = 10)
+    @Schema(description = "Transaction status")
     private TransactionStatus status;
 
-    @ApiModelProperty(value = "Shipment ID", position = 11)
+    @Schema(description = "Shipment ID")
     private Long shipmentId;
 
-    @ApiModelProperty(value = "Input measurement unit type", position = 12)
+    @Schema(description = "Input measurement unit type")
     private ApiMeasureUnitType inputMeasureUnitType;
 
-    @ApiModelProperty(value = "Input quantity", position = 14)
+    @Schema(description = "Input quantity")
     private BigDecimal inputQuantity;
 
-    @ApiModelProperty(value = "Output quantity", position = 15)
+    @Schema(description = "Output quantity")
     private BigDecimal outputQuantity;
 
-    @ApiModelProperty(value = "Price per unit", position = 16)
+    @Schema(description = "Price per unit")
     private BigDecimal pricePerUnit;
 
-    @ApiModelProperty(value = "Currency", position = 17)
+    @Schema(description = "Currency")
     private String currency;
 
-    @ApiModelProperty(value = "Reject comment", position = 19)
+    @Schema(description = "Reject comment")
     private String rejectComment;
 
     public ApiCompany getCompany() {

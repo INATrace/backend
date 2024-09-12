@@ -1,16 +1,18 @@
 package com.abelium.inatrace.components.company.api;
 
 import com.abelium.inatrace.api.ApiPaginatedRequest;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
+@ParameterObject
 public class ApiListFarmersRequest extends ApiPaginatedRequest {
 
-    @ApiParam(value = "Name or surname")
+    @Parameter(name = "Name or surname")
     private String query;
 
-    @ApiParam(value = "Search by parameter")
+    @Parameter(name = "Search by parameter")
     private String searchBy;
 
     public String getQuery() {

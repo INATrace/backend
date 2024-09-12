@@ -4,29 +4,27 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserRole;
 import com.abelium.inatrace.types.UserStatus;
-
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiUserBase extends ApiBaseEntity {
 
-	@ApiModelProperty("Email/username")
+	@Schema(description = "Email/username")
 	public String email;
 	
-	@ApiModelProperty(value = "Name")
+	@Schema(description = "Name")
 	public String name;
 	
-	@ApiModelProperty(value = "Surname")
+	@Schema(description = "Surname")
 	public String surname;
 	
-	@ApiModelProperty(value = "Status")
+	@Schema(description = "Status")
 	public UserStatus status;
 	
-	@ApiModelProperty(value = "User role")
+	@Schema(description = "User role")
 	public UserRole role;
 	
-	@ApiModelProperty(value = "language")
-	public Language language;	
-	
+	@Schema(description = "language")
+	public Language language;
 
 	public String getEmail() {
 		return email;
