@@ -5,11 +5,10 @@ import com.abelium.inatrace.db.entities.analytics.AnalyticsAggregate;
 import com.abelium.inatrace.db.entities.analytics.AnalyticsAggregateItem;
 import com.abelium.inatrace.db.entities.analytics.RequestLog;
 import com.abelium.inatrace.tools.Queries;
+import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import org.torpedoquery.jpa.Torpedo;
-
-import javax.transaction.Transactional;
+import org.torpedoquery.jakarta.jpa.Torpedo;
 import java.time.Instant;
 import java.util.*;
 
@@ -29,8 +28,7 @@ public class AnalyticsQueries extends BaseService {
 	public AggregateUpdate updaterFor(String key, Map<String, Integer> map) {
 		return () -> updateAggregate(key, map);
 	}
-	
-	
+
 	@Transactional
 	public List<AnalyticsAggregate> fetchByKey(String key1, String key2) {
 		AnalyticsAggregate aProxy = Torpedo.from(AnalyticsAggregate.class);

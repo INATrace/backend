@@ -1,19 +1,15 @@
 package com.abelium.inatrace.tools;
 
+import com.abelium.inatrace.tools.queries.AliasCondition;
+import com.abelium.inatrace.tools.queries.SimpleQueryBuilder;
+import jakarta.persistence.EntityManager;
+import org.torpedoquery.jakarta.jpa.OnGoingLogicalCondition;
+import org.torpedoquery.jakarta.jpa.Torpedo;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-
-import javax.persistence.EntityManager;
-
-import org.torpedoquery.jpa.OnGoingLogicalCondition;
-import org.torpedoquery.jpa.Torpedo;
-
-import com.abelium.inatrace.tools.queries.AliasCondition;
-import com.abelium.inatrace.tools.queries.SimpleQueryBuilder;
-
 
 public class Queries
 {

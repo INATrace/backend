@@ -6,10 +6,9 @@ import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.product.ProductLabelCompanyDocument;
 import com.abelium.inatrace.types.CompanyDocumentCategory;
 import com.abelium.inatrace.types.CompanyDocumentType;
+import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,9 +1,8 @@
 package com.abelium.inatrace.db.entities.facility;
 
 import com.abelium.inatrace.db.entities.common.Location;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 
 @Entity
 public class FacilityLocation extends Location {

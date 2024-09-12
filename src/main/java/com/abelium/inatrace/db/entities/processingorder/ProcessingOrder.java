@@ -4,9 +4,8 @@ import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.stockorder.Transaction;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

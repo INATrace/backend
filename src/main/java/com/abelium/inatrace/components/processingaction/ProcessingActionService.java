@@ -29,14 +29,13 @@ import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.torpedoquery.jpa.OnGoingLogicalCondition;
-import org.torpedoquery.jpa.Torpedo;
-
-import javax.transaction.Transactional;
+import org.torpedoquery.jakarta.jpa.OnGoingLogicalCondition;
+import org.torpedoquery.jakarta.jpa.Torpedo;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;
 

@@ -2,12 +2,7 @@ package com.abelium.inatrace.components.groupstockorder.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
-import com.abelium.inatrace.tools.converters.SimpleDateConverter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.apache.tomcat.jni.Local;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;

@@ -7,7 +7,7 @@ import org.springframework.validation.annotation.Validated;
 
 import com.abelium.inatrace.components.common.api.ApiDocument;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 @Validated
 public class ApiKnowledgeBlog extends ApiKnowledgeBlogBase {

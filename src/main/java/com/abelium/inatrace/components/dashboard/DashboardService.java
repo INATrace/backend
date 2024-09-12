@@ -45,7 +45,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.criteria.*;
+import jakarta.persistence.criteria.*;
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

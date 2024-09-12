@@ -5,12 +5,11 @@ import com.abelium.inatrace.api.exceptions.ApiUpstreamApplicationException;
 import com.abelium.inatrace.api.exceptions.ApiUpstreamServiceException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
-
-import javax.validation.constraints.NotNull;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;

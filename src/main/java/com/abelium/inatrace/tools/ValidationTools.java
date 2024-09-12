@@ -1,23 +1,21 @@
 package com.abelium.inatrace.tools;
 
-import java.time.Instant;
-import java.time.LocalTime;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.regex.Pattern;
+import com.google.common.net.InternetDomainName;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
-
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
-
-import com.google.common.net.InternetDomainName;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.regex.Pattern;
 
 public class ValidationTools {
     /**

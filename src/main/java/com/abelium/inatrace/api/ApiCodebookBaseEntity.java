@@ -1,9 +1,8 @@
 package com.abelium.inatrace.api;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * Codebook base entity API model.

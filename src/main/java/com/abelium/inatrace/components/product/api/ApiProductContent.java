@@ -2,9 +2,8 @@ package com.abelium.inatrace.components.product.api;
 
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
-
-import javax.validation.Valid;
 
 @Validated
 public class ApiProductContent extends ApiProductBase {

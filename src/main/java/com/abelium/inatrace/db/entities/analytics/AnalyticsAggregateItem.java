@@ -3,7 +3,7 @@ package com.abelium.inatrace.db.entities.analytics;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(indexes = { @Index(columnList = "itemKey") })

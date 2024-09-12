@@ -3,7 +3,7 @@ package com.abelium.inatrace.components.product.api;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 @Validated
 public class ApiProcess {

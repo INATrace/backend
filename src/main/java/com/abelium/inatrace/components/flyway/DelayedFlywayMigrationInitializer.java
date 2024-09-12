@@ -16,8 +16,7 @@
 
 package com.abelium.inatrace.components.flyway;
 
-import javax.persistence.EntityManagerFactory;
-
+import jakarta.persistence.EntityManagerFactory;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;

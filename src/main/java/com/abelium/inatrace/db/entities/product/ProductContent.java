@@ -3,8 +3,7 @@ package com.abelium.inatrace.db.entities.product;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.process.Process;
-
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @MappedSuperclass
 public class ProductContent extends BaseEntity {

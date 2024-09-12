@@ -6,10 +6,9 @@ import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.types.CompanyDocumentCategory;
 import com.abelium.inatrace.types.CompanyDocumentType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
-
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 
 @Validated
 public class ApiCompanyDocument extends ApiBaseEntity {

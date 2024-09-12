@@ -1,8 +1,8 @@
 package com.abelium.inatrace.db.entities.codebook;
 
 import com.abelium.inatrace.db.base.TimestampEntity;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

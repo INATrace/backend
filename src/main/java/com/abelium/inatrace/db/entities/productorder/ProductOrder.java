@@ -4,11 +4,11 @@ import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.company.CompanyCustomer;
 import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

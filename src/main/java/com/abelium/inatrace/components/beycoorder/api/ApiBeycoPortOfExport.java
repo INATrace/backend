@@ -2,7 +2,7 @@ package com.abelium.inatrace.components.beycoorder.api;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 public class ApiBeycoPortOfExport {
 

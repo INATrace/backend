@@ -4,8 +4,7 @@ import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.value_chain.ValueChainProcessingEvidenceField;
 import com.abelium.inatrace.types.ProcessingEvidenceFieldType;
-
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

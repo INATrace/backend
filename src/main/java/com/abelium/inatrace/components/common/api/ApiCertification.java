@@ -2,10 +2,10 @@ package com.abelium.inatrace.components.common.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Validated

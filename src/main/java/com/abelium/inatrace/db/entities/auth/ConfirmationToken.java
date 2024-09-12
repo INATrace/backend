@@ -9,8 +9,8 @@ import com.abelium.inatrace.types.Status;
 import com.abelium.inatrace.types.UserStatus;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 

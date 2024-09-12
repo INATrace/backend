@@ -5,7 +5,7 @@ import com.abelium.inatrace.db.base.CreationTimestampEntity;
 import com.abelium.inatrace.types.RequestLogType;
 import org.flywaydb.core.internal.util.StringUtils;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(indexes = { @Index(columnList = "creationTimestamp") })

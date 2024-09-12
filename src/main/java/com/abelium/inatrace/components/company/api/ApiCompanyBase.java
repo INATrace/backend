@@ -3,10 +3,10 @@ package com.abelium.inatrace.components.company.api;
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.types.Lengths;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Size;
 import java.util.Map;
 
 public class ApiCompanyBase extends ApiBaseEntity {

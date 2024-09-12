@@ -5,7 +5,7 @@ import org.springframework.validation.annotation.Validated;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 @Validated
 public class ApiGlobalSettingsValue {

@@ -1,5 +1,8 @@
 package com.abelium.inatrace.tools;
 
+import jakarta.xml.bind.DatatypeConverter;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -7,10 +10,6 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
 
 public class EncryptionTools {
     

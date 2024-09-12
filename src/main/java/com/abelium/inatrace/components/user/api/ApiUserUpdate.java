@@ -3,9 +3,8 @@ package com.abelium.inatrace.components.user.api;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.types.Language;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
-
-import javax.validation.constraints.Size;
 
 @Validated
 public class ApiUserUpdate {

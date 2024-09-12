@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.TypedQuery;
+import jakarta.persistence.TypedQuery;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;

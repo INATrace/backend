@@ -1,6 +1,6 @@
 package com.abelium.inatrace.components.product.api;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;

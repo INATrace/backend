@@ -2,14 +2,13 @@ package com.abelium.inatrace.db.entities.facility;
 
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.SemiProduct;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @NamedQueries({
 	@NamedQuery(name = "Facility.listSellingFacilitiesByCompanyAndSemiProduct",
-	            query = "SELECT fsp.facility FROM FacilitySemiProduct fsp INNER JOIN FETCH fsp.facility.facilityTranslations t WHERE fsp.facility.company.id = :companyId AND fsp.facility.isPublic = true AND fsp.semiProduct.id = :semiProductId AND t.language = :language"),
+	            query = "SELECT f FROM FacilitySemiProduct fsp JOIN fsp.facility f JOIN f.facilityTranslations t WHERE f.company.id = :companyId AND f.isPublic = true AND fsp.semiProduct.id = :semiProductId AND t.language = :language"),
 	@NamedQuery(name = "Facility.countSellingFacilitiesByCompanyAndSemiProduct",
 	            query = "SELECT COUNT(fsp.facility) FROM FacilitySemiProduct fsp WHERE fsp.facility.company.id = :companyId AND fsp.facility.isPublic = true AND fsp.semiProduct.id = :semiProductId")
 })

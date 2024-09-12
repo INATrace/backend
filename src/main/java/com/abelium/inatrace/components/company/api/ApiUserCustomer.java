@@ -9,11 +9,10 @@ import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.types.Gender;
 import com.abelium.inatrace.types.UserCustomerType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.hibernate.validator.constraints.Length;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import java.util.List;
 
 @Validated

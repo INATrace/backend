@@ -4,10 +4,10 @@ import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProductLabelStatus;
+import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

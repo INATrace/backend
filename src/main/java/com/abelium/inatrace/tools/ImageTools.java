@@ -1,15 +1,13 @@
 package com.abelium.inatrace.tools;
 
-import java.awt.Color;
+import org.imgscalr.Scalr;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import javax.imageio.ImageIO;
-
-import org.imgscalr.Scalr;
-
-
 
 public class ImageTools {
 	

@@ -6,8 +6,7 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.product.Product;
 import com.abelium.inatrace.types.Gender;
 import com.abelium.inatrace.types.UserCustomerType;
-
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

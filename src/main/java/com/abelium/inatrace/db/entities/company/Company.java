@@ -12,8 +12,8 @@ import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.value_chain.CompanyValueChain;
 import com.abelium.inatrace.types.CompanyStatus;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

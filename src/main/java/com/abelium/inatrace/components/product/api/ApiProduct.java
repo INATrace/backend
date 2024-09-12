@@ -3,9 +3,9 @@ package com.abelium.inatrace.components.product.api;
 import com.abelium.inatrace.components.company.api.ApiCompany;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @Validated

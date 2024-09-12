@@ -10,7 +10,7 @@ import com.abelium.inatrace.types.KnowledgeBlogType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 @Validated
 public class ApiKnowledgeBlogBase extends ApiBaseEntity {

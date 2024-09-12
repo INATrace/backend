@@ -2,8 +2,7 @@ package com.abelium.inatrace.db.entities.common;
 
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.codebook.ProductType;
-
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

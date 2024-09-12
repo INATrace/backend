@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 import java.util.Map;
 
 @Validated

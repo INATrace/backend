@@ -7,11 +7,10 @@ import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.UserStatus;
+import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import org.torpedoquery.jpa.Torpedo;
-
-import javax.transaction.Transactional;
+import org.torpedoquery.jakarta.jpa.Torpedo;
 import java.util.List;
 
 @Lazy

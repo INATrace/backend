@@ -1,12 +1,11 @@
 package com.abelium.inatrace.components.flyway;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.executor.Context;
 import org.flywaydb.core.api.executor.MigrationExecutor;
 import org.springframework.core.env.Environment;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 /**
  * Adapter for executing migrations implementing JpaMigration.

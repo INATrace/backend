@@ -5,10 +5,10 @@ import com.abelium.inatrace.components.common.api.ApiCertification;
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import java.util.List;
 
 @Validated

@@ -11,8 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import javax.persistence.TypedQuery;
-import javax.transaction.Transactional;
+import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.ZoneId;

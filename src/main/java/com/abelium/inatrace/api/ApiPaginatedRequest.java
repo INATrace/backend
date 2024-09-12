@@ -5,7 +5,7 @@ import com.abelium.inatrace.types.SortDirection;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 @Validated
 public class ApiPaginatedRequest {

@@ -6,11 +6,10 @@ import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserRole;
 import com.abelium.inatrace.types.UserStatus;
+import jakarta.persistence.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.springframework.security.core.GrantedAuthority;
-
-import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

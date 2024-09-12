@@ -1,7 +1,7 @@
 package com.abelium.inatrace.components.product.api;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;

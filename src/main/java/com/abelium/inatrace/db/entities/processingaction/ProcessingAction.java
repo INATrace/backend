@@ -8,8 +8,8 @@ import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.value_chain.ProcessingActionValueChain;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;

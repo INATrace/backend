@@ -4,7 +4,7 @@ import com.abelium.inatrace.components.flyway.JpaMigration;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
 import org.springframework.core.env.Environment;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.util.List;
 

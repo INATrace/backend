@@ -5,8 +5,8 @@ import com.abelium.inatrace.db.entities.codebook.FacilityType;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.value_chain.FacilityValueChain;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

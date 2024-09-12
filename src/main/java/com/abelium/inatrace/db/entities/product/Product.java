@@ -4,9 +4,8 @@ import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.types.ProductStatus;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 

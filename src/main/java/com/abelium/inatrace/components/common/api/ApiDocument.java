@@ -2,9 +2,8 @@ package com.abelium.inatrace.components.common.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
-
-import javax.validation.constraints.NotNull;
 
 @Validated
 public class ApiDocument extends ApiBaseEntity {

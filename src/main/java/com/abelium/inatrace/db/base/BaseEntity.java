@@ -1,12 +1,6 @@
-
 package com.abelium.inatrace.db.base;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 
 /**
  * Base class for all entities, contains auto incremented id.

@@ -1,13 +1,12 @@
 package com.abelium.inatrace.configuration;
 
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.mvc.condition.NameValueExpression;
 import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
+import org.springframework.web.servlet.mvc.condition.NameValueExpression;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.util.pattern.PathPatternParser;
-
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.lang.reflect.Method;
 
 public class PrefixedApiRequestHandler extends RequestMappingHandlerMapping {

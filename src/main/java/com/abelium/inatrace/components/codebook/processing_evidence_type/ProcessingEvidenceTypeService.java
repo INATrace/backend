@@ -15,12 +15,11 @@ import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserRole;
+import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.torpedoquery.jpa.Torpedo;
-
-import javax.persistence.TypedQuery;
-import javax.transaction.Transactional;
+import org.torpedoquery.jakarta.jpa.Torpedo;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -1,11 +1,11 @@
 package com.abelium.inatrace.components.flyway;
 
+import jakarta.persistence.EntityManagerFactory;
+import org.flywaydb.core.api.CoreMigrationType;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.Location;
-import org.flywaydb.core.api.MigrationType;
 import org.flywaydb.core.api.MigrationVersion;
 import org.flywaydb.core.api.configuration.Configuration;
-import org.flywaydb.core.api.resolver.Context;
 import org.flywaydb.core.api.resolver.MigrationResolver;
 import org.flywaydb.core.api.resolver.ResolvedMigration;
 import org.flywaydb.core.internal.resolver.MigrationInfoHelper;
@@ -18,9 +18,10 @@ import org.flywaydb.core.internal.util.ClassUtils;
 import org.flywaydb.core.internal.util.Pair;
 import org.springframework.core.env.Environment;
 
-import javax.persistence.EntityManagerFactory;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Migration resolver for JPA migrations. 
@@ -107,7 +108,7 @@ public class JpaMigrationResolver implements MigrationResolver {
         String physicalLocation = ClassUtils.getLocationOnDisk(clazz);
         JpaMigrationExecutor executor = new JpaMigrationExecutor(migration, entityManagerFactory, environment);
 
-        return new ResolvedMigrationImpl(version, description, script, checksum, checksum, MigrationType.CUSTOM, physicalLocation, executor);
+        return new ResolvedMigrationImpl(version, description, script, checksum, checksum, CoreMigrationType.CUSTOM, physicalLocation, executor);
     }
 
     private static String getShortName(Class<?> aClass) {

@@ -2,8 +2,8 @@ package com.abelium.inatrace.db.entities.product;
 
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

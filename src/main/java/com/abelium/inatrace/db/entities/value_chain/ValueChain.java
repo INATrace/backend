@@ -2,11 +2,11 @@ package com.abelium.inatrace.db.entities.value_chain;
 
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
-import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.codebook.ProductType;
+import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.value_chain.enums.ValueChainStatus;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

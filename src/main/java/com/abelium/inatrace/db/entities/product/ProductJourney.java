@@ -2,10 +2,10 @@ package com.abelium.inatrace.db.entities.product;
 
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.converters.MarkerListConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

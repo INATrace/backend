@@ -1,8 +1,8 @@
 package com.abelium.inatrace.db.entities.product;
 
 import com.abelium.inatrace.db.entities.company.Company;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

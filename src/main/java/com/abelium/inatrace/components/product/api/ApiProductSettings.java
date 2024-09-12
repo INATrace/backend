@@ -5,7 +5,7 @@ import com.abelium.inatrace.types.Language;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 import java.util.Map;
 
 @Validated

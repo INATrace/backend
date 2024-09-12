@@ -6,19 +6,18 @@ import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.api.ApiCountry;
 import com.abelium.inatrace.components.common.api.ApiDocument;
-import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.Country;
+import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.tools.*;
 import com.abelium.inatrace.types.DocumentType;
 import com.abelium.inatrace.types.MediaObject;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.torpedoquery.jpa.Torpedo;
-
-import javax.transaction.Transactional;
+import org.torpedoquery.jakarta.jpa.Torpedo;
 import java.util.EnumSet;
 
 @Lazy

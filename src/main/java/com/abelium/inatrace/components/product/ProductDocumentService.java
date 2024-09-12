@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;

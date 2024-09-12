@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.18</version>
+		<version>3.0.13</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	
@@ -17,7 +17,7 @@
 	<description>Coffee backend services</description>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
     </properties>
 
 	<dependencies>
@@ -54,12 +54,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
-		
-        <!-- Auditing -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-envers</artifactId>
-        </dependency>
+
+		<!-- Auditing -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-envers</artifactId>
+		</dependency>
         		
         <!-- Flyway - migrations -->
 		<dependency>
@@ -112,11 +112,11 @@
 	    </dependency>                       
 
         <!-- Torpedo - easier & nicer query builder -->
-        <dependency>
-            <groupId>org.torpedoquery</groupId>
-            <artifactId>org.torpedoquery</artifactId>
-            <version>2.6.0</version>
-        </dependency>
+		<dependency>
+			<groupId>io.github.walkingcodedan</groupId>
+			<artifactId>org.torpedoquery.jakarta</artifactId>
+			<version>1.0.1</version>
+		</dependency>
         
 		<!-- Google Guava -->
 		<dependency>

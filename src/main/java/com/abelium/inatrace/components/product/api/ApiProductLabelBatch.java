@@ -3,8 +3,8 @@ package com.abelium.inatrace.components.product.api;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 
 import org.springframework.validation.annotation.Validated;
 

@@ -5,8 +5,8 @@ import com.abelium.inatrace.types.BeycoCurrency;
 import com.abelium.inatrace.types.BeycoPriceUnit;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.math.BigDecimal;
 
 public class ApiBeycoOrderCoffees {

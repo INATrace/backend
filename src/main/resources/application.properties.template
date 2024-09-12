@@ -44,7 +44,7 @@ spring.datasource.hikari.maxLifetime = 30000
 # Hibernate naming strategies (fixes case with one class being embedded multiple times into same entity
 spring.jpa.hibernate.naming.implicit-strategy = org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
 spring.jpa.hibernate.naming.physical-strategy = org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-spring.jpa.properties.hibernate.dialect = com.abelium.inatrace.configuration.CustomMySQL5InnoDBDialect
+spring.jpa.properties.hibernate.dialect = com.abelium.inatrace.configuration.CustomMySQLDialect
 
 # Create/update envers auditing tables
 spring.jpa.properties.hibernate.hbm2ddl.auto = update

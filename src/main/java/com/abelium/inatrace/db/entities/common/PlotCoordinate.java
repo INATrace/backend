@@ -1,10 +1,9 @@
 package com.abelium.inatrace.db.entities.common;
 
 import com.abelium.inatrace.db.base.BaseEntity;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 
 /**
  * Singe coordinate of a plot.

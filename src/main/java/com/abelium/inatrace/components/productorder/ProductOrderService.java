@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 
 /**

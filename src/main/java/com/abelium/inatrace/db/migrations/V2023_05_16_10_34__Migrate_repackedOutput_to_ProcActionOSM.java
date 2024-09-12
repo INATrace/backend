@@ -5,7 +5,7 @@ import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.tools.Queries;
 import org.springframework.core.env.Environment;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 public class V2023_05_16_10_34__Migrate_repackedOutput_to_ProcActionOSM implements JpaMigration {

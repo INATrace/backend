@@ -2,11 +2,10 @@ package com.abelium.inatrace.db.entities.value_chain;
 
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.codebook.ProcessingEvidenceType;
-
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 /**
  * Intermediate entity between value chain and proc. evidence type.
@@ -14,7 +13,7 @@ import javax.persistence.Table;
  * @author Pece Adjievski, Sunesis d.o.o.
  */
 @Entity
-@Table(indexes = { @Index(columnList = "valueChain_id, processingEvidenceType_id", unique = true) })
+@Table(indexes = {@Index(columnList = "valueChain_id, processingEvidenceType_id", unique = true) })
 public class ValueChainProcEvidenceType extends BaseEntity {
 
 	@ManyToOne(optional = false)

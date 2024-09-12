@@ -15,8 +15,7 @@ import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.productorder.ProductOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
-
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
