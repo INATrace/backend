@@ -10,9 +10,10 @@ import jakarta.persistence.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.springframework.security.core.GrantedAuthority;
+
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Audited
@@ -73,7 +74,7 @@ public class User extends TimestampEntity {
 	 */
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	@NotAudited
-	private List<CompanyUser> userCompanies;
+	private Set<CompanyUser> userCompanies;
 
     public String getEmail() {
 		return email;
@@ -135,11 +136,11 @@ public class User extends TimestampEntity {
 		return Collections.singletonList(getRole());
 	}
 
-	public List<CompanyUser> getUserCompanies() {
+	public Set<CompanyUser> getUserCompanies() {
 		return userCompanies;
 	}
 
-	public void setUserCompanies(List<CompanyUser> userCompanies) {
+	public void setUserCompanies(Set<CompanyUser> userCompanies) {
 		this.userCompanies = userCompanies;
 	}
 

@@ -4,8 +4,8 @@ import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.codebook.MeasureUnitType;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @NamedQueries({
@@ -30,7 +30,7 @@ public class FinalProduct extends TimestampEntity {
     private Product product;
 
     @OneToMany(mappedBy = "finalProduct", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FinalProductLabel> finalProductLabels;
+    private Set<FinalProductLabel> finalProductLabels;
 
     public String getName() {
         return name;
@@ -64,9 +64,9 @@ public class FinalProduct extends TimestampEntity {
         this.product = product;
     }
 
-    public List<FinalProductLabel> getFinalProductLabels() {
+    public Set<FinalProductLabel> getFinalProductLabels() {
         if (finalProductLabels == null) {
-            finalProductLabels = new ArrayList<>();
+            finalProductLabels = new HashSet<>();
         }
         return finalProductLabels;
     }

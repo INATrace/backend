@@ -9,8 +9,9 @@ import com.abelium.inatrace.types.CompanyDocumentType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class CompanyDocument extends BaseEntity {
@@ -73,7 +74,7 @@ public class CompanyDocument extends BaseEntity {
 
 	@OneToMany(mappedBy = "companyDocumentId")
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	private List<ProductLabelCompanyDocument> productLabels = new ArrayList<>();
+	private Set<ProductLabelCompanyDocument> productLabels = new HashSet<>();
 
 	public Company getCompany() {
 		return company;
@@ -147,11 +148,12 @@ public class CompanyDocument extends BaseEntity {
 		this.document = document;
 	}
 
-	public List<ProductLabelCompanyDocument> getProductLabels() {
+	public Set<ProductLabelCompanyDocument> getProductLabels() {
 		return productLabels;
 	}
 
-	public void setProductLabels(List<ProductLabelCompanyDocument> productLabels) {
+	public void setProductLabels(Set<ProductLabelCompanyDocument> productLabels) {
 		this.productLabels = productLabels;
 	}
+
 }

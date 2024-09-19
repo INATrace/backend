@@ -3,7 +3,7 @@ package com.abelium.inatrace.components.product.api;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.types.ProductLabelFeedbackType;
 import io.swagger.v3.oas.annotations.Parameter;
-import org.springdoc.api.annotations.ParameterObject;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.validation.annotation.Validated;
 
 @Validated

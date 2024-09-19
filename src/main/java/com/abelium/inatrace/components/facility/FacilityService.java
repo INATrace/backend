@@ -81,7 +81,7 @@ public class FacilityService extends BaseService {
 		} else {
 
 			// Check if req. user is enrolled in facility's company
-			PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
+			PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers().stream().toList(), user);
 		}
 
 		return FacilityMapper.toApiFacility(facility, language);
@@ -92,7 +92,7 @@ public class FacilityService extends BaseService {
 		Facility facility = fetchFacility(id);
 
 		// Check if req. user is enrolled in facility's company
-		PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers().stream().toList(), user);
 
 		return FacilityMapper.toApiFacilityDetail(facility, language);
 	}
@@ -118,7 +118,7 @@ public class FacilityService extends BaseService {
 		}
 
 		// Create or update can be done only by company admin or system admin
-		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(company.getUsers().stream().toList(), user);
 
 		entity.setIsCollectionFacility(apiFacility.getIsCollectionFacility());
 		entity.setIsPublic(apiFacility.getIsPublic());
@@ -195,7 +195,7 @@ public class FacilityService extends BaseService {
 		Facility facility = em.find(Facility.class, id);
 
 		// Deactivate/Activate can be done only by company admin or system admin
-		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(facility.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(facility.getCompany().getUsers().stream().toList(), user);
 
 		facility.setIsDeactivated(deactivated);
 	}
@@ -206,7 +206,7 @@ public class FacilityService extends BaseService {
 		Facility facility = fetchFacility(id);
 
 		// Remove can be done only by company admin or system admin
-		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(facility.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(facility.getCompany().getUsers().stream().toList(), user);
 
 		em.remove(facility);
 	}
@@ -230,7 +230,7 @@ public class FacilityService extends BaseService {
 																	CustomUserDetails user) throws ApiException {
 
 		Company company = companyQueries.fetchCompany(companyId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request, () ->
 						listFacilitiesByCompanyQuery(companyId, null, null, language, null),
@@ -248,7 +248,7 @@ public class FacilityService extends BaseService {
 	                                                             Language language) throws ApiException {
 
 		Company company = companyQueries.fetchCompany(companyId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request, () ->
 						listFacilitiesByCompanyQuery(companyId, semiProductId, finalProductId, language, true),
@@ -286,7 +286,7 @@ public class FacilityService extends BaseService {
 
 		// Check request user if enrolled in company
 		Company company = companyQueries.fetchCompany(companyId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
 
 		TypedQuery<Facility> collectingFacilitiesQuery = em.createNamedQuery("Facility.listCollectingFacilitiesByCompany",
 						Facility.class)
@@ -315,7 +315,7 @@ public class FacilityService extends BaseService {
 
 		// Check that the request user is enrolled in the company for which we are fetching connected selling facilities
 		Company company = companyQueries.fetchCompany(companyId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
 
 		// First get all the products where the company is participating in role BUYER OR EXPORTER
 		TypedQuery<ProductCompany> productsAssociationsQuery = em.createNamedQuery(

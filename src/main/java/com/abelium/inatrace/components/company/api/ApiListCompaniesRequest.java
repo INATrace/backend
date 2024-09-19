@@ -4,7 +4,7 @@ import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.types.CompanyStatus;
 import com.abelium.inatrace.types.Language;
 import io.swagger.v3.oas.annotations.Parameter;
-import org.springdoc.api.annotations.ParameterObject;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.validation.annotation.Validated;
 
 @Validated

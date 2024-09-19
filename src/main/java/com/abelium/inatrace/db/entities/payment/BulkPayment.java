@@ -8,8 +8,8 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table
@@ -50,10 +50,10 @@ public class BulkPayment extends TimestampEntity {
 	private String additionalCostDescription;
 	
 	@OneToMany(mappedBy = "bulkPayment")
-	private List<Payment> payments = new ArrayList<>();
+	private Set<Payment> payments = new HashSet<>();
 
 	@OneToMany(mappedBy = "bulkPayment", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<BulkPaymentActivityProof> additionalProofs;
+	private Set<BulkPaymentActivityProof> additionalProofs;
 
 	public User getCreatedBy() {
 		return createdBy;
@@ -135,23 +135,24 @@ public class BulkPayment extends TimestampEntity {
 		this.additionalCostDescription = additionalCostDescription;
 	}
 
-	public List<Payment> getPayments() {
+	public Set<Payment> getPayments() {
 		if (payments == null)
-			payments = new ArrayList<>();
+			payments = new HashSet<>();
 		return payments;
 	}
 
-	public void setPayments(List<Payment> payments) {
+	public void setPayments(Set<Payment> payments) {
 		this.payments = payments;
 	}
 
-	public List<BulkPaymentActivityProof> getAdditionalProofs() {
+	public Set<BulkPaymentActivityProof> getAdditionalProofs() {
 		if (additionalProofs == null)
-			additionalProofs = new ArrayList<>();
+			additionalProofs = new HashSet<>();
 		return additionalProofs;
 	}
 
-	public void setAdditionalProofs(List<BulkPaymentActivityProof> additionalProofs) {
+	public void setAdditionalProofs(Set<BulkPaymentActivityProof> additionalProofs) {
 		this.additionalProofs = additionalProofs;
 	}
+
 }

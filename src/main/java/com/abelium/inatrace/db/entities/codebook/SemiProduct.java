@@ -3,8 +3,8 @@ package com.abelium.inatrace.db.entities.codebook;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Codebook entity for semi products.
@@ -42,7 +42,7 @@ public class SemiProduct extends TimestampEntity {
 	 * Translations for semi product
 	 */
 	@OneToMany(mappedBy = "semiProduct", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<SemiProductTranslation> semiProductTranslations = new ArrayList<>();
+	private Set<SemiProductTranslation> semiProductTranslations = new HashSet<>();
 
 	/**
 	 * Whether the product is considered as Stock keeping unit (at producer)
@@ -107,11 +107,12 @@ public class SemiProduct extends TimestampEntity {
 		isSKUEndCustomer = SKUEndCustomer;
 	}
 
-	public List<SemiProductTranslation> getSemiProductTranslations() {
+	public Set<SemiProductTranslation> getSemiProductTranslations() {
 		return semiProductTranslations;
 	}
 
-	public void setSemiProductTranslations(List<SemiProductTranslation> semiProductTranslations) {
+	public void setSemiProductTranslations(Set<SemiProductTranslation> semiProductTranslations) {
 		this.semiProductTranslations = semiProductTranslations;
 	}
+
 }

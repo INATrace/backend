@@ -16,10 +16,11 @@ import com.abelium.inatrace.db.entities.productorder.ProductOrder;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table
@@ -90,25 +91,25 @@ public class StockOrder extends TimestampEntity {
 	private Company quoteCompany;
 
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Certification> certifications;
+	private Set<Certification> certifications;
 
 	// The required processing evidence fields values - the available values are sourced from the
 	// selected Processing action definition;
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<StockOrderPEFieldValue> processingEFValues;
+	private Set<StockOrderPEFieldValue> processingEFValues;
 
 	// The required processing evidence documents - the available values are sourced from the
 	// selected Processing action definition;
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<StockOrderPETypeValue> documentRequirements;
+	private Set<StockOrderPETypeValue> documentRequirements;
 
 	// Activity proofs that were provided while creating or updating a purchase order
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<StockOrderActivityProof> activityProofs;
+	private Set<StockOrderActivityProof> activityProofs;
 
 	// A stock (purchase) order can be divided in many payments
 	@OneToMany(mappedBy = "stockOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Payment> payments = new ArrayList<>();
+	private Set<Payment> payments = new HashSet<>();
 
 	@ManyToOne
 	private Company company;
@@ -299,13 +300,13 @@ public class StockOrder extends TimestampEntity {
 		this.producerUserCustomer = producerUserCustomer;
 	}
 
-	public List<Certification> getCertifications() {
+	public Set<Certification> getCertifications() {
 		if (certifications == null)
-			certifications = new ArrayList<>();
+			certifications = new HashSet<>();
 		return certifications;
 	}
 
-	public void setCertifications(List<Certification> certifications) {
+	public void setCertifications(Set<Certification> certifications) {
 		this.certifications = certifications;
 	}
 
@@ -445,23 +446,23 @@ public class StockOrder extends TimestampEntity {
 		this.deliveryTime = deliveryTime;
 	}
 
-	public List<StockOrderPEFieldValue> getProcessingEFValues() {
+	public Set<StockOrderPEFieldValue> getProcessingEFValues() {
 		if (processingEFValues == null) {
-			processingEFValues = new ArrayList<>();
+			processingEFValues = new HashSet<>();
 		}
 		return processingEFValues;
 	}
 
-	public List<StockOrderPETypeValue> getDocumentRequirements() {
+	public Set<StockOrderPETypeValue> getDocumentRequirements() {
 		if (documentRequirements == null) {
-			documentRequirements = new ArrayList<>();
+			documentRequirements = new HashSet<>();
 		}
 		return documentRequirements;
 	}
 
-	public List<StockOrderActivityProof> getActivityProofs() {
+	public Set<StockOrderActivityProof> getActivityProofs() {
 		if (activityProofs == null) {
-			activityProofs = new ArrayList<>();
+			activityProofs = new HashSet<>();
 		}
 		return activityProofs;
 	}
@@ -474,11 +475,11 @@ public class StockOrder extends TimestampEntity {
 		this.pricePerUnit = pricePerUnit;
 	}
 
-	public List<Payment> getPayments() {
+	public Set<Payment> getPayments() {
 		return payments;
 	}
 
-	public void setPayments(List<Payment> payments) {
+	public void setPayments(Set<Payment> payments) {
 		this.payments = payments;
 	}
 

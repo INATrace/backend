@@ -59,7 +59,7 @@ public class UserCustomerImportService extends BaseService {
         // If importing as a Regional admin, check that it is enrolled in the company
         if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
             Company company = companyQueries.fetchCompany(companyId);
-            PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
+            PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), authUser);
         }
 
         DocumentData documentData = storageService.downloadDocument(em.find(Document.class, documentId).getStorageKey());

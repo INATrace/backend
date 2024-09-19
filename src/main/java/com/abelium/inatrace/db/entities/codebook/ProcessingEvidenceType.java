@@ -4,8 +4,9 @@ import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.enums.EvidenceType;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Codebook entity for processing evidences.
@@ -63,7 +64,7 @@ public class ProcessingEvidenceType extends TimestampEntity {
 	private Boolean quality;
 
 	@OneToMany(mappedBy = "processingEvidenceType", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-	private List<ProcessingEvidenceTypeTranslation> translations;
+	private Set<ProcessingEvidenceTypeTranslation> translations;
 
 	public String getCode() {
 		return code;
@@ -113,10 +114,11 @@ public class ProcessingEvidenceType extends TimestampEntity {
 		this.quality = quality;
 	}
 
-	public List<ProcessingEvidenceTypeTranslation> getTranslations() {
+	public Set<ProcessingEvidenceTypeTranslation> getTranslations() {
 		if (translations == null) {
-			translations = new ArrayList<>();
+			translations = new HashSet<>();
 		}
 		return translations;
 	}
+
 }

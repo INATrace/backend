@@ -6,8 +6,9 @@ import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.types.ProductStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(indexes = { @Index(columnList = "name") })
@@ -28,7 +29,7 @@ public class Product extends ProductContent {
 	 * indicate the number of farmers or suppliers you work with directly or indirectly at each location. 
 	 */
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductLocation> originLocations = new ArrayList<>(0);
+    private Set<ProductLocation> originLocations = new HashSet<>();
 	
 	/**
 	 * company - owner
@@ -48,25 +49,25 @@ public class Product extends ProductContent {
 	 * a list of other companies associated with this product (buyers, producers, ...) 
 	 */
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProductCompany> associatedCompanies = new ArrayList<>();
+	private Set<ProductCompany> associatedCompanies = new HashSet<>();
     
 	/**
 	 * labels
 	 */
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "product")
-	private List<ProductLabel> labels = new ArrayList<>();
+	private Set<ProductLabel> labels = new HashSet<>();
 
 	/**
 	 * Data sharing agreements between the stakeholders on this product (value chain)
 	 */
 	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProductDataSharingAgreement> dataSharingAgreements;
+	private Set<ProductDataSharingAgreement> dataSharingAgreements;
 
-	public List<ProductLocation> getOriginLocations() {
+	public Set<ProductLocation> getOriginLocations() {
 		return originLocations;
 	}
 
-	public void setOriginLocations(List<ProductLocation> originLocations) {
+	public void setOriginLocations(Set<ProductLocation> originLocations) {
 		this.originLocations = originLocations;
 	}
 
@@ -86,11 +87,11 @@ public class Product extends ProductContent {
 		this.valueChain = valueChain;
 	}
 
-	public List<ProductCompany> getAssociatedCompanies() {
+	public Set<ProductCompany> getAssociatedCompanies() {
 		return associatedCompanies;
 	}
 
-	public void setAssociatedCompanies(List<ProductCompany> associatedCompanies) {
+	public void setAssociatedCompanies(Set<ProductCompany> associatedCompanies) {
 		this.associatedCompanies = associatedCompanies;
 	}
 
@@ -102,22 +103,22 @@ public class Product extends ProductContent {
 		this.status = status;
 	}
 
-	public List<ProductLabel> getLabels() {
+	public Set<ProductLabel> getLabels() {
 		return labels;
 	}
 
-	public void setLabels(List<ProductLabel> labels) {
+	public void setLabels(Set<ProductLabel> labels) {
 		this.labels = labels;
 	}
 
-	public List<ProductDataSharingAgreement> getDataSharingAgreements() {
+	public Set<ProductDataSharingAgreement> getDataSharingAgreements() {
 		if (dataSharingAgreements == null) {
-			dataSharingAgreements = new ArrayList<>();
+			dataSharingAgreements = new HashSet<>();
 		}
 		return dataSharingAgreements;
 	}
 
-	public void setDataSharingAgreements(List<ProductDataSharingAgreement> dataSharingAgreements) {
+	public void setDataSharingAgreements(Set<ProductDataSharingAgreement> dataSharingAgreements) {
 		this.dataSharingAgreements = dataSharingAgreements;
 	}
 

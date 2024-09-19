@@ -10,8 +10,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class ProductOrder extends TimestampEntity {
@@ -35,7 +35,7 @@ public class ProductOrder extends TimestampEntity {
 	private Boolean requiredOrganic;
 
 	@OneToMany(mappedBy = "productOrder")
-	private List<StockOrder> items;
+	private Set<StockOrder> items;
 
 	public String getOrderId() {
 		return orderId;
@@ -85,14 +85,14 @@ public class ProductOrder extends TimestampEntity {
 		this.requiredOrganic = requiredOrganic;
 	}
 
-	public List<StockOrder> getItems() {
+	public Set<StockOrder> getItems() {
 		if (items == null) {
-			items = new ArrayList<>();
+			items = new HashSet<>();
 		}
 		return items;
 	}
 
-	public void setItems(List<StockOrder> items) {
+	public void setItems(Set<StockOrder> items) {
 		this.items = items;
 	}
 

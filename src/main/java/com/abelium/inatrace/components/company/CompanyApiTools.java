@@ -392,10 +392,10 @@ public class CompanyApiTools {
 		apiUserCustomer.setFarm(toApiFarmInformation(userCustomer, language));
 
 		// Associations
-		apiUserCustomer.setAssociations(toApiUserCustomerAssociationList(userCustomer.getAssociations()));
+		apiUserCustomer.setAssociations(toApiUserCustomerAssociationList(userCustomer.getAssociations().stream().toList()));
 
 		// Cooperatives
-		apiUserCustomer.setCooperatives(toApiUserCustomerCooperativesList(userCustomer.getCooperatives()));
+		apiUserCustomer.setCooperatives(toApiUserCustomerCooperativesList(userCustomer.getCooperatives().stream().toList()));
 
 		// Certifications
 		apiUserCustomer.setCertifications(userCustomer.getCertifications().stream().map(ucc -> {

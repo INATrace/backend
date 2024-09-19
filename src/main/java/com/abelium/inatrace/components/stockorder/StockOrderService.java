@@ -179,15 +179,15 @@ public class StockOrderService extends BaseService {
         // If company or quote company ID is provided, validate that the request user is enrolled in this company
         if (queryRequest.companyId != null) {
             Company company = companyQueries.fetchCompany(queryRequest.companyId);
-            PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+            PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
         } else if (queryRequest.quoteCompanyId != null) {
             Company company = companyQueries.fetchCompany(queryRequest.quoteCompanyId);
-            PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+            PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
         } else {
 
             // If company ID is not provided, fetch the facility's company and validate user company enrollment
             Facility facility = facilityService.fetchFacility(queryRequest.facilityId);
-            PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
+            PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers().stream().toList(), user);
         }
 
         return PaginationTools.createPaginatedResponse(em, request,
@@ -845,7 +845,7 @@ public class StockOrderService extends BaseService {
         }
 
         Facility facility = facilityService.fetchFacility(apiPurchaseOrder.getFacility().id);
-        PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
+        PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers().stream().toList(), user);
 
         // Update stocks of type Purchase, one by one
         for (ApiPurchaseOrderFarmer farmer : apiPurchaseOrder.getFarmers()) {
@@ -959,7 +959,7 @@ public class StockOrderService extends BaseService {
         // In some cases we don't need to check if request user is enrolled in company due to already
         // executed checks (approve/reject quote order transaction, etc.)
         if (checkCompanyEnrolment) {
-            PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
+            PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers().stream().toList(), user);
         }
 
         entity.setOrderType(apiStockOrder.getOrderType());
@@ -1190,7 +1190,7 @@ public class StockOrderService extends BaseService {
             if (processingOrder != null) {
 
                 // Calculate quantities based on input transactions
-                List<Transaction> inputTxs = processingOrder.getInputTransactions();
+                List<Transaction> inputTxs = processingOrder.getInputTransactions().stream().toList();
                 Transaction newInputTransaction = newInputTransactionId != null ? inputTxs
                         .stream()
                         .filter(t -> t.getId().equals(newInputTransactionId)).findAny()
@@ -1239,7 +1239,7 @@ public class StockOrderService extends BaseService {
                     BooleanUtils.isFalse(procAction.getRepackedOutputFinalProducts()) && expectedTotalQuantityPerUnit != null) {
 
                 // Calculate the total input quantity (summed up input transactions from the processing order)
-                List<Transaction> inputTxs = processingOrder.getInputTransactions();
+                List<Transaction> inputTxs = processingOrder.getInputTransactions().stream().toList();
                 BigDecimal totalInputQuantity = inputTxs.stream()
                         .filter(t -> !t.getStatus().equals(TransactionStatus.CANCELED))
                         .map(Transaction::getOutputQuantity)
@@ -1302,7 +1302,7 @@ public class StockOrderService extends BaseService {
 
         StockOrder stockOrder = fetchEntity(id, StockOrder.class);
 
-        PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(stockOrder.getCompany().getUsers(), user);
+        PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(stockOrder.getCompany().getUsers().stream().toList(), user);
 
         em.remove(stockOrder);
     }

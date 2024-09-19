@@ -3,11 +3,13 @@ package com.abelium.inatrace.api;
 import com.abelium.inatrace.types.PaginatedRequestType;
 import com.abelium.inatrace.types.SortDirection;
 import io.swagger.v3.oas.annotations.Parameter;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.validation.annotation.Validated;
 
 import jakarta.validation.constraints.Min;
 
 @Validated
+@ParameterObject
 public class ApiPaginatedRequest {
 
 	@Parameter(name = "Only count, only fetch, or return both values (if null)")

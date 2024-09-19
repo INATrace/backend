@@ -111,7 +111,7 @@ public class CompanyService extends BaseService {
 				CompanyApiTools::toApiCompanyListResponse);
 	}
 
-	private Function<Company> userCompanyListQueryObject(Long userId,
+	private Company userCompanyListQueryObject(Long userId,
 			ApiListCompaniesRequest request) {
 
 		CompanyUser cuProxy = Torpedo.from(CompanyUser.class);
@@ -139,11 +139,11 @@ public class CompanyService extends BaseService {
 				QueryTools.orderBy(request.sort, cProxy.getId());
 		}
 
-		return Torpedo.distinct(cuProxy.getCompany());
+		return cProxy;
 	}
 
 	public ApiPaginatedList<ApiCompanyListResponse> listUserCompanies(Long userId, ApiListCompaniesRequest request) {
-		return PaginationTools.createPaginatedResponse1(em, request, () -> userCompanyListQueryObject(userId, request),
+		return PaginationTools.createPaginatedResponse(em, request, () -> userCompanyListQueryObject(userId, request),
 				CompanyApiTools::toApiCompanyListResponse);
 	}
 
@@ -176,7 +176,7 @@ public class CompanyService extends BaseService {
 		Company c = companyQueries.fetchCompany(id);
 		List<ApiCompanyUser> users = companyQueries.fetchUsersForCompany(id);
 
-		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(c.getUsers(), authUser);
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(c.getUsers().stream().toList(), authUser);
 
 		List<ApiValueChain> valueChains = companyQueries.fetchCompanyValueChains(id);
 
@@ -211,7 +211,7 @@ public class CompanyService extends BaseService {
 
 		Company c = companyQueries.fetchCompany(id);
 
-		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(c.getUsers(), authUser);
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(c.getUsers().stream().toList(), authUser);
 
 		return companyApiTools.toApiCompanyName(c);
 	}
@@ -220,7 +220,7 @@ public class CompanyService extends BaseService {
 
 		// Validate that company exists with the provided ID and that request user is enrolled in this company
 		Company company = companyQueries.fetchCompany(id);
-		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(company.getUsers().stream().toList(), user);
 
 		return companyQueries.fetchUsersForCompany(id);
 	}
@@ -230,7 +230,7 @@ public class CompanyService extends BaseService {
 		Company c = companyQueries.fetchCompany(authUser, ac.id);
 
 		// Check that the user is company enrolled and Company admin
-		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(c.getUsers(), authUser);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(c.getUsers().stream().toList(), authUser);
 
 		companyApiTools.updateCompanyWithUsers(authUser.getUserId(), c, ac);
 
@@ -247,7 +247,7 @@ public class CompanyService extends BaseService {
 
 		// Check if requesting user is authorized for the company
 		if (authUser.getUserRole() == UserRole.REGIONAL_ADMIN) {
-			PermissionsUtil.checkUserIfCompanyEnrolled(c.getUsers(), authUser);
+			PermissionsUtil.checkUserIfCompanyEnrolled(c.getUsers().stream().toList(), authUser);
 
 			// Check if action is 'DEACTIVATE_COMPANY' or 'MERGE_TO_COMPANY' - this is not allowed by the Regional admin
 			if (action == CompanyAction.DEACTIVATE_COMPANY || action == CompanyAction.MERGE_TO_COMPANY) {
@@ -285,7 +285,7 @@ public class CompanyService extends BaseService {
 	public ApiUserCustomer getUserCustomer(Long id, CustomUserDetails user, Language language) throws ApiException {
 
 		UserCustomer userCustomer = fetchUserCustomer(id);
-		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers().stream().toList(), user);
 
 		return companyApiTools.toApiUserCustomer(userCustomer, user.getUserId(), language);
 	}
@@ -306,7 +306,7 @@ public class CompanyService extends BaseService {
 	                                                                           Language language) throws ApiException {
 
 		Company company = companyQueries.fetchCompany(companyId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request,
 				() -> userCustomerListQueryObject(companyId, type, request),
@@ -803,7 +803,7 @@ public class CompanyService extends BaseService {
 	public ApiUserCustomer addUserCustomer(Long companyId, ApiUserCustomer apiUserCustomer, CustomUserDetails user, Language language) throws ApiException {
 
 		Company company = companyQueries.fetchCompany(companyId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
 
 		UserCustomer userCustomer = new UserCustomer();
 		userCustomer.setCompany(company);
@@ -872,7 +872,7 @@ public class CompanyService extends BaseService {
 
 		// Set farm plants information
 		if (apiUserCustomer.getFarm() != null && !apiUserCustomer.getFarm().getFarmPlantInformationList().isEmpty()) {
-			userCustomer.setFarmPlantInformationList(new ArrayList<>());
+			userCustomer.setFarmPlantInformationList(new HashSet<>());
 
 			for(ApiFarmPlantInformation apiPlantInfo: apiUserCustomer.getFarm().getFarmPlantInformationList()) {
 				FarmPlantInformation farmPlantInformation = new FarmPlantInformation();
@@ -886,7 +886,7 @@ public class CompanyService extends BaseService {
 		}
 
 		// Add the company as default cooperative
-		userCustomer.setCooperatives(new ArrayList<>());
+		userCustomer.setCooperatives(new HashSet<>());
 		UserCustomerCooperative userCustomerCooperative = new UserCustomerCooperative();
 		userCustomerCooperative.setCompany(company);
 		userCustomerCooperative.setRole(apiUserCustomer.getType());
@@ -895,7 +895,7 @@ public class CompanyService extends BaseService {
 		em.persist(userCustomerCooperative);
 
 		// Set associations
-		userCustomer.setAssociations(new ArrayList<>());
+		userCustomer.setAssociations(new HashSet<>());
 		if (apiUserCustomer.getAssociations() != null) {
 			for (ApiUserCustomerAssociation apiUserCustomerAssociation : apiUserCustomer.getAssociations()) {
 				UserCustomerAssociation userCustomerAssociation = new UserCustomerAssociation();
@@ -959,7 +959,7 @@ public class CompanyService extends BaseService {
 		}
 
 		UserCustomer userCustomer = fetchUserCustomer(apiUserCustomer.getId());
-		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers().stream().toList(), user);
 
 		userCustomer.setName(apiUserCustomer.getName());
 		userCustomer.setSurname(apiUserCustomer.getSurname());
@@ -1019,7 +1019,7 @@ public class CompanyService extends BaseService {
 		}
 
 		if (userCustomer.getAssociations() == null) {
-			userCustomer.setAssociations(new ArrayList<>());
+			userCustomer.setAssociations(new HashSet<>());
 		}
 
 		// Update user customer associations
@@ -1035,7 +1035,7 @@ public class CompanyService extends BaseService {
 		}
 
 		if (userCustomer.getCooperatives() == null) {
-			userCustomer.setCooperatives(new ArrayList<>());
+			userCustomer.setCooperatives(new HashSet<>());
 		}
 
 		// Update user customer cooperatives
@@ -1158,7 +1158,7 @@ public class CompanyService extends BaseService {
 	public byte[] exportUserCustomerGeoData(CustomUserDetails authUser, Long id) throws ApiException {
 
 		UserCustomer userCustomer = fetchUserCustomer(id);
-		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), authUser);
+		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers().stream().toList(), authUser);
 
 		// Prepare the GeoJSON object
 		List<Feature> features = new ArrayList<>();
@@ -1169,8 +1169,8 @@ public class CompanyService extends BaseService {
 			if (plot.getCoordinates().size() < 3) {
 
 				feature = Feature.fromGeometry(Point.fromLngLat(
-						plot.getCoordinates().get(0).getLongitude(),
-						plot.getCoordinates().get(0).getLatitude()
+						plot.getCoordinates().stream().toList().get(0).getLongitude(),
+						plot.getCoordinates().stream().toList().get(0).getLatitude()
 				));
 			} else {
 
@@ -1183,8 +1183,8 @@ public class CompanyService extends BaseService {
 						.collect(
 						Collectors.toList());
 				polygonCoordinates.add(Point.fromLngLat(
-						plot.getCoordinates().get(0).getLongitude(),
-						plot.getCoordinates().get(0).getLatitude()));
+						plot.getCoordinates().stream().toList().get(0).getLongitude(),
+						plot.getCoordinates().stream().toList().get(0).getLatitude()));
 
 				feature = Feature.fromGeometry(Polygon.fromLngLats(List.of(polygonCoordinates)));
 			}
@@ -1198,7 +1198,7 @@ public class CompanyService extends BaseService {
 	public void uploadUserCustomerGeoData(CustomUserDetails authUser, Long id, MultipartFile file) throws ApiException {
 
 		UserCustomer userCustomer = fetchUserCustomer(id);
-		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), authUser);
+		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers().stream().toList(), authUser);
 
 		// Try to read the GeoJSON into Feature collection
         try {
@@ -1230,7 +1230,7 @@ public class CompanyService extends BaseService {
 						}).collect(Collectors.toList()));
 
 						ApiProductType apiProductType = new ApiProductType();
-						apiProductType.setId(userCustomer.getProductTypes().get(0).getProductType().getId());
+						apiProductType.setId(userCustomer.getProductTypes().stream().toList().get(0).getProductType().getId());
 						apiPlot.setCrop(apiProductType);
 
 						createUserCustomerPlot(id, authUser, Language.EN, apiPlot);
@@ -1248,7 +1248,7 @@ public class CompanyService extends BaseService {
 						apiPlot.setCoordinates(List.of(coordinate));
 
 						ApiProductType apiProductType = new ApiProductType();
-						apiProductType.setId(userCustomer.getProductTypes().get(0).getProductType().getId());
+						apiProductType.setId(userCustomer.getProductTypes().stream().toList().get(0).getProductType().getId());
 						apiPlot.setCrop(apiProductType);
 
 						createUserCustomerPlot(id, authUser, Language.EN, apiPlot);
@@ -1266,7 +1266,7 @@ public class CompanyService extends BaseService {
 	public void deleteUserCustomer(Long id, CustomUserDetails user) throws ApiException {
 
 		UserCustomer userCustomer = fetchUserCustomer(id);
-		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers().stream().toList(), user);
 
 		em.remove(userCustomer);
 	}
@@ -1278,7 +1278,7 @@ public class CompanyService extends BaseService {
 										  ApiPlot request) throws ApiException {
 
 		UserCustomer userCustomer = fetchUserCustomer(userCustomerId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers().stream().toList(), user);
 
 		Plot plot = new Plot();
 		plot.setPlotName(request.getPlotName());
@@ -1313,7 +1313,7 @@ public class CompanyService extends BaseService {
 												   Language language) throws ApiException {
 
 		UserCustomer userCustomer = fetchUserCustomer(userCustomerId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(userCustomer.getCompany().getUsers().stream().toList(), user);
 
 		Plot plot = userCustomer.getPlots()
 				.stream()
@@ -1328,8 +1328,10 @@ public class CompanyService extends BaseService {
 		return PlotMapper.toApiPlot(plot, language);
 	}
 
-	private String generatePlotGeoID(List<PlotCoordinate> coordinates) {
-		
+	private String generatePlotGeoID(Set<PlotCoordinate> coordinatesSet) {
+
+		List<PlotCoordinate> coordinates = new ArrayList<>(coordinatesSet);
+
 		if (coordinates.isEmpty() || coordinates.size() < 3) {
 			return null;
 		}
@@ -1358,8 +1360,8 @@ public class CompanyService extends BaseService {
 	private void fixCoordinatesForApiCall(List<PlotCoordinate> coordinates) {
 		if (coordinates != null && !coordinates.isEmpty() && coordinates.size() > 2) {
 			int lastIndex = coordinates.size() - 1;
-			if (coordinates.get(0).getLatitude() != null && coordinates.get(lastIndex).getLatitude()!=null &&
-					coordinates.get(0).getLongitude() != null && coordinates.get(lastIndex).getLongitude()!=null) {
+			if (coordinates.get(0).getLatitude() != null && coordinates.get(lastIndex).getLatitude() != null &&
+					coordinates.get(0).getLongitude() != null && coordinates.get(lastIndex).getLongitude() != null) {
 				if (!coordinates.get(0).getLatitude().equals(coordinates.get(lastIndex).getLatitude()) ||
 						!coordinates.get(0).getLongitude().equals(coordinates.get(lastIndex).getLongitude())
 				) {
@@ -1373,7 +1375,7 @@ public class CompanyService extends BaseService {
 	public ApiPaginatedList<ApiCompanyCustomer> listCompanyCustomers(CustomUserDetails authUser, Long companyId, ApiListCustomersRequest request) throws ApiException {
 
 		Company company = companyQueries.fetchCompany(companyId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), authUser);
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> customerListQueryObject(companyId, request),
 				CompanyCustomerMapper::toApiCompanyCustomer);
@@ -1401,7 +1403,7 @@ public class CompanyService extends BaseService {
 	public ApiPaginatedList<ApiCompanyListResponse> getAssociations(Long id, ApiPaginatedRequest request, CustomUserDetails user) throws ApiException {
 
 		Company company = companyQueries.fetchCompany(id);
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> associationsCompanyListQueryObject(id));
 	}
@@ -1427,7 +1429,7 @@ public class CompanyService extends BaseService {
 	public ApiPaginatedList<ApiCompanyListResponse> getConnectedCompanies(Long id, ApiPaginatedRequest request, CustomUserDetails user) throws ApiException {
 
 		Company company = companyQueries.fetchCompany(id);
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
 
 		return PaginationTools.createPaginatedResponse1(em, request, () -> connectedCompanyListQueryObject(id),
 				CompanyApiTools::toApiCompanyListResponse);
@@ -1458,7 +1460,7 @@ public class CompanyService extends BaseService {
 	public ApiCompanyCustomer getCompanyCustomer(Long companyCustomerId, CustomUserDetails user) throws ApiException {
 
 		CompanyCustomer companyCustomer = fetchCompanyCustomer(companyCustomerId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(companyCustomer.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(companyCustomer.getCompany().getUsers().stream().toList(), user);
 
 		return CompanyCustomerMapper.toApiCompanyCustomer(companyCustomer);
 	}
@@ -1495,7 +1497,7 @@ public class CompanyService extends BaseService {
 	public ApiCompanyCustomer createCompanyCustomer(ApiCompanyCustomer apiCompanyCustomer, CustomUserDetails user) throws ApiException {
 
 		Company company = em.find(Company.class, apiCompanyCustomer.getCompanyId());
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
 
 		CompanyCustomer companyCustomer = new CompanyCustomer();
 		companyCustomer.setCompany(company);
@@ -1520,7 +1522,7 @@ public class CompanyService extends BaseService {
 		}
 
 		CompanyCustomer companyCustomer = fetchCompanyCustomer(apiCompanyCustomer.getId());
-		PermissionsUtil.checkUserIfCompanyEnrolled(companyCustomer.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(companyCustomer.getCompany().getUsers().stream().toList(), user);
 
 		companyCustomer.setContact(apiCompanyCustomer.getContact());
 		companyCustomer.setEmail(apiCompanyCustomer.getEmail());
@@ -1540,7 +1542,7 @@ public class CompanyService extends BaseService {
 	public void deleteCompanyCustomer(Long id, CustomUserDetails user) throws ApiException {
 
 		CompanyCustomer companyCustomer = em.find(CompanyCustomer.class, id);
-		PermissionsUtil.checkUserIfCompanyEnrolled(companyCustomer.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(companyCustomer.getCompany().getUsers().stream().toList(), user);
 
 		em.remove(companyCustomer);
 	}
@@ -1665,7 +1667,7 @@ public class CompanyService extends BaseService {
 
 		// user permissions check
 		Company company = companyQueries.fetchCompany(companyId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), authUser);
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> getCompanyValueChains(companyId, request),
 				ValueChainMapper::toApiValueChainBase);
@@ -1700,7 +1702,7 @@ public class CompanyService extends BaseService {
 
 		// user permissions check
 		Company company = companyQueries.fetchCompany(companyId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), authUser);
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> getCompanyProductTypes(companyId, request),
 				apt -> ProductTypeMapper.toApiProductType(apt, language));
@@ -1737,6 +1739,5 @@ public class CompanyService extends BaseService {
 
 		return productTypeProxy;
 	}
-
 
 }

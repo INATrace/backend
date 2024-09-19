@@ -1,7 +1,9 @@
 package com.abelium.inatrace.api;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import org.springdoc.core.annotations.ParameterObject;
 
+@ParameterObject
 public class ApiPaginatedQueryStringRequest extends ApiPaginatedRequest {
 	
     @Parameter(name = "Generic query string for (a part of) name, email etc.")

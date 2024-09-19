@@ -45,7 +45,7 @@ public class FinalProductService extends BaseService {
 	public ApiPaginatedList<ApiFinalProduct> getFinalProductsForCompany(ApiPaginatedRequest request, Long companyId, CustomUserDetails user) throws ApiException {
 
 		// Check that the request user is enrolled in the company for which we are requesting list of final products
-		PermissionsUtil.checkUserIfCompanyEnrolled(companyQueries.fetchCompany(companyId).getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(companyQueries.fetchCompany(companyId).getUsers().stream().toList(), user);
 
 		// Fetch the products that the company with the provided ID is in any role in the value chain
 		TypedQuery<Product> companyProductsQuery = em.createNamedQuery("ProductCompany.getCompanyProductsWithAnyRole",

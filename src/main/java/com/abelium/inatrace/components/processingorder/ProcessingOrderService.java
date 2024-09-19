@@ -31,6 +31,7 @@ import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Lazy
@@ -412,7 +413,7 @@ public class ProcessingOrderService extends BaseService {
         // Set the user entered Order ID
         quoteStockOrder.setOrderId(apiQuoteStockOrder.getOrderId());
 
-        entity.setTargetStockOrders(List.of(quoteStockOrder));
+        entity.setTargetStockOrders(Set.of(quoteStockOrder));
 
         if (entity.getId() == null) {
             em.persist(entity);
@@ -429,7 +430,7 @@ public class ProcessingOrderService extends BaseService {
         ProcessingOrder entity = fetchEntity(id, ProcessingOrder.class);
 
         // Check if req. user is enrolled in owner company for this processing order
-        PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(entity.getProcessingAction().getCompany().getUsers(), user);
+        PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(entity.getProcessingAction().getCompany().getUsers().stream().toList(), user);
 
         // Remove connected transactions
         for (Transaction t: entity.getInputTransactions()) {

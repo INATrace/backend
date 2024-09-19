@@ -3,8 +3,8 @@ package com.abelium.inatrace.db.entities.codebook;
 import com.abelium.inatrace.db.base.TimestampEntity;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class ProductType extends TimestampEntity {
@@ -25,7 +25,7 @@ public class ProductType extends TimestampEntity {
      * Translations for the product type
      */
     @OneToMany(mappedBy = "productType", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductTypeTranslation> productTypeTranslations;
+    private Set<ProductTypeTranslation> productTypeTranslations;
 
     public Long getEntityVersion() {
         return entityVersion;
@@ -59,14 +59,15 @@ public class ProductType extends TimestampEntity {
         this.description = description;
     }
 
-    public List<ProductTypeTranslation> getProductTypeTranslations() {
+    public Set<ProductTypeTranslation> getProductTypeTranslations() {
         if (productTypeTranslations == null) {
-            productTypeTranslations = new ArrayList<>();
+            productTypeTranslations = new HashSet<>();
         }
         return productTypeTranslations;
     }
 
-    public void setProductTypeTranslations(List<ProductTypeTranslation> productTypeTranslations) {
+    public void setProductTypeTranslations(Set<ProductTypeTranslation> productTypeTranslations) {
         this.productTypeTranslations = productTypeTranslations;
     }
+
 }

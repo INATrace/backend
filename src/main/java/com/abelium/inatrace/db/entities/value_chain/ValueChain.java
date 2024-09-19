@@ -7,8 +7,8 @@ import com.abelium.inatrace.db.entities.common.User;
 import com.abelium.inatrace.db.entities.value_chain.enums.ValueChainStatus;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Value chain entity representing definition of generic value chains. This is used as a template when creating products.
@@ -35,31 +35,31 @@ public class ValueChain extends TimestampEntity {
 	 * Holds a list of supported facility types ba this value chain.
 	 */
 	@OneToMany(mappedBy = "valueChain", orphanRemoval = true, cascade = CascadeType.ALL)
-	private List<ValueChainFacilityType> facilityTypes;
+	private Set<ValueChainFacilityType> facilityTypes;
 
 	/**
 	 * Holds a list of supported measuring unit types by this value chain.
 	 */
 	@OneToMany(mappedBy = "valueChain", orphanRemoval = true, cascade = CascadeType.ALL)
-	private List<ValueChainMeasureUnitType> measureUnitTypes;
+	private Set<ValueChainMeasureUnitType> measureUnitTypes;
 
 	/**
 	 * Holds a list of supported processing evidence by this value chain.
 	 */
 	@OneToMany(mappedBy = "valueChain", orphanRemoval = true, cascade = CascadeType.ALL)
-	private List<ValueChainProcEvidenceType> procEvidenceTypes;
+	private Set<ValueChainProcEvidenceType> procEvidenceTypes;
 
 	/**
 	 * Holds a list of supported semi-products by this value chain.
 	 */
 	@OneToMany(mappedBy = "valueChain", orphanRemoval = true, cascade = CascadeType.ALL)
-	private List<ValueChainSemiProduct> semiProducts;
+	private Set<ValueChainSemiProduct> semiProducts;
 	
 	/**
 	 * Holds a list of supported processing evidence fields by this value chain.
 	 */
 	@OneToMany(mappedBy = "valueChain", orphanRemoval = true, cascade = CascadeType.ALL)
-	private List<ValueChainProcessingEvidenceField> processingEvidenceFields;
+	private Set<ValueChainProcessingEvidenceField> processingEvidenceFields;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	private User createdBy;
@@ -100,58 +100,58 @@ public class ValueChain extends TimestampEntity {
 		this.valueChainStatus = valueChainStatus;
 	}
 
-	public List<ValueChainFacilityType> getFacilityTypes() {
+	public Set<ValueChainFacilityType> getFacilityTypes() {
 		if (facilityTypes == null) {
-			facilityTypes = new ArrayList<>();
+			facilityTypes = new HashSet<>();
 		}
 		return facilityTypes;
 	}
 
-	public void setFacilityTypes(List<ValueChainFacilityType> facilityTypes) {
+	public void setFacilityTypes(Set<ValueChainFacilityType> facilityTypes) {
 		this.facilityTypes = facilityTypes;
 	}
 
-	public List<ValueChainMeasureUnitType> getMeasureUnitTypes() {
+	public Set<ValueChainMeasureUnitType> getMeasureUnitTypes() {
 		if (measureUnitTypes == null) {
-			measureUnitTypes = new ArrayList<>();
+			measureUnitTypes = new HashSet<>();
 		}
 		return measureUnitTypes;
 	}
 
-	public void setMeasureUnitTypes(List<ValueChainMeasureUnitType> measureUnitTypes) {
+	public void setMeasureUnitTypes(Set<ValueChainMeasureUnitType> measureUnitTypes) {
 		this.measureUnitTypes = measureUnitTypes;
 	}
 
-	public List<ValueChainSemiProduct> getSemiProducts() {
+	public Set<ValueChainSemiProduct> getSemiProducts() {
 		if (semiProducts == null) {
-			semiProducts = new ArrayList<>();
+			semiProducts = new HashSet<>();
 		}
 		return semiProducts;
 	}
 
-	public void setSemiProducts(List<ValueChainSemiProduct> semiProducts) {
+	public void setSemiProducts(Set<ValueChainSemiProduct> semiProducts) {
 		this.semiProducts = semiProducts;
 	}
 	
-	public List<ValueChainProcessingEvidenceField> getProcessingEvidenceFields() {
+	public Set<ValueChainProcessingEvidenceField> getProcessingEvidenceFields() {
 		if (processingEvidenceFields == null) {
-			processingEvidenceFields = new ArrayList<>();
+			processingEvidenceFields = new HashSet<>();
 		}
 		return processingEvidenceFields;
 	}
 
-	public void setProcessingEvidenceFields(List<ValueChainProcessingEvidenceField> processingEvidenceFields) {
+	public void setProcessingEvidenceFields(Set<ValueChainProcessingEvidenceField> processingEvidenceFields) {
 		this.processingEvidenceFields = processingEvidenceFields;
 	}
 
-	public List<ValueChainProcEvidenceType> getProcEvidenceTypes() {
+	public Set<ValueChainProcEvidenceType> getProcEvidenceTypes() {
 		if (procEvidenceTypes == null) {
-			procEvidenceTypes = new ArrayList<>();
+			procEvidenceTypes = new HashSet<>();
 		}
 		return procEvidenceTypes;
 	}
 
-	public void setProcEvidenceTypes(List<ValueChainProcEvidenceType> procEvidenceTypes) {
+	public void setProcEvidenceTypes(Set<ValueChainProcEvidenceType> procEvidenceTypes) {
 		this.procEvidenceTypes = procEvidenceTypes;
 	}
 

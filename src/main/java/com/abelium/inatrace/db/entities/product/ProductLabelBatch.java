@@ -3,11 +3,11 @@ package com.abelium.inatrace.db.entities.product;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.common.Document;
-
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(indexes = { @Index(columnList = "number") }, uniqueConstraints = {
@@ -42,7 +42,7 @@ public class ProductLabelBatch extends BaseEntity {
 	 * locations 
 	 */
     @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BatchLocation> locations = new ArrayList<>(0);
+    private Set<BatchLocation> locations = new HashSet<>();
     
 	/**
 	 * photo 
@@ -94,11 +94,11 @@ public class ProductLabelBatch extends BaseEntity {
 		this.expiryDate = expiryDate;
 	}
 
-	public List<BatchLocation> getLocations() {
+	public Set<BatchLocation> getLocations() {
 		return locations;
 	}
 
-	public void setLocations(List<BatchLocation> locations) {
+	public void setLocations(Set<BatchLocation> locations) {
 		this.locations = locations;
 	}
 

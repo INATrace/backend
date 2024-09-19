@@ -5,11 +5,7 @@ import com.abelium.inatrace.components.company.types.CompanyTranslatables;
 import com.abelium.inatrace.db.base.TranslatedEntity;
 import com.abelium.inatrace.types.Language;
 import jakarta.persistence.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Entity
 @Table(indexes = { @Index(columnList = "company_id, language", unique = true) })
@@ -73,13 +69,13 @@ public class CompanyTranslation extends TranslatedEntity implements CompanyTrans
 	 * documents (images)
 	 */
 	@OneToMany(mappedBy = "companyTranslation", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<CompanyDocument> documents = new ArrayList<>();
+	private Set<CompanyDocument> documents = new HashSet<>();
 	
 	/**
 	 * certifications
 	 */
 	@OneToMany(mappedBy = "companyTranslation", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<CompanyCertification> certifications = new ArrayList<>();
+	private Set<CompanyCertification> certifications = new HashSet<>();
 
 	public Company getCompany() {
 		return company;
@@ -137,19 +133,19 @@ public class CompanyTranslation extends TranslatedEntity implements CompanyTrans
 		this.mediaLinks = mediaLinks;
 	}
 
-	public List<CompanyDocument> getDocuments() {
+	public Set<CompanyDocument> getDocuments() {
 		return documents;
 	}
 
-	public void setDocuments(List<CompanyDocument> documents) {
+	public void setDocuments(Set<CompanyDocument> documents) {
 		this.documents = documents;
 	}
 
-	public List<CompanyCertification> getCertifications() {
+	public Set<CompanyCertification> getCertifications() {
 		return certifications;
 	}
 
-	public void setCertifications(List<CompanyCertification> certifications) {
+	public void setCertifications(Set<CompanyCertification> certifications) {
 		this.certifications = certifications;
 	}
 }

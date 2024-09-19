@@ -9,7 +9,7 @@ import com.abelium.inatrace.db.entities.common.*;
 import com.abelium.inatrace.db.entities.company.Company;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 @Component
 public class ProductMapper extends BaseService {
@@ -45,7 +45,7 @@ public class ProductMapper extends BaseService {
         }
         // Cooperatives
         if (userCustomer.getCooperatives() == null) {
-            userCustomer.setCooperatives(new ArrayList<>());
+            userCustomer.setCooperatives(new HashSet<>());
         }
         userCustomer.getCooperatives().removeIf(userCustomerCooperative -> apiUserCustomer.getCooperatives().stream().noneMatch(apiUserCustomerCooperative -> userCustomerCooperative.getId().equals(apiUserCustomerCooperative.getId())));
         for (ApiUserCustomerCooperative apiUserCustomerCooperative : apiUserCustomer.getCooperatives()) {
@@ -62,7 +62,7 @@ public class ProductMapper extends BaseService {
         }
         // Associations
         if (userCustomer.getAssociations() == null) {
-            userCustomer.setAssociations(new ArrayList<>());
+            userCustomer.setAssociations(new HashSet<>());
         }
         userCustomer.getAssociations().removeIf(userCustomerAssociation -> apiUserCustomer.getAssociations().stream().noneMatch(apiUserCustomerAssociation -> userCustomerAssociation.getId().equals(apiUserCustomerAssociation.getId())));
         for (ApiUserCustomerAssociation apiUserCustomerAssociation : apiUserCustomer.getAssociations()) {

@@ -3,9 +3,8 @@ package com.abelium.inatrace.db.entities.common;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.codebook.ProductType;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
+import java.util.*;
 
 /**
  * Entity representing farmer plot. Used only for user customer of type FARMER.
@@ -40,7 +39,7 @@ public class Plot extends BaseEntity {
 	private Date lastUpdated;
 
 	@OneToMany(mappedBy = "plot", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-	private List<PlotCoordinate> coordinates;
+	private Set<PlotCoordinate> coordinates;
 
 	@ManyToOne
 	private UserCustomer farmer;
@@ -109,14 +108,14 @@ public class Plot extends BaseEntity {
 		this.lastUpdated = lastUpdated;
 	}
 
-	public List<PlotCoordinate> getCoordinates() {
+	public Set<PlotCoordinate> getCoordinates() {
 		if (coordinates == null) {
-			coordinates = new ArrayList<>();
+			coordinates = new HashSet<>();
 		}
 		return coordinates;
 	}
 
-	public void setCoordinates(List<PlotCoordinate> coordinates) {
+	public void setCoordinates(Set<PlotCoordinate> coordinates) {
 		this.coordinates = coordinates;
 	}
 

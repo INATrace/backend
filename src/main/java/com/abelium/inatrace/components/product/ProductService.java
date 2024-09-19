@@ -119,7 +119,7 @@ public class ProductService extends BaseService {
 	public ApiBaseEntity createProduct(CustomUserDetails authUser, ApiProduct request) throws ApiException {
 
 		Company company = em.find(Company.class, request.getCompany().getId());
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), authUser);
 
 		Product product = new Product();
 		

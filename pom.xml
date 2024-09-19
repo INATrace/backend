@@ -171,7 +171,7 @@
 	        <version>2.13.1</version>
 	    </dependency>
 	    
-	    <!-- jwt token -->
+	    <!-- JWT token -->
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
@@ -188,13 +188,13 @@
         <!-- OpenAPI -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.8.0</version>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.6.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-security</artifactId>
-			<version>1.8.0</version>
+			<artifactId>springdoc-openapi-starter-common</artifactId>
+			<version>2.6.0</version>
 		</dependency>
 
 		<dependency>

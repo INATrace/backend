@@ -5,8 +5,9 @@ import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.value_chain.ValueChainProcessingEvidenceField;
 import com.abelium.inatrace.types.ProcessingEvidenceFieldType;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(indexes = { @Index(columnList = "label") })
@@ -44,10 +45,10 @@ public class ProcessingEvidenceField extends TimestampEntity {
 	private ProcessingEvidenceFieldType type = ProcessingEvidenceFieldType.STRING;
 
 	@OneToMany(mappedBy = "processingEvidenceField", orphanRemoval = true, cascade = CascadeType.ALL)
-	private List<ValueChainProcessingEvidenceField> valueChains;
+	private Set<ValueChainProcessingEvidenceField> valueChains;
 
 	@OneToMany(mappedBy = "processingEvidenceField", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-	private List<ProcessingEvidenceFieldTranslation> translations = new ArrayList<>();
+	private Set<ProcessingEvidenceFieldTranslation> translations = new HashSet<>();
 
 	public String getFieldName() {
 		return fieldName;
@@ -73,18 +74,19 @@ public class ProcessingEvidenceField extends TimestampEntity {
 		this.type = type;
 	}
 
-	public List<ValueChainProcessingEvidenceField> getValueChains() {
+	public Set<ValueChainProcessingEvidenceField> getValueChains() {
 		return valueChains;
 	}
 
-	public void setValueChains(List<ValueChainProcessingEvidenceField> valueChains) {
+	public void setValueChains(Set<ValueChainProcessingEvidenceField> valueChains) {
 		this.valueChains = valueChains;
 	}
 
-	public List<ProcessingEvidenceFieldTranslation> getTranslations() {
+	public Set<ProcessingEvidenceFieldTranslation> getTranslations() {
 		if (translations == null) {
-			translations = new ArrayList<>();
+			translations = new HashSet<>();
 		}
 		return translations;
 	}
+
 }
