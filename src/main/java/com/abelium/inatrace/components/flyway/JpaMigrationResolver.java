@@ -6,6 +6,7 @@ import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.Location;
 import org.flywaydb.core.api.MigrationVersion;
 import org.flywaydb.core.api.configuration.Configuration;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.flywaydb.core.api.resolver.MigrationResolver;
 import org.flywaydb.core.api.resolver.ResolvedMigration;
 import org.flywaydb.core.internal.resolver.MigrationInfoHelper;
@@ -66,14 +67,10 @@ public class JpaMigrationResolver implements MigrationResolver {
 
                 Collection<Class<? extends JpaMigration>> classes = new Scanner<>(
                         JpaMigration.class,
-                        List.of(locations),
-                        classLoader,
-                        StandardCharsets.UTF_8,
-                        false,
                         true,
                         new ResourceNameCache(),
                         new LocationScannerCache(),
-                        false
+                        new FluentConfiguration(classLoader).encoding(StandardCharsets.UTF_8)
                 ).getClasses();
 
                 for (Class<?> clazz : classes) {
