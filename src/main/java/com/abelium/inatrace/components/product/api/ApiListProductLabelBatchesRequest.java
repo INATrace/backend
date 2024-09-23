@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 @ParameterObject
 public class ApiListProductLabelBatchesRequest extends ApiPaginatedRequest {
 
-	@Parameter(name = "Batch number (start of it)")
+	@Parameter(description = "Batch number (start of it)")
 	public String number;
 
 	public String getNumber() {

@@ -10,7 +10,7 @@ import org.springframework.validation.annotation.Validated;
 @ParameterObject
 public class ApiListKnowledgeBlogRequest extends ApiPaginatedRequest {
 
-	@Parameter(name = "knowledge blog type")
+	@Parameter(description = "knowledge blog type")
 	public KnowledgeBlogType type;
 
 	public KnowledgeBlogType getType() {

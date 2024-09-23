@@ -35,7 +35,7 @@ public class FinalProductController {
 	public ApiPaginatedResponse<ApiFinalProduct> getFinalProductsForCompany(
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid ApiPaginatedRequest request,
-			@Valid @Parameter(name = "Company ID", required = true) @PathVariable("companyId") Long companyId) throws ApiException {
+			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("companyId") Long companyId) throws ApiException {
 
 		return new ApiPaginatedResponse<>(finalProductService.getFinalProductsForCompany(request, companyId, authUser));
 	}

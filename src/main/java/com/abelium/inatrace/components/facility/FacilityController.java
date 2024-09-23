@@ -31,7 +31,7 @@ public class FacilityController {
 
 	@GetMapping("list/company/{id}/all")
 	public ApiPaginatedResponse<ApiFacility> listAllFacilitiesByCompany(
-			@Valid @Parameter(name = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long companyId,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 			@Valid ApiPaginatedRequest request,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
@@ -43,9 +43,9 @@ public class FacilityController {
 	@GetMapping("list/company/{id}")
 	@Operation(summary ="Get a list of facilities by company ID.")
 	public ApiPaginatedResponse<ApiFacility> listFacilitiesByCompany(
-			@Valid @Parameter(name = "Company ID", required = true) @PathVariable("id") Long companyId,
-			@Valid @Parameter(name = "Semi product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
-			@Valid @Parameter(name = "Final product ID") @RequestParam(value = "finalProductId", required = false) Long finalProductId,
+			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @Parameter(description = "Semi product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+			@Valid @Parameter(description = "Final product ID") @RequestParam(value = "finalProductId", required = false) Long finalProductId,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 			@Valid ApiPaginatedRequest request,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
@@ -59,9 +59,9 @@ public class FacilityController {
 	@Operation(summary ="Get a list of public (selling) facilities that the provided company can see")
 	public ApiPaginatedResponse<ApiFacility> listAvailableSellingFacilitiesForCompany(
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
-			@Valid @Parameter(name = "Company ID", required = true) @PathVariable("id") Long companyId,
-			@Valid @Parameter(name = "Semi product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
-			@Valid @Parameter(name = "Final product ID") @RequestParam(value = "finalProductId", required = false) Long finalProductId,
+			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @Parameter(description = "Semi product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+			@Valid @Parameter(description = "Final product ID") @RequestParam(value = "finalProductId", required = false) Long finalProductId,
 			@Valid ApiPaginatedRequest request,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
@@ -73,7 +73,7 @@ public class FacilityController {
 	@GetMapping("list/collecting/company/{id}")
 	@Operation(summary ="Get a list of collecting facilities by company ID.")
 	public ApiPaginatedResponse<ApiFacility> listCollectingFacilitiesByCompany(
-			@Valid @Parameter(name = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long companyId,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 			@Valid ApiPaginatedRequest request,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
@@ -84,7 +84,7 @@ public class FacilityController {
 	@GetMapping("{id}")
 	@Operation(summary ="Get a single facility with the provided ID.")
 	public ApiResponse<ApiFacility> getFacility(
-			@Valid @Parameter(name = "Facility ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "Facility ID", required = true) @PathVariable("id") Long id,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
@@ -95,7 +95,7 @@ public class FacilityController {
 	@GetMapping("{id}/detail")
 	@Operation(summary ="Get a single facility with translations for the provided ID.")
 	public ApiResponse<ApiFacility> getFacilityDetail(
-			@Valid @Parameter(name = "Facility ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "Facility ID", required = true) @PathVariable("id") Long id,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
@@ -113,7 +113,7 @@ public class FacilityController {
 
 	@PutMapping("{id}/activate")
 	@Operation(summary ="Activate a facility")
-	public ApiDefaultResponse activateFacility(@Valid @Parameter(name = "Facility ID", required = true) @PathVariable("id") Long id,
+	public ApiDefaultResponse activateFacility(@Valid @Parameter(description = "Facility ID", required = true) @PathVariable("id") Long id,
 											   @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 		facilityService.setFacilityDeactivatedStatus(id, Boolean.FALSE, authUser);
 		return new ApiDefaultResponse();
@@ -121,7 +121,7 @@ public class FacilityController {
 
 	@PutMapping("{id}/deactivate")
 	@Operation(summary ="Deactivate a facility")
-	public ApiDefaultResponse deactivateFacility(@Valid @Parameter(name = "Facility ID", required = true) @PathVariable("id") Long id,
+	public ApiDefaultResponse deactivateFacility(@Valid @Parameter(description = "Facility ID", required = true) @PathVariable("id") Long id,
 												 @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 		facilityService.setFacilityDeactivatedStatus(id, Boolean.TRUE, authUser);
 		return new ApiDefaultResponse();
@@ -129,7 +129,7 @@ public class FacilityController {
 
 	@DeleteMapping("{id}")
 	@Operation(summary ="Deletes a facility with the provided ID.")
-	public ApiDefaultResponse deleteFacility(@Valid @Parameter(name = "Facility ID", required = true) @PathVariable("id") Long id,
+	public ApiDefaultResponse deleteFacility(@Valid @Parameter(description = "Facility ID", required = true) @PathVariable("id") Long id,
 											 @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
 		facilityService.deleteFacility(id, authUser);

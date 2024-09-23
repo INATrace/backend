@@ -10,7 +10,7 @@ import org.springframework.validation.annotation.Validated;
 @ParameterObject
 public class ApiListProductLabelFeedbackRequest extends ApiPaginatedRequest {
 
-	@Parameter(name = "feedback type")
+	@Parameter(description = "feedback type")
 	public ProductLabelFeedbackType type;
 
 	public ProductLabelFeedbackType getType() {

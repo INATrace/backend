@@ -34,9 +34,9 @@ public class ProcessingActionController {
 	@Operation(summary ="Get a list of processing actions by company ID.")
 	public ApiPaginatedResponse<ApiProcessingAction> listProcessingActionsByCompany(
 			@AuthenticationPrincipal CustomUserDetails authUser,
-			@Valid @Parameter(name = "Company ID", required = true) @PathVariable("id") Long companyId,
-			@Valid @Parameter(name = "Processing action type") @RequestParam(value = "actionType", required = false) ProcessingActionType actionType,
-			@Valid @Parameter(name = "Only final product actions") @RequestParam(value = "onlyFinalProducts", required = false) Boolean onlyFinalProducts,
+			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @Parameter(description = "Processing action type") @RequestParam(value = "actionType", required = false) ProcessingActionType actionType,
+			@Valid @Parameter(description = "Only final product actions") @RequestParam(value = "onlyFinalProducts", required = false) Boolean onlyFinalProducts,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 			@Valid ApiPaginatedRequest request) throws ApiException {
 
@@ -49,7 +49,7 @@ public class ProcessingActionController {
 	@Operation(summary ="Get a single processing action with the provided ID.")
 	public ApiResponse<ApiProcessingAction> getProcessingAction(
 			@AuthenticationPrincipal CustomUserDetails authUser,
-			@Valid @Parameter(name = "ProcessingAction ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "ProcessingAction ID", required = true) @PathVariable("id") Long id,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
 		return new ApiResponse<>(processingActionService.getProcessingAction(id, authUser, language));
@@ -59,7 +59,7 @@ public class ProcessingActionController {
 	@Operation(summary ="Get a single processing action by the provided ID with all translations.")
 	public ApiResponse<ApiProcessingAction> getProcessingActionDetail(
 			@AuthenticationPrincipal CustomUserDetails authUser,
-			@Valid @Parameter(name = "ProcessingAction ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "ProcessingAction ID", required = true) @PathVariable("id") Long id,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 		return new ApiResponse<>(processingActionService.getProcessingActionDetail(id, authUser, language));
 	}
@@ -77,7 +77,7 @@ public class ProcessingActionController {
 	@Operation(summary ="Deletes a processing action with the provided ID.")
 	public ApiDefaultResponse deleteProcessingAction(
 			@AuthenticationPrincipal CustomUserDetails authUser,
-			@Valid @Parameter(name = "ProcessingAction ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @Parameter(description = "ProcessingAction ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		processingActionService.deleteProcessingAction(id, authUser);
 		return new ApiDefaultResponse();

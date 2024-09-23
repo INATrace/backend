@@ -10,13 +10,13 @@ import org.springframework.validation.annotation.Validated;
 @ParameterObject
 public class ApiListCollectorsRequest extends ApiPaginatedRequest {
 
-	@Parameter(name = "Name or surname")
+	@Parameter(description = "Name or surname")
 	public String query;
 	
-	@Parameter(name = "Phone number")
+	@Parameter(description = "Phone number")
 	public String phone;
 
-	@Parameter(name = "Type (collector, farmer)")
+	@Parameter(description = "Type (collector, farmer)")
 	public UserCustomerType userCustomerType;
 
 	public String getQuery() {

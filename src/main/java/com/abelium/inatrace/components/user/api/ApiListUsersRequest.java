@@ -11,19 +11,19 @@ import org.springframework.validation.annotation.Validated;
 @ParameterObject
 public class ApiListUsersRequest extends ApiPaginatedRequest {
 
-	@Parameter(name = "Status")
+	@Parameter(description = "Status")
 	public UserStatus status;
 	
-	@Parameter(name = "User role")
+	@Parameter(description = "User role")
 	public UserRole role;
 	
-	@Parameter(name = "Email")
+	@Parameter(description = "Email")
 	public String email;
 	
-	@Parameter(name = "Surname")
+	@Parameter(description = "Surname")
 	public String surname;
 
-	@Parameter(name = "Name, surname or email")
+	@Parameter(description = "Name, surname or email")
 	public String query;
 	
 	public UserStatus getStatus() {

@@ -34,7 +34,7 @@ public class TransactionController {
 	@GetMapping("list/input/stock-order/{stockOrderId}")
 	@Operation(summary = "Get a paginated list of input transactions for provided stock order ID.")
 	public ApiPaginatedResponse<ApiTransaction> getStockOrderInputTransactions(
-			@Valid @Parameter(name = "Company ID", required = true) @PathVariable("stockOrderId") Long stockOrderId,
+			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("stockOrderId") Long stockOrderId,
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
@@ -44,7 +44,7 @@ public class TransactionController {
 	@PutMapping("/{id}/approve")
 	@Operation(summary = "Approves transaction with provided ID.")
 	public ApiDefaultResponse approveTransaction(
-			@Valid @Parameter(name = "Transaction ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "Transaction ID", required = true) @PathVariable("id") Long id,
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
@@ -55,7 +55,7 @@ public class TransactionController {
 	@PutMapping("/{id}/reject")
 	@Operation(summary = "Rejects transaction with provided ID and reverts it's quantities.")
 	public ApiDefaultResponse rejectTransaction(
-			@Valid @Parameter(name = "Transaction ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "Transaction ID", required = true) @PathVariable("id") Long id,
 			@Valid @RequestBody ApiTransaction apiTransaction,
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {

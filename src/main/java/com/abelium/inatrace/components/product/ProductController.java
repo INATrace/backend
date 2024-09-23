@@ -58,7 +58,7 @@ public class ProductController {
     @GetMapping(value = "/{id}")
     @Operation(summary = "Get all info about a product")
     public ApiResponse<ApiProduct> getProduct(@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "Product id", required = true) @PathVariable("id") Long id,
+    		@Valid @Parameter(description = "Product id", required = true) @PathVariable("id") Long id,
     		@Valid @RequestParam(value = "includeLabels", defaultValue = "false") boolean includeLabels) throws ApiException {
     	return new ApiResponse<>(productService.getProduct(authUser, id, includeLabels));
     }
@@ -74,7 +74,7 @@ public class ProductController {
     @DeleteMapping(value = "/{id}")
     @Operation(summary = "Deletes a product")
     public ApiDefaultResponse deleteProduct(@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "Product id", required = true)  @PathVariable("id") Long id) throws ApiException {
+    		@Valid @Parameter(description = "Product id", required = true)  @PathVariable("id") Long id) throws ApiException {
     	productService.deleteProduct(authUser, id);
     	return new ApiDefaultResponse();
     }
@@ -83,7 +83,7 @@ public class ProductController {
 	@Operation(summary = "Get labels for product")
 	public ApiResponse<List<ApiProductLabelBase>> getProductLabels(
 			@AuthenticationPrincipal CustomUserDetails authUser,
-			@Valid @Parameter(name = "Product id", required = true)  @PathVariable("id") Long id) throws ApiException {
+			@Valid @Parameter(description = "Product id", required = true)  @PathVariable("id") Long id) throws ApiException {
 		return new ApiResponse<>(productService.getProductLabels(authUser, id));
 	}
 
@@ -97,7 +97,7 @@ public class ProductController {
     @GetMapping(value = "/label/{id}")
     @Operation(summary = "Get label data")
     public ApiResponse<ApiProductLabel> getProductLabel(@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "Record id", required = true) @PathVariable("id") Long id) throws ApiException {
+    		@Valid @Parameter(description = "Record id", required = true) @PathVariable("id") Long id) throws ApiException {
     	return new ApiResponse<>(productService.getProductLabel(authUser, id));
     }
 
@@ -111,7 +111,7 @@ public class ProductController {
     @DeleteMapping(value = "/label/{id}")
     @Operation(summary = "Deletes a product label")
     public ApiDefaultResponse deleteProductLabel(@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "Label id", required = true)  @PathVariable("id") Long id) throws ApiException {
+    		@Valid @Parameter(description = "Label id", required = true)  @PathVariable("id") Long id) throws ApiException {
     	productService.deleteProductLabel(authUser, id);
     	return new ApiDefaultResponse();
     }
@@ -133,35 +133,35 @@ public class ProductController {
     @GetMapping(value = "/label/values/{id}")
     @Operation(summary = "Get label with field values")
     public ApiResponse<ApiProductLabelValues> getProductLabelValues(@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "Record id", required = true)  @PathVariable("id") Long id) throws ApiException {
+    		@Valid @Parameter(description = "Record id", required = true)  @PathVariable("id") Long id) throws ApiException {
     	return new ApiResponse<>(productService.getProductLabelValues(authUser, id));
     }
     
     @GetMapping(value = "/label/content/{id}")
     @Operation(summary = "Get label content")
     public ApiResponse<ApiProductLabelContent> getProductLabelContent(@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "Label id", required = true)  @PathVariable("id") Long id) throws ApiException {
+    		@Valid @Parameter(description = "Label id", required = true)  @PathVariable("id") Long id) throws ApiException {
     	return new ApiResponse<>(productService.getProductLabelContent(authUser, id));
     }
 
     @GetMapping(value = "/label/{id}/documents")
     @Operation(summary = "Get selected company documents for product label")
     public ApiResponse<List<ApiProductLabelCompanyDocument>> getCompanyDocumentsForProductLabel(@AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Label id", required = true) @PathVariable("id") Long id) throws ApiException {
+            @Valid @Parameter(description = "Label id", required = true) @PathVariable("id") Long id) throws ApiException {
         return new ApiResponse<>(productService.getCompanyDocumentsForProductLabel(authUser, id));
     }
 
     @PutMapping(value = "/label/{id}/documents")
     @Operation(summary = "Update company document product label list")
     public ApiDefaultResponse updateCompanyDocumentsForProductLabel(@AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Label ID", required = true) @PathVariable("id") Long id,
-            @Valid @Parameter(name = "Company document list", required = true) @RequestBody List<ApiProductLabelCompanyDocument> documents) throws ApiException {
+            @Valid @Parameter(description = "Label ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(description = "Company document list", required = true) @RequestBody List<ApiProductLabelCompanyDocument> documents) throws ApiException {
         productService.updateCompanyDocumentsForProductLabel(authUser, id, documents);
         return new ApiDefaultResponse();
     }
 
     @PostMapping(value = "/label/execute/{action}")
-    @Operation(summary = "Execute action")
+    @Operation(summary = "Execute action", operationId = "executeProductAction")
     public ApiDefaultResponse executeAction(@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @RequestBody ApiBaseEntity request, 
     		@Valid @PathVariable(value = "action") ProductLabelAction action) throws ApiException {
@@ -172,7 +172,7 @@ public class ProductController {
     @GetMapping(value = "/label/analytics/{uid}")
     @Operation(summary = "Get label data")
     public ApiResponse<ApiProductLabelAnalytics> getProductLabelAnalytics(@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "Label uid", required = true) @PathVariable("uid") String uid) throws ApiException {
+    		@Valid @Parameter(description = "Label uid", required = true) @PathVariable("uid") String uid) throws ApiException {
     	return new ApiResponse<>(productService.getProductLabelAnalytics(authUser, uid));
     }
     
@@ -186,7 +186,7 @@ public class ProductController {
     @GetMapping(value = "/label_batch/{id}")
     @Operation(summary = "Get label batch data")
     public ApiResponse<ApiProductLabelBatch> getProductLabelBatch(@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "Batch id", required = true) @PathVariable("id") Long id) throws ApiException {
+    		@Valid @Parameter(description = "Batch id", required = true) @PathVariable("id") Long id) throws ApiException {
     	return new ApiResponse<>(productService.getProductLabelBatch(authUser, id));
     }
 
@@ -200,7 +200,7 @@ public class ProductController {
     @DeleteMapping(value = "/label_batch/{id}")
     @Operation(summary = "Deletes a product label batch")
     public ApiDefaultResponse deleteProductLabelBatch(@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "Batch id", required = true)  @PathVariable("id") Long id) throws ApiException {
+    		@Valid @Parameter(description = "Batch id", required = true)  @PathVariable("id") Long id) throws ApiException {
     	productService.deleteProductLabelBatch(authUser, id);
     	return new ApiDefaultResponse();
     }
@@ -208,22 +208,22 @@ public class ProductController {
     @GetMapping(value = "/label/{id}/batches")
     @Operation(summary = "Get label batches for specified label. Sorting: number or productionDate, expiryDate")
     public ApiPaginatedResponse<ApiProductLabelBatch> getProductLabelBatches(@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "Label id", required = true) @PathVariable("id") Long id,
+    		@Valid @Parameter(description = "Label id", required = true) @PathVariable("id") Long id,
     		@Valid ApiListProductLabelBatchesRequest request) throws ApiException {
     	return new ApiPaginatedResponse<>(productService.listProductLabelBatches(authUser, id, request));
     }
 
     @GetMapping(value = "/label/{id}/instructions")
     public ResponseEntity<byte[]> getProductLabelInstructions(@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "Label id", required = true) @PathVariable("id") Long id) throws ApiException {
+    		@Valid @Parameter(description = "Label id", required = true) @PathVariable("id") Long id) throws ApiException {
         return productDocumentEngine.createLabelsAndHowToUseInstructions(authUser, id).toResponseEntity();
     }
     
     @GetMapping(value = "/knowledgeBlog/list/{productId}")
     @Operation(summary = "Get knowledge blogs for a product")
-    public ApiPaginatedResponse<ApiKnowledgeBlogBase> getProductKnowledgeBlog(
+    public ApiPaginatedResponse<ApiKnowledgeBlogBase> getProductKnowledgeBlogs(
     		@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "Product id", required = true) @PathVariable("productId") Long productId,
+    		@Valid @Parameter(description = "Product id", required = true) @PathVariable("productId") Long productId,
     		@Valid ApiListKnowledgeBlogRequest request) throws ApiException {
     	return new ApiPaginatedResponse<>(productService.listKnowledgeBlogs(authUser, productId, request));
     }
@@ -232,13 +232,13 @@ public class ProductController {
     @Operation(summary = "Get knowledge blog by id")
     public ApiResponse<ApiKnowledgeBlog> getProductKnowledgeBlog(
     		@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "id", required = true) @PathVariable("id") Long id) throws ApiException {
+    		@Valid @Parameter(description = "id", required = true) @PathVariable("id") Long id) throws ApiException {
     	return new ApiResponse<>(productService.getKnowledgeBlog(authUser, id));
     }
 
     @PutMapping(value = "/knowledgeBlog")
     @Operation(summary = "Update knowledge blog")
-    public ApiDefaultResponse getProductKnowledgeBlog(
+    public ApiDefaultResponse updateProductKnowledgeBlog(
     		@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @RequestBody ApiKnowledgeBlog request) throws ApiException {
     	productService.updateKnowledgeBlog(authUser, request);
@@ -247,9 +247,9 @@ public class ProductController {
     
     @PostMapping(value = "/knowledgeBlog/{productId}")
     @Operation(summary = "Add knowledge blog to a product")
-    public ApiDefaultResponse getProductKnowledgeBlog(
+    public ApiDefaultResponse addProductKnowledgeBlog(
     		@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "type", required = true) @PathVariable("productId") Long productId,
+    		@Valid @Parameter(description = "type", required = true) @PathVariable("productId") Long productId,
     		@Valid @RequestBody ApiKnowledgeBlog request) throws ApiException {
     	productService.addKnowledgeBlog(authUser, productId, request);
     	return new ApiDefaultResponse();
@@ -259,7 +259,7 @@ public class ProductController {
     @Operation(summary = "Deletes a product label feedback")
     public ApiDefaultResponse deleteProductLabelFeedback(
     		@AuthenticationPrincipal CustomUserDetails authUser,
-    		@Valid @Parameter(name = "Feedback id", required = true) @PathVariable("id") Long id) throws ApiException {
+    		@Valid @Parameter(description = "Feedback id", required = true) @PathVariable("id") Long id) throws ApiException {
     	productService.deleteProductLabelFeedback(authUser, id);
     	return new ApiDefaultResponse();
     }
@@ -268,8 +268,8 @@ public class ProductController {
     @Operation(summary = "Get final product by ID.")
     public ApiResponse<ApiFinalProduct> getFinalProduct(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Product ID", required = true) @PathVariable("productId") Long productId,
-            @Valid @Parameter(name = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId) throws ApiException {
+            @Valid @Parameter(description = "Product ID", required = true) @PathVariable("productId") Long productId,
+            @Valid @Parameter(description = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId) throws ApiException {
         return new ApiResponse<>(productService.getFinalProduct(productId, finalProductId, authUser));
     }
 
@@ -277,9 +277,9 @@ public class ProductController {
 	@Operation(summary = "Get final product labels.")
 	public ApiResponse<List<ApiProductLabelBase>> getFinalProductLabels(
             @AuthenticationPrincipal CustomUserDetails authUser,
-			@Valid @Parameter(name = "Product ID", required = true) @PathVariable("productId") Long productId,
-			@Valid @Parameter(name = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId,
-			@Valid @Parameter(name = "Also return the unpublished labels") @RequestParam(value = "returnUnpublished", required = false) Boolean returnUnpublished) throws ApiException {
+			@Valid @Parameter(description = "Product ID", required = true) @PathVariable("productId") Long productId,
+			@Valid @Parameter(description = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId,
+			@Valid @Parameter(description = "Also return the unpublished labels") @RequestParam(value = "returnUnpublished", required = false) Boolean returnUnpublished) throws ApiException {
 		return new ApiResponse<>(productService.getFinalProductLabels(productId, finalProductId, returnUnpublished, authUser));
 	}
 
@@ -287,7 +287,7 @@ public class ProductController {
     @Operation(summary = "Get final product list by product ID.")
     public ApiPaginatedResponse<ApiFinalProduct> getFinalProductList(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Product ID", required = true) @PathVariable("productId") Long productId,
+            @Valid @Parameter(description = "Product ID", required = true) @PathVariable("productId") Long productId,
             @Valid ApiPaginatedRequest request) throws ApiException {
 
         return new ApiPaginatedResponse<>(productService.getFinalProductList(
@@ -301,7 +301,7 @@ public class ProductController {
     @Operation(summary = "Create or update final product.")
     public ApiResponse<ApiBaseEntity> createOrUpdateFinalProduct(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Product ID", required = true) @PathVariable("productId") Long productId,
+            @Valid @Parameter(description = "Product ID", required = true) @PathVariable("productId") Long productId,
             @Valid @RequestBody ApiFinalProduct apiFinalProduct) throws ApiException {
 
         return new ApiResponse<>(productService.createOrUpdateFinalProduct(authUser, productId, apiFinalProduct));
@@ -311,8 +311,8 @@ public class ProductController {
     @Operation(summary = "Delete a final product")
     public ApiDefaultResponse deleteFinalProduct(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Product ID", required = true) @PathVariable("productId") Long productId,
-            @Valid @Parameter(name = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId) throws ApiException {
+            @Valid @Parameter(description = "Product ID", required = true) @PathVariable("productId") Long productId,
+            @Valid @Parameter(description = "Final product ID", required = true) @PathVariable("finalProductId") Long finalProductId) throws ApiException {
 
         productService.deleteFinalProduct(productId, finalProductId, authUser);
         return new ApiDefaultResponse();

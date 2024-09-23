@@ -29,7 +29,7 @@ public class ProcessingOrderController {
     @GetMapping("{id}")
     @Operation(summary ="Get a single processing order with the provided ID.")
     public ApiResponse<ApiProcessingOrder> getProcessingOrder(
-            @Valid @Parameter(name = "ProcessingOrder ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(description = "ProcessingOrder ID", required = true) @PathVariable("id") Long id,
             @AuthenticationPrincipal CustomUserDetails authUser,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
@@ -49,7 +49,7 @@ public class ProcessingOrderController {
     @DeleteMapping("{id}")
     @Operation(summary ="Deletes a processing order with the provided ID.")
     public ApiDefaultResponse deleteProcessingOrder(
-            @Valid @Parameter(name = "ProcessingOrder ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(description = "ProcessingOrder ID", required = true) @PathVariable("id") Long id,
             @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
         processingOrderService.deleteProcessingOrder(id, authUser);

@@ -6,7 +6,7 @@ import org.springdoc.core.annotations.ParameterObject;
 @ParameterObject
 public class ApiPaginatedQueryStringRequest extends ApiPaginatedRequest {
 	
-    @Parameter(name = "Generic query string for (a part of) name, email etc.")
+    @Parameter(description = "Generic query string for (a part of) name, email etc.")
     public String queryString;
 
     public String getQueryString() {

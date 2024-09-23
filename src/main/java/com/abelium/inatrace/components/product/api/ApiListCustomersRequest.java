@@ -9,10 +9,10 @@ import org.springframework.validation.annotation.Validated;
 @ParameterObject
 public class ApiListCustomersRequest extends ApiPaginatedRequest {
 
-	@Parameter(name = "Name")
+	@Parameter(description = "Name")
 	public String query;
 	
-	@Parameter(name = "Phone number")
+	@Parameter(description = "Phone number")
 	public String phone;
 
 	public String getQuery() {

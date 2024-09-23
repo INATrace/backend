@@ -52,12 +52,12 @@ public class CommonCsvController {
 	public @ResponseBody byte[] generatePaymentsByCompanyCsv(
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid ApiPaginatedRequest request,
-			@Valid @Parameter(name = "Company ID", required = true) @PathVariable("id") Long companyId,
-			@Valid @Parameter(name = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
-			@Valid @Parameter(name = "Payment status") @RequestParam(value = "paymentStatus", required = false) PaymentStatus paymentStatus,
-			@Valid @Parameter(name = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
-			@Valid @Parameter(name = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
-			@Valid @Parameter(name = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws IOException, ApiException {
+			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @Parameter(description = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
+			@Valid @Parameter(description = "Payment status") @RequestParam(value = "paymentStatus", required = false) PaymentStatus paymentStatus,
+			@Valid @Parameter(description = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+			@Valid @Parameter(description = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
+			@Valid @Parameter(description = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws IOException, ApiException {
 
 		request.limit = 500;
 		
@@ -90,12 +90,12 @@ public class CommonCsvController {
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid ApiPaginatedRequest request,
-			@Valid @Parameter(name = "Company ID", required = true) @PathVariable("id") Long companyId,
-			@Valid @Parameter(name = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
-			@Valid @Parameter(name = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
-			@Valid @Parameter(name = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
-			@Valid @Parameter(name = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
-			@Valid @Parameter(name = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws IOException, ApiException {
+			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @Parameter(description = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
+			@Valid @Parameter(description = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
+			@Valid @Parameter(description = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+			@Valid @Parameter(description = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
+			@Valid @Parameter(description = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws IOException, ApiException {
 
 		request.limit = 500;
 		

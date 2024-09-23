@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 @ParameterObject
 public class ApiListProductsRequest extends ApiPaginatedRequest {
 
-	@Parameter(name = "Product name (start of name)")
+	@Parameter(description = "Product name (start of name)")
 	public String name;
 
 	public String getName() {

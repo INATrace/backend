@@ -44,7 +44,7 @@ public class ValueChainController {
 	@GetMapping("{id}")
 	@Operation(summary ="Get a single value chain with the provided ID.")
 	public ApiResponse<ApiValueChain> getValueChain(
-			@Valid @Parameter(name = "Value chain ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "Value chain ID", required = true) @PathVariable("id") Long id,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
 		return new ApiResponse<>(valueChainService.getValueChain(id, language));
@@ -64,7 +64,7 @@ public class ValueChainController {
 	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@Operation(summary ="Set the status of the value chain with the provided ID as 'ENABLED'.")
 	public ApiResponse<ApiBaseEntity> enableValueChain(
-			@Valid @Parameter(name = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @Parameter(description = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		return new ApiResponse<>(valueChainService.enableValueChain(id));
 	}
@@ -73,7 +73,7 @@ public class ValueChainController {
 	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@Operation(summary ="Set the status of the value chain with the provided ID as 'DISABLED'.")
 	public ApiResponse<ApiBaseEntity> disableValueChain(
-			@Valid @Parameter(name = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @Parameter(description = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		return new ApiResponse<>(valueChainService.disableValueChain(id));
 	}
@@ -82,7 +82,7 @@ public class ValueChainController {
 	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@Operation(summary ="Deletes a value chain with the provided ID.")
 	public ApiDefaultResponse deleteValueChain(
-			@Valid @Parameter(name = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @Parameter(description = "Value chain ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		valueChainService.deleteValueChain(id);
 		return new ApiDefaultResponse();

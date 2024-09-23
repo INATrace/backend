@@ -11,13 +11,13 @@ import org.springframework.validation.annotation.Validated;
 @ParameterObject
 public class ApiListCompaniesRequest extends ApiPaginatedRequest {
 
-	@Parameter(name = "Language")
+	@Parameter(description = "Language")
 	public Language language = Language.EN;
 	
-	@Parameter(name = "Company status, sortable")
+	@Parameter(description = "Company status, sortable")
 	public CompanyStatus status;
 	
-	@Parameter(name = "Company name (start of name), sortable")
+	@Parameter(description = "Company name (start of name), sortable")
 	public String name;
 	
 	public Language getLanguage() {

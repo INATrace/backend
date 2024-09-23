@@ -39,7 +39,7 @@ public class FacilityTypeController {
 	@GetMapping("{id}")
 	@Operation(summary ="Get a single facility type with the provided ID.")
 	public ApiResponse<ApiFacilityType> getFacilityType(
-			@Valid @Parameter(name = "Facility type ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @Parameter(description = "Facility type ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		return new ApiResponse<>(facilityTypeService.getFacilityType(id));
 	}
@@ -58,7 +58,7 @@ public class FacilityTypeController {
 	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@Operation(summary ="Deletes a facility type with the provided ID.")
 	public ApiDefaultResponse deleteFacilityType(
-			@Valid @Parameter(name = "Facility type ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @Parameter(description = "Facility type ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		facilityTypeService.deleteFacilityType(id);
 		return new ApiDefaultResponse();

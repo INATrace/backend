@@ -43,7 +43,7 @@ public class SemiProductController {
 	@GetMapping("list/by-value-chains")
 	@Operation(summary ="Get a paginated list of semi products for given value-chain list")
 	public ApiPaginatedResponse<ApiSemiProduct> getSemiProductListByValueChains(
-			@Parameter(name = "Value chain IDs", required = true) @RequestParam(value = "valueChainIds") List<Long> valueChainIds,
+			@Parameter(description = "Value chain IDs", required = true) @RequestParam(value = "valueChainIds") List<Long> valueChainIds,
 			@Valid ApiPaginatedRequest request,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
 
@@ -53,7 +53,7 @@ public class SemiProductController {
 	@GetMapping("{id}")
 	@Operation(summary ="Get a single semi product with the provided ID.")
 	public ApiResponse<ApiSemiProduct> getSemiProduct(
-			@Valid @Parameter(name = "Semi product ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "Semi product ID", required = true) @PathVariable("id") Long id,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
 		return new ApiResponse<>(semiProductService.getSemiProduct(id, language));
@@ -62,7 +62,7 @@ public class SemiProductController {
 	@GetMapping("{id}/detail")
 	@Operation(summary ="Get a single semi product with details with the provided ID.")
 	public ApiResponse<ApiSemiProduct> getSemiProductDetails(
-			@Valid @Parameter(name = "Semi product ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "Semi product ID", required = true) @PathVariable("id") Long id,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 		return new ApiResponse<>(semiProductService.getSemiProductDetails(id, language));
 	}
@@ -80,7 +80,7 @@ public class SemiProductController {
 	@DeleteMapping("{id}")
 	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@Operation(summary ="Deletes a semi product with the provided ID.")
-	public ApiDefaultResponse deleteSemiProduct(@Valid @Parameter(name = "Semi product ID", required = true) @PathVariable("id") Long id) throws ApiException {
+	public ApiDefaultResponse deleteSemiProduct(@Valid @Parameter(description = "Semi product ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		semiProductService.deleteSemiProduct(id);
 		return new ApiDefaultResponse();

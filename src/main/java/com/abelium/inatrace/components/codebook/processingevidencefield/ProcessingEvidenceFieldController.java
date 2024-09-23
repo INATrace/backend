@@ -44,7 +44,7 @@ public class ProcessingEvidenceFieldController {
 	@GetMapping("list/value-chain/{id}")
 	@Operation(summary ="Get a list of processing evidence fields by value chain ID.")
 	public ApiPaginatedResponse<ApiProcessingEvidenceField> listProcessingEvidenceFieldsByValueChain(
-		@Valid @Parameter(name = "Value chain ID", required = true) @PathVariable("id") Long valueChainId,
+		@Valid @Parameter(description = "Value chain ID", required = true) @PathVariable("id") Long valueChainId,
 		@Valid ApiPaginatedRequest request,
 		@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
 
@@ -54,7 +54,7 @@ public class ProcessingEvidenceFieldController {
 	@GetMapping("list/by-value-chains")
 	@Operation(summary ="Get a list of processing evidence fields by value chain ID list.")
 	public ApiPaginatedResponse<ApiProcessingEvidenceField> listProcessingEvidenceFieldsByValueChains(
-			@Parameter(name = "Value chain IDs", required = true) @RequestParam(value = "valueChainIds")
+			@Parameter(description = "Value chain IDs", required = true) @RequestParam(value = "valueChainIds")
 			List<Long> valueChainIds,
 			@Valid ApiPaginatedRequest request,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) {
@@ -65,7 +65,7 @@ public class ProcessingEvidenceFieldController {
 	@GetMapping("{id}")
 	@Operation(summary ="Get a single processing evidence field with the provided ID.")
 	public ApiResponse<ApiProcessingEvidenceField> getProcessingEvidenceField(
-			@Valid @Parameter(name = "ProcessingEvidenceField ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "ProcessingEvidenceField ID", required = true) @PathVariable("id") Long id,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
 		return new ApiResponse<>(processingEvidenceFieldService.getProcessingEvidenceField(id, language));
@@ -83,7 +83,7 @@ public class ProcessingEvidenceFieldController {
 	@DeleteMapping("{id}")
 	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@Operation(summary ="Deletes a processing evidence field with the provided ID.")
-	public ApiDefaultResponse deleteProcessingEvidenceField(@Valid @Parameter(name = "ProcessingEvidenceField ID", required = true) @PathVariable("id") Long id) throws ApiException {
+	public ApiDefaultResponse deleteProcessingEvidenceField(@Valid @Parameter(description = "ProcessingEvidenceField ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		processingEvidenceFieldService.deleteProcessingEvidenceField(id);
 		return new ApiDefaultResponse();

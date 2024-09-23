@@ -28,8 +28,8 @@ public class BeycoOrderController {
     @GetMapping("/company/{companyId}/token")
     @Operation(summary = "Get OAuth2 token for Beyco integration")
     public ApiResponse<ApiBeycoTokenResponse> getToken(
-            @Parameter(name = "Authorization code from Beyco OAuth2", required = true) @RequestParam(value = "authCode") String authCode,
-            @Parameter(name = "ID of company", required = true) @PathVariable(value = "companyId") Long companyId
+            @Parameter(description = "Authorization code from Beyco OAuth2", required = true) @RequestParam(value = "authCode") String authCode,
+            @Parameter(description = "ID of company", required = true) @PathVariable(value = "companyId") Long companyId
     ) throws ApiException {
         return new ApiResponse<>(beycoOrderService.getBeycoAuthToken(authCode, companyId));
     }
@@ -37,8 +37,8 @@ public class BeycoOrderController {
     @GetMapping("/company/{companyId}/token/refresh")
     @Operation(summary = "Refresh expired token")
     public ApiResponse<ApiBeycoTokenResponse> refreshToken(
-            @Parameter(name = "Refresh token", required = true) @RequestHeader(value = "X-Beyco-Refresh-Token") String refreshToken,
-            @Parameter(name = "ID of company", required = true) @PathVariable(value = "companyId") Long companyId
+            @Parameter(description = "Refresh token", required = true) @RequestHeader(value = "X-Beyco-Refresh-Token") String refreshToken,
+            @Parameter(description = "ID of company", required = true) @PathVariable(value = "companyId") Long companyId
     ) throws ApiException {
         return new ApiResponse<>(beycoOrderService.refreshBeycoAuthToken(refreshToken, companyId));
     }
@@ -46,8 +46,8 @@ public class BeycoOrderController {
     @GetMapping("/company/{companyId}/fields")
     @Operation(summary = "Get list of fields necessary for Beyco order for selected Stock Orders")
     public ApiResponse<ApiBeycoOrderFields> getBeycoOrderFieldsForSelectedStockOrders(
-            @Parameter(name = "ID's of selected stock orders", required = true) @RequestParam(value = "id") List<Long> stockOrderIds,
-            @Parameter(name = "ID of company", required = true) @PathVariable(value = "companyId") Long companyId
+            @Parameter(description = "ID's of selected stock orders", required = true) @RequestParam(value = "id") List<Long> stockOrderIds,
+            @Parameter(description = "ID of company", required = true) @PathVariable(value = "companyId") Long companyId
     ) throws ApiException {
         return new ApiResponse<>(beycoOrderService.getBeycoOrderFieldList(stockOrderIds, companyId));
     }
@@ -55,9 +55,9 @@ public class BeycoOrderController {
     @PostMapping("/company/{companyId}/order")
     @Operation(summary = "Send order to Beyco")
     public ApiResponse<Object> sendBeycoOrder(
-            @Valid @Parameter(name = "Beyco offer", required = true) @RequestBody ApiBeycoOrderFields beycoOrder,
-            @Parameter(name = "JWT token", required = true) @RequestHeader(value = "X-Beyco-Token") String token,
-            @Parameter(name = "ID of company", required = true) @PathVariable(value = "companyId") Long companyId
+            @Valid @Parameter(description = "Beyco offer", required = true) @RequestBody ApiBeycoOrderFields beycoOrder,
+            @Parameter(description = "JWT token", required = true) @RequestHeader(value = "X-Beyco-Token") String token,
+            @Parameter(description = "ID of company", required = true) @PathVariable(value = "companyId") Long companyId
     ) throws ApiException {
         return new ApiResponse<>(this.beycoOrderService.sendBeycoOrder(beycoOrder, token, companyId));
     }

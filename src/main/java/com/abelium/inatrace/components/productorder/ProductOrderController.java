@@ -33,7 +33,7 @@ public class ProductOrderController {
 	@GetMapping("{id}")
 	@Operation(summary = "Get a single product order with the provided ID.")
 	public ApiResponse<ApiProductOrder> getProductOrder(
-			@Valid @Parameter(name = "Product order ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "Product order ID", required = true) @PathVariable("id") Long id,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
 		return new ApiResponse<>(productOrderService.getProductOrder(id, language));

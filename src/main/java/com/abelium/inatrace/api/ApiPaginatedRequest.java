@@ -12,21 +12,21 @@ import jakarta.validation.constraints.Min;
 @ParameterObject
 public class ApiPaginatedRequest {
 
-	@Parameter(name = "Only count, only fetch, or return both values (if null)")
+	@Parameter(description = "Only count, only fetch, or return both values (if null)")
 	public PaginatedRequestType requestType = null;
 	
     @Min(1)
-    @Parameter(name = "Number of records to return. Min: 1, default: 100")
+    @Parameter(description = "Number of records to return. Min: 1, default: 100")
     public int limit = 100;
 
     @Min(0)
-    @Parameter(name = "Number of records to skip before returning. Default: 0, min: 0")
+    @Parameter(description = "Number of records to skip before returning. Default: 0, min: 0")
     public int offset = 0;
 
-    @Parameter(name = "Column name to be sorted by, varies for each endpoint, default is id")
+    @Parameter(description = "Column name to be sorted by, varies for each endpoint, default is id")
     public String sortBy = "id";
 
-    @Parameter(name = "Direction of sorting (ASC or DESC). Default DESC.")
+    @Parameter(description = "Direction of sorting (ASC or DESC). Default DESC.")
     public SortDirection sort = SortDirection.DESC;
     
     public PaginatedRequestType getRequestType() {

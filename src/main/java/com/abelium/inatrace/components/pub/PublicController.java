@@ -59,15 +59,15 @@ public class PublicController {
     @GetMapping(value = "/product/label/{uid}")
     @Operation(summary = "Get label with field values")
     public ApiResponse<ApiProductLabelValuesExtended> getPublicProductLabelValues(
-			@Valid @Parameter(name = "Label uid", required = true) @PathVariable("uid") String uid) throws ApiException {
+			@Valid @Parameter(description = "Label uid", required = true) @PathVariable("uid") String uid) throws ApiException {
     	return new ApiResponse<>(productService.getProductLabelValuesPublic(uid));
     }
 
 	@GetMapping(value = "/stock-order/{qrTag}")
 	@Operation(summary = "Get public data for the Stock order with the given QR code tag")
 	public ApiResponse<ApiQRTagPublic> getQRTagPublicData(
-			@Valid @Parameter(name = "QR code tag", required = true) @PathVariable("qrTag") String qrTag,
-			@Valid @Parameter(name = "Return aggregated history") @RequestParam(value = "withHistory", required = false) Boolean withHistory,
+			@Valid @Parameter(description = "QR code tag", required = true) @PathVariable("qrTag") String qrTag,
+			@Valid @Parameter(description = "Return aggregated history") @RequestParam(value = "withHistory", required = false) Boolean withHistory,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 		return new ApiResponse<>(stockOrderService.getQRTagPublicData(qrTag, withHistory, language));
 	}
@@ -75,22 +75,22 @@ public class PublicController {
     @GetMapping(value = "/product/knowledgeBlog/{id}")
     @Operation(summary = "Get knowledge blog by id")
     public ApiResponse<ApiKnowledgeBlog> getPublicProductKnowledgeBlog(
-    		@Valid @Parameter(name = "id", required = true) @PathVariable("id") Long id) throws ApiException {
+    		@Valid @Parameter(description = "id", required = true) @PathVariable("id") Long id) throws ApiException {
     	return new ApiResponse<>(productService.getKnowledgeBlogPublic(id));
     }
 
     @GetMapping(value = "/product/label_batch/{uid}/{number}")
     @Operation(summary = "Get batch by label and number")
     public ApiResponse<ApiProductLabelBatch> getPublicProductLabelBatch(
-			@Valid @Parameter(name = "Label uid", required = true) @PathVariable("uid") String uid,
-    		@Valid @Parameter(name = "Batch number", required = true)  @PathVariable("number") String number) {
+			@Valid @Parameter(description = "Label uid", required = true) @PathVariable("uid") String uid,
+    		@Valid @Parameter(description = "Batch number", required = true)  @PathVariable("number") String number) {
     	return new ApiResponse<>(productService.getProductLabelBatchPublic(uid, number));
     }
     
     @GetMapping(value = "/product/label/{uid}/verify_batch_authenticity")
     @Operation(summary = "Check batch by number and given date(s)")
     public ApiResponse<Boolean> checkPublicProductLabelBatchAuthenticity(HttpServletRequest servletRequest,
-    		@Valid @Parameter(name = "Label uid", required = true) @PathVariable("uid") String uid,
+    		@Valid @Parameter(description = "Label uid", required = true) @PathVariable("uid") String uid,
     		@Valid ApiProductLabelBatchCheckAuthenticity request) {
     	return new ApiResponse<>(productService.checkProductLabelBatchAuthenticityPublic(uid, request, servletRequest));
     }
@@ -98,7 +98,7 @@ public class PublicController {
     @GetMapping(value = "/product/label/{uid}/verify_batch_origin")
     @Operation(summary = "Get batch by label and number")
     public ApiResponse<List<ApiLocation>> checkPublicProductLabelBatchOrigin(HttpServletRequest servletRequest,
-    		@Valid @Parameter(name = "Label uid", required = true) @PathVariable("uid") String uid,
+    		@Valid @Parameter(description = "Label uid", required = true) @PathVariable("uid") String uid,
     		@Valid ApiProductLabelBatchCheckOrigin request) {
     	return new ApiResponse<>(productService.checkProductLabelBatchOriginPublic(uid, request, servletRequest));
     }
@@ -133,7 +133,7 @@ public class PublicController {
     @GetMapping(value = "/product/label/feedback/list/{labelUid}")
     @Operation(summary = "List feedback for a label uid")
     public ApiPaginatedResponse<ApiProductLabelFeedback> listProductLabelFeedbacks(
-    		@Valid @Parameter(name = "Label id", required = true) @PathVariable("labelUid") String labelUid,
+    		@Valid @Parameter(description = "Label id", required = true) @PathVariable("labelUid") String labelUid,
     		@Valid ApiListProductLabelFeedbackRequest request) throws ApiException {
     	return new ApiPaginatedResponse<>(productService.listProductLabelFeedbacks(labelUid, request));
     }    
@@ -141,7 +141,7 @@ public class PublicController {
     @PostMapping(value = "/product/label/feedback/{labelUid}")
     @Operation(summary = "Add a feedback to a label with a label uid")
     public ApiDefaultResponse addProductLabelFeedback(
-    		@Valid @Parameter(name = "Label id", required = true) @PathVariable("labelUid") String labelUid,
+    		@Valid @Parameter(description = "Label id", required = true) @PathVariable("labelUid") String labelUid,
     		@Valid @RequestBody ApiProductLabelFeedback request) throws ApiException {
     	productService.addProductLabelFeedback(labelUid, request);
     	return new ApiDefaultResponse();

@@ -62,8 +62,8 @@ public class CompanyController {
     @GetMapping(value = "/profile/{id}")
     @Operation(summary = "Get all info about a company")
     public ApiResponse<ApiCompanyGet> getCompany(@AuthenticationPrincipal CustomUserDetails authUser, 
-    		@Valid @Parameter(name = "Record id", required = true) @PathVariable("id") Long id,
-    		@Valid @Parameter(name = "language") @RequestParam(value = "language", defaultValue = "EN") String language) throws ApiException {
+    		@Valid @Parameter(description = "Record id", required = true) @PathVariable("id") Long id,
+    		@Valid @Parameter(description = "language") @RequestParam(value = "language", defaultValue = "EN") String language) throws ApiException {
     	return new ApiResponse<>(companyService.getCompany(authUser, id, Language.valueOf(language)));
     }
 
@@ -71,14 +71,14 @@ public class CompanyController {
     @Operation(summary = "Get the company name and abbreviation")
     public ApiResponse<ApiCompanyName> getCompanyName(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Record id", required = true) @PathVariable("id") Long id) throws ApiException {
+            @Valid @Parameter(description = "Record id", required = true) @PathVariable("id") Long id) throws ApiException {
         return new ApiResponse<>(companyService.getCompanyName(authUser, id));
     }
 
 	@GetMapping("/profile/{id}/users")
 	@Operation(summary ="Get all user for the company with the provided ID")
 	public ApiResponse<List<ApiCompanyUser>> getCompanyUsers(
-			@Valid @Parameter(name = "Company ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long id,
             @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
 		return new ApiResponse<>(companyService.getCompanyUsers(id, authUser));
@@ -92,7 +92,8 @@ public class CompanyController {
     }
     
     @PostMapping(value = "/execute/{action}")
-    @Operation(summary = "Execute company action. Must be an Company admin, System admin or Regional admin enrolled in this company")
+    @Operation(summary = "Execute company action. Must be an Company admin, System admin or Regional admin enrolled in this company",
+               operationId = "executeCompanyAction")
     public ApiDefaultResponse executeAction(
             @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @RequestBody ApiCompanyActionRequest request,
@@ -105,7 +106,7 @@ public class CompanyController {
     @Operation(summary = "Get user customer by id")
     public ApiResponse<ApiUserCustomer> getUserCustomer(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "User customer ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(description = "User customer ID", required = true) @PathVariable("id") Long id,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
         return new ApiResponse<>(companyService.getUserCustomer(id, authUser, language));
@@ -115,8 +116,8 @@ public class CompanyController {
     @Operation(summary = "Get list of user customers for given company ID and type")
     public ApiPaginatedResponse<ApiUserCustomer> getUserCustomersForCompanyAndType(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Company ID", required = true) @PathVariable("companyId") Long companyId,
-            @Valid @Parameter(name = "Type of user customer (collector, farmer)") @PathVariable("type") UserCustomerType type,
+            @Valid @Parameter(description = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @Parameter(description = "Type of user customer (collector, farmer)") @PathVariable("type") UserCustomerType type,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
             @Valid ApiListFarmersRequest request) throws ApiException {
 
@@ -128,7 +129,7 @@ public class CompanyController {
     @Operation(summary = "Get all user customers plots that are part of the company with the provided ID")
     public ApiResponse<List<ApiPlot>> getUserCustomersPlotsForCompany(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @Parameter(description = "Company ID", required = true) @PathVariable("companyId") Long companyId,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
         return companyService.getUserCustomersPlotsForCompany(authUser, companyId, language);
     }
@@ -137,7 +138,7 @@ public class CompanyController {
     @Operation(summary ="Export payments for provided company ID")
     public ResponseEntity<byte[]> exportFarmerDataByCompany(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @Parameter(description = "Company ID", required = true) @PathVariable("companyId") Long companyId,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
     ) throws ApiException {
 
@@ -157,7 +158,7 @@ public class CompanyController {
     @Operation(summary = "Add new user customer for given company ID")
     public ApiResponse<ApiUserCustomer> addUserCustomer(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @Parameter(description = "Company ID", required = true) @PathVariable("companyId") Long companyId,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
             @Valid @RequestBody ApiUserCustomer request
     ) throws ApiException {
@@ -177,7 +178,7 @@ public class CompanyController {
     @GetMapping(value = "/userCustomers/{id}/exportGeoData")
     @Operation(summary = "Export the Geo-data for the user customer with the provided ID")
     public ResponseEntity<byte[]> exportUserCustomerGeoData(
-            @Valid @Parameter(name = "User customer ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(description = "User customer ID", required = true) @PathVariable("id") Long id,
             @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
         byte[] response = companyService.exportUserCustomerGeoData(authUser, id);
@@ -191,7 +192,7 @@ public class CompanyController {
     @Operation(summary = "Upload Geo-data for the user customer with the provided ID")
     public ApiDefaultResponse uploadUserCustomerGeoData(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "User customer ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(description = "User customer ID", required = true) @PathVariable("id") Long id,
             @RequestParam("file") MultipartFile file) throws ApiException {
 
         companyService.uploadUserCustomerGeoData(authUser, id, file);
@@ -202,7 +203,7 @@ public class CompanyController {
     @DeleteMapping(value = "/userCustomers/{id}")
     @Operation(summary = "Delete user customer with given id")
     public ApiDefaultResponse deleteUserCustomer(
-            @Valid @Parameter(name = "User customer ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(description = "User customer ID", required = true) @PathVariable("id") Long id,
             @AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
         companyService.deleteUserCustomer(id, authUser);
         return new ApiDefaultResponse();
@@ -212,7 +213,7 @@ public class CompanyController {
     @Operation(summary = "Add new plot for the provided user customer")
     public ApiResponse<ApiPlot> createUserCustomerPlot(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "User customer ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(description = "User customer ID", required = true) @PathVariable("id") Long id,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
             @Valid @RequestBody ApiPlot request) throws ApiException {
         return new ApiResponse<>(companyService.createUserCustomerPlot(id, authUser, language, request));
@@ -222,8 +223,8 @@ public class CompanyController {
     @Operation(summary = "Add new plot for the provided user customer")
     public ApiResponse<ApiPlot> refreshGeoIDForUserCustomerPlot(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "User customer ID", required = true) @PathVariable("id") Long id,
-            @Valid @Parameter(name = "Plot ID", required = true) @PathVariable("plotId") Long plotId,
+            @Valid @Parameter(description = "User customer ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(description = "Plot ID", required = true) @PathVariable("plotId") Long plotId,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
         return new ApiResponse<>(companyService.refreshGeoIDForUserCustomerPlot(id, plotId, authUser, language));
     }
@@ -232,7 +233,7 @@ public class CompanyController {
     @Operation(summary = "List company customers for company")
     public ApiPaginatedResponse<ApiCompanyCustomer> getCompanyCustomersList(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Company id", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @Parameter(description = "Company id", required = true) @PathVariable("companyId") Long companyId,
             @Valid ApiListCustomersRequest request) throws ApiException {
         return new ApiPaginatedResponse<>(companyService.listCompanyCustomers(authUser, companyId, request));
     }
@@ -241,7 +242,7 @@ public class CompanyController {
     @Operation(summary = "Get company customer by ID")
     public ApiResponse<ApiCompanyCustomer> getCompanyCustomer(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Company customer ID", required = true) @PathVariable("id") Long companyCustomerId
+            @Valid @Parameter(description = "Company customer ID", required = true) @PathVariable("id") Long companyCustomerId
     ) throws ApiException {
         return new ApiResponse<>(companyService.getCompanyCustomer(companyCustomerId, authUser));
     }
@@ -266,7 +267,7 @@ public class CompanyController {
     @Operation(summary = "Delete company customer with ID")
     public ApiDefaultResponse deleteCompanyCustomer(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Company customer ID", required = true) @PathVariable("id") Long id) throws ApiException {
+            @Valid @Parameter(description = "Company customer ID", required = true) @PathVariable("id") Long id) throws ApiException {
         companyService.deleteCompanyCustomer(id, authUser);
         return new ApiDefaultResponse();
     }
@@ -275,7 +276,7 @@ public class CompanyController {
     @Operation(summary = "Get list of associations for the selected company with given ID")
     public ApiPaginatedResponse<ApiCompanyListResponse> getAssociations(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Company ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long id,
             @Valid ApiPaginatedRequest request) throws ApiException {
         return new ApiPaginatedResponse<>(companyService.getAssociations(id, request, authUser));
     }
@@ -284,7 +285,7 @@ public class CompanyController {
     @Operation(summary = "Get list of connected companies for the company with the given ID")
     public ApiPaginatedResponse<ApiCompanyListResponse> getConnectedCompanies(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Company ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long id,
             @Valid ApiPaginatedRequest request) throws ApiException {
         return new ApiPaginatedResponse<>(companyService.getConnectedCompanies(id, request, authUser));
     }
@@ -294,8 +295,8 @@ public class CompanyController {
     @Operation(summary = "Upload .xls or .xlsx spreadsheet of farmers to import into DB")
     public ApiUserCustomerImportResponse importFarmersSpreadsheet(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Company ID", required = true) @PathVariable("companyId") Long companyId,
-            @Valid @Parameter(name = "Document ID", required = true) @PathVariable("documentId") Long documentId,
+            @Valid @Parameter(description = "Company ID", required = true) @PathVariable("companyId") Long companyId,
+            @Valid @Parameter(description = "Document ID", required = true) @PathVariable("documentId") Long documentId,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
         return userCustomerImportService.importFarmersSpreadsheet(companyId, documentId, authUser, language);
     }
@@ -304,7 +305,7 @@ public class CompanyController {
     @Operation(summary = "Get list of value chains for the company with the given ID")
     public ApiPaginatedResponse<ApiValueChain> getCompanyValueChains(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Company ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long id,
             @Valid ApiPaginatedRequest request) throws ApiException {
         return new ApiPaginatedResponse<>(companyService.getCompanyValueChainList(id, request, authUser));
     }
@@ -313,7 +314,7 @@ public class CompanyController {
     @Operation(summary = "Get list of product types for the company with the given ID")
     public ApiPaginatedResponse<ApiProductType> getCompanyProductTypes(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @Valid @Parameter(name = "Company ID", required = true) @PathVariable("id") Long id,
+            @Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long id,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
             @Valid ApiPaginatedRequest request) throws ApiException {
         return new ApiPaginatedResponse<>(companyService.getCompanyProductTypesList(id, request, authUser, language));

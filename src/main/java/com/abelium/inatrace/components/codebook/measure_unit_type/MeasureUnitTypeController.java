@@ -39,7 +39,7 @@ public class MeasureUnitTypeController {
 	@GetMapping("{id}")
 	@Operation(summary ="Get a single measurement unit type with the provided ID.")
 	public ApiResponse<ApiMeasureUnitType> getMeasurementUnitType(
-			@Valid @Parameter(name = "Measurement unit type ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @Parameter(description = "Measurement unit type ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		return new ApiResponse<>(measureUnitTypeService.getMeasureUnitType(id));
 	}
@@ -58,7 +58,7 @@ public class MeasureUnitTypeController {
 	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
 	@Operation(summary ="Deletes a measurement with the provided ID.")
 	public ApiDefaultResponse deleteMeasurementUnitType(
-			@Valid @Parameter(name = "Measurement unit type ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @Parameter(description = "Measurement unit type ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		measureUnitTypeService.deleteMeasureUnitType(id);
 		return new ApiDefaultResponse();

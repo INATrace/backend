@@ -15,13 +15,13 @@ import org.springframework.validation.annotation.Validated;
 @ParameterObject
 public class ApiValueChainListRequest extends ApiPaginatedRequest {
 
-	@Parameter(name = "Value chain name")
+	@Parameter(description = "Value chain name")
 	private String name;
 
-	@Parameter(name = "Value chain status")
+	@Parameter(description = "Value chain status")
 	private ValueChainStatus valueChainStatus;
 
-	@Parameter(name = "Value chain product type ID")
+	@Parameter(description = "Value chain product type ID")
 	private Long productTypeId;
 
 	public String getName() {
