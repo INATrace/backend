@@ -155,27 +155,27 @@
 	    <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
-            <version>3.4.0</version>
+            <version>3.5.3</version>
 	    </dependency>
         
 	    <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
-            <version>3.4.0</version>
+            <version>3.5.3</version>
 	    </dependency>
 	    
 	    <!-- Maxmind geoip2 database parser -->
 	    <dependency>
 	        <groupId>com.maxmind.geoip2</groupId>
 	        <artifactId>geoip2</artifactId>
-	        <version>2.13.1</version>
+	        <version>4.2.1</version>
 	    </dependency>
 	    
 	    <!-- JWT token -->
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
-            <version>3.10.3</version>
+            <version>4.4.0</version>
         </dependency>
 
 		<!-- Working with GeoJSON -->
