@@ -8,71 +8,71 @@ import com.abelium.inatrace.components.product.api.ApiFarmInformation;
 import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.types.Gender;
 import com.abelium.inatrace.types.UserCustomerType;
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @Validated
 public class ApiUserCustomer extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "Company id", position = 1)
+	@Schema(description = "Company id")
 	public Long companyId;
 
-	@ApiModelProperty(value = "Company internal farmer ID")
+	@Schema(description = "Company internal farmer ID")
 	public String farmerCompanyInternalId;
 	
-	@ApiModelProperty(value = "Type", position = 2)
+	@Schema(description = "Type")
 	public UserCustomerType type;
 	
-	@ApiModelProperty(value = "Name", position = 3)
-	@Length(max = Lengths.NAME)
+	@Schema(description = "Name")
+	@Size(max = Lengths.NAME)
 	public String name;
 	
-	@ApiModelProperty(value = "Surname", position = 4)
-	@Length(max = Lengths.SURNAME)
+	@Schema(description = "Surname")
+	@Size(max = Lengths.SURNAME)
 	public String surname;
 	
-	@ApiModelProperty(value = "Phone", position = 5)
-	@Length(max = Lengths.PHONE_NUMBER)
+	@Schema(description = "Phone")
+	@Size(max = Lengths.PHONE_NUMBER)
 	public String phone;
 
-	@ApiModelProperty(value = "Email", position = 6)
-	@Length(max = Lengths.EMAIL)
+	@Schema(description = "Email")
+	@Size(max = Lengths.EMAIL)
 	public String email;
 
-	@ApiModelProperty(value = "Has smartphone", position = 7)
+	@Schema(description = "Has smartphone")
 	public Boolean hasSmartphone;
 	
-	@ApiModelProperty(value = "Location", position = 8)
+	@Schema(description = "Location")
 	public ApiUserCustomerLocation location;
 	
-	@ApiModelProperty(value = "Gender", position = 9)
+	@Schema(description = "Gender")
 	public Gender gender;
 
-	@ApiModelProperty(value = "Bank information", position = 10)
+	@Schema(description = "Bank information")
 	public ApiBankInformation bank;
 
-	@ApiModelProperty(value = "Farm information", position = 11)
+	@Schema(description = "Farm information")
 	public ApiFarmInformation farm;
 
-	@ApiModelProperty(value = "List of associations", position = 12)
+	@Schema(description = "List of associations")
 	public List<ApiUserCustomerAssociation> associations;
 
-	@ApiModelProperty(value = "List of cooperatives", position = 13)
+	@Schema(description = "List of cooperatives")
 	public List<ApiUserCustomerCooperative> cooperatives;
 
-	@ApiModelProperty(value = "User customer certifications", position = 14)
+	@Schema(description = "User customer certifications")
 	@Valid
 	public List<ApiCertification> certifications;
 
-	@ApiModelProperty(value = "User customer product types", position = 15)
+	@Schema(description = "User customer product types")
 	@Valid
 	public List<ApiProductType> productTypes;
 
-	@ApiModelProperty(value = "Plots in possession of the user customer (only applicable for type FARMER)", position = 16)
+	@Schema(description = "Plots in possession of the user customer (only applicable for type FARMER)")
 	@Valid
 	public List<ApiPlot> plots;
 

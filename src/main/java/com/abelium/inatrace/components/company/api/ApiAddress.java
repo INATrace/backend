@@ -1,65 +1,64 @@
 package com.abelium.inatrace.components.company.api;
 
-import org.hibernate.validator.constraints.Length;
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.components.common.api.ApiCountry;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.Size;
 
 @Validated
 public class ApiAddress {
 
-	@Length(max = Lengths.ADDRESS)
-    @ApiModelProperty(value = "address", position = 1)
+	@Size(max = Lengths.ADDRESS)
+    @Schema(description = "address", maxLength = Lengths.ADDRESS)
 	public String address;
 	
-	@Length(max = Lengths.CITY)
-    @ApiModelProperty(value = "city", position = 2)
+	@Size(max = Lengths.CITY)
+    @Schema(description = "city", maxLength = Lengths.CITY)
 	public String city;
 
-	@Length(max = Lengths.STATE)
-    @ApiModelProperty(value = "state / province / region", position = 3)
+	@Size(max = Lengths.STATE)
+    @Schema(description = "state / province / region", maxLength = Lengths.STATE)
 	public String state;
 
-	@Length(max = Lengths.ZIPCODE)
-    @ApiModelProperty(value = "ZIP / postal code / p.p. box", position = 4)
+	@Size(max = Lengths.ZIPCODE)
+    @Schema(description = "ZIP / postal code / p.p. box", maxLength = Lengths.ZIPCODE)
 	public String zip;
 
-	@Length(max = Lengths.CELL)
-	@ApiModelProperty(value = "Village cell", position = 5)
+	@Size(max = Lengths.CELL)
+	@Schema(description = "Village cell", maxLength = Lengths.CELL)
 	public String cell;
 
-	@Length(max = Lengths.SECTOR)
-	@ApiModelProperty(value = "Village sector", position = 6)
+	@Size(max = Lengths.SECTOR)
+	@Schema(description = "Village sector", maxLength = Lengths.SECTOR)
 	public String sector;
 
-	@Length(max = Lengths.VILLAGE)
-	@ApiModelProperty(value = "Village name", position = 7)
+	@Size(max = Lengths.VILLAGE)
+	@Schema(description = "Village name", maxLength = Lengths.VILLAGE)
 	public String village;
 
-	@Length(max = Lengths.OTHER_ADDRESS)
-	@ApiModelProperty(value = "Other/additional address field", position = 8)
+	@Size(max = Lengths.OTHER_ADDRESS)
+	@Schema(description = "Other/additional address field", maxLength = Lengths.OTHER_ADDRESS)
 	public String otherAddress;
 
-	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "Honduras farm name", position = 9)
+	@Size(max = Lengths.DEFAULT)
+	@Schema(description = "Honduras farm name", maxLength = Lengths.DEFAULT)
 	public String hondurasFarm;
 
-	@Length(max = Lengths.VILLAGE)
-	@ApiModelProperty(value = "Honduras village name", position = 10)
+	@Size(max = Lengths.VILLAGE)
+	@Schema(description = "Honduras village name", maxLength = Lengths.VILLAGE)
 	public String hondurasVillage;
 
-	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "Honduras municipality name", position = 11)
+	@Size(max = Lengths.DEFAULT)
+	@Schema(description = "Honduras municipality name", maxLength = Lengths.DEFAULT)
 	public String hondurasMunicipality;
 
-	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "Honduras department name", position = 12)
+	@Size(max = Lengths.DEFAULT)
+	@Schema(description = "Honduras department name", maxLength = Lengths.DEFAULT)
 	public String hondurasDepartment;
 
-    @ApiModelProperty(value = "country", position = 13)
+    @Schema(description = "country")
 	public ApiCountry country;
 
 	public String getAddress() {

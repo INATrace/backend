@@ -1,30 +1,26 @@
 package com.abelium.inatrace.components.common.api;
 
-import javax.validation.constraints.NotNull;
-
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.api.ApiBaseEntity;
-
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.validation.annotation.Validated;
 
 @Validated
 public class ApiDocument extends ApiBaseEntity {
 
     @NotNull
-    @ApiModelProperty(value = "storage key (file on system, s3, ...).", position = 1)
+    @Schema(description = "storage key (file on system, s3, ...).", requiredMode = Schema.RequiredMode.REQUIRED)
     public String storageKey;
     
     @NotNull
-    @ApiModelProperty(value = "document (file) name", position = 2)
+    @Schema(description = "document (file) name", requiredMode = Schema.RequiredMode.REQUIRED)
     public String name;    
 
-    @ApiModelProperty(value = "content type", position = 3)
+    @Schema(description = "content type")
     public String contentType;    
     
-    @ApiModelProperty(value = "size", position = 4)
-    public Long size;    
-
+    @Schema(description = "size")
+    public Long size;
     
     public ApiDocument() {}
 

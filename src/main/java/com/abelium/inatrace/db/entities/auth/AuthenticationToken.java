@@ -9,8 +9,8 @@ import com.abelium.inatrace.tools.EncryptionTools;
 import com.abelium.inatrace.types.Status;
 import com.abelium.inatrace.types.UserStatus;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;

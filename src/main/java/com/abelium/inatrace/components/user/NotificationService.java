@@ -6,8 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.spring5.SpringTemplateEngine;
-
+import org.thymeleaf.spring6.SpringTemplateEngine;
 import java.util.Locale;
 
 @Lazy
@@ -19,7 +18,6 @@ public class NotificationService extends BaseService {
 
     @Autowired
     private SpringTemplateEngine templateEngine;
-
 
     public String createEmailConfirmationEmail(String name, String surname, String link) {
         Context context = new Context(Locale.ENGLISH);

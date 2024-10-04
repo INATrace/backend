@@ -3,43 +3,43 @@ package com.abelium.inatrace.components.product.api;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 
 import org.springframework.validation.annotation.Validated;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.common.api.ApiDocument;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiProductLabelBatch extends ApiBaseEntity {
 	
-	@ApiModelProperty(value = "Label id", position = 1)
+	@Schema(description = "Label id")
 	public Long labelId;
 
-	@ApiModelProperty(value = "Batch number", position = 2)
-	@Pattern(regexp = "^[\\p{Alnum}]*$")
+	@Schema(description = "Batch number")
+	@Pattern(regexp = "^\\p{Alnum}*$")
 	public String number;
 	
-	@ApiModelProperty(value = "Production date", position = 3)
+	@Schema(description = "Production date")
     public LocalDate productionDate;
 
-	@ApiModelProperty(value = "Expiry date", position = 4)
+	@Schema(description = "Expiry date")
 	public LocalDate expiryDate;
 	
-	@ApiModelProperty(value = "batch farming location", position = 5)
+	@Schema(description = "batch farming location")
 	@Valid
     public List<ApiLocation> locations;
 
-	@ApiModelProperty(value = "batch photo", position = 6)
+	@Schema(description = "batch photo")
 	public ApiDocument photo;	
 
-	@ApiModelProperty(value = "enable authenticity check", position = 7)
+	@Schema(description = "enable authenticity check")
 	public Boolean checkAuthenticity;
 
-	@ApiModelProperty(value = "enable tracing origin", position = 8)
+	@Schema(description = "enable tracing origin")
 	public Boolean traceOrigin;
 
 	public Long getLabelId() {

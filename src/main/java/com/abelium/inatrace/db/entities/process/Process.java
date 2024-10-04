@@ -1,9 +1,8 @@
 package com.abelium.inatrace.db.entities.process;
 
 import com.abelium.inatrace.db.base.BaseEntity;
-
-import javax.persistence.Entity;
-import javax.persistence.Lob;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
 
 @Entity
 public class Process extends BaseEntity {

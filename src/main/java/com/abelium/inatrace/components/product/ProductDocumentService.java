@@ -14,6 +14,7 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.Overlay;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -26,7 +27,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -78,7 +79,7 @@ public class ProductDocumentService extends BaseService {
 	    	
 			// Overlay docdument
 			Path path = Paths.get(documentsRoot, "INATrace-labele-o-A4.pdf");
-	    	PDDocument overlayPdf = PDDocument.load(path.toFile());
+	    	PDDocument overlayPdf = Loader.loadPDF(path.toFile());
 	    	
 	    	// Add images to overlay
 	    	addImages(overlayPdf, feUrlPrefix + "q/" + l.getUuid());
@@ -90,11 +91,11 @@ public class ProductDocumentService extends BaseService {
 			logger.error("Error creating instructions document", e);
 			throw new ApiException(ApiStatus.ERROR, "Error creating instructions document");
 		}
-    	
     }
     
     private byte[] putOverlay(byte[] origDocument, PDDocument overlayPdf) throws Exception, Exception {
-    	PDDocument orig = PDDocument.load(origDocument);
+
+    	PDDocument orig = Loader.loadPDF(origDocument);
     	try (Overlay overlay = new Overlay()) {
 	    	overlay.setInputPDF(orig);
 	    	overlay.setOverlayPosition(Overlay.Position.FOREGROUND);

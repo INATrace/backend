@@ -1,11 +1,18 @@
 package com.abelium.inatrace.configuration;
 
-import java.io.IOException;
-import java.util.concurrent.CompletionException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolationException;
-
+import com.abelium.inatrace.api.ApiStatus;
+import com.abelium.inatrace.api.errors.ApiError;
+import com.abelium.inatrace.api.errors.ApiException;
+import com.abelium.inatrace.api.errors.ApiImageException;
+import com.abelium.inatrace.api.errors.HtmlPageException;
+import com.abelium.inatrace.api.errors.validation.ApiValidationError;
+import com.abelium.inatrace.api.exceptions.ApiUpstreamServiceException;
+import com.abelium.inatrace.components.exceptionhandling.SpringExceptionConverter;
+import com.abelium.inatrace.components.exceptionhandling.SpringExceptionResponseBuilder;
+import com.abelium.inatrace.tools.SecurityTools;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -27,17 +34,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import com.abelium.inatrace.api.ApiStatus;
-import com.abelium.inatrace.api.errors.ApiError;
-import com.abelium.inatrace.api.errors.ApiException;
-import com.abelium.inatrace.api.errors.ApiImageException;
-import com.abelium.inatrace.api.errors.HtmlPageException;
-import com.abelium.inatrace.api.errors.validation.ApiValidationError;
-import com.abelium.inatrace.api.exceptions.ApiUpstreamServiceException;
-import com.abelium.inatrace.components.exceptionhandling.SpringExceptionConverter;
-import com.abelium.inatrace.components.exceptionhandling.SpringExceptionResponseBuilder;
-import com.abelium.inatrace.tools.SecurityTools;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import java.io.IOException;
+import java.util.concurrent.CompletionException;
 
 @ControllerAdvice
 public class DefaultControllerExceptionHandler {

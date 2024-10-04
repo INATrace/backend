@@ -3,10 +3,9 @@ package com.abelium.inatrace.tools;
 import com.abelium.inatrace.api.ApiPaginatedList;
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.types.PaginatedRequestType;
-import org.torpedoquery.jpa.Torpedo;
-
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaQuery;
+import org.torpedoquery.jakarta.jpa.Torpedo;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -46,7 +45,7 @@ public class PaginationTools
     }
     
     public static <DBT, APIT> ApiPaginatedList<APIT> createPaginatedResponse1(EntityManager em, ApiPaginatedRequest request, 
-            Supplier<org.torpedoquery.jpa.Function<DBT>> proxyObjectSupplier, Function<DBT, APIT> typeConverter) {
+            Supplier<org.torpedoquery.jakarta.jpa.Function<DBT>> proxyObjectSupplier, Function<DBT, APIT> typeConverter) {
         List<APIT> items;
         long count;
         

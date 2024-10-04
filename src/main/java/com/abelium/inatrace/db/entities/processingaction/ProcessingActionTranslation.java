@@ -2,17 +2,11 @@ package com.abelium.inatrace.db.entities.processingaction;
 
 import com.abelium.inatrace.db.base.TranslatedEntity;
 import com.abelium.inatrace.types.Language;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Version;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(indexes = { @Index(columnList = "processingaction_id, language, name") })
+@Table(indexes = {@Index(columnList = "processingaction_id, language, name") })
 public class ProcessingActionTranslation extends TranslatedEntity {
 
 	@Version

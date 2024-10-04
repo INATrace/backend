@@ -1,11 +1,11 @@
 package com.abelium.inatrace.components.beycoorder.api;
 
 import com.abelium.inatrace.types.BeycoQualitySegmentType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiBeycoCoffeeQuality {
 
-    @ApiModelProperty(value = "Quality of coffee beans")
+    @Schema(description = "Quality of coffee beans")
     private BeycoQualitySegmentType type;
 
     public BeycoQualitySegmentType getType() {

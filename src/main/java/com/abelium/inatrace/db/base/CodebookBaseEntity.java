@@ -1,7 +1,7 @@
 package com.abelium.inatrace.db.base;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 
 /**
  * Superclass for base codebook entities.

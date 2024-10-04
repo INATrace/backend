@@ -1,12 +1,9 @@
 package com.abelium.inatrace.components.exceptionhandling;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.abelium.inatrace.api.ApiStatus;
+import com.abelium.inatrace.api.errors.ApiError;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
@@ -16,17 +13,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.stereotype.Component;
-import com.abelium.inatrace.api.ApiStatus;
-import com.abelium.inatrace.api.errors.ApiError;
+import org.springframework.util.MimeTypeUtils;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 @Lazy
 @Component
 public class SpringExceptionResponseBuilder {
 
     private static final MediaType TEXT_ANY = MediaType.valueOf("text/*");
-
-	//    @Autowired
-	//    private HandlerMapping handlerMapping;
     
     @Autowired
     private MappingJackson2HttpMessageConverter springJacksonConverter;
@@ -71,8 +68,8 @@ public class SpringExceptionResponseBuilder {
             springJacksonConverter.write(responseObj, MediaType.APPLICATION_JSON, new ServletServerHttpResponse(response));
         } else {
             // TODO: correctly negotiate response content type
-            MediaType.sortBySpecificity(accepted);
-            if (accepted.size() > 0 && !accepted.get(0).isWildcardType()) {
+            MimeTypeUtils.sortBySpecificity(accepted);
+            if (!accepted.isEmpty() && !accepted.get(0).isWildcardType()) {
                 response.setHeader(HttpHeaders.CONTENT_TYPE, accepted.get(0).toString());
             }
             response.getOutputStream().flush();

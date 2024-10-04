@@ -2,7 +2,7 @@ package com.abelium.inatrace.components.stockorder.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
@@ -11,22 +11,22 @@ import java.util.List;
 @Validated
 public class ApiStockOrderHistoryTimelineItem extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "The Processing order representing this processing step (used when not Purchase order)")
+	@Schema(description = "The Processing order representing this processing step (used when not Purchase order)")
 	private ApiProcessingOrder processingOrder;
 
-	@ApiModelProperty(value = "Processing evidence types stored values for this stock order")
+	@Schema(description = "Processing evidence types stored values for this stock order")
 	private List<ApiStockOrderEvidenceTypeValue> requiredEvidenceDocuments;
 
-	@ApiModelProperty(value = "Other processing evidence documents - evidence types that can be provided but are not mandatory")
+	@Schema(description = "Other processing evidence documents - evidence types that can be provided but are not mandatory")
 	private List<ApiStockOrderEvidenceTypeValue> otherEvidenceDocuments;
 
-	@ApiModelProperty(value = "Stock order representing this processing step (used in Purchase orders)")
+	@Schema(description = "Stock order representing this processing step (used in Purchase orders)")
 	private ApiStockOrder stockOrder;
 
-	@ApiModelProperty(value = "Aggregated Purchase orders")
+	@Schema(description = "Aggregated Purchase orders")
 	private List<ApiStockOrder> purchaseOrders;
 
-	@ApiModelProperty(value = "Depth of aggregation history")
+	@Schema(description = "Depth of aggregation history")
 	private Integer depth;
 
 	public ApiProcessingOrder getProcessingOrder() {

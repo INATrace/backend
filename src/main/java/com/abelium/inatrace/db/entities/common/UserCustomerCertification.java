@@ -1,8 +1,7 @@
 package com.abelium.inatrace.db.entities.common;
 
 import com.abelium.inatrace.db.base.BaseEntity;
-
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 /**

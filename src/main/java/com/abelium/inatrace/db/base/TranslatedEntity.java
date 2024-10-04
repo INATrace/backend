@@ -1,14 +1,12 @@
-
 package com.abelium.inatrace.db.base;
-
-import java.util.EnumSet;
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.MappedSuperclass;
 
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.types.Language;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.MappedSuperclass;
+import java.util.EnumSet;
 
 /**
  * Base class for "translated entity" (entity with language)

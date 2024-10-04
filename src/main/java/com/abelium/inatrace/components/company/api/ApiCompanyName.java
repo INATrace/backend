@@ -1,13 +1,13 @@
 package com.abelium.inatrace.components.company.api;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiCompanyName extends ApiCompanyBase {
 
-	@ApiModelProperty(value = "company name", position = 2)
+	@Schema(description = "company name")
 	public String name;
 
-	@ApiModelProperty(value = "company abbreviation", position = 3)
+	@Schema(description = "company abbreviation")
 	public String abbreviation;
 
 	@Override

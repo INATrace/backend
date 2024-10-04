@@ -8,15 +8,18 @@ import com.abelium.inatrace.db.entities.payment.PaymentStatus;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
 
@@ -37,33 +40,33 @@ public class PaymentController {
 	}
 
 	@GetMapping("{id}")
-	@ApiOperation("Get a single payment with the provided ID.")
+	@Operation(summary = "Get a single payment with the provided ID.")
 	public ApiResponse<ApiPayment> getPayment(
 			@AuthenticationPrincipal CustomUserDetails authUser,
-			@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @Parameter(description = "Payment ID", required = true) @PathVariable("id") Long id) throws ApiException {
 		return new ApiResponse<>(paymentService.getPayment(id, authUser));
 	}
 	
 	@GetMapping("bulk-payment/{id}")
-	@ApiOperation("Get a single bulk payment with the provided ID.")
+	@Operation(summary = "Get a single bulk payment with the provided ID.")
 	public ApiResponse<ApiBulkPayment> getBulkPayment(
-			@Valid @ApiParam(value = "Bulk payment ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "Bulk payment ID", required = true) @PathVariable("id") Long id,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
 		return new ApiResponse<>(paymentService.getBulkPayment(id, authUser));
 	}
 
 	@GetMapping("list/purchase/{id}")
-	@ApiOperation("Get a list of payments by purchase order (stock order) ID.")
+	@Operation(summary = "Get a list of payments by purchase order (stock order) ID.")
 	public ApiPaginatedResponse<ApiPayment> listPaymentsByPurchase(
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid ApiPaginatedRequest request,
-			@Valid @ApiParam(value = "Purchase ID", required = true) @PathVariable("id") Long purchaseId,
-			@Valid @ApiParam(value = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
-			@Valid @ApiParam(value = "Payment status") @RequestParam(value = "paymentStatus", required = false) PaymentStatus paymentStatus,
-			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
-			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
-			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws ApiException {
+			@Valid @Parameter(description = "Purchase ID", required = true) @PathVariable("id") Long purchaseId,
+			@Valid @Parameter(description = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
+			@Valid @Parameter(description = "Payment status") @RequestParam(value = "paymentStatus", required = false) PaymentStatus paymentStatus,
+			@Valid @Parameter(description = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+			@Valid @Parameter(description = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
+			@Valid @Parameter(description = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName) throws ApiException {
 
 		return new ApiPaginatedResponse<>(paymentService.getPaymentList(
 				request,
@@ -83,18 +86,18 @@ public class PaymentController {
 	}
 
 	@GetMapping("list/company/{id}")
-	@ApiOperation("Get a list of payments by company ID.")
+	@Operation(summary = "Get a list of payments by company ID.")
 	public ApiPaginatedResponse<ApiPayment> listPaymentsByCompany(
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid ApiPaginatedRequest request,
-			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
-			@Valid @ApiParam(value = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
-			@Valid @ApiParam(value = "Payment status") @RequestParam(value = "paymentStatus", required = false) PaymentStatus paymentStatus,
-			@Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
-			@Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
-			@Valid @ApiParam(value = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName,
-			@Valid @ApiParam(value = "Search by farmer id") @RequestParam(value = "farmerId", required = false) Long farmerId,
-			@Valid @ApiParam(value = "Search by representative of farmer id") @RequestParam(value = "representativeOfRecipientUserCustomerId", required = false) Long representativeOfRecipientUserCustomerId) throws ApiException {
+			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @Parameter(description = "Preferred way of payment") @RequestParam(value = "preferredWayOfPayment", required = false) PreferredWayOfPayment preferredWayOfPayment,
+			@Valid @Parameter(description = "Payment status") @RequestParam(value = "paymentStatus", required = false) PaymentStatus paymentStatus,
+			@Valid @Parameter(description = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+			@Valid @Parameter(description = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
+			@Valid @Parameter(description = "Search by farmer name") @RequestParam(value = "query", required = false) String farmerName,
+			@Valid @Parameter(description = "Search by farmer id") @RequestParam(value = "farmerId", required = false) Long farmerId,
+			@Valid @Parameter(description = "Search by representative of farmer id") @RequestParam(value = "representativeOfRecipientUserCustomerId", required = false) Long representativeOfRecipientUserCustomerId) throws ApiException {
 
 		return new ApiPaginatedResponse<>(paymentService.getPaymentList(
 				request,
@@ -112,11 +115,16 @@ public class PaymentController {
 		));
 	}
 
-	@GetMapping("export/company/{id}")
-	@ApiOperation("Export payments for provided company ID")
+	@GetMapping(value = "export/company/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	@Operation(summary = "Export payments for provided company ID")
+	@ApiResponses({
+			@io.swagger.v3.oas.annotations.responses.ApiResponse(
+					content = @Content(schema = @Schema(type = "string", format = "binary"))
+			)
+	})
 	public ResponseEntity<byte[]> exportPaymentsByCompany(
 			@AuthenticationPrincipal CustomUserDetails authUser,
-			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long companyId,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
 	) throws ApiException {
 
@@ -133,9 +141,9 @@ public class PaymentController {
 	}
 
 	@GetMapping("list/bulk-payment/company/{id}")
-	@ApiOperation("Get a list of bulk payments by company ID.")
+	@Operation(summary = "Get a list of bulk payments by company ID.")
 	public ApiPaginatedResponse<ApiBulkPayment> listBulkPaymentsByCompany(
-		@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+		@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long companyId,
 		@AuthenticationPrincipal CustomUserDetails authUser,
 		@Valid ApiPaginatedRequest request) throws ApiException {
 
@@ -146,11 +154,16 @@ public class PaymentController {
 		);
 	}
 
-	@GetMapping("export/bulk-payment/company/{id}")
-	@ApiOperation("Export bulk-payments for provided company ID")
+	@GetMapping(value = "export/bulk-payment/company/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	@Operation(summary = "Export bulk-payments for provided company ID")
+	@ApiResponses({
+			@io.swagger.v3.oas.annotations.responses.ApiResponse(
+					content = @Content(schema = @Schema(type = "string", format = "binary"))
+			)
+	})
 	public ResponseEntity<byte[]> exportBulkPaymentsByCompany(
 			@AuthenticationPrincipal CustomUserDetails authUser,
-			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long companyId,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
 	) throws ApiException {
 
@@ -167,7 +180,8 @@ public class PaymentController {
 	}
 
 	@PutMapping
-	@ApiOperation("Create or update payment. If ID is provided, then the entity with the provided ID is updated.")
+	@Operation(
+			summary = "Create or update payment. If ID is provided, then the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdatePayment(
 			@Valid @RequestBody ApiPayment apiPayment,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
@@ -176,7 +190,7 @@ public class PaymentController {
 	}
 	
 	@PostMapping("bulk-payment")
-	@ApiOperation("Create bulk payment.")
+	@Operation(summary = "Create bulk payment.")
 	public ApiResponse<ApiBaseEntity> createBulkPayment(
 			@Valid @RequestBody ApiBulkPayment apiBulkPayment,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
@@ -185,9 +199,9 @@ public class PaymentController {
 	}
 
 	@DeleteMapping("{id}")
-	@ApiOperation("Deletes a payment with the provided ID.")
+	@Operation(summary = "Deletes a payment with the provided ID.")
 	public ApiDefaultResponse deletePayment(
-			@Valid @ApiParam(value = "Payment ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "Payment ID", required = true) @PathVariable("id") Long id,
 			@AuthenticationPrincipal CustomUserDetails authUser) throws ApiException {
 
 		paymentService.deletePayment(id, authUser);

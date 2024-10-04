@@ -1,15 +1,14 @@
 package com.abelium.inatrace.api;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import com.abelium.inatrace.db.base.BaseEntity;
 
-import io.swagger.annotations.ApiModelProperty;
-
 @Validated
 public class ApiBaseEntity {
 	
-	@ApiModelProperty(value = "Entity id", position = 0)
+	@Schema(description = "Entity id")
 	public Long id;
 	
 	public ApiBaseEntity() {

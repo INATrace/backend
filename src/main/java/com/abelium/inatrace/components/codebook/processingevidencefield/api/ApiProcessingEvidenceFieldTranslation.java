@@ -2,14 +2,14 @@ package com.abelium.inatrace.components.codebook.processingevidencefield.api;
 
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.types.Language;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiProcessingEvidenceFieldTranslation extends BaseEntity {
 
-    @ApiModelProperty(value = "Processing evidence field label")
+    @Schema(description = "Processing evidence field label")
     private String label;
 
-    @ApiModelProperty(value = "Processing evidence field language")
+    @Schema(description = "Processing evidence field language")
     private Language language;
 
     public String getLabel() {

@@ -1,14 +1,16 @@
 package com.abelium.inatrace.components.common;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import java.time.Duration;
 import java.util.UUID;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
-
 public class StorageKeyCache {
-	
+
+	private static final Cache<String, CacheValue> cache = CacheBuilder.newBuilder().
+			expireAfterWrite(Duration.ofMinutes(120)).
+			build();
+
 	public static class CacheValue {
 		String dbStorageKey;	// Storage key in the database
 		Long userId;			// user allowed to access a document, null if public
@@ -18,11 +20,6 @@ public class StorageKeyCache {
 			this.userId = userId;
 		}
 	}
-	
-	private static Cache<String, CacheValue> cache = CacheBuilder.newBuilder().
-		expireAfterWrite(Duration.ofMinutes(120)).
-		build(); 
-	
 
 	public static String put(String storageKey, Long userId) {
 		if (storageKey == null) return null;

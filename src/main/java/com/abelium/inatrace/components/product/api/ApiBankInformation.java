@@ -1,22 +1,22 @@
 package com.abelium.inatrace.components.product.api;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 
 @Validated
 public class ApiBankInformation {
 
-    @ApiModelProperty(value = "Account holder name")
+    @Schema(description = "Account holder name")
     public String accountHolderName;
 
-    @ApiModelProperty(value = "Account number")
+    @Schema(description = "Account number")
     public String accountNumber;
 
-    @ApiModelProperty(value = "Bank name")
+    @Schema(description = "Bank name")
     public String bankName;
 
-    @ApiModelProperty(value = "Additional information")
+    @Schema(description = "Additional information")
     public String additionalInformation;
 
     public String getAccountHolderName() {

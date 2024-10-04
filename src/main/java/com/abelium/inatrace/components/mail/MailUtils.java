@@ -3,13 +3,13 @@ package com.abelium.inatrace.components.mail;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 
-import javax.activation.DataHandler;
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeUtility;
-import javax.mail.util.ByteArrayDataSource;
+import jakarta.activation.DataHandler;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeUtility;
+import jakarta.mail.util.ByteArrayDataSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.mail.javamail.MimeMessageHelper;

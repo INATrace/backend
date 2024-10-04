@@ -6,9 +6,9 @@ import com.abelium.inatrace.components.common.BaseService;
 import com.abelium.inatrace.components.groupstockorder.api.ApiGroupStockOrder;
 import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.types.Language;
+import jakarta.persistence.TypedQuery;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import javax.persistence.TypedQuery;
 
 @Lazy
 @Service

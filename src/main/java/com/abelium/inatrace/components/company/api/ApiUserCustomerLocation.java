@@ -1,11 +1,11 @@
 package com.abelium.inatrace.components.company.api;
 
 import com.abelium.inatrace.components.product.api.ApiLocation;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiUserCustomerLocation extends ApiLocation {
 
-    @ApiModelProperty(value = "Is location publicly visible on a map")
+    @Schema(description = "Is location publicly visible on a map")
     private Boolean isPubliclyVisible;
 
     public Boolean getPubliclyVisible() {

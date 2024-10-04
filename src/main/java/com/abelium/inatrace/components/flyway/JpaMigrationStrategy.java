@@ -1,7 +1,6 @@
 package com.abelium.inatrace.components.flyway;
 
-import javax.persistence.EntityManagerFactory;
-
+import jakarta.persistence.EntityManagerFactory;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.ClassicConfiguration;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;

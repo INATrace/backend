@@ -2,12 +2,7 @@ package com.abelium.inatrace.components.groupstockorder.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.db.entities.stockorder.enums.OrderType;
-import com.abelium.inatrace.tools.converters.SimpleDateConverter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
-import org.apache.tomcat.jni.Local;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -50,46 +45,46 @@ public class ApiGroupStockOrder extends ApiBaseEntity {
         setGroupedIds(Arrays.stream(groupedIds.split(",")).map(Long::parseLong).collect(Collectors.toList()));
     }
 
-    @ApiModelProperty(value = "List of stock order ID's, belonging to this group")
+    @Schema(description = "List of stock order ID's, belonging to this group")
     private List<Long> groupedIds;
 
-    @ApiModelProperty(value = "Production date")
+    @Schema(description = "Production date")
     private LocalDate productionDate;
 
-    @ApiModelProperty(value = "Timestamp indicates when process order have been updated")
+    @Schema(description = "Timestamp indicates when process order have been updated")
     private Instant updateTimestamp;
 
-    @ApiModelProperty(value = "Internal LOT number")
+    @Schema(description = "Internal LOT number")
     private String internalLotNumber;
 
-    @ApiModelProperty(value = "Number of sacs (if the order was repackaged)")
+    @Schema(description = "Number of sacs (if the order was repackaged)")
     private Long noOfSacs;
 
-    @ApiModelProperty(value = "Order type")
+    @Schema(description = "Order type")
     private OrderType orderType;
 
-    @ApiModelProperty(value = "Semi product name")
+    @Schema(description = "Semi product name")
     private String semiProductName;
 
-    @ApiModelProperty(value = "Final product name")
+    @Schema(description = "Final product name")
     private String finalProductName;
 
-    @ApiModelProperty(value = "Total quantity")
+    @Schema(description = "Total quantity")
     private BigDecimal totalQuantity;
 
-    @ApiModelProperty(value = "Fulfilled quantity")
+    @Schema(description = "Fulfilled quantity")
     private BigDecimal fulfilledQuantity;
 
-    @ApiModelProperty(value = "Available quantity")
+    @Schema(description = "Available quantity")
     private BigDecimal availableQuantity;
 
-    @ApiModelProperty(value = "Measurement unit")
+    @Schema(description = "Measurement unit")
     private String unitLabel;
 
-    @ApiModelProperty(value = "Delivery time")
+    @Schema(description = "Delivery time")
     private LocalDate deliveryTime;
 
-    @ApiModelProperty(value = "Is stock available")
+    @Schema(description = "Is stock available")
     private Boolean isAvailable;
 
     public Instant getUpdateTimestamp() {

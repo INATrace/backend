@@ -5,8 +5,8 @@ import com.abelium.inatrace.db.entities.processingaction.ProcessingAction;
 import com.abelium.inatrace.tools.Queries;
 import org.springframework.core.env.Environment;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import java.util.List;
 
 public class V2023_05_24_12_11__Rename__Role__ADMIN__into__SYSTEM_ADMIN implements JpaMigration {

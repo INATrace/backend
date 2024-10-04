@@ -26,6 +26,7 @@ import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.tools.QueryTools;
 import com.abelium.inatrace.tools.TranslateTools;
 import com.abelium.inatrace.types.Language;
+import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -35,10 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.torpedoquery.jpa.OnGoingLogicalCondition;
-import org.torpedoquery.jpa.Torpedo;
-
-import javax.transaction.Transactional;
+import org.torpedoquery.jakarta.jpa.OnGoingLogicalCondition;
+import org.torpedoquery.jakarta.jpa.Torpedo;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -78,7 +77,7 @@ public class PaymentService extends BaseService {
 		Payment payment = fetchEntity(id, Payment.class);
 
 		// Check that the request user is enrolled in the paying company (owner company)
-		PermissionsUtil.checkUserIfCompanyEnrolled(payment.getPayingCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(payment.getPayingCompany().getUsers().stream().toList(), user);
 
 		return PaymentMapper.toApiPayment(payment, user.getUserId());
 	}
@@ -88,7 +87,7 @@ public class PaymentService extends BaseService {
 		BulkPayment bulkPayment = fetchEntity(id, BulkPayment.class);
 
 		// Check that the request user is enrolled in the paying company (bulk payment owner company)
-		PermissionsUtil.checkUserIfCompanyEnrolled(bulkPayment.getPayingCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(bulkPayment.getPayingCompany().getUsers().stream().toList(), user);
 
 		return BulkPaymentMapper.toApiBulkPayment(bulkPayment, user.getUserId());
 	}
@@ -101,11 +100,11 @@ public class PaymentService extends BaseService {
 
 		if (queryRequest.companyId != null) {
 			Company company = companyQueries.fetchCompany(queryRequest.companyId);
-			PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+			PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
 		} else {
 			// Check that the stock order exists and also validate that request user is enrolled in stock order owner company
 			StockOrder stockOrder = stockOrderService.fetchEntity(queryRequest.purchaseId, StockOrder.class);
-			PermissionsUtil.checkUserIfCompanyEnrolled(stockOrder.getCompany().getUsers(), user);
+			PermissionsUtil.checkUserIfCompanyEnrolled(stockOrder.getCompany().getUsers().stream().toList(), user);
 		}
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> paymentQueryObject(
@@ -286,7 +285,7 @@ public class PaymentService extends BaseService {
 		}
 
 		Company company = companyQueries.fetchCompany(queryRequest.companyId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request, () -> bulkPaymentQueryObject(
 				request, queryRequest), bulkPayment -> BulkPaymentMapper.toApiBulkPaymentBase(bulkPayment, user.getUserId()));
@@ -384,7 +383,7 @@ public class PaymentService extends BaseService {
 		if (entity.getId() != null) {
 
 			// Check if the request user is enrolled in the owner company
-			PermissionsUtil.checkUserIfCompanyEnrolled(entity.getPayingCompany().getUsers(), user);
+			PermissionsUtil.checkUserIfCompanyEnrolled(entity.getPayingCompany().getUsers().stream().toList(), user);
 
 			// Do not allow update of fields other than the payment status
 			// Also it is not allowed to set back the value to UNCONFIRMED
@@ -408,7 +407,7 @@ public class PaymentService extends BaseService {
 			StockOrder stockOrder = fetchEntity(apiPayment.getStockOrder().getId(), StockOrder.class);
 
 			// Check that the request user is enrolled in the stock order owner company (the company that initiates the payment)
-			PermissionsUtil.checkUserIfCompanyEnrolled(stockOrder.getCompany().getUsers(), user);
+			PermissionsUtil.checkUserIfCompanyEnrolled(stockOrder.getCompany().getUsers().stream().toList(), user);
 
 			if (stockOrder.getOrderType() != OrderType.PURCHASE_ORDER && stockOrder.getOrderType() != OrderType.GENERAL_ORDER) {
 				throw new ApiException(ApiStatus.VALIDATION_ERROR, "Not a Purchase or Quote order");
@@ -521,7 +520,7 @@ public class PaymentService extends BaseService {
 		Company payingCompany = fetchEntity(apiBulkPayment.getPayingCompany().getId(), Company.class);
 
 		// Check that the request user is enrolled in the paying company (the company that initiates the payment)
-		PermissionsUtil.checkUserIfCompanyEnrolled(payingCompany.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(payingCompany.getUsers().stream().toList(), user);
 
 		BulkPayment entity = new BulkPayment();
 
@@ -579,7 +578,7 @@ public class PaymentService extends BaseService {
 		Payment payment = fetchEntity(id, Payment.class);
 
 		// Check that the request user is enrolled in the paying company (the company that initiated the payment)
-		PermissionsUtil.checkUserIfCompanyEnrolled(payment.getPayingCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(payment.getPayingCompany().getUsers().stream().toList(), user);
 
 		User currentUser = userService.fetchUserById(user.getUserId());
 		StockOrder stockOrder = payment.getStockOrder();

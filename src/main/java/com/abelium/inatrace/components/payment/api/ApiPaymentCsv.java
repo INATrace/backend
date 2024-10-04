@@ -11,34 +11,34 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.math.BigDecimal;
 import java.time.Instant;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiPaymentCsv extends ApiBaseEntity {
 
 	
-	@ApiModelProperty(value = "Payment purpose type")
+	@Schema(description = "Payment purpose type")
 	private PaymentPurposeType paymentPurposeType;
 	
-	@ApiModelProperty(value = "Payment amount paid to the farmer")
+	@Schema(description = "Payment amount paid to the farmer")
 	private BigDecimal amountPaidToTheFarmer;
 	
-	@ApiModelProperty(value = "Farmer name")
+	@Schema(description = "Farmer name")
 	private String farmerName;
 	
-	@ApiModelProperty(value = "Delivery time")
+	@Schema(description = "Delivery time")
 	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
 	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
     private Instant deliveryTime;
 	
-	@ApiModelProperty(value = "Payment date")
+	@Schema(description = "Payment date")
 	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
 	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
     private Instant paymentDate;
 	
-	@ApiModelProperty(value = "Payment status")
+	@Schema(description = "Payment status")
 	private PaymentStatus paymentStatus;
 	
-	@ApiModelProperty(value = "Preferred way of payment")
+	@Schema(description = "Preferred way of payment")
 	private PreferredWayOfPayment preferredWayOfPayment;
 
 	public PaymentPurposeType getPaymentPurposeType() {

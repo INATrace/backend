@@ -5,7 +5,7 @@ import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.types.KnowledgeBlogType;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,23 +1,23 @@
 package com.abelium.inatrace.components.beycoorder.api;
 
 import com.abelium.inatrace.types.TokenGrantType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiBeycoTokenRequest {
 
-    @ApiModelProperty(value = "Type of grant")
+    @Schema(description = "Type of grant")
     private TokenGrantType grantType;
 
-    @ApiModelProperty(value = "ID of client application")
+    @Schema(description = "ID of client application")
     private String clientId;
 
-    @ApiModelProperty(value = "Belonging secret of client application")
+    @Schema(description = "Belonging secret of client application")
     private String clientSecret;
 
-    @ApiModelProperty(value = "Authorization code of a user")
+    @Schema(description = "Authorization code of a user")
     private String code;
 
-    @ApiModelProperty(value = "Refresh token")
+    @Schema(description = "Refresh token")
     private String refreshToken;
 
     public TokenGrantType getGrantType() {

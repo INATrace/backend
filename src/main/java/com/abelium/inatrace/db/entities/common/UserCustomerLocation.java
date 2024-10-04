@@ -1,7 +1,7 @@
 package com.abelium.inatrace.db.entities.common;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 
 @Entity
 public class UserCustomerLocation extends Location {

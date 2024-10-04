@@ -4,7 +4,7 @@ import com.abelium.inatrace.components.flyway.JpaMigration;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
 import org.springframework.core.env.Environment;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 /**

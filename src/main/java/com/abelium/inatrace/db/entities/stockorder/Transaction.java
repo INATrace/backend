@@ -9,10 +9,8 @@ import com.abelium.inatrace.db.entities.facility.Facility;
 import com.abelium.inatrace.db.entities.processingorder.ProcessingOrder;
 import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.stockorder.enums.TransactionStatus;
-
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
-
 
 @NamedQueries({
 @NamedQuery(

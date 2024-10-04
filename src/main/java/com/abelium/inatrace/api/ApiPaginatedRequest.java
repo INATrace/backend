@@ -1,34 +1,33 @@
 package com.abelium.inatrace.api;
 
-import javax.validation.constraints.Min;
-
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.types.PaginatedRequestType;
 import com.abelium.inatrace.types.SortDirection;
+import io.swagger.v3.oas.annotations.Parameter;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiParam;
+import jakarta.validation.constraints.Min;
 
 @Validated
+@ParameterObject
 public class ApiPaginatedRequest {
 
-	@ApiParam(value = "Only count, only fetch, or return both values (if null)") 
+	@Parameter(description = "Only count, only fetch, or return both values (if null)")
 	public PaginatedRequestType requestType = null;
 	
     @Min(1)
-    @ApiParam(value = "Number of records to return. Min: 1, default: 100", defaultValue = "100")
+    @Parameter(description = "Number of records to return. Min: 1, default: 100")
     public int limit = 100;
 
     @Min(0)
-    @ApiParam(value = "Number of records to skip before returning. Default: 0, min: 0", defaultValue = "0")
+    @Parameter(description = "Number of records to skip before returning. Default: 0, min: 0")
     public int offset = 0;
 
-    @ApiParam(value = "Column name to be sorted by, varies for each endpoint, default is id")
+    @Parameter(description = "Column name to be sorted by, varies for each endpoint, default is id")
     public String sortBy = "id";
 
-    @ApiParam(value = "Direction of sorting (ASC or DESC). Default DESC.", defaultValue = "DESC")
+    @Parameter(description = "Direction of sorting (ASC or DESC). Default DESC.")
     public SortDirection sort = SortDirection.DESC;
-
     
     public PaginatedRequestType getRequestType() {
 		return requestType;

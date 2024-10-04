@@ -1,11 +1,7 @@
 package com.abelium.inatrace.db.entities.codebook;
 
 import com.abelium.inatrace.db.base.CodebookBaseEntity;
-import com.abelium.inatrace.db.entities.facility.Facility;
-
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Entity;
 
 /**
  * Codebook entity for facility types.

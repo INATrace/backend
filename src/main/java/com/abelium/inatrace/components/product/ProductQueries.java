@@ -1,6 +1,6 @@
 package com.abelium.inatrace.components.product;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import com.abelium.inatrace.components.common.BaseService;
 import org.springframework.context.annotation.Lazy;

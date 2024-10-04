@@ -1,24 +1,24 @@
 package com.abelium.inatrace.components.company.api;
 
+import com.abelium.inatrace.components.company.types.CompanyAction;
+import com.abelium.inatrace.types.ProductCompanyType;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.abelium.inatrace.components.company.types.CompanyAction;
-import com.abelium.inatrace.types.ProductCompanyType;
-import io.swagger.annotations.ApiModelProperty;
-
 public class ApiCompanyGet extends ApiCompany {
 
-	@ApiModelProperty("Possible actions")
+	@Schema(description = "Possible actions")
 	public List<CompanyAction> actions = new ArrayList<>();
 
-	@ApiModelProperty("Company users")
+	@Schema(description = "Company users")
 	public List<ApiCompanyUser> users = new ArrayList<>();
 
-	@ApiModelProperty("Roles by which this company is connected in the Products where it is part of")
+	@Schema(description = "Roles by which this company is connected in the Products where it is part of")
 	public List<ProductCompanyType> companyRoles;
 
-	@ApiModelProperty("Flag indicating that the company supports collectors for deliveries")
+	@Schema(description = "Flag indicating that the company supports collectors for deliveries")
 	public Boolean supportsCollectors;
 
 	public List<CompanyAction> getActions() {

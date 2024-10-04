@@ -1,11 +1,11 @@
 package com.abelium.inatrace.components.beycoorder.api;
 
 import com.abelium.inatrace.types.BeycoGradeType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiBeycoCoffeeGrade {
 
-    @ApiModelProperty(value = "Grade of coffee beans")
+    @Schema(description = "Grade of coffee beans")
     private BeycoGradeType type;
 
     public BeycoGradeType getType() {

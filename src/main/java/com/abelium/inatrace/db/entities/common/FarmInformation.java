@@ -1,8 +1,9 @@
 package com.abelium.inatrace.db.entities.common;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.MappedSuperclass;
+
 import java.math.BigDecimal;
 import java.util.Date;
 

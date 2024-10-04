@@ -6,7 +6,7 @@ import com.abelium.inatrace.components.company.api.ApiUserCustomer;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.user.api.ApiUser;
 import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Instant;
@@ -16,39 +16,39 @@ import java.util.List;
 @Validated
 public class ApiPurchaseOrder extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "Timestamp indicates when purchase order have been updated", position = 2)
+	@Schema(description = "Timestamp indicates when purchase order have been updated")
 	private Instant updateTimestamp;
 
-	@ApiModelProperty(value = "User that has created PurchaseOrder")
+	@Schema(description = "User that has created PurchaseOrder")
 	private ApiUser createdBy;
 
-	@ApiModelProperty(value = "ID of the user who has created the stock order")
+	@Schema(description = "ID of the user who has created the stock order")
 	public Long creatorId;
 
-	@ApiModelProperty(value = "User that has last updated PurchaseOrder")
+	@Schema(description = "User that has last updated PurchaseOrder")
 	private ApiUser updatedBy;
 
-	@ApiModelProperty(value = "Delivery date")
+	@Schema(description = "Delivery date")
 	private LocalDate deliveryTime;
 
-	@ApiModelProperty(value = "Production date")
+	@Schema(description = "Production date")
 	public LocalDate productionDate;
 
-	@ApiModelProperty(value = "Currency")
+	@Schema(description = "Currency")
 	public String currency;
 
-	@ApiModelProperty(value = "Representative of producer user customer. E.g. collector.")
+	@Schema(description = "Representative of producer user customer. E.g. collector.")
 	public ApiUserCustomer representativeOfProducerUserCustomer;
 
 	private List<ApiPurchaseOrderFarmer> farmers;
 
-	@ApiModelProperty(value = "Preferred way of payment")
+	@Schema(description = "Preferred way of payment")
 	private PreferredWayOfPayment preferredWayOfPayment;
 
-	@ApiModelProperty(value = "Facility")
+	@Schema(description = "Facility")
 	public ApiFacility facility;
 
-	@ApiModelProperty(value = "Activity proofs")
+	@Schema(description = "Activity proofs")
 	public List<ApiActivityProof> activityProofs;
 
 	public Instant getUpdateTimestamp() {

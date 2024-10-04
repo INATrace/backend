@@ -1,43 +1,40 @@
 package com.abelium.inatrace.components.user.api;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.Length;
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.types.Language;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Validated
 public class ApiCreateUserRequest {
 	
     @NotNull
-	@Length(max = Lengths.EMAIL)
+	@Size(max = Lengths.EMAIL)
 	@Email
-    @ApiModelProperty(required = true, value = "Email (username).", position = 0)
+    @Schema(description = "Email (username).", requiredMode = Schema.RequiredMode.REQUIRED, maxLength = Lengths.EMAIL)
 	public String email;
 	
     @NotNull
-    @Length(max = Lengths.PASSWORD)
-    @ApiModelProperty(required = true, value = "Password.", position = 1)
+    @Size(max = Lengths.PASSWORD)
+    @Schema(description = "Password.", requiredMode = Schema.RequiredMode.REQUIRED, maxLength = Lengths.PASSWORD)
     public String password = null;
 
     @NotNull
-    @Length(max = Lengths.NAME)
-    @ApiModelProperty(required = true, value = "Name.", position = 2)
+    @Size(max = Lengths.NAME)
+    @Schema(description = "Name.", requiredMode = Schema.RequiredMode.REQUIRED, maxLength = Lengths.NAME)
     public String name = null;
 
     @NotNull
-    @Length(max = Lengths.SURNAME)
-    @ApiModelProperty(required = true, value = "Surname.", position = 3)
+    @Size(max = Lengths.SURNAME)
+    @Schema(description = "Surname.", requiredMode = Schema.RequiredMode.REQUIRED, maxLength = Lengths.SURNAME)
     public String surname = null;
     
-	@ApiModelProperty(value = "language", position = 4)
+	@Schema(description = "language")
 	public Language language = Language.EN;
-
     
 	public String getEmail() {
 		return email;

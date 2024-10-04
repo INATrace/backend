@@ -7,16 +7,15 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 @Configuration
 public class WebConfiguration {
-	
+
 	@Bean
     public WebMvcRegistrations webMvcRegistrationsHandlerMapping() {
         return new WebMvcRegistrations() {
-            
+
             @Override
             public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
                 return new PrefixedApiRequestHandler();
             }
-            
         };
-    }		
+    }
 }

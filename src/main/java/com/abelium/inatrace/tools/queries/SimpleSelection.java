@@ -1,11 +1,10 @@
 package com.abelium.inatrace.tools.queries;
 
+import jakarta.persistence.EntityManager;
+import org.torpedoquery.jakarta.jpa.Query;
+
 import java.util.List;
 import java.util.Optional;
-
-import javax.persistence.EntityManager;
-
-import org.torpedoquery.jpa.Query;
 
 public class SimpleSelection<S> implements Selection<S> {
     private EntityManager em;

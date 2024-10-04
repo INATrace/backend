@@ -10,7 +10,7 @@ import com.abelium.inatrace.types.Language;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -2,20 +2,18 @@ package com.abelium.inatrace.components.company.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.types.CompanyStatus;
-
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiCompanyListResponse extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "Company status")
+	@Schema(description = "Company status")
 	public CompanyStatus status;
 	
-	@ApiModelProperty(value = "Name")
+	@Schema(description = "Name")
 	public String name;
 	
-    @ApiModelProperty(value = "storage key (file on system, s3, ...).")
+    @Schema(description = "storage key (file on system, s3, ...).")
     public String logoStorageKey;
-
 
 	public CompanyStatus getStatus() {
 		return status;

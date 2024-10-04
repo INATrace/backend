@@ -4,14 +4,11 @@ import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProductLabelStatus;
+import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
@@ -28,8 +25,8 @@ public class ProductLabel extends BaseEntity {
 
 	@OneToMany(mappedBy = "productLabelId")
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	private List<ProductLabelCompanyDocument> companyDocuments = new ArrayList<>();
-	
+	private Set<ProductLabelCompanyDocument> companyDocuments = new HashSet<>();
+
 	/**
 	 * label status
 	 */
@@ -84,11 +81,11 @@ public class ProductLabel extends BaseEntity {
 		this.content = content;
 	}
 
-	public List<ProductLabelCompanyDocument> getCompanyDocuments() {
+	public Set<ProductLabelCompanyDocument> getCompanyDocuments() {
 		return companyDocuments;
 	}
 
-	public void setCompanyDocuments(List<ProductLabelCompanyDocument> companyDocuments) {
+	public void setCompanyDocuments(Set<ProductLabelCompanyDocument> companyDocuments) {
 		this.companyDocuments = companyDocuments;
 	}
 
@@ -120,7 +117,6 @@ public class ProductLabel extends BaseEntity {
 		this.language = language;
 	}
 
-	// @ElementCollection with @OrderColumn can return null elements when the order column contains gaps in values
 	public List<ProductLabelField> getFields() {
 		return fields.stream().filter(Objects::nonNull).collect(Collectors.toList());
 	}

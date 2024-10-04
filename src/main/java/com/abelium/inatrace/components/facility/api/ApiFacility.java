@@ -7,64 +7,64 @@ import com.abelium.inatrace.components.company.api.ApiCompanyBase;
 
 import com.abelium.inatrace.components.product.api.ApiFinalProduct;
 import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
 public class ApiFacility extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "Facility name")
+	@Schema(description = "Facility name")
 	private String name;
 
-	@ApiModelProperty(value = "Is collection facility")
+	@Schema(description = "Is collection facility")
 	private Boolean isCollectionFacility;
 
-	@ApiModelProperty(value = "Is public facility")
+	@Schema(description = "Is public facility")
 	private Boolean isPublic;
 
-	@ApiModelProperty(value = "Enable form control 'May involve collectors'")
+	@Schema(description = "Enable form control 'May involve collectors'")
 	private Boolean displayMayInvolveCollectors;
 
-	@ApiModelProperty(value = "Enable form control 'Organic'")
+	@Schema(description = "Enable form control 'Organic'")
 	private Boolean displayOrganic;
 
-	@ApiModelProperty(value = "Enable form control 'Price deduction damage'")
+	@Schema(description = "Enable form control 'Price deduction damage'")
 	private Boolean displayPriceDeductionDamage;
 
-	@ApiModelProperty(value = "Enable form control 'Weight deduction damage'")
+	@Schema(description = "Enable form control 'Weight deduction damage'")
 	private Boolean displayWeightDeductionDamage;
 
-	@ApiModelProperty(value = "Enable form control 'Tare'")
+	@Schema(description = "Enable form control 'Tare'")
 	private Boolean displayTare;
 
-	@ApiModelProperty(value = "Enable form control 'Women only'")
+	@Schema(description = "Enable form control 'Women only'")
 	private Boolean displayWomenOnly;
 
-	@ApiModelProperty(value = "Facility is activated")
+	@Schema(description = "Facility is activated")
 	private Boolean isDeactivated;
 
-	@ApiModelProperty(value = "Enable form control 'Price determined later'")
+	@Schema(description = "Enable form control 'Price determined later'")
 	private Boolean displayPriceDeterminedLater;
 
-	@ApiModelProperty(value = "Facility location")
+	@Schema(description = "Facility location")
 	private ApiFacilityLocation facilityLocation;
 
-	@ApiModelProperty(value = "Facility company")
+	@Schema(description = "Facility company")
 	private ApiCompanyBase company;
 
-	@ApiModelProperty(value = "Facility type")
+	@Schema(description = "Facility type")
 	private ApiFacilityType facilityType;
 
-	@ApiModelProperty(value = "List of semi product ID's for this facility")
+	@Schema(description = "List of semi product ID's for this facility")
 	private List<ApiSemiProduct> facilitySemiProductList;
 
-	@ApiModelProperty(value = "List of final product ID's for this facility")
+	@Schema(description = "List of final product ID's for this facility")
 	private List<ApiFinalProduct> facilityFinalProducts;
 
-	@ApiModelProperty(value = "List of value chains for this facility")
+	@Schema(description = "List of value chains for this facility")
 	private List<ApiValueChain> facilityValueChains;
 
-	@ApiModelProperty(value = "List of facility translations")
+	@Schema(description = "List of facility translations")
 	private List<ApiFacilityTranslation> translations;
 
 	public String getName() {
