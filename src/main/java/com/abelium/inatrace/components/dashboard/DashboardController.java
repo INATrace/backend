@@ -7,6 +7,9 @@ import com.abelium.inatrace.components.dashboard.api.*;
 import com.abelium.inatrace.types.Language;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +61,12 @@ public class DashboardController {
                 )));
     }
 
-    @GetMapping("deliveries-aggregated-data/export")
+    @GetMapping(value = "deliveries-aggregated-data/export", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> exportDeliveriesData(
             @Valid @Parameter(description = "Company ID", required = true) @RequestParam("companyId") Long companyId,
             @Valid @Parameter(description = "Facility IDs") @RequestParam(value = "facilityIds", required = false) List<Long> facilityIds,
@@ -123,8 +131,13 @@ public class DashboardController {
         return new ApiResponse<>(dashboardService.calculateProcessingPerformanceData(processingPerformanceRequest));
     }
 
-    @PostMapping(value = "processing-performance-data/export")
+    @PostMapping(value = "processing-performance-data/export", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Operation(summary ="Exports processing performance data to the requested format")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> exportProcessingPerformanceData(
             @Valid @RequestBody ApiProcessingPerformanceRequest processingPerformanceRequest,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language

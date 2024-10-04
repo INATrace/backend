@@ -10,6 +10,9 @@ import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -112,8 +115,13 @@ public class PaymentController {
 		));
 	}
 
-	@GetMapping("export/company/{id}")
+	@GetMapping(value = "export/company/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	@Operation(summary = "Export payments for provided company ID")
+	@ApiResponses({
+			@io.swagger.v3.oas.annotations.responses.ApiResponse(
+					content = @Content(schema = @Schema(type = "string", format = "binary"))
+			)
+	})
 	public ResponseEntity<byte[]> exportPaymentsByCompany(
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long companyId,
@@ -146,8 +154,13 @@ public class PaymentController {
 		);
 	}
 
-	@GetMapping("export/bulk-payment/company/{id}")
+	@GetMapping(value = "export/bulk-payment/company/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	@Operation(summary = "Export bulk-payments for provided company ID")
+	@ApiResponses({
+			@io.swagger.v3.oas.annotations.responses.ApiResponse(
+					content = @Content(schema = @Schema(type = "string", format = "binary"))
+			)
+	})
 	public ResponseEntity<byte[]> exportBulkPaymentsByCompany(
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long companyId,

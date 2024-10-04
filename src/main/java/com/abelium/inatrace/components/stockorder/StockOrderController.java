@@ -12,12 +12,14 @@ import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -252,6 +254,11 @@ public class StockOrderController {
 
     @GetMapping(value = "{id}/exportGeoData", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Operation(summary ="Generate a geoJSON file with a list of polygons.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public @ResponseBody byte[] exportGeoData(
             @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @Parameter(description = "StockOrder ID", required = true) @PathVariable("id") Long id,
@@ -265,6 +272,11 @@ public class StockOrderController {
 
     @GetMapping(value = "export/deliveries/company/{companyId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Operation(summary ="Export deliveries (stock orders of type PURCHASE_ORDER) for the provided company ID")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> exportDeliveriesByCompany(
             @AuthenticationPrincipal CustomUserDetails authUser,
             @Valid @Parameter(description = "Company ID", required = true) @PathVariable("companyId") Long companyId,

@@ -8,12 +8,15 @@ import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import jakarta.validation.Valid;
 import java.util.List;
 
@@ -213,7 +216,12 @@ public class ProductController {
     	return new ApiPaginatedResponse<>(productService.listProductLabelBatches(authUser, id, request));
     }
 
-    @GetMapping(value = "/label/{id}/instructions")
+    @GetMapping(value = "/label/{id}/instructions", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> getProductLabelInstructions(@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @Parameter(description = "Label id", required = true) @PathVariable("id") Long id) throws ApiException {
         return productDocumentEngine.createLabelsAndHowToUseInstructions(authUser, id).toResponseEntity();

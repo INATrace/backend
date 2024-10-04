@@ -17,10 +17,13 @@ import com.abelium.inatrace.components.stockorder.api.ApiQRTagPublic;
 import com.abelium.inatrace.types.Language;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -102,7 +105,7 @@ public class PublicController {
     		@Valid ApiProductLabelBatchCheckOrigin request) {
     	return new ApiResponse<>(productService.checkProductLabelBatchOriginPublic(uid, request, servletRequest));
     }
-    
+
     @PostMapping(value = "/logRequest")
     @Operation(summary = "Write data to request log for analytics")
     public ApiDefaultResponse logPublicRequest(HttpServletRequest servletRequest,
@@ -110,21 +113,36 @@ public class PublicController {
     	requestLogService.log(servletRequest, request);
     	return new ApiDefaultResponse();
     }
-    
+
+    @GetMapping(value = "/document/{storageKey}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Operation(summary = "Returns file contents for given storage key")
-    @GetMapping(value = "/document/{storageKey}")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> getPublicDocument(@Valid @PathVariable(value = "storageKey") String storageKey) throws ApiException {
         return commonService.getDocument(null, storageKey, null).toResponseEntity();
     }
-    
+
+    @GetMapping(value = "/image/{storageKey}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Operation(summary = "Returns image contents for given storage key")
-    @GetMapping(value = "/image/{storageKey}")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> getPublicImage(@Valid @PathVariable(value = "storageKey") String storageKey) throws ApiException {
         return commonService.getImage(null, storageKey, null).toResponseEntity();
     }
 
+    @GetMapping(value = "/image/{storageKey}/{size}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Operation(summary = "Returns image contents for given storage key")
-    @GetMapping(value = "/image/{storageKey}/{size}")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> getPublicResizedImage(@Valid @PathVariable(value = "storageKey") String storageKey,
     		@Valid @PathVariable(value = "size", required = false) String size) throws ApiException {
         return commonService.getImage(null, storageKey, size).toResponseEntity();

@@ -11,6 +11,9 @@ import com.abelium.inatrace.components.common.api.ApiGlobalSettingsValue;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.DocumentType;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -55,21 +58,36 @@ public class CommonController {
     }    
     
     @Operation(summary = "Returns file contents for given storage key")
-    @GetMapping(value = "/document/{storageKey}")
+    @GetMapping(value = "/document/{storageKey}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> getDocument(@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @PathVariable(value = "storageKey", required = true) String storageKey) throws ApiException {
         return commonEngine.getDocument(authUser.getUserId(), storageKey, null).toResponseEntity();
     }
     
     @Operation(summary = "Returns image contents for given storage key")
-    @GetMapping(value = "/image/{storageKey}")
+    @GetMapping(value = "/image/{storageKey}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> getImage(@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @PathVariable(value = "storageKey", required = true) String storageKey) throws ApiException {
         return commonEngine.getImage(authUser.getUserId(), storageKey, null).toResponseEntity();
     }
 
     @Operation(summary = "Returns image contents for given storage key")
-    @GetMapping(value = "/image/{storageKey}/{size}")
+    @GetMapping(value = "/image/{storageKey}/{size}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> getResizedImage(@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @PathVariable(value = "storageKey", required = true) String storageKey,
     		@Valid @PathVariable(value = "size", required = true) String size) throws ApiException {
