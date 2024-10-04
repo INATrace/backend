@@ -19,6 +19,9 @@ spring.servlet.multipart.max-file-size = 10MB
 # increase async request timeout (in milliseconds) to avoid AsyncRequestTimeoutException
 spring.mvc.async.request-timeout = 120000
 
+# Springdoc
+springdoc.default-produces-media-type = application/json
+
 # DataSource settings
 INATrace.database.name =
 INATrace.database.hostname = localhost
