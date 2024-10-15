@@ -33,12 +33,13 @@ public class CommonService extends BaseService {
         if (StringUtils.isNotBlank(request.queryString)) {
             Torpedo.where(cProxy.getName()).like().startsWith(request.queryString);
         }
-        switch (request.sortBy) {
-        	case "name": QueryTools.orderBy(request.sort, cProxy.getName()); break;
-        	default: QueryTools.orderBy(request.sort, cProxy.getId());
+        if (request.sortBy.equals("name")) {
+            QueryTools.orderBy(request.sort, cProxy.getName());
+        } else {
+            QueryTools.orderBy(request.sort, cProxy.getId());
         }
         return cProxy;
-    }	
+    }
 	
     @Transactional
     public ApiPaginatedList<ApiCountry> fetchCountryList(ApiPaginatedQueryStringRequest filterRequest) {
@@ -105,7 +106,6 @@ public class CommonService extends BaseService {
         		throw new ApiException(ApiStatus.INVALID_OR_EXPIRED_STORAGE_KEY, "Invalid storage key or storage key has expired");
         	}
     		return Queries.getUniqueBy(em, Document.class, Document::getStorageKey, storageKey);
-    		// return Queries.get(em, Document.class, ad.id);
     	}
     	
     }
@@ -114,13 +114,11 @@ public class CommonService extends BaseService {
     public Country fetchCountry(ApiCountry ac) throws ApiException {
     	if (ac == null) return null;
     	
-    	Country c = Queries.get(em, Country.class, ac.id);
+    	Country c = Queries.get(em, Country.class, ac.getId());
     	if (c == null) {
     		throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid country id");
     	}
     	return c;
     }
-
-
 
 }

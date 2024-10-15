@@ -1,6 +1,7 @@
 package com.abelium.inatrace.components.common;
 
 import com.abelium.inatrace.components.codebook.currencies.api.ApiCurrencyType;
+import com.abelium.inatrace.components.common.mappers.CountryMapper;
 import com.abelium.inatrace.db.entities.codebook.CurrencyType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -33,11 +34,7 @@ public class CommonApiTools {
         if (country == null) {
             return null;
         }
-        ApiCountry ac = new ApiCountry(); 
-        ac.id = country.getId();
-        ac.name = country.getName();
-        ac.code = country.getCode();
-        return ac;
+        return CountryMapper.toApiCountry(country);
     }
 
     public static ApiDocument toApiDocument(Document document, Long userId) {

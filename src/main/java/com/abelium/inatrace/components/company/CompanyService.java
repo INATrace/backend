@@ -791,6 +791,7 @@ public class CompanyService extends BaseService {
 
 				feature.addNumberProperty("farmerID", apiUserCustomer.getId());
 				feature.addNumberProperty("plotID", apiPlot.getId());
+				feature.addStringProperty("geoID", Optional.ofNullable(apiPlot.getGeoId()).orElse(""));
 
 				features.add(feature);
 			}
@@ -993,17 +994,28 @@ public class CompanyService extends BaseService {
 		if (userCustomer.getUserCustomerLocation().getAddress() == null) {
 			userCustomer.getUserCustomerLocation().setAddress(new Address());
 		}
+
+		// Set generic address fields
 		userCustomer.getUserCustomerLocation().getAddress().setAddress(apiUserCustomer.getLocation().getAddress().getAddress());
-		userCustomer.getUserCustomerLocation().getAddress().setCell(apiUserCustomer.getLocation().getAddress().getCell());
 		userCustomer.getUserCustomerLocation().getAddress().setCity(apiUserCustomer.getLocation().getAddress().getCity());
+		userCustomer.getUserCustomerLocation().getAddress().setState(apiUserCustomer.getLocation().getAddress().getState());
 		userCustomer.getUserCustomerLocation().getAddress().setOtherAddress(apiUserCustomer.getLocation().getAddress().getOtherAddress());
 
-		Country country = getCountry(apiUserCustomer.getLocation().getAddress().getCountry().getId());
-		userCustomer.getUserCustomerLocation().getAddress().setCountry(country);
+		// Set Rwanda specific address fields
+		userCustomer.getUserCustomerLocation().getAddress().setVillage(apiUserCustomer.getLocation().getAddress().getVillage());
+		userCustomer.getUserCustomerLocation().getAddress().setCell(apiUserCustomer.getLocation().getAddress().getCell());
+		userCustomer.getUserCustomerLocation().getAddress().setSector(apiUserCustomer.getLocation().getAddress().getSector());
+
+		// Set Honduras specific address fields
 		userCustomer.getUserCustomerLocation().getAddress().setHondurasDepartment(apiUserCustomer.getLocation().getAddress().getHondurasDepartment());
 		userCustomer.getUserCustomerLocation().getAddress().setHondurasFarm(apiUserCustomer.getLocation().getAddress().getHondurasFarm());
 		userCustomer.getUserCustomerLocation().getAddress().setHondurasMunicipality(apiUserCustomer.getLocation().getAddress().getHondurasMunicipality());
 		userCustomer.getUserCustomerLocation().getAddress().setHondurasVillage(apiUserCustomer.getLocation().getAddress().getHondurasVillage());
+
+		// Set the address country
+		Country country = getCountry(apiUserCustomer.getLocation().getAddress().getCountry().getId());
+		userCustomer.getUserCustomerLocation().getAddress().setCountry(country);
+
 		userCustomer.getUserCustomerLocation().setLatitude(apiUserCustomer.getLocation().getLatitude());
 		userCustomer.getUserCustomerLocation().setLongitude(apiUserCustomer.getLocation().getLongitude());
 		userCustomer.getUserCustomerLocation().setPubliclyVisible(apiUserCustomer.getLocation().getPubliclyVisible());
@@ -1188,6 +1200,7 @@ public class CompanyService extends BaseService {
 
 				feature = Feature.fromGeometry(Polygon.fromLngLats(List.of(polygonCoordinates)));
 			}
+			feature.addStringProperty("geoID", Optional.ofNullable(plot.getGeoId()).orElse(""));
 			features.add(feature);
 		}
 

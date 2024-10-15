@@ -100,10 +100,7 @@ INATrace.loginManager.mail =
 # info email
 INATrace.info.mail =
 
-# tokens name and expiration
-INATrace.auth.authenticationTokenCookieName = authenticationToken
-INATrace.auth.authenticationTokenExpirationSec = 31536000
-
+# Tokens name and expiration
 INATrace.auth.accessTokenCookieName = inatrace-accessToken
 INATrace.auth.accessTokenExpirationSec = 3600
 INATrace.auth.refreshTokenCookieName = inatrace-refreshToken

@@ -4,6 +4,7 @@ import com.abelium.inatrace.components.codebook.facility_type.api.ApiFacilityTyp
 import com.abelium.inatrace.components.codebook.semiproduct.SemiProductMapper;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.common.api.ApiCountry;
+import com.abelium.inatrace.components.common.mappers.CountryMapper;
 import com.abelium.inatrace.components.company.api.ApiAddress;
 import com.abelium.inatrace.components.company.mappers.CompanyMapper;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
@@ -81,7 +82,6 @@ public final class FacilityMapper {
 		// Map facility location data
 		ApiFacilityLocation apiFacilityLocation = new ApiFacilityLocation();
 		ApiAddress apiAddress = new ApiAddress();
-		ApiCountry apiCountry = new ApiCountry();
 
 		apiAddress.setAddress(entity.getFacilityLocation().getAddress().getAddress());
 		apiAddress.setCity(entity.getFacilityLocation().getAddress().getCity());
@@ -91,10 +91,7 @@ public final class FacilityMapper {
 		apiAddress.setSector(entity.getFacilityLocation().getAddress().getSector());
 		apiAddress.setVillage(entity.getFacilityLocation().getAddress().getVillage());
 
-		apiCountry.setId(entity.getFacilityLocation().getAddress().getCountry().getId());
-		apiCountry.setCode(entity.getFacilityLocation().getAddress().getCountry().getCode());
-		apiCountry.setName(entity.getFacilityLocation().getAddress().getCountry().getName());
-		apiAddress.setCountry(apiCountry);
+		apiAddress.setCountry(CountryMapper.toApiCountry(entity.getFacilityLocation().getAddress().getCountry()));
 
 		apiFacilityLocation.setAddress(apiAddress);
 		apiFacilityLocation.setLatitude(entity.getFacilityLocation().getLatitude());

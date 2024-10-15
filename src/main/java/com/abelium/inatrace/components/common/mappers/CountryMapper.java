@@ -10,6 +10,8 @@ public class CountryMapper {
         apiCountry.setId(entity.getId());
         apiCountry.setName(entity.getName());
         apiCountry.setCode(entity.getCode());
+        apiCountry.setLatitude(entity.getLatitude());
+        apiCountry.setLongitude(entity.getLongitude());
         return apiCountry;
     }
 

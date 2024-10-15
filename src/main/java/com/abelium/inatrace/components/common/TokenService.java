@@ -25,11 +25,7 @@ import java.util.Optional;
 @Service
 public class TokenService extends BaseService {
 	 protected final Logger logger = LoggerFactory.getLogger(TokenService.class);
-	
-	
-    @Value("${INATrace.auth.authenticationTokenCookieName}")
-    private String authenticationTokenCookieName;
-    
+
     @Value("${INATrace.auth.accessTokenCookieName}")
     private String accessTokenCookieName;
 
