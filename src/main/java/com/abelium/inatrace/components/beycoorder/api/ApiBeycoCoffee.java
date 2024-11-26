@@ -3,77 +3,77 @@ package com.abelium.inatrace.components.beycoorder.api;
 import com.abelium.inatrace.tools.converters.InstantConverter;
 import com.abelium.inatrace.types.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
 public class ApiBeycoCoffee {
 
-    @ApiModelProperty(value = "Internal LOT number or name of coffee")
+    @Schema(description = "Internal LOT number or name of coffee")
     @Size(min = 1)
     private String name;
 
-    @ApiModelProperty(value = "Region of coffee beans")
+    @Schema(description = "Region of coffee beans")
     private String region;
 
-    @ApiModelProperty(value = "Country of coffee beans")
+    @Schema(description = "Country of coffee beans")
     @Size(min = 1)
     private String country;
 
-    @ApiModelProperty(value = "Harvest date")
+    @Schema(description = "Harvest date")
     @JsonSerialize(using = InstantConverter.Serializer.class)
     private Instant harvestAt;
 
-    @ApiModelProperty(value = "Coffee species")
+    @Schema(description = "Coffee species")
     private BeycoSpeciesType species;
 
-    @ApiModelProperty(value = "Coffee process")
+    @Schema(description = "Coffee process")
     private BeycoProcessType process;
 
-    @ApiModelProperty(value = "Minimal screen size")
+    @Schema(description = "Minimal screen size")
     @Min(8)
     @Max(20)
     private Integer minScreenSize;
 
-    @ApiModelProperty(value = "Maximum screen size")
+    @Schema(description = "Maximum screen size")
     @Min(8)
     @Max(20)
     private Integer maxScreenSize;
 
-    @ApiModelProperty(value = "Cupping score")
+    @Schema(description = "Cupping score")
     @Min(8)
     @Max(20)
     private Integer cuppingScore;
 
-    @ApiModelProperty(value = "Varieties of coffee beans")
+    @Schema(description = "Varieties of coffee beans")
     private List<ApiBeycoCoffeeVariety> varieties;
 
-    @ApiModelProperty(value = "Quality of coffee beans")
+    @Schema(description = "Quality of coffee beans")
     private List<ApiBeycoCoffeeQuality> qualitySegments;
 
-    @ApiModelProperty(value = "Grades of coffee beans")
+    @Schema(description = "Grades of coffee beans")
     private List<ApiBeycoCoffeeGrade> grades;
 
-    @ApiModelProperty(value = "Additional grade, if selected 'Other' in grades")
+    @Schema(description = "Additional grade, if selected 'Other' in grades")
     private String additionalQualityDescriptors;
 
-    @ApiModelProperty(value = "Is bulk")
+    @Schema(description = "Is bulk")
     private Boolean isBulk;
 
-    @ApiModelProperty(value = "Certificates of coffee beans")
+    @Schema(description = "Certificates of coffee beans")
     private List<ApiBeycoCoffeeCertificate> certificates;
 
     @Min(0)
     @Max(999999999999999999L)
-    @ApiModelProperty(value = "Quantity of beans")
+    @Schema(description = "Quantity of beans")
     private BigDecimal quantity;
 
-    @ApiModelProperty(value = "Unit of order")
+    @Schema(description = "Unit of order")
     private BeycoCoffeeUnit unit;
 
     public String getName() {

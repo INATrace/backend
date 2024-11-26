@@ -1,16 +1,16 @@
 package com.abelium.inatrace.components.company.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
 public class ApiPlotCoordinate extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "The latitude of the coordinate")
+	@Schema(description = "The latitude of the coordinate")
 	private Double latitude;
 
-	@ApiModelProperty(value = "The longitude of the coordinate")
+	@Schema(description = "The longitude of the coordinate")
 	private Double longitude;
 
 	public Double getLatitude() {

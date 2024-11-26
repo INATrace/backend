@@ -1,9 +1,8 @@
 package com.abelium.inatrace.api;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * Codebook base entity API model.
@@ -13,11 +12,11 @@ import javax.validation.constraints.NotNull;
 @Validated
 public class ApiCodebookBaseEntity extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "code", position = 1)
+	@Schema(description = "code")
 	@NotNull
 	private String code;
 
-	@ApiModelProperty(value = "label", position = 2)
+	@Schema(description = "label")
 	@NotNull
 	private String label;
 

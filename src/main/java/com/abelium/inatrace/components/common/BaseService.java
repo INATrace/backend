@@ -1,11 +1,9 @@
-
 package com.abelium.inatrace.components.common;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 public class BaseService {
 	

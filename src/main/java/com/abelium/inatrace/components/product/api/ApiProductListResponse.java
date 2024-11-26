@@ -1,14 +1,14 @@
 package com.abelium.inatrace.components.product.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiProductListResponse extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "Name")
+	@Schema(description = "Name")
 	public String name;
 
-	@ApiModelProperty(value = "Photo storage id")
+	@Schema(description = "Photo storage id")
 	public String photoStorageId;
 	
 	public String getName() {

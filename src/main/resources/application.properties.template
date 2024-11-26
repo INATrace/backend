@@ -19,6 +19,9 @@ spring.servlet.multipart.max-file-size = 10MB
 # increase async request timeout (in milliseconds) to avoid AsyncRequestTimeoutException
 spring.mvc.async.request-timeout = 120000
 
+# Springdoc
+springdoc.default-produces-media-type = application/json
+
 # DataSource settings
 INATrace.database.name =
 INATrace.database.hostname = localhost
@@ -44,7 +47,7 @@ spring.datasource.hikari.maxLifetime = 30000
 # Hibernate naming strategies (fixes case with one class being embedded multiple times into same entity
 spring.jpa.hibernate.naming.implicit-strategy = org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
 spring.jpa.hibernate.naming.physical-strategy = org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-spring.jpa.properties.hibernate.dialect = com.abelium.inatrace.configuration.CustomMySQL5InnoDBDialect
+spring.jpa.properties.hibernate.dialect = com.abelium.inatrace.configuration.CustomMySQLDialect
 
 # Create/update envers auditing tables
 spring.jpa.properties.hibernate.hbm2ddl.auto = update
@@ -97,10 +100,7 @@ INATrace.loginManager.mail =
 # info email
 INATrace.info.mail =
 
-# tokens name and expiration
-INATrace.auth.authenticationTokenCookieName = authenticationToken
-INATrace.auth.authenticationTokenExpirationSec = 31536000
-
+# Tokens name and expiration
 INATrace.auth.accessTokenCookieName = inatrace-accessToken
 INATrace.auth.accessTokenExpirationSec = 3600
 INATrace.auth.refreshTokenCookieName = inatrace-refreshToken

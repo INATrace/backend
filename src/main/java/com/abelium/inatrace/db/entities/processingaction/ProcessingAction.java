@@ -8,11 +8,11 @@ import com.abelium.inatrace.db.entities.product.FinalProduct;
 import com.abelium.inatrace.db.entities.value_chain.ProcessingActionValueChain;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table
@@ -48,7 +48,7 @@ public class ProcessingAction extends TimestampEntity {
 	 * If type is PROCESSING, we can have one or more output semi-products. In the other case only one output semi-product is allowed.
 	 */
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProcessingActionOutputSemiProduct> outputSemiProducts = new ArrayList<>();
+	private Set<ProcessingActionOutputSemiProduct> outputSemiProducts = new HashSet<>();
 
 	/**
 	 * Used when we have action types QUOTE or TRANSFER and finalProductAction value to true
@@ -105,19 +105,19 @@ public class ProcessingAction extends TimestampEntity {
 	 * The value chains that this Processing action supports - used to source semi-products, proc. evidence types and proc. evidence fields
 	 */
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProcessingActionValueChain> processingActionsValueChains = new ArrayList<>();
+	private Set<ProcessingActionValueChain> processingActionsValueChains = new HashSet<>();
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProcessingActionPET> requiredDocumentTypes = new ArrayList<>();
+	private Set<ProcessingActionPET> requiredDocumentTypes = new HashSet<>();
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProcessingActionPEF> processingEvidenceFields = new ArrayList<>();
+	private Set<ProcessingActionPEF> processingEvidenceFields = new HashSet<>();
 
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProcessingActionFacility> processingActionFacilities = new ArrayList<>();
+	private Set<ProcessingActionFacility> processingActionFacilities = new HashSet<>();
 	
 	@OneToMany(mappedBy = "processingAction", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProcessingActionTranslation> processingActionTranslations = new ArrayList<>();
+	private Set<ProcessingActionTranslation> processingActionTranslations = new HashSet<>();
 
 	public ProcessingAction() {
 		super();
@@ -179,11 +179,11 @@ public class ProcessingAction extends TimestampEntity {
 		this.inputSemiProduct = inputSemiProduct;
 	}
 
-	public List<ProcessingActionOutputSemiProduct> getOutputSemiProducts() {
+	public Set<ProcessingActionOutputSemiProduct> getOutputSemiProducts() {
 		return outputSemiProducts;
 	}
 
-	public void setOutputSemiProducts(List<ProcessingActionOutputSemiProduct> outputSemiProducts) {
+	public void setOutputSemiProducts(Set<ProcessingActionOutputSemiProduct> outputSemiProducts) {
 		this.outputSemiProducts = outputSemiProducts;
 	}
 
@@ -251,46 +251,46 @@ public class ProcessingAction extends TimestampEntity {
 		this.finalProductAction = finalProductAction;
 	}
 
-	public List<ProcessingActionValueChain> getProcessingActionsValueChains() {
+	public Set<ProcessingActionValueChain> getProcessingActionsValueChains() {
 		if (processingActionsValueChains == null) {
-			processingActionsValueChains = new ArrayList<>();
+			processingActionsValueChains = new HashSet<>();
 		}
 		return processingActionsValueChains;
 	}
 
-	public void setProcessingActionsValueChains(List<ProcessingActionValueChain> processingActionsValueChains) {
+	public void setProcessingActionsValueChains(Set<ProcessingActionValueChain> processingActionsValueChains) {
 		this.processingActionsValueChains = processingActionsValueChains;
 	}
 
-	public List<ProcessingActionPET> getRequiredDocumentTypes() {
+	public Set<ProcessingActionPET> getRequiredDocumentTypes() {
 		return requiredDocumentTypes;
 	}
 
-	public void setRequiredDocumentTypes(List<ProcessingActionPET> requiredDocumentTypes) {
+	public void setRequiredDocumentTypes(Set<ProcessingActionPET> requiredDocumentTypes) {
 		this.requiredDocumentTypes = requiredDocumentTypes;
 	}
 	
-	public List<ProcessingActionPEF> getProcessingEvidenceFields() {
+	public Set<ProcessingActionPEF> getProcessingEvidenceFields() {
 		return processingEvidenceFields;
 	}
 
-	public void setProcessingEvidenceFields(List<ProcessingActionPEF> processingEvidenceFields) {
+	public void setProcessingEvidenceFields(Set<ProcessingActionPEF> processingEvidenceFields) {
 		this.processingEvidenceFields = processingEvidenceFields;
 	}
 
-	public List<ProcessingActionFacility> getProcessingActionFacilities() {
+	public Set<ProcessingActionFacility> getProcessingActionFacilities() {
 		return processingActionFacilities;
 	}
 
-	public void setProcessingActionFacilities(List<ProcessingActionFacility> processingActionFacilities) {
+	public void setProcessingActionFacilities(Set<ProcessingActionFacility> processingActionFacilities) {
 		this.processingActionFacilities = processingActionFacilities;
 	}
 
-	public List<ProcessingActionTranslation> getProcessingActionTranslations() {
+	public Set<ProcessingActionTranslation> getProcessingActionTranslations() {
 		return processingActionTranslations;
 	}
 
-	public void setProcessingActionTranslations(List<ProcessingActionTranslation> processingActionTranslations) {
+	public void setProcessingActionTranslations(Set<ProcessingActionTranslation> processingActionTranslations) {
 		this.processingActionTranslations = processingActionTranslations;
 	}
 

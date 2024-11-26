@@ -2,7 +2,7 @@ package com.abelium.inatrace.components.stockorder.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.types.ProcessingEvidenceFieldType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
@@ -11,25 +11,25 @@ import java.time.Instant;
 @Validated
 public class ApiStockOrderEvidenceFieldValue extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "The id of the Processing evidence field from the codebook", position = 1)
+	@Schema(description = "The id of the Processing evidence field from the codebook")
 	private Long evidenceFieldId;
 
-	@ApiModelProperty(value = "The field name of the Processing evidence field from the codebook", position = 2)
+	@Schema(description = "The field name of the Processing evidence field from the codebook")
 	private String evidenceFieldName;
 
-	@ApiModelProperty(value = "The data type oof the Processing evidence field from the codebook", position = 3)
+	@Schema(description = "The data type oof the Processing evidence field from the codebook")
 	private ProcessingEvidenceFieldType evidenceFieldType;
 
-	@ApiModelProperty(value = "Value holder of type String", position = 4)
+	@Schema(description = "Value holder of type String")
 	private String stringValue;
 
-	@ApiModelProperty(value = "Value holder of type Number", position = 5)
+	@Schema(description = "Value holder of type Number")
 	private BigDecimal numericValue;
 
-	@ApiModelProperty(value = "Value holder of type Boolean", position = 6)
+	@Schema(description = "Value holder of type Boolean")
 	private Boolean booleanValue;
 
-	@ApiModelProperty(value = "Value holder of type Date", position = 7)
+	@Schema(description = "Value holder of type Date")
 	private Instant dateValue;
 
 	public Long getEvidenceFieldId() {

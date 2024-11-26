@@ -25,19 +25,18 @@ import com.abelium.inatrace.types.ProductCompanyType;
 import com.abelium.inatrace.types.ProductLabelStatus;
 import com.abelium.inatrace.types.RequestLogType;
 import com.abelium.inatrace.types.UserRole;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaDelete;
+import jakarta.persistence.criteria.Root;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.torpedoquery.jpa.OnGoingLogicalCondition;
-import org.torpedoquery.jpa.Torpedo;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
-import javax.persistence.criteria.Root;
-import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
+import org.torpedoquery.jakarta.jpa.OnGoingLogicalCondition;
+import org.torpedoquery.jakarta.jpa.Torpedo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -66,7 +65,7 @@ public class ProductService extends BaseService {
     private Product productListQueryObject(ApiListProductsRequest request) {
         Product pProxy = Torpedo.from(Product.class);
         
-        OnGoingLogicalCondition condition = Torpedo.condition();        
+        OnGoingLogicalCondition condition = Torpedo.condition();
         if (StringUtils.isNotBlank(request.name)) {
             condition = condition.and(pProxy.getName()).like().any(request.name);
         }
@@ -120,7 +119,7 @@ public class ProductService extends BaseService {
 	public ApiBaseEntity createProduct(CustomUserDetails authUser, ApiProduct request) throws ApiException {
 
 		Company company = em.find(Company.class, request.getCompany().getId());
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), authUser);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), authUser);
 
 		Product product = new Product();
 		

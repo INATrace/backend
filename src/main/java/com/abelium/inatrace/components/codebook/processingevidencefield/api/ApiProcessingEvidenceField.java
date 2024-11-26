@@ -2,8 +2,7 @@ package com.abelium.inatrace.components.codebook.processingevidencefield.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.types.ProcessingEvidenceFieldType;
-
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,22 +14,22 @@ import java.util.List;
  */
 public class ApiProcessingEvidenceField extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "Processing evidence field name")
+	@Schema(description = "Processing evidence field name")
 	private String fieldName;
 
-	@ApiModelProperty(value = "Processing evidence field label")
+	@Schema(description = "Processing evidence field label")
 	private String label;
 	
-	@ApiModelProperty(value = "Processing evidence field mandatory")
+	@Schema(description = "Processing evidence field mandatory")
 	private Boolean mandatory;
 	
-	@ApiModelProperty(value = "Processing evidence field required on quote")
+	@Schema(description = "Processing evidence field required on quote")
 	private Boolean requiredOnQuote;
 	
-	@ApiModelProperty(value = "Processing evidence field type")
+	@Schema(description = "Processing evidence field type")
 	private ProcessingEvidenceFieldType type;
 
-	@ApiModelProperty(value = "Processing evidence field translations")
+	@Schema(description = "Processing evidence field translations")
 	private List<ApiProcessingEvidenceFieldTranslation> translations;
 
 	public String getFieldName() {

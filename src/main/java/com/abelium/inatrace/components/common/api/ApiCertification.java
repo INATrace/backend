@@ -1,28 +1,28 @@
 package com.abelium.inatrace.components.common.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import java.time.LocalDate;
 
 @Validated
 public class ApiCertification extends ApiBaseEntity {
 	
-	@ApiModelProperty(value = "certification type", position = 1)
+	@Schema(description = "certification type")
 	public String type;
 	
-	@ApiModelProperty(value = "certificate for this standard", position = 2)
+	@Schema(description = "certificate for this standard")
 	@Valid
 	public ApiDocument certificate;
 	
-	@Length(max = 2000)
-	@ApiModelProperty(value = "description of this standard and certification", position = 3)
+	@Size(max = 2000)
+	@Schema(description = "description of this standard and certification", maxLength = 2000)
 	public String description;
 	
-	@ApiModelProperty(value = "validity", position = 4)
+	@Schema(description = "validity")
 	public LocalDate validity;
 
 	public String getDescription() {

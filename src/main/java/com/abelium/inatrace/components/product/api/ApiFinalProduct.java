@@ -2,23 +2,23 @@ package com.abelium.inatrace.components.product.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.measure_unit_type.api.ApiMeasureUnitType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ApiFinalProduct extends ApiBaseEntity {
 
-    @ApiModelProperty(value = "Name of final product")
+    @Schema(description = "Name of final product")
     private String name;
 
-    @ApiModelProperty(value = "Description of final product")
+    @Schema(description = "Description of final product")
     private String description;
 
-    @ApiModelProperty(value = "The Product that this final product belongs")
+    @Schema(description = "The Product that this final product belongs")
     private ApiProductBase product;
 
-    @ApiModelProperty(value = "Measurement unit type of final product")
+    @Schema(description = "Measurement unit type of final product")
     private ApiMeasureUnitType measurementUnitType;
 
     private List<ApiProductLabelBase> labels;

@@ -1,10 +1,10 @@
 package com.abelium.inatrace.tools;
 
+import jakarta.persistence.EntityManager;
+import org.torpedoquery.jakarta.jpa.Torpedo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
-import javax.persistence.EntityManager;
-import org.torpedoquery.jpa.Torpedo;
 
 public class TorpedoProjector<P, T> {
 	

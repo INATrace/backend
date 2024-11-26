@@ -54,6 +54,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -65,11 +67,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.torpedoquery.jpa.OnGoingLogicalCondition;
-import org.torpedoquery.jpa.Torpedo;
+import org.torpedoquery.jakarta.jpa.OnGoingLogicalCondition;
+import org.torpedoquery.jakarta.jpa.Torpedo;
 
-import javax.persistence.TypedQuery;
-import javax.transaction.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -179,15 +179,15 @@ public class StockOrderService extends BaseService {
         // If company or quote company ID is provided, validate that the request user is enrolled in this company
         if (queryRequest.companyId != null) {
             Company company = companyQueries.fetchCompany(queryRequest.companyId);
-            PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+            PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
         } else if (queryRequest.quoteCompanyId != null) {
             Company company = companyQueries.fetchCompany(queryRequest.quoteCompanyId);
-            PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+            PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
         } else {
 
             // If company ID is not provided, fetch the facility's company and validate user company enrollment
             Facility facility = facilityService.fetchFacility(queryRequest.facilityId);
-            PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
+            PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers().stream().toList(), user);
         }
 
         return PaginationTools.createPaginatedResponse(em, request,
@@ -845,7 +845,7 @@ public class StockOrderService extends BaseService {
         }
 
         Facility facility = facilityService.fetchFacility(apiPurchaseOrder.getFacility().id);
-        PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
+        PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers().stream().toList(), user);
 
         // Update stocks of type Purchase, one by one
         for (ApiPurchaseOrderFarmer farmer : apiPurchaseOrder.getFarmers()) {
@@ -959,7 +959,7 @@ public class StockOrderService extends BaseService {
         // In some cases we don't need to check if request user is enrolled in company due to already
         // executed checks (approve/reject quote order transaction, etc.)
         if (checkCompanyEnrolment) {
-            PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers(), user);
+            PermissionsUtil.checkUserIfCompanyEnrolled(facility.getCompany().getUsers().stream().toList(), user);
         }
 
         entity.setOrderType(apiStockOrder.getOrderType());
@@ -1190,7 +1190,7 @@ public class StockOrderService extends BaseService {
             if (processingOrder != null) {
 
                 // Calculate quantities based on input transactions
-                List<Transaction> inputTxs = processingOrder.getInputTransactions();
+                List<Transaction> inputTxs = processingOrder.getInputTransactions().stream().toList();
                 Transaction newInputTransaction = newInputTransactionId != null ? inputTxs
                         .stream()
                         .filter(t -> t.getId().equals(newInputTransactionId)).findAny()
@@ -1239,7 +1239,7 @@ public class StockOrderService extends BaseService {
                     BooleanUtils.isFalse(procAction.getRepackedOutputFinalProducts()) && expectedTotalQuantityPerUnit != null) {
 
                 // Calculate the total input quantity (summed up input transactions from the processing order)
-                List<Transaction> inputTxs = processingOrder.getInputTransactions();
+                List<Transaction> inputTxs = processingOrder.getInputTransactions().stream().toList();
                 BigDecimal totalInputQuantity = inputTxs.stream()
                         .filter(t -> !t.getStatus().equals(TransactionStatus.CANCELED))
                         .map(Transaction::getOutputQuantity)
@@ -1302,7 +1302,7 @@ public class StockOrderService extends BaseService {
 
         StockOrder stockOrder = fetchEntity(id, StockOrder.class);
 
-        PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(stockOrder.getCompany().getUsers(), user);
+        PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(stockOrder.getCompany().getUsers().stream().toList(), user);
 
         em.remove(stockOrder);
     }
@@ -1614,86 +1614,86 @@ public class StockOrderService extends BaseService {
                 // Create delivery date column
                 row.createCell(0, CellType.NUMERIC).setCellValue(apiDelivery.getProductionDate());
                 row.getCell(0).setCellStyle(dateCellStyle);
-                sheet.autoSizeColumn(0);
+                // sheet.autoSizeColumn(0);
 
                 // Create column identifier
                 row.createCell(1, CellType.STRING).setCellValue(apiDelivery.getIdentifier());
-                sheet.autoSizeColumn(1);
+                // sheet.autoSizeColumn(1);
 
                 // Create farmer column
                 row.createCell(2, CellType.STRING).setCellValue(apiDelivery.getProducerUserCustomer().getName() + " " + apiDelivery.getProducerUserCustomer().getSurname());
-                sheet.autoSizeColumn(2);
+                // sheet.autoSizeColumn(2);
 
                 // Create semi-product column
                 row.createCell(3, CellType.STRING).setCellValue(apiDelivery.getSemiProduct().getName());
-                sheet.autoSizeColumn(3);
+                // sheet.autoSizeColumn(3);
 
                 // Create quantity column
                 row.createCell(4, CellType.NUMERIC).setCellValue(apiDelivery.getTotalQuantity().doubleValue());
-                sheet.autoSizeColumn(4);
+                // sheet.autoSizeColumn(4);
 
                 // Create gross quantity column
                 row.createCell(5, CellType.NUMERIC);
                 if (apiDelivery.getTotalGrossQuantity() != null) {
                     row.getCell(5).setCellValue(apiDelivery.getTotalGrossQuantity().doubleValue());
                 }
-                sheet.autoSizeColumn(5);
+                // sheet.autoSizeColumn(5);
 
                 // Create tare column
                 row.createCell(6, CellType.NUMERIC);
                 if (apiDelivery.getTare() != null) {
                     row.getCell(6).setCellValue(apiDelivery.getTare().doubleValue());
                 }
-                sheet.autoSizeColumn(6);
+                // sheet.autoSizeColumn(6);
 
                 // Create damaged weight deduction column
                 row.createCell(7, CellType.NUMERIC);
                 if (apiDelivery.getDamagedWeightDeduction() != null) {
                     row.getCell(7).setCellValue(apiDelivery.getDamagedWeightDeduction().doubleValue());
                 }
-                sheet.autoSizeColumn(7);
+                // sheet.autoSizeColumn(7);
 
                 // Create unit column
                 row.createCell(8, CellType.STRING).setCellValue(apiDelivery.getMeasureUnitType().getLabel());
-                sheet.autoSizeColumn(8);
+                // sheet.autoSizeColumn(8);
 
                 // Create price per unit column
                 row.createCell(9, CellType.NUMERIC);
                 if (apiDelivery.getPricePerUnit() != null) {
                     row.getCell(9).setCellValue(apiDelivery.getPricePerUnit().doubleValue());
                 }
-                sheet.autoSizeColumn(9);
+                // sheet.autoSizeColumn(9);
 
                 // Create damaged price deduction column
                 row.createCell(10, CellType.NUMERIC);
                 if (apiDelivery.getDamagedPriceDeduction() != null) {
                     row.getCell(10).setCellValue(apiDelivery.getDamagedPriceDeduction().doubleValue());
                 }
-                sheet.autoSizeColumn(10);
+                // sheet.autoSizeColumn(10);
 
                 // Create payable column
                 row.createCell(11, CellType.NUMERIC);
                 if (apiDelivery.getCost() != null) {
                     row.getCell(11).setCellValue(apiDelivery.getCost().doubleValue());
                 }
-                sheet.autoSizeColumn(11);
+                // sheet.autoSizeColumn(11);
 
                 // Create balance column
                 row.createCell(12, CellType.NUMERIC);
                 if (apiDelivery.getBalance() != null) {
                     row.getCell(12).setCellValue(apiDelivery.getBalance().doubleValue());
                 }
-                sheet.autoSizeColumn(12);
+                // sheet.autoSizeColumn(12);
 
                 // Create currency column
                 row.createCell(13, CellType.STRING).setCellValue(apiDelivery.getCurrency());
-                sheet.autoSizeColumn(13);
+                // sheet.autoSizeColumn(13);
 
                 // Create preferred way of payment column
                 row.createCell(14, CellType.STRING).setCellValue(TranslateTools.getTranslatedValue(
                         messageSource, "export.payments.column.preferredWayOfPayment.value." + apiDelivery.getPreferredWayOfPayment().toString(), language
                 ));
-                sheet.autoSizeColumn(14);
+                // sheet.autoSizeColumn(14);
             }
 
             workbook.write(byteArrayOutputStream);

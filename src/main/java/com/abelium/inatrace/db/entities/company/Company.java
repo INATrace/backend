@@ -12,12 +12,9 @@ import com.abelium.inatrace.db.entities.product.ProductCompany;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.value_chain.CompanyValueChain;
 import com.abelium.inatrace.types.CompanyStatus;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Entity
 @Table(indexes = { @Index(columnList = "name") })
@@ -115,49 +112,49 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	 * a list of users
 	 */
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<CompanyUser> users = new ArrayList<>();
+	private Set<CompanyUser> users = new HashSet<>();
 
 	/**
 	 * documents (images)
 	 */
 	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<CompanyDocument> documents = new ArrayList<>();
+	private Set<CompanyDocument> documents = new HashSet<>();
 	
 	/**
 	 * certifications
 	 */
 	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<CompanyCertification> certifications = new ArrayList<>();
+	private Set<CompanyCertification> certifications = new HashSet<>();
 
 	/**
 	 * translations of fields
 	 */
 	@OneToMany(mappedBy = "company")
-	private List<CompanyTranslation> translations = new ArrayList<>();
+	private Set<CompanyTranslation> translations = new HashSet<>();
 	
 	/**
 	 * facilities
 	 */
 	@OneToMany(mappedBy = "company")
-	private List<Facility> facilities = new ArrayList<>();
+	private Set<Facility> facilities = new HashSet<>();
 	
 	/**
 	 * processing actions
 	 */
 	@OneToMany(mappedBy = "company")
-	private List<ProcessingAction> processingActions = new ArrayList<>();
+	private Set<ProcessingAction> processingActions = new HashSet<>();
 
 	/**
 	 * stock orders
 	 */
 	@OneToMany(mappedBy = "company")
-	private List<StockOrder> stockOrders = new ArrayList<>();
+	private Set<StockOrder> stockOrders = new HashSet<>();
 
 	/**
 	 * A list of supported value chains for the company (filter)
 	 */
 	@OneToMany(mappedBy = "company")
-	private List<CompanyValueChain> valueChains;
+	private Set<CompanyValueChain> valueChains;
 	
 	@ManyToOne
 	private CurrencyType currency;
@@ -166,7 +163,7 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	private Boolean allowBeycoIntegration;
 
 	@OneToMany(mappedBy = "company")
-	private List<ProductCompany> companyRoles;
+	private Set<ProductCompany> companyRoles;
 
 	public CompanyStatus getStatus() {
 		return status;
@@ -280,59 +277,59 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 		this.mediaLinks = mediaLinks;
 	}
 
-	public List<CompanyUser> getUsers() {
+	public Set<CompanyUser> getUsers() {
 		return users;
 	}
 
-	public void setUsers(List<CompanyUser> users) {
+	public void setUsers(Set<CompanyUser> users) {
 		this.users = users;
 	}
 
-	public List<CompanyDocument> getDocuments() {
+	public Set<CompanyDocument> getDocuments() {
 		return documents;
 	}
 
-	public void setDocuments(List<CompanyDocument> documents) {
+	public void setDocuments(Set<CompanyDocument> documents) {
 		this.documents = documents;
 	}
 
-	public List<CompanyTranslation> getTranslations() {
+	public Set<CompanyTranslation> getTranslations() {
 		return translations;
 	}
 
-	public void setTranslations(List<CompanyTranslation> translations) {
+	public void setTranslations(Set<CompanyTranslation> translations) {
 		this.translations = translations;
 	}
 
-	public List<CompanyCertification> getCertifications() {
+	public Set<CompanyCertification> getCertifications() {
 		return certifications;
 	}
 
-	public void setCertifications(List<CompanyCertification> certifications) {
+	public void setCertifications(Set<CompanyCertification> certifications) {
 		this.certifications = certifications;
 	}
 	
-	public List<Facility> getFacilities() {
+	public Set<Facility> getFacilities() {
 		return facilities;
 	}
 
-	public void setFacilities(List<Facility> facilities) {
+	public void setFacilities(Set<Facility> facilities) {
 		this.facilities = facilities;
 	}
 	
-	public List<ProcessingAction> getProcessingActions() {
+	public Set<ProcessingAction> getProcessingActions() {
 		return processingActions;
 	}
 
-	public void setProcessingActions(List<ProcessingAction> processingActions) {
+	public void setProcessingActions(Set<ProcessingAction> processingActions) {
 		this.processingActions = processingActions;
 	}
 
-	public List<StockOrder> getStockOrders() {
+	public Set<StockOrder> getStockOrders() {
 		return stockOrders;
 	}
 
-	public void setStockOrders(List<StockOrder> stockOrders) {
+	public void setStockOrders(Set<StockOrder> stockOrders) {
 		this.stockOrders = stockOrders;
 	}
 	
@@ -352,22 +349,22 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 		this.allowBeycoIntegration = allowBeycoIntegration;
 	}
 
-	public List<ProductCompany> getCompanyRoles() {
+	public Set<ProductCompany> getCompanyRoles() {
 		return companyRoles;
 	}
 
-	public void setCompanyRoles(List<ProductCompany> companyRoles) {
+	public void setCompanyRoles(Set<ProductCompany> companyRoles) {
 		this.companyRoles = companyRoles;
 	}
 
-	public List<CompanyValueChain> getValueChains() {
+	public Set<CompanyValueChain> getValueChains() {
 		if (valueChains == null) {
-			valueChains = new ArrayList<>();
+			valueChains = new HashSet<>();
 		}
 		return valueChains;
 	}
 
-	public void setValueChains(List<CompanyValueChain> valueChains) {
+	public void setValueChains(Set<CompanyValueChain> valueChains) {
 		this.valueChains = valueChains;
 	}
 }

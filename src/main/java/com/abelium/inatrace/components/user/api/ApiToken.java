@@ -1,16 +1,16 @@
 package com.abelium.inatrace.components.user.api;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiToken {
 	
 	@NotNull
-	@ApiModelProperty(value = "Entity id", position = 0)
+	@Schema(description = "Entity id")
 	public String token;
 
 	public String getToken() {

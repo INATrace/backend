@@ -12,7 +12,7 @@ import com.abelium.inatrace.db.entities.stockorder.enums.PreferredWayOfPayment;
 import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -21,84 +21,84 @@ import java.time.LocalDate;
 public class ApiPayment extends ApiBaseEntity {
 
 	// From BaseEntity
-	@ApiModelProperty(value = "Last updated timestamp")
+	@Schema(description = "Last updated timestamp")
 	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
 	private Instant updatedTimestamp;
 
-	@ApiModelProperty(value = "Payment created by user")
+	@Schema(description = "Payment created by user")
 	private ApiUser createdBy;
 	
-	@ApiModelProperty(value = "Payment updated by user")
+	@Schema(description = "Payment updated by user")
 	private ApiUser updatedBy;
 
-	@ApiModelProperty(value = "Payment type")
+	@Schema(description = "Payment type")
 	private PaymentType paymentType;
 
-	@ApiModelProperty(value = "Payment's currency")
+	@Schema(description = "Payment's currency")
 	private String currency;
 	
-	@ApiModelProperty(value = "Quantity purchased to be paid")
+	@Schema(description = "Quantity purchased to be paid")
 	private Integer purchased;
 
-	@ApiModelProperty(value = "Payment amount paid (to a farmer or recipient company)")
+	@Schema(description = "Payment amount paid (to a farmer or recipient company)")
 	private BigDecimal amount;
 	
-	@ApiModelProperty(value = "Payment amount paid to the collector")
+	@Schema(description = "Payment amount paid to the collector")
 	private BigDecimal amountPaidToTheCollector;
 	
-	@ApiModelProperty(value = "Payment total amount")
+	@Schema(description = "Payment total amount")
 	private BigDecimal totalPaid;
 	
-	@ApiModelProperty(value = "Stock order related to the payment")
+	@Schema(description = "Stock order related to the payment")
 	private ApiStockOrder stockOrder;
 	
-	@ApiModelProperty(value = "Recipient type")
+	@Schema(description = "Recipient type")
 	private RecipientType recipientType;
 	
-	@ApiModelProperty(value = "Receipt number")
+	@Schema(description = "Receipt number")
 	private String receiptNumber;
 
-	@ApiModelProperty(value = "Receipt document")
+	@Schema(description = "Receipt document")
 	private ApiDocument receiptDocument;
 	
-	@ApiModelProperty(value = "Receipt document type")
+	@Schema(description = "Receipt document type")
 	private ReceiptDocumentType receiptDocumentType;
 	
-	@ApiModelProperty(value = "Payment purpose type")
+	@Schema(description = "Payment purpose type")
 	private PaymentPurposeType paymentPurposeType;
 	
-	@ApiModelProperty(value = "Payment status")
+	@Schema(description = "Payment status")
 	private PaymentStatus paymentStatus;
 	
-	@ApiModelProperty(value = "User who confirmed the payment")
+	@Schema(description = "User who confirmed the payment")
 	private ApiUser paymentConfirmedByUser;
 	
-	@ApiModelProperty(value = "Payment time confirmation")
+	@Schema(description = "Payment time confirmation")
 	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
 	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
     private Instant paymentConfirmedAtTime;
 
-	@ApiModelProperty(value = "Formal creation date (for example: date on receipt)")
+	@Schema(description = "Formal creation date (for example: date on receipt)")
 	private LocalDate formalCreationTime;
 	
-	@ApiModelProperty(value = "Preferred way of payment")
+	@Schema(description = "Preferred way of payment")
 	private PreferredWayOfPayment preferredWayOfPayment;
 	
-	@ApiModelProperty(value = "Production date")
+	@Schema(description = "Production date")
     private LocalDate productionDate;
 
-	@ApiModelProperty(value = "Paying company")
+	@Schema(description = "Paying company")
 	private ApiCompany payingCompany;
 	
 	// The properties can be extracted from the purchase (stock order) on the way back
 	
-	@ApiModelProperty(value = "Company that receives the payment")
+	@Schema(description = "Company that receives the payment")
 	private ApiCompanyBase recipientCompany;
 
-	@ApiModelProperty(value = "User customer that receives the payment (farmer)")
+	@Schema(description = "User customer that receives the payment (farmer)")
 	private ApiUserCustomer recipientUserCustomer;
 
-	@ApiModelProperty(value = "Representative of the user customer that receives the payment (collector)")
+	@Schema(description = "Representative of the user customer that receives the payment (collector)")
 	private ApiUserCustomer representativeOfRecipientUserCustomer;
 
 	public Instant getUpdatedTimestamp() {

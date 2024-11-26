@@ -6,14 +6,14 @@ import com.abelium.inatrace.db.entities.company.CompanyUser;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.UserRole;
 import com.abelium.inatrace.types.UserStatus;
+import jakarta.persistence.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.springframework.security.core.GrantedAuthority;
 
-import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Audited
@@ -74,7 +74,7 @@ public class User extends TimestampEntity {
 	 */
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	@NotAudited
-	private List<CompanyUser> userCompanies;
+	private Set<CompanyUser> userCompanies;
 
     public String getEmail() {
 		return email;
@@ -136,11 +136,11 @@ public class User extends TimestampEntity {
 		return Collections.singletonList(getRole());
 	}
 
-	public List<CompanyUser> getUserCompanies() {
+	public Set<CompanyUser> getUserCompanies() {
 		return userCompanies;
 	}
 
-	public void setUserCompanies(List<CompanyUser> userCompanies) {
+	public void setUserCompanies(Set<CompanyUser> userCompanies) {
 		this.userCompanies = userCompanies;
 	}
 

@@ -1,33 +1,31 @@
 package com.abelium.inatrace.components.product.api;
 
-import javax.validation.Valid;
-
-import org.hibernate.validator.constraints.Length;
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.components.company.api.ApiAddress;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 
 @Validated
 public class ApiLocation {
 	
-	@ApiModelProperty(value = "location address", position = 1)
+	@Schema(description = "location address")
 	@Valid
 	public ApiAddress address;
 	
-	@ApiModelProperty(value = "location latitude", position = 2)
+	@Schema(description = "location latitude")
 	public Double latitude;
 	
-	@ApiModelProperty(value = "location longitude", position = 3)
+	@Schema(description = "location longitude")
 	public Double longitude;
 
-	@ApiModelProperty(value = "number of farmers at this location", position = 4)
+	@Schema(description = "number of farmers at this location")
 	public Integer numberOfFarmers;
 
-	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "pin (location) name", position = 5)
+	@Size(max = Lengths.DEFAULT)
+	@Schema(description = "pin (location) name")
 	public String pinName;
 	
 	public ApiAddress getAddress() {

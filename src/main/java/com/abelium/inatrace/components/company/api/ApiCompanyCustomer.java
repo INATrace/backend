@@ -1,6 +1,7 @@
 package com.abelium.inatrace.components.company.api;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
@@ -8,42 +9,41 @@ import org.springframework.validation.annotation.Validated;
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.types.Lengths;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiCompanyCustomer extends ApiBaseEntity {
 	
-	@ApiModelProperty(value = "Company id", position = 1)
+	@Schema(description = "Company id")
 	public Long companyId;
 	
-	@ApiModelProperty(value = "Name", position = 2)
-	@Length(max = Lengths.NAME)
+	@Schema(description = "Name")
+	@Size(max = Lengths.NAME)
 	public String name;
 	
-	@ApiModelProperty(value = "Official company name", position = 3)
-	@Length(max = Lengths.NAME)
+	@Schema(description = "Official company name")
+	@Size(max = Lengths.NAME)
 	public String officialCompanyName;
 	
-	@ApiModelProperty(value = "Vat id", position = 4)
-	@Length(max = Lengths.VAT_ID)
+	@Schema(description = "Vat id")
+	@Size(max = Lengths.VAT_ID)
 	public String vatId;
 
-	@ApiModelProperty(value = "Contact", position = 5)
-	@Length(max = Lengths.DEFAULT)
+	@Schema(description = "Contact")
+	@Size(max = Lengths.DEFAULT)
 	public String contact;
 	
-	@ApiModelProperty(value = "Phone", position = 6)
-	@Length(max = Lengths.PHONE_NUMBER)
+	@Schema(description = "Phone")
+	@Size(max = Lengths.PHONE_NUMBER)
 	public String phone;
 
-	@ApiModelProperty(value = "Email", position = 7)
-	@Length(max = Lengths.EMAIL)
+	@Schema(description = "Email")
+	@Size(max = Lengths.EMAIL)
 	public String email;
 	
-	@ApiModelProperty(value = "Location", position = 8)
+	@Schema(description = "Location")
 	@Valid
 	public ApiGeoAddress location;
-
 	
 	public Long getCompanyId() {
 		return companyId;

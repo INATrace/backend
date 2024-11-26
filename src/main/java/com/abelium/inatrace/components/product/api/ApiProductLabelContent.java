@@ -1,26 +1,22 @@
 package com.abelium.inatrace.components.product.api;
 
-import javax.validation.Valid;
-
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.components.company.api.ApiCompany;
-
-import io.swagger.annotations.ApiModelProperty;
-
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 import java.util.List;
 
 @Validated
 public class ApiProductLabelContent extends ApiProductContent {
 
-	@ApiModelProperty(value = "company", position = 14)
+	@Schema(description = "company")
 	@Valid
 	public ApiCompany company;
 	
-	@ApiModelProperty(value = "label id", position = 21)
+	@Schema(description = "label id")
 	public Long labelId;
     
-    @ApiModelProperty(value = "Product journey path")
+    @Schema(description = "Product journey path")
     private List<ApiProductJourneyMarker> journeyMarkers;
 
 	public ApiCompany getCompany() {

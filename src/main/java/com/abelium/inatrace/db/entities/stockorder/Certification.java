@@ -2,8 +2,11 @@ package com.abelium.inatrace.db.entities.stockorder;
 
 import com.abelium.inatrace.db.base.TimestampEntity;
 import com.abelium.inatrace.db.entities.common.Document;
-
-import javax.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Version;
 import java.time.Instant;
 
 @Entity

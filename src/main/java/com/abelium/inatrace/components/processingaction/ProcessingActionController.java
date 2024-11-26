@@ -6,13 +6,13 @@ import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * REST controller for processing action entity.
@@ -31,12 +31,12 @@ public class ProcessingActionController {
 	}
 	
 	@GetMapping("list/company/{id}")
-	@ApiOperation("Get a list of processing actions by company ID.")
+	@Operation(summary ="Get a list of processing actions by company ID.")
 	public ApiPaginatedResponse<ApiProcessingAction> listProcessingActionsByCompany(
 			@AuthenticationPrincipal CustomUserDetails authUser,
-			@Valid @ApiParam(value = "Company ID", required = true) @PathVariable("id") Long companyId,
-			@Valid @ApiParam(value = "Processing action type") @RequestParam(value = "actionType", required = false) ProcessingActionType actionType,
-			@Valid @ApiParam(value = "Only final product actions") @RequestParam(value = "onlyFinalProducts", required = false) Boolean onlyFinalProducts,
+			@Valid @Parameter(description = "Company ID", required = true) @PathVariable("id") Long companyId,
+			@Valid @Parameter(description = "Processing action type") @RequestParam(value = "actionType", required = false) ProcessingActionType actionType,
+			@Valid @Parameter(description = "Only final product actions") @RequestParam(value = "onlyFinalProducts", required = false) Boolean onlyFinalProducts,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language,
 			@Valid ApiPaginatedRequest request) throws ApiException {
 
@@ -46,26 +46,26 @@ public class ProcessingActionController {
 	}
 	
 	@GetMapping("{id}")
-	@ApiOperation("Get a single processing action with the provided ID.")
+	@Operation(summary ="Get a single processing action with the provided ID.")
 	public ApiResponse<ApiProcessingAction> getProcessingAction(
 			@AuthenticationPrincipal CustomUserDetails authUser,
-			@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "ProcessingAction ID", required = true) @PathVariable("id") Long id,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 
 		return new ApiResponse<>(processingActionService.getProcessingAction(id, authUser, language));
 	}
 
 	@GetMapping("{id}/detail")
-	@ApiOperation("Get a single processing action by the provided ID with all translations.")
+	@Operation(summary ="Get a single processing action by the provided ID with all translations.")
 	public ApiResponse<ApiProcessingAction> getProcessingActionDetail(
 			@AuthenticationPrincipal CustomUserDetails authUser,
-			@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long id,
+			@Valid @Parameter(description = "ProcessingAction ID", required = true) @PathVariable("id") Long id,
 			@RequestHeader(value = "language", defaultValue = "EN", required = false) Language language) throws ApiException {
 		return new ApiResponse<>(processingActionService.getProcessingActionDetail(id, authUser, language));
 	}
 
 	@PutMapping
-	@ApiOperation("Create or update processing action. If ID is provided, then the entity with the provided ID is updated.")
+	@Operation(summary ="Create or update processing action. If ID is provided, then the entity with the provided ID is updated.")
 	public ApiResponse<ApiBaseEntity> createOrUpdateProcessingAction(
 			@AuthenticationPrincipal CustomUserDetails authUser,
 			@Valid @RequestBody ApiProcessingAction apiProcessingAction) throws ApiException {
@@ -74,10 +74,10 @@ public class ProcessingActionController {
 	}
 
 	@DeleteMapping("{id}")
-	@ApiOperation("Deletes a processing action with the provided ID.")
+	@Operation(summary ="Deletes a processing action with the provided ID.")
 	public ApiDefaultResponse deleteProcessingAction(
 			@AuthenticationPrincipal CustomUserDetails authUser,
-			@Valid @ApiParam(value = "ProcessingAction ID", required = true) @PathVariable("id") Long id) throws ApiException {
+			@Valid @Parameter(description = "ProcessingAction ID", required = true) @PathVariable("id") Long id) throws ApiException {
 
 		processingActionService.deleteProcessingAction(id, authUser);
 		return new ApiDefaultResponse();

@@ -2,7 +2,7 @@ package com.abelium.inatrace.components.company.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.product.api.ApiProductType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Date;
@@ -11,34 +11,34 @@ import java.util.List;
 @Validated
 public class ApiPlot extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "Plot name", position = 1)
+	@Schema(description = "Plot name")
 	private String plotName;
 
-	@ApiModelProperty(value = "Product type of this plot", position = 2)
+	@Schema(description = "Product type of this plot")
 	private ApiProductType crop;
 
-	@ApiModelProperty(value = "Number of plants", position = 3)
+	@Schema(description = "Number of plants")
 	public Integer numberOfPlants;
 
-	@ApiModelProperty(value = "The unit in which the size of the plot is expressed", position = 4)
+	@Schema(description = "The unit in which the size of the plot is expressed")
 	private String unit;
 
-	@ApiModelProperty(value = "The total size of the plot", position = 5)
+	@Schema(description = "The total size of the plot")
 	private Double size;
 
-	@ApiModelProperty(value = "The Geoid of the plot", position = 6)
+	@Schema(description = "The Geoid of the plot")
 	private String geoId;
 
-	@ApiModelProperty(value = "Date of transitioning into organic production", position = 7)
+	@Schema(description = "Date of transitioning into organic production")
 	private Date organicStartOfTransition;
 
-	@ApiModelProperty(value = "The list of coordinates of the plot", position = 8)
+	@Schema(description = "The list of coordinates of the plot")
 	private List<ApiPlotCoordinate> coordinates;
 
-	@ApiModelProperty(value = "Date of last update", position = 9)
+	@Schema(description = "Date of last update")
 	private Date lastUpdated;
 
-	@ApiModelProperty(value = "Date of last update", position = 10)
+	@Schema(description = "Date of last update")
 	private Long farmerId;
 
 	public String getPlotName() {

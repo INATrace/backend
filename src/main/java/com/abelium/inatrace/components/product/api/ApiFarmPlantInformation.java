@@ -1,6 +1,6 @@
 package com.abelium.inatrace.components.product.api;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
@@ -8,13 +8,13 @@ import java.math.BigDecimal;
 @Validated
 public class ApiFarmPlantInformation {
 
-	@ApiModelProperty(value = "Product type")
+	@Schema(description = "Product type")
 	public ApiProductType productType;
 
-	@ApiModelProperty(value = "Area cultivated with plant (ha)")
+	@Schema(description = "Area cultivated with plant (ha)")
 	public BigDecimal plantCultivatedArea;
 
-	@ApiModelProperty(value = "Number of plants")
+	@Schema(description = "Number of plants")
 	public Integer numberOfPlants;
 
 	public ApiProductType getProductType() {

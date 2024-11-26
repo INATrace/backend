@@ -1,7 +1,7 @@
 package com.abelium.inatrace.components.processingaction.api;
 
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 
@@ -12,10 +12,10 @@ import java.math.BigDecimal;
  */
 public class ApiProcessingActionOutputSemiProduct extends ApiSemiProduct {
 
-	@ApiModelProperty(value = "Repacked outputs of this output semi-product")
+	@Schema(description = "Repacked outputs of this output semi-product")
 	private Boolean repackedOutput;
 
-	@ApiModelProperty(value = "Maximum output weight when repacked outputs")
+	@Schema(description = "Maximum output weight when repacked outputs")
 	private BigDecimal maxOutputWeight;
 
 	public Boolean getRepackedOutput() {

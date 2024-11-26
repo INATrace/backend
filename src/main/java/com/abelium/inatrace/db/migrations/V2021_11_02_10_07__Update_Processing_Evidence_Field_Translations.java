@@ -7,7 +7,7 @@ import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
 import org.springframework.core.env.Environment;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 public class V2021_11_02_10_07__Update_Processing_Evidence_Field_Translations implements JpaMigration {

@@ -1,15 +1,13 @@
 package com.abelium.inatrace.configuration;
 
-import javax.persistence.EntityManagerFactory;
-
+import com.abelium.inatrace.components.flyway.DelayedFlywayMigrationInitializer;
+import com.abelium.inatrace.components.flyway.JpaMigrationStrategy;
+import jakarta.persistence.EntityManagerFactory;
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-
-import com.abelium.inatrace.components.flyway.DelayedFlywayMigrationInitializer;
-import com.abelium.inatrace.components.flyway.JpaMigrationStrategy;
 
 @Configuration
 public class MigrationsConfiguration {

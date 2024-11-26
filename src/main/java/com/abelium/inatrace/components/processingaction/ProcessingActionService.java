@@ -29,14 +29,13 @@ import com.abelium.inatrace.tools.PaginationTools;
 import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.torpedoquery.jpa.OnGoingLogicalCondition;
-import org.torpedoquery.jpa.Torpedo;
-
-import javax.transaction.Transactional;
+import org.torpedoquery.jakarta.jpa.OnGoingLogicalCondition;
+import org.torpedoquery.jakarta.jpa.Torpedo;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
@@ -85,7 +84,7 @@ public class ProcessingActionService extends BaseService {
 		ProcessingAction processingAction = fetchProcessingAction(id);
 
 		// The request user should be enrolled in the processing action owner company
-		PermissionsUtil.checkUserIfCompanyEnrolled(processingAction.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(processingAction.getCompany().getUsers().stream().toList(), user);
 
 		return ProcessingActionMapper.toApiProcessingAction(processingAction, language);
 	}
@@ -95,7 +94,7 @@ public class ProcessingActionService extends BaseService {
 		ProcessingAction processingAction = fetchProcessingAction(id);
 
 		// The request user should be enrolled in the processing action owner company
-		PermissionsUtil.checkUserIfCompanyEnrolled(processingAction.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(processingAction.getCompany().getUsers().stream().toList(), user);
 
 		return ProcessingActionMapper.toApiProcessingActionDetail(processingAction, language);
 	}
@@ -114,7 +113,7 @@ public class ProcessingActionService extends BaseService {
 		Company company = companyQueries.fetchCompany(apiProcessingAction.getCompany().getId());
 
 		// Check that request user is enrolled in owner company
-		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(company.getUsers().stream().toList(), user);
 
 		// Set processing action owner company
 		entity.setCompany(company);
@@ -183,7 +182,7 @@ public class ProcessingActionService extends BaseService {
 
 		ProcessingAction processingAction = fetchProcessingAction(id);
 
-		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(processingAction.getCompany().getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolledAndAdminOrSystemAdmin(processingAction.getCompany().getUsers().stream().toList(), user);
 
 		em.remove(processingAction);
 	}
@@ -206,7 +205,7 @@ public class ProcessingActionService extends BaseService {
 
 		// Check that request user is company enrolled
 		Company company = companyQueries.fetchCompany(companyId);
-		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers(), user);
+		PermissionsUtil.checkUserIfCompanyEnrolled(company.getUsers().stream().toList(), user);
 
 		return PaginationTools.createPaginatedResponse(em, request, () ->
 						listProcessingActionsByCompanyQuery(companyId, language, actionType, onlyFinalProducts),

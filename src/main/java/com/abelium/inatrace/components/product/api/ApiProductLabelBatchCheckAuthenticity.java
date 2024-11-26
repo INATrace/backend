@@ -1,26 +1,26 @@
 package com.abelium.inatrace.components.product.api;
 
 import java.time.LocalDate;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import org.springframework.validation.annotation.Validated;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiProductLabelBatchCheckAuthenticity extends ApiBaseEntity {
 
 	@NotNull
-	@ApiModelProperty(value = "Batch number", position = 1)
+	@Schema(description = "Batch number")
 	@Pattern(regexp = "^[\\p{Alnum}]*$")
 	public String number;
 	
-	@ApiModelProperty(value = "Production date", position = 3)
+	@Schema(description = "Production date")
     public LocalDate productionDate;
 
-	@ApiModelProperty(value = "Expiry date", position = 4)
+	@Schema(description = "Expiry date")
 	public LocalDate expiryDate;
 	
 

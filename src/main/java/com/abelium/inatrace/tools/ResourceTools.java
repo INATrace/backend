@@ -1,17 +1,19 @@
 package com.abelium.inatrace.tools;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-
+import com.abelium.inatrace.types.MediaObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
 import org.springframework.http.MediaType;
 
-import com.abelium.inatrace.types.MediaObject;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
-public class ResourceTools
-{
+public class ResourceTools {
+
+    private static final ThreadLocal<Tika> tikaInstance = ThreadLocal.withInitial(Tika::new);
+
     public static boolean exists(String path) {
         String respath = StringUtils.stripStart(path, "/");     // resource paths must not start with "/" 
         return Thread.currentThread().getContextClassLoader().getResource(respath) != null;
@@ -19,7 +21,7 @@ public class ResourceTools
     
     public static String loadResourceText(String name) throws FileNotFoundException, IOException {
         try (InputStream stream = getResourceStream(name)) {
-            return new String(stream.readAllBytes(), "UTF-8");
+            return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
     
@@ -44,8 +46,6 @@ public class ResourceTools
         return stream;
     }
     
-    private static ThreadLocal<Tika> tikaInstance = ThreadLocal.withInitial(() -> new Tika());
-    
     public static Tika mediaTypeDetector() {
         return tikaInstance.get();
     }
@@ -53,4 +53,5 @@ public class ResourceTools
     public static void cleanupMediaDetector() {
         tikaInstance.remove();
     }
+
 }

@@ -4,8 +4,8 @@ import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.types.Language;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
 

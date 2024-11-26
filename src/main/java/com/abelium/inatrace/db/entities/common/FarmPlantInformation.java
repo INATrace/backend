@@ -1,12 +1,11 @@
 package com.abelium.inatrace.db.entities.common;
 
-import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.codebook.ProductType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
 
 @Entity
@@ -18,10 +17,10 @@ public class FarmPlantInformation extends BaseEntity {
 	@ManyToOne
 	private UserCustomer userCustomer;
 
-	@Column(length = Lengths.DEFAULT)
+	@Column
 	private BigDecimal plantCultivatedArea;
 
-	@Column(length = Lengths.DEFAULT)
+	@Column
 	private Integer numberOfPlants;
 
 	public ProductType getProductType() {

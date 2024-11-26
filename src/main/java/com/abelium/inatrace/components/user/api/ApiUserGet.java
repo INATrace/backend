@@ -1,21 +1,20 @@
 package com.abelium.inatrace.components.user.api;
 
+import com.abelium.inatrace.components.user.types.UserAction;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.abelium.inatrace.components.user.types.UserAction;
-
-import io.swagger.annotations.ApiModelProperty;
-
 public class ApiUserGet extends ApiUser {
 	
-	@ApiModelProperty("Possible actions")
+	@Schema(description = "Possible actions")
 	public List<UserAction> actions = new ArrayList<>();
 
-	@ApiModelProperty("User's company ids")
+	@Schema(description = "User's company ids")
 	public List<Long> companyIds = new ArrayList<>();
 
-	@ApiModelProperty("User's company ids where user is company admin")
+	@Schema(description = "User's company ids where user is company admin")
 	public List<Long> companyIdsAdmin = new ArrayList<>();
 	
 	public List<UserAction> getActions() {

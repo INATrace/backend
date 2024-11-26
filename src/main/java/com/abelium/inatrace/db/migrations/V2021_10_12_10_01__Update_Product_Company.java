@@ -8,7 +8,7 @@ import com.abelium.inatrace.tools.Queries;
 import com.abelium.inatrace.types.ProductCompanyType;
 import org.springframework.core.env.Environment;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 /**

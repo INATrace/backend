@@ -2,7 +2,7 @@ package com.abelium.inatrace.db.migrations;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.springframework.core.env.Environment;
 import com.abelium.inatrace.components.flyway.JpaMigration;

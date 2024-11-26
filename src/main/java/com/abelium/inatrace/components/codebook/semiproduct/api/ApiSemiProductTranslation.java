@@ -2,17 +2,17 @@ package com.abelium.inatrace.components.codebook.semiproduct.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.types.Language;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiSemiProductTranslation extends ApiBaseEntity {
 
-    @ApiModelProperty(value = "Semi product name")
+    @Schema(description = "Semi product name")
     private String name;
 
-    @ApiModelProperty(value = "Semi product description")
+    @Schema(description = "Semi product description")
     private String description;
 
-    @ApiModelProperty(value = "Semi product language")
+    @Schema(description = "Semi product language")
     private Language language;
 
     public String getName() {

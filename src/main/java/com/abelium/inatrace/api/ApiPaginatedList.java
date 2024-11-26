@@ -1,9 +1,9 @@
 package com.abelium.inatrace.api;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Collections;
 import java.util.List;
-
-import io.swagger.annotations.ApiModelProperty;
 
 public class ApiPaginatedList<DATATYPE> {
     
@@ -22,18 +22,17 @@ public class ApiPaginatedList<DATATYPE> {
     }
     
     
-    @ApiModelProperty(value = "Response items.", position = 0)
+    @Schema(description = "Response items.")
     public List<DATATYPE> items;
     
-    @ApiModelProperty(value = "Count of all items satisfying 'paginatable' request.", position = 1)
+    @Schema(description = "Count of all items satisfying 'paginatable' request.")
     public int count;
 
-    @ApiModelProperty(value = "Offset got from request", position = 2)
+    @Schema(description = "Offset got from request")
     public int offset;
     
-    @ApiModelProperty(value = "Limit got from request", position = 3)
+    @Schema(description = "Limit got from request")
     public int limit;
-    
     
     public List<DATATYPE> getItems() {
         return items;

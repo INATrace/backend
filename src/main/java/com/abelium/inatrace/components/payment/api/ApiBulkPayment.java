@@ -8,7 +8,7 @@ import com.abelium.inatrace.db.entities.payment.PaymentPurposeType;
 import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -17,46 +17,46 @@ import java.util.List;
 
 public class ApiBulkPayment extends ApiBaseEntity {
 	
-	@ApiModelProperty(value = "Bulk payment created by")
+	@Schema(description = "Bulk payment created by")
 	private ApiUser createdBy;
 
-	@ApiModelProperty(value = "Creation timestamp")
+	@Schema(description = "Creation timestamp")
 	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
 	private Instant creationTimestamp;
 
-	@ApiModelProperty(value = "Bulk payment currency")
+	@Schema(description = "Bulk payment currency")
 	private String currency;
 
-	@ApiModelProperty(value = "Formal creation date")
+	@Schema(description = "Formal creation date")
 	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
 	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
 	private Instant formalCreationTime;
 	
-	@ApiModelProperty(value = "Company that pays for the bulk payment")
+	@Schema(description = "Company that pays for the bulk payment")
 	private ApiCompany payingCompany;
 	
-	@ApiModelProperty(value = "Bulk payment drescription")
+	@Schema(description = "Bulk payment drescription")
 	private String paymentDescription;
 	
-	@ApiModelProperty(value = "Bulk payment purpose type")
+	@Schema(description = "Bulk payment purpose type")
 	private PaymentPurposeType paymentPurposeType;
 	
-	@ApiModelProperty(value = "Bulk payment receipt number")
+	@Schema(description = "Bulk payment receipt number")
 	private String receiptNumber;
 	
-	@ApiModelProperty(value = "Bulk payment total amount")
+	@Schema(description = "Bulk payment total amount")
 	private BigDecimal totalAmount;
 	
-	@ApiModelProperty(value = "Bulk payment additional cost")
+	@Schema(description = "Bulk payment additional cost")
 	private BigDecimal additionalCost;
 	
-	@ApiModelProperty(value = "Bulk payment additional cost description")
+	@Schema(description = "Bulk payment additional cost description")
 	private String additionalCostDescription;
 	
-	@ApiModelProperty(value = "Bulk payment payments")
+	@Schema(description = "Bulk payment payments")
 	private List<ApiPayment> payments = new ArrayList<>();
 	
-	@ApiModelProperty(value = "Bulk payment additional proofs")
+	@Schema(description = "Bulk payment additional proofs")
 	private List<ApiActivityProof> additionalProofs = new ArrayList<>();
 
 	public ApiUser getCreatedBy() {

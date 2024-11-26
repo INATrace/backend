@@ -107,7 +107,7 @@ public final class ProcessingActionMapper {
 		List<ApiProcessingEvidenceType> apiRequiredDocumentTypes = new ArrayList<>();
 
 		// Processing evidence types
-		List<ProcessingActionPET> processingActionProcessingEvidenceTypes = entity.getRequiredDocumentTypes();
+		List<ProcessingActionPET> processingActionProcessingEvidenceTypes = entity.getRequiredDocumentTypes().stream().toList();
 		processingActionProcessingEvidenceTypes.forEach(
 			processingActionProcessingEvidenceType -> {
 
@@ -133,7 +133,7 @@ public final class ProcessingActionMapper {
 
 		// Map the supported facilities for this
 		List<ApiFacility> supportedFacilities = new ArrayList<>();
-		List<ProcessingActionFacility> processingActionFacilities = entity.getProcessingActionFacilities();
+		List<ProcessingActionFacility> processingActionFacilities = entity.getProcessingActionFacilities().stream().toList();
 		processingActionFacilities.forEach(processingActionFacility -> {
 
 			// Get the translated facility name
@@ -221,7 +221,7 @@ public final class ProcessingActionMapper {
 	private static List<ApiProcessingEvidenceField> mapProcessingEvidenceFields(ProcessingAction entity, Language language) {
 
 		List<ApiProcessingEvidenceField> apiRequiredEvidenceFields = new ArrayList<>();
-		List<ProcessingActionPEF> processingActionProcessingEvidenceFields = entity.getProcessingEvidenceFields();
+		List<ProcessingActionPEF> processingActionProcessingEvidenceFields = entity.getProcessingEvidenceFields().stream().toList();
 		processingActionProcessingEvidenceFields.forEach(
 				processingActionProcessingEvidenceField -> {
 

@@ -2,17 +2,17 @@ package com.abelium.inatrace.components.product.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.types.Language;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiProductTypeTranslation extends ApiBaseEntity {
 
-    @ApiModelProperty(value = "Product type name")
+    @Schema(description = "Product type name")
     private String name;
 
-    @ApiModelProperty(value = "Product type description")
+    @Schema(description = "Product type description")
     private String description;
 
-    @ApiModelProperty(value = "Product type language")
+    @Schema(description = "Product type language")
     private Language language;
 
     public String getName() {

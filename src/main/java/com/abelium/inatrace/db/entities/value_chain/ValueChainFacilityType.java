@@ -2,11 +2,7 @@ package com.abelium.inatrace.db.entities.value_chain;
 
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.codebook.FacilityType;
-
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import jakarta.persistence.*;
 
 /**
  * Intermediate entity between value chain and facility type.

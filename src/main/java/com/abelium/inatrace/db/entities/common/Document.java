@@ -4,13 +4,7 @@ package com.abelium.inatrace.db.entities.common;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.CreationTimestampEntity;
 import com.abelium.inatrace.types.DocumentType;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(indexes = { @Index(columnList = "storageKey") })

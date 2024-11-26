@@ -1,6 +1,7 @@
 package com.abelium.inatrace.components.analytics.api;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
@@ -8,30 +9,29 @@ import org.springframework.validation.annotation.Validated;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.types.RequestLogType;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiLogRequest {
 
-	@ApiModelProperty(value = "request token", position = 0)
+	@Schema(description = "request token")
 	public String token;
 
 	@NotNull
-	@ApiModelProperty(value = "type", position = 1)
+	@Schema(description = "type")
 	public RequestLogType type;
 	
-	@Length(max = Lengths.REQUEST_LOG_KEY)
-	@ApiModelProperty(value = "log key to store (max 64 chars)", position = 2)
+	@Size(max = Lengths.REQUEST_LOG_KEY)
+	@Schema(description = "log key to store (max 64 chars)")
 	public String logKey;
 
-	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "value 1 (max 255 chars)", position = 3)
+	@Size(max = Lengths.DEFAULT)
+	@Schema(description = "value 1 (max 255 chars)")
 	public String value1;
 
-	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "value 2 (max 255 chars)", position = 4)
+	@Size(max = Lengths.DEFAULT)
+	@Schema(description = "value 2 (max 255 chars)")
 	public String value2;
-	
 
 	public String getToken() {
 		return token;

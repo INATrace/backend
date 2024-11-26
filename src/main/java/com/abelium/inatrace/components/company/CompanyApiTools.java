@@ -33,8 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -392,10 +392,10 @@ public class CompanyApiTools {
 		apiUserCustomer.setFarm(toApiFarmInformation(userCustomer, language));
 
 		// Associations
-		apiUserCustomer.setAssociations(toApiUserCustomerAssociationList(userCustomer.getAssociations()));
+		apiUserCustomer.setAssociations(toApiUserCustomerAssociationList(userCustomer.getAssociations().stream().toList()));
 
 		// Cooperatives
-		apiUserCustomer.setCooperatives(toApiUserCustomerCooperativesList(userCustomer.getCooperatives()));
+		apiUserCustomer.setCooperatives(toApiUserCustomerCooperativesList(userCustomer.getCooperatives().stream().toList()));
 
 		// Certifications
 		apiUserCustomer.setCertifications(userCustomer.getCertifications().stream().map(ucc -> {

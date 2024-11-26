@@ -5,7 +5,7 @@ import com.abelium.inatrace.tools.Queries;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 @Lazy
 @Service

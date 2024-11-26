@@ -5,7 +5,7 @@ import com.abelium.inatrace.db.entities.product.BusinessToCustomerSettings;
 import com.abelium.inatrace.tools.Queries;
 import org.springframework.core.env.Environment;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 public class V2022_08_30_11_00__Update_Business_To_Customer_Settings_Add_Prod_Title_Color implements JpaMigration {

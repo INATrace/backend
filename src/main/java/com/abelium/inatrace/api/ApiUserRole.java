@@ -1,15 +1,14 @@
 package com.abelium.inatrace.api;
 
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.types.UserRole;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.validation.annotation.Validated;
 
 @Validated
 public class ApiUserRole extends ApiBaseEntity {
 	
-	@ApiModelProperty(value = "Role", position = 1)
+	@Schema(description = "Role")
 	public UserRole role;
 	
 	public ApiUserRole() {

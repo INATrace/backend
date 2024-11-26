@@ -1,31 +1,35 @@
 package com.abelium.inatrace.components.common.api;
 
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.Length;
+import com.abelium.inatrace.api.types.Lengths;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
 import org.springframework.validation.annotation.Validated;
 
-import com.abelium.inatrace.api.types.Lengths;
-
-import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Validated
 public class ApiCountry {
 
     @NotNull
-    @ApiModelProperty(value = "Db id.", position = 0)    
-    public Long id;
-    
-    @NotNull
-    @ApiModelProperty(required = true, value = "Two letter country code of country (ISO 3166-1 alpha-2 code).", position = 0)
-    @Length(max = Lengths.COUNTRY_CODE)
-    public String code = null;
+    @Schema(description = "Db id.", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Long id;
 
     @NotNull
-    @ApiModelProperty(required = true, value = "Country name.", position = 1)
-    @Length(max = Lengths.COUNTRY_NAME)
-    public String name = null;
+    @Size(max = Lengths.COUNTRY_CODE)
+    @Schema(description = "Two letter country code of country (ISO 3166-1 alpha-2 code).", maxLength = Lengths.COUNTRY_CODE, requiredMode = Schema.RequiredMode.REQUIRED)
+    private String code = null;
 
+    @NotNull
+    @Size(max = Lengths.COUNTRY_NAME)
+    @Schema(description = "Country name.", maxLength = Lengths.COUNTRY_NAME, requiredMode = Schema.RequiredMode.REQUIRED)
+    private String name = null;
+
+    @Schema(description = "The latitude of the country")
+    private Double latitude;
+
+    @Schema(description = "The longitude of the country")
+    private Double longitude;
     
     public ApiCountry() {}
 
@@ -58,5 +62,21 @@ public class ApiCountry {
     public void setName(String name) {
         this.name = name;
     }
-   
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
 }

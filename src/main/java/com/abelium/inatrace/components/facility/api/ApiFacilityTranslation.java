@@ -1,14 +1,14 @@
 package com.abelium.inatrace.components.facility.api;
 
 import com.abelium.inatrace.types.Language;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiFacilityTranslation {
 
-    @ApiModelProperty(value = "Facility name")
+    @Schema(description = "Facility name")
     private String name;
 
-    @ApiModelProperty(value = "Facility language")
+    @Schema(description = "Facility language")
     private Language language;
 
     public String getName() {

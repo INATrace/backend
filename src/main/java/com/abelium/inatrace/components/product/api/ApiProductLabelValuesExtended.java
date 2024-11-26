@@ -3,32 +3,32 @@ package com.abelium.inatrace.components.product.api;
 import com.abelium.inatrace.components.company.api.ApiCompanyDocument;
 import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
 @Validated
 public class ApiProductLabelValuesExtended extends ApiProductLabelValues {
 	
-	@ApiModelProperty(value = "Number of batches", position = 10)
+	@Schema(description = "Number of batches")
 	public Integer numberOfBatches;
 	
-	@ApiModelProperty(value = "Number of true 'checkAuthenticity' fields over all of batches", position = 11)
+	@Schema(description = "Number of true 'checkAuthenticity' fields over all of batches")
 	public Integer checkAuthenticityCount;
 
-	@ApiModelProperty(value = "Number of true 'traceOrigin' fields over all of batches", position = 11)
+	@Schema(description = "Number of true 'traceOrigin' fields over all of batches")
 	public Integer traceOriginCount;
 
-	@ApiModelProperty(value = "B2C settings")
+	@Schema(description = "B2C settings")
 	public ApiBusinessToCustomerSettings businessToCustomerSettings;
 
-	@ApiModelProperty(value = "Meet the farmers video")
+	@Schema(description = "Meet the farmers video")
 	public ApiCompanyDocument videoMeetTheFarmers;
 
-	@ApiModelProperty(value = "Meet the farmers photos")
+	@Schema(description = "Meet the farmers photos")
 	public List<ApiCompanyDocument> photosMeetTheFarmers;
 
-	@ApiModelProperty(value = "Production records")
+	@Schema(description = "Production records")
 	public List<ApiCompanyDocument> productionRecords;
 
 	public Integer getNumberOfBatches() {

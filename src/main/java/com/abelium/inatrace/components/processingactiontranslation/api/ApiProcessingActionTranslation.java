@@ -2,17 +2,17 @@ package com.abelium.inatrace.components.processingactiontranslation.api;
 
 
 import com.abelium.inatrace.types.Language;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiProcessingActionTranslation {
 
-    @ApiModelProperty(value = "Processing action name")
+    @Schema(description = "Processing action name")
     private String name;
 
-    @ApiModelProperty(value = "Processing action description")
+    @Schema(description = "Processing action description")
     private String description;
 
-    @ApiModelProperty(value = "Processing action language")
+    @Schema(description = "Processing action language")
     private Language language;
 
     public String getName() {

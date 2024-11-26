@@ -2,17 +2,16 @@ package com.abelium.inatrace.db.entities.common;
 
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
 
 // Do not make a db relation to this table, use the country code to refer to it 
 @Entity
 @NamedQueries({
 		@NamedQuery(name = "Country.getCountryByCode",
-					query = "SELECT c FROM Country c WHERE c.code = :code")
+		            query = "SELECT c FROM Country c WHERE c.code = :code")
 })
 public class Country extends BaseEntity {
     
@@ -27,6 +26,12 @@ public class Country extends BaseEntity {
      */
     @Column(nullable = false, length = Lengths.COUNTRY_NAME)
     private String name;
+
+	@Column
+	private Double latitude;
+
+	@Column
+	private Double longitude;
 	
     public String getCode() {
 		return code;
@@ -43,4 +48,21 @@ public class Country extends BaseEntity {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	public Double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(Double latitude) {
+		this.latitude = latitude;
+	}
+
+	public Double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+
 }

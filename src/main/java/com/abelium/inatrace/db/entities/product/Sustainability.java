@@ -1,11 +1,9 @@
 package com.abelium.inatrace.db.entities.product;
 
-import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
 
 @Entity
 public class Sustainability extends BaseEntity {
@@ -30,7 +28,7 @@ public class Sustainability extends BaseEntity {
 	 * CO2 footprint - If you have calculated your company CO2 footprint, please add this information. 
 	 * Make sure to include your annual CO2 footprint
 	 */
-	@Column(length = Lengths.DEFAULT)
+	@Column
 	private String co2Footprint;
 	
 	public String getProduction() {

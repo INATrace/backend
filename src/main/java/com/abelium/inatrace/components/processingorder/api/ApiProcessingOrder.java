@@ -4,7 +4,7 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.processingaction.api.ApiProcessingAction;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
 import com.abelium.inatrace.components.transaction.api.ApiTransaction;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -13,22 +13,22 @@ import java.util.List;
 
 public class ApiProcessingOrder extends ApiBaseEntity {
 
-    @ApiModelProperty(value = "Initiator user ID")
+    @Schema(description = "Initiator user ID")
     public Long initiatorUserId;
 
-    @ApiModelProperty(value = "Timestamp indicates when processing order have been created")
+    @Schema(description = "Timestamp indicates when processing order have been created")
     private Instant creationTimestamp;
 
-    @ApiModelProperty(value = "Processing action")
+    @Schema(description = "Processing action")
     public ApiProcessingAction processingAction;
 
-    @ApiModelProperty(value = "Processing date")
+    @Schema(description = "Processing date")
     public LocalDate processingDate;
 
-    @ApiModelProperty(value = "Input transactions")
+    @Schema(description = "Input transactions")
     public List<ApiTransaction> inputTransactions;
 
-    @ApiModelProperty(value = "Target stock orders")
+    @Schema(description = "Target stock orders")
     public List<ApiStockOrder> targetStockOrders;
 
     public Long getInitiatorUserId() {

@@ -5,7 +5,7 @@ import com.abelium.inatrace.db.entities.codebook.ProductType;
 import com.abelium.inatrace.tools.Queries;
 import org.springframework.core.env.Environment;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 public class V2023_04_17_11_00__Update_Product_Type_FieldName implements JpaMigration {
