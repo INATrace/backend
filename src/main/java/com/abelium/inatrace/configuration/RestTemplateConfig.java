@@ -32,8 +32,10 @@ public class RestTemplateConfig {
     // replace Spring's RestTemplateBuilder because it allows only 5 concurrent requests
     @Bean
     public RestTemplateBuilder restTemplateBuilder() {
-        return restTemplateConfiguration.restTemplateBuilder(messageConverters, restTemplateCustomizers, restTemplateRequestCustomizers)
-                .requestFactory(() -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()));
+
+        return restTemplateConfiguration.restTemplateBuilderConfigurer(messageConverters, restTemplateCustomizers,
+                restTemplateRequestCustomizers).configure(new RestTemplateBuilder()).requestFactory(
+                        () -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()));
     }
 
     @Lazy

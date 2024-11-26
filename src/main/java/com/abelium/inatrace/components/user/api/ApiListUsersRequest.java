@@ -1,29 +1,29 @@
 package com.abelium.inatrace.components.user.api;
 
-import org.springframework.validation.annotation.Validated;
-
 import com.abelium.inatrace.api.ApiPaginatedRequest;
 import com.abelium.inatrace.types.UserRole;
 import com.abelium.inatrace.types.UserStatus;
-
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.validation.annotation.Validated;
 
 @Validated
+@ParameterObject
 public class ApiListUsersRequest extends ApiPaginatedRequest {
 
-	@ApiParam(value = "Status")
+	@Parameter(description = "Status")
 	public UserStatus status;
 	
-	@ApiParam(value = "User role")
+	@Parameter(description = "User role")
 	public UserRole role;
 	
-	@ApiParam(value = "Email")
+	@Parameter(description = "Email")
 	public String email;
 	
-	@ApiParam(value = "Surname")
+	@Parameter(description = "Surname")
 	public String surname;
 
-	@ApiParam(value = "Name, surname or email")
+	@Parameter(description = "Name, surname or email")
 	public String query;
 	
 	public UserStatus getStatus() {

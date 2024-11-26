@@ -12,7 +12,7 @@ import com.abelium.inatrace.components.value_chain.api.ApiValueChain;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProcessingActionType;
 import com.abelium.inatrace.types.PublicTimelineIconType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,76 +25,76 @@ import java.util.List;
  */
 public class ApiProcessingAction extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "Processing action name")
+	@Schema(description = "Processing action name")
 	private String name;
 	
-	@ApiModelProperty(value = "Processing action description")
+	@Schema(description = "Processing action description")
 	private String description;
 	
-	@ApiModelProperty(value = "Processing action language")
+	@Schema(description = "Processing action language")
 	private Language language;
 
-	@ApiModelProperty(value = "Sort order number. Lower number means first")
+	@Schema(description = "Sort order number. Lower number means first")
 	private Long sortOrder;
 
-	@ApiModelProperty(value = "Processing action prefix")
+	@Schema(description = "Processing action prefix")
 	private String prefix;
 
-	@ApiModelProperty(value = "The estimated output quantity per unit for this processing action")
+	@Schema(description = "The estimated output quantity per unit for this processing action")
 	private BigDecimal estimatedOutputQuantityPerUnit;
 	
-	@ApiModelProperty(value = "Processing action public timeline label")
+	@Schema(description = "Processing action public timeline label")
 	private String publicTimelineLabel;
 	
-	@ApiModelProperty(value = "Processing action public timeline location")
+	@Schema(description = "Processing action public timeline location")
 	private String publicTimelineLocation;
 
-	@ApiModelProperty(value = "Processing action company")
+	@Schema(description = "Processing action company")
 	private ApiCompanyBase company;
 	
-	@ApiModelProperty(value = "Processing action input semi product")
+	@Schema(description = "Processing action input semi product")
 	private ApiSemiProduct inputSemiProduct;
 
-	@ApiModelProperty(value = "List of supported output semi-products")
+	@Schema(description = "List of supported output semi-products")
 	private List<ApiProcessingActionOutputSemiProduct> outputSemiProducts;
 
-	@ApiModelProperty(value = "The input Final product")
+	@Schema(description = "The input Final product")
 	private ApiFinalProduct inputFinalProduct;
 
-	@ApiModelProperty(value = "The output final product")
+	@Schema(description = "The output final product")
 	private ApiFinalProduct outputFinalProduct;
 
-	@ApiModelProperty(value = "Processing action repacked outputs when using output final product")
+	@Schema(description = "Processing action repacked outputs when using output final product")
 	private Boolean repackedOutputFinalProducts;
 
-	@ApiModelProperty(value = "Processing action maximum output weight when repacked outputs for final product is set to 'true'")
+	@Schema(description = "Processing action maximum output weight when repacked outputs for final product is set to 'true'")
 	private BigDecimal maxOutputWeight;
 
-	@ApiModelProperty(value = "The Final product for which the QR code tag will be generated (used with action type GENERATE_QR_CODE)")
+	@Schema(description = "The Final product for which the QR code tag will be generated (used with action type GENERATE_QR_CODE)")
 	private ApiFinalProduct qrCodeForFinalProduct;
 	
-	@ApiModelProperty(value = "Processing action type")
+	@Schema(description = "Processing action type")
 	private ProcessingActionType type;
 
-	@ApiModelProperty(value = "Processing action public timeline icon type")
+	@Schema(description = "Processing action public timeline icon type")
 	private PublicTimelineIconType publicTimelineIconType;
 
-	@ApiModelProperty(value = "Denoting if this processing action is Transfer or Quote of a Final product")
+	@Schema(description = "Denoting if this processing action is Transfer or Quote of a Final product")
 	private Boolean finalProductAction;
 
-	@ApiModelProperty(value = "List of value chains for this processing action")
+	@Schema(description = "List of value chains for this processing action")
 	private List<ApiValueChain> valueChains;
 
-	@ApiModelProperty(value = "Processing action required document types")
+	@Schema(description = "Processing action required document types")
 	private List<ApiProcessingEvidenceType> requiredDocumentTypes = new ArrayList<>();
 	
-	@ApiModelProperty(value = "Processing action required evidence fields")
+	@Schema(description = "Processing action required evidence fields")
 	private List<ApiProcessingEvidenceField> requiredEvidenceFields = new ArrayList<>();
 
-	@ApiModelProperty(value = "List of facilities where this processing starts")
+	@Schema(description = "List of facilities where this processing starts")
 	private List<ApiFacility> supportedFacilities = new ArrayList<>();
 
-	@ApiModelProperty(value = "Processing action translations")
+	@Schema(description = "Processing action translations")
 	private List<ApiProcessingActionTranslation> translations = new ArrayList<>();
 
 	public ApiProcessingAction() {

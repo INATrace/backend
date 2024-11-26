@@ -5,14 +5,17 @@ import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.dashboard.api.*;
 import com.abelium.inatrace.types.Language;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -30,17 +33,17 @@ public class DashboardController {
 
     @GetMapping("deliveries-aggregated-data")
     public ApiResponse<ApiDeliveriesTotal> getDeliveriesAggregatedData(
-            @Valid @ApiParam(value = "Company ID", required = true) @RequestParam("companyId") Long companyId,
-            @Valid @ApiParam(value = "Facility IDs") @RequestParam(value = "facilityIds", required = false) List<Long> facilityIds,
-            @Valid @ApiParam(value = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
-            @Valid @ApiParam(value = "Farmer (UserCustomer) ID") @RequestParam(value = "farmerId", required = false) Long farmerId,
-            @Valid @ApiParam(value = "Collector (Representative of producer UserCustomer) ID") @RequestParam(value = "collectorId", required = false) Long collectorId,
-            @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
-            @Valid @ApiParam(value = "Organic only") @RequestParam(value = "organicOnly", required = false) Boolean organicOnly,
-            @Valid @ApiParam(value = "Price determined later") @RequestParam(value = "priceDeterminedLater", required = false) Boolean priceDeterminedLater,
-            @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
-            @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
-            @Valid @ApiParam(value = "Aggregation type", required = true) @RequestParam(value = "aggregationType") ApiAggregationTimeUnit aggregationType
+            @Valid @Parameter(description = "Company ID", required = true) @RequestParam("companyId") Long companyId,
+            @Valid @Parameter(description = "Facility IDs") @RequestParam(value = "facilityIds", required = false) List<Long> facilityIds,
+            @Valid @Parameter(description = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+            @Valid @Parameter(description = "Farmer (UserCustomer) ID") @RequestParam(value = "farmerId", required = false) Long farmerId,
+            @Valid @Parameter(description = "Collector (Representative of producer UserCustomer) ID") @RequestParam(value = "collectorId", required = false) Long collectorId,
+            @Valid @Parameter(description = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
+            @Valid @Parameter(description = "Organic only") @RequestParam(value = "organicOnly", required = false) Boolean organicOnly,
+            @Valid @Parameter(description = "Price determined later") @RequestParam(value = "priceDeterminedLater", required = false) Boolean priceDeterminedLater,
+            @Valid @Parameter(description = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+            @Valid @Parameter(description = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
+            @Valid @Parameter(description = "Aggregation type", required = true) @RequestParam(value = "aggregationType") ApiAggregationTimeUnit aggregationType
     ) {
         return new ApiResponse<>(dashboardService.getDeliveriesAggregatedData(
                 aggregationType,
@@ -58,20 +61,25 @@ public class DashboardController {
                 )));
     }
 
-    @GetMapping("deliveries-aggregated-data/export")
+    @GetMapping(value = "deliveries-aggregated-data/export", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> exportDeliveriesData(
-            @Valid @ApiParam(value = "Company ID", required = true) @RequestParam("companyId") Long companyId,
-            @Valid @ApiParam(value = "Facility IDs") @RequestParam(value = "facilityIds", required = false) List<Long> facilityIds,
-            @Valid @ApiParam(value = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
-            @Valid @ApiParam(value = "Farmer (UserCustomer) ID") @RequestParam(value = "farmerId", required = false) Long farmerId,
-            @Valid @ApiParam(value = "Collector (Representative of producer UserCustomer) ID") @RequestParam(value = "collectorId", required = false) Long collectorId,
-            @Valid @ApiParam(value = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
-            @Valid @ApiParam(value = "Organic only") @RequestParam(value = "organicOnly", required = false) Boolean organicOnly,
-            @Valid @ApiParam(value = "Price determined later") @RequestParam(value = "priceDeterminedLater", required = false) Boolean priceDeterminedLater,
-            @Valid @ApiParam(value = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
-            @Valid @ApiParam(value = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
-            @Valid @ApiParam(value = "Aggregation type", required = true) @RequestParam(value = "aggregationType") ApiAggregationTimeUnit aggregationType,
-            @Valid @ApiParam(value = "Export type", required = true) @RequestParam(value = "exportType") ApiExportType exportType,
+            @Valid @Parameter(description = "Company ID", required = true) @RequestParam("companyId") Long companyId,
+            @Valid @Parameter(description = "Facility IDs") @RequestParam(value = "facilityIds", required = false) List<Long> facilityIds,
+            @Valid @Parameter(description = "Semi-product ID") @RequestParam(value = "semiProductId", required = false) Long semiProductId,
+            @Valid @Parameter(description = "Farmer (UserCustomer) ID") @RequestParam(value = "farmerId", required = false) Long farmerId,
+            @Valid @Parameter(description = "Collector (Representative of producer UserCustomer) ID") @RequestParam(value = "collectorId", required = false) Long collectorId,
+            @Valid @Parameter(description = "Is women share") @RequestParam(value = "isWomenShare", required = false) Boolean isWomenShare,
+            @Valid @Parameter(description = "Organic only") @RequestParam(value = "organicOnly", required = false) Boolean organicOnly,
+            @Valid @Parameter(description = "Price determined later") @RequestParam(value = "priceDeterminedLater", required = false) Boolean priceDeterminedLater,
+            @Valid @Parameter(description = "Production date range start") @RequestParam(value = "productionDateStart", required = false) LocalDate productionDateStart,
+            @Valid @Parameter(description = "Production date range end") @RequestParam(value = "productionDateEnd", required = false) LocalDate productionDateEnd,
+            @Valid @Parameter(description = "Aggregation type", required = true) @RequestParam(value = "aggregationType") ApiAggregationTimeUnit aggregationType,
+            @Valid @Parameter(description = "Export type", required = true) @RequestParam(value = "exportType") ApiExportType exportType,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language
     ) throws ApiException {
 
@@ -116,15 +124,20 @@ public class DashboardController {
     }
 
     @PostMapping(value = "processing-performance-data")
-    @ApiOperation("Calculates processing performance data")
+    @Operation(summary ="Calculates processing performance data")
     public ApiResponse<ApiProcessingPerformanceTotal> calculateProcessingPerformanceData(
             @Valid @RequestBody ApiProcessingPerformanceRequest processingPerformanceRequest
     ) throws ApiException {
         return new ApiResponse<>(dashboardService.calculateProcessingPerformanceData(processingPerformanceRequest));
     }
 
-    @PostMapping(value = "processing-performance-data/export")
-    @ApiOperation("Exports processing performance data to the requested format")
+    @PostMapping(value = "processing-performance-data/export", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @Operation(summary ="Exports processing performance data to the requested format")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> exportProcessingPerformanceData(
             @Valid @RequestBody ApiProcessingPerformanceRequest processingPerformanceRequest,
             @RequestHeader(value = "language", defaultValue = "EN", required = false) Language language

@@ -1,10 +1,10 @@
 package com.abelium.inatrace.db.base;
 
-import java.time.Instant;
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.Instant;
 
 /**
  * Base class for all entities with creationTimestamp  

@@ -1,10 +1,10 @@
 package com.abelium.inatrace.db.entities.product;
 
 import com.abelium.inatrace.db.entities.company.Company;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
@@ -24,7 +24,7 @@ public class ProductLabelContent extends ProductContent {
 	 * indicate the number of farmers or suppliers you work with directly or indirectly at each location. 
 	 */
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductLocation> originLocations = new ArrayList<>(0);
+    private Set<ProductLocation> originLocations = new HashSet<>();
 	
 	public Company getCompany() {
 		return company;
@@ -34,11 +34,11 @@ public class ProductLabelContent extends ProductContent {
 		this.company = company;
 	}
 
-	public List<ProductLocation> getOriginLocations() {
+	public Set<ProductLocation> getOriginLocations() {
 		return originLocations;
 	}
 
-	public void setOriginLocations(List<ProductLocation> originLocations) {
+	public void setOriginLocations(Set<ProductLocation> originLocations) {
 		this.originLocations = originLocations;
 	}
 
@@ -54,7 +54,7 @@ public class ProductLabelContent extends ProductContent {
 		plc.setSustainability(p.getSustainability().copy());
 		plc.setSettings(p.getSettings().copy());
 		plc.setCompany(p.getCompany()); // no copy -- read only!
-		plc.setOriginLocations(p.getOriginLocations().stream().map(ProductLocation::copy).collect(Collectors.toList()));
+		plc.setOriginLocations(p.getOriginLocations().stream().map(ProductLocation::copy).collect(Collectors.toSet()));
 
 		// If product has journey points set, copy them to the Product label
 		if (p.getJourney() != null) {

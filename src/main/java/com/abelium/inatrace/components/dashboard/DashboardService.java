@@ -45,7 +45,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.criteria.*;
+import jakarta.persistence.criteria.*;
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -449,10 +449,10 @@ public class DashboardService extends BaseService {
         } else {
 
             if (processingAction.getOutputSemiProducts() != null && !processingAction.getOutputSemiProducts().isEmpty() &&
-                    processingAction.getOutputSemiProducts().get(0) != null &&
-                    processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct() != null) {
+                    processingAction.getOutputSemiProducts().stream().toList().get(0) != null &&
+                    processingAction.getOutputSemiProducts().stream().toList().get(0).getOutputSemiProduct() != null) {
                 return MeasureUnitTypeMapper.toApiMeasureUnitType(
-                        processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct().getMeasurementUnitType());
+                        processingAction.getOutputSemiProducts().stream().toList().get(0).getOutputSemiProduct().getMeasurementUnitType());
             }
         }
         
@@ -497,11 +497,11 @@ public class DashboardService extends BaseService {
             // default return 1, if not found
             if (processingAction.getOutputSemiProducts() != null &&
                     !processingAction.getOutputSemiProducts().isEmpty() &&
-                    processingAction.getOutputSemiProducts().get(0) != null &&
-                    processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct() != null &&
-                    processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct().getMeasurementUnitType() !=
+                    processingAction.getOutputSemiProducts().stream().toList().get(0) != null &&
+                    processingAction.getOutputSemiProducts().stream().toList().get(0).getOutputSemiProduct() != null &&
+                    processingAction.getOutputSemiProducts().stream().toList().get(0).getOutputSemiProduct().getMeasurementUnitType() !=
                             null) {
-                outputWeight = processingAction.getOutputSemiProducts().get(0).getOutputSemiProduct()
+                outputWeight = processingAction.getOutputSemiProducts().stream().toList().get(0).getOutputSemiProduct()
                         .getMeasurementUnitType().getWeight();
             }
         }

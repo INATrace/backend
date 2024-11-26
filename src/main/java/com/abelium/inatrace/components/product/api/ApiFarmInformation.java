@@ -1,6 +1,6 @@
 package com.abelium.inatrace.components.product.api;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
@@ -11,22 +11,22 @@ import java.util.List;
 @Validated
 public class ApiFarmInformation {
     
-    @ApiModelProperty(value = "Area unit")
+    @Schema(description = "Area unit")
     public String areaUnit;
 
-    @ApiModelProperty(value = "Total cultivated area (ha)")
+    @Schema(description = "Total cultivated area (ha)")
     public BigDecimal totalCultivatedArea;
 
-    @ApiModelProperty(value = "List of plant information")
+    @Schema(description = "List of plant information")
     public List<ApiFarmPlantInformation> farmPlantInformationList;
 
-    @ApiModelProperty(value = "Organic")
+    @Schema(description = "Organic")
     public Boolean organic;
 
-    @ApiModelProperty(value = "Area is organic certified")
+    @Schema(description = "Area is organic certified")
     public BigDecimal areaOrganicCertified;
 
-    @ApiModelProperty(value = "Start date of transition to organic")
+    @Schema(description = "Start date of transition to organic")
     public Date startTransitionToOrganic;
 
     public BigDecimal getTotalCultivatedArea() {

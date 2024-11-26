@@ -5,42 +5,42 @@ import java.util.Map;
 
 import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiProductLabelAnalytics {
 	
-	@ApiModelProperty(value = "number of vistis", position = 1)
+	@Schema(description = "number of vistis")
 	public Integer visits;
 
-	@ApiModelProperty(value = "number of visits per country", position = 2)
+	@Schema(description = "number of visits per country")
 	public Map<String, Integer> visitsCountries = new HashMap<>();
 
-	@ApiModelProperty(value = "number of visits per lat:lon", position = 3)
+	@Schema(description = "number of visits per lat:lon")
 	public Map<String, Integer> visitsLocations = new HashMap<>();
 
-	@ApiModelProperty(value = "number of successful authenticity checks", position = 4)
+	@Schema(description = "number of successful authenticity checks")
 	public Integer authTrue;
 
-	@ApiModelProperty(value = "number of unsuccessful authenticity checks", position = 5)
+	@Schema(description = "number of unsuccessful authenticity checks")
 	public Integer authFalse;
 
-	@ApiModelProperty(value = "number of authenticity checks per country", position = 6)
+	@Schema(description = "number of authenticity checks per country")
 	public Map<String, Integer> authCountries = new HashMap<>();
 
-	@ApiModelProperty(value = "number of authenticity checks per lat:lon", position = 7)
+	@Schema(description = "number of authenticity checks per lat:lon")
 	public Map<String, Integer> authLocations = new HashMap<>();
 
-	@ApiModelProperty(value = "number of successful origin checks", position = 8)
+	@Schema(description = "number of successful origin checks")
 	public Integer originTrue;
 
-	@ApiModelProperty(value = "number of unsuccessful origin checks", position = 9)
+	@Schema(description = "number of unsuccessful origin checks")
 	public Integer originFalse;
 
-	@ApiModelProperty(value = "number of origin checks per country", position = 10)
+	@Schema(description = "number of origin checks per country")
 	public Map<String, Integer> originCountries = new HashMap<>();
 
-	@ApiModelProperty(value = "number of origin checks per lat:lon", position = 11)
+	@Schema(description = "number of origin checks per lat:lon")
 	public Map<String, Integer> originLocations = new HashMap<>();
 	
 	

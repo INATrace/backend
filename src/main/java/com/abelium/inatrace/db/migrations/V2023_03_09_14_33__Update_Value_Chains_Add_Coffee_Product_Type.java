@@ -8,7 +8,7 @@ import com.abelium.inatrace.db.entities.value_chain.ValueChain;
 import com.abelium.inatrace.tools.Queries;
 import org.springframework.core.env.Environment;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 public class V2023_03_09_14_33__Update_Value_Chains_Add_Coffee_Product_Type implements JpaMigration {

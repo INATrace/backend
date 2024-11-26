@@ -5,10 +5,10 @@ import com.abelium.inatrace.db.entities.codebook.FacilityType;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.stockorder.StockOrder;
 import com.abelium.inatrace.db.entities.value_chain.FacilityValueChain;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table
@@ -66,19 +66,19 @@ public class Facility extends TimestampEntity {
 	private FacilityType facilityType;
 
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<FacilitySemiProduct> facilitySemiProducts;
+	private Set<FacilitySemiProduct> facilitySemiProducts;
 
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<FacilityFinalProduct> facilityFinalProducts;
+	private Set<FacilityFinalProduct> facilityFinalProducts;
 
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<FacilityValueChain> facilityValueChains;
+	private Set<FacilityValueChain> facilityValueChains;
 	
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL)
-	private List<StockOrder> stockOrders;
+	private Set<StockOrder> stockOrders;
 
 	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<FacilityTranslation> facilityTranslations;
+	private Set<FacilityTranslation> facilityTranslations;
 
 	public String getName() {
 		return name;
@@ -192,42 +192,42 @@ public class Facility extends TimestampEntity {
 		this.facilityType = facilityType;
 	}
 
-	public List<FacilitySemiProduct> getFacilitySemiProducts() {
+	public Set<FacilitySemiProduct> getFacilitySemiProducts() {
 		if (facilitySemiProducts == null) {
-			facilitySemiProducts = new ArrayList<>();
+			facilitySemiProducts = new HashSet<>();
 		}
 		return facilitySemiProducts;
 	}
 
-	public List<FacilityFinalProduct> getFacilityFinalProducts() {
+	public Set<FacilityFinalProduct> getFacilityFinalProducts() {
 		if (facilityFinalProducts == null) {
-			facilityFinalProducts = new ArrayList<>();
+			facilityFinalProducts = new HashSet<>();
 		}
 		return facilityFinalProducts;
 	}
 
-	public List<StockOrder> getStockOrders() {
+	public Set<StockOrder> getStockOrders() {
 		return stockOrders;
 	}
 
-	public List<FacilityValueChain> getFacilityValueChains() {
+	public Set<FacilityValueChain> getFacilityValueChains() {
 		if (facilityValueChains == null) {
-			facilityValueChains = new ArrayList<>();
+			facilityValueChains = new HashSet<>();
 		}
 		return facilityValueChains;
 	}
 
-	public void setFacilityValueChains(List<FacilityValueChain> facilityValueChains) {
+	public void setFacilityValueChains(Set<FacilityValueChain> facilityValueChains) {
 		this.facilityValueChains = facilityValueChains;
 	}
 
-	public void setStockOrders(List<StockOrder> stockOrders) {
+	public void setStockOrders(Set<StockOrder> stockOrders) {
 		this.stockOrders = stockOrders;
 	}
 
-	public List<FacilityTranslation> getFacilityTranslations() {
+	public Set<FacilityTranslation> getFacilityTranslations() {
 		if (facilityTranslations == null) {
-			facilityTranslations = new ArrayList<>();
+			facilityTranslations = new HashSet<>();
 		}
 		return facilityTranslations;
 	}
@@ -238,7 +238,7 @@ public class Facility extends TimestampEntity {
 
 	public Facility(String name, Boolean isCollectionFacility, Boolean isPublic, Boolean isDeactivated,
 			FacilityLocation facilityLocation, Company company, FacilityType facilityType,
-			List<FacilitySemiProduct> facilitySemiProducts, List<StockOrder> stockOrders, List<FacilityTranslation> facilityTranslations) {
+			Set<FacilitySemiProduct> facilitySemiProducts, Set<StockOrder> stockOrders, Set<FacilityTranslation> facilityTranslations) {
 		super();
 		this.name = name;
 		this.isCollectionFacility = isCollectionFacility;

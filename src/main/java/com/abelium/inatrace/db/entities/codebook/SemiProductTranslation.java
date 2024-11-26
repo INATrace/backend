@@ -1,9 +1,8 @@
 package com.abelium.inatrace.db.entities.codebook;
 
 import com.abelium.inatrace.db.base.TranslatedEntity;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table

@@ -5,20 +5,22 @@ import org.springframework.validation.annotation.Validated;
 
 import com.abelium.inatrace.api.types.Lengths;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import jakarta.validation.constraints.Size;
 
 @Validated
 public class ApiProductLabelField {
 
-	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "Field name in Product", position = 1)
+	@Size(max = Lengths.DEFAULT)
+	@Schema(description = "Field name in Product")
 	public String name;
 
-	@ApiModelProperty(value = "Visible on FE", position = 2)
+	@Schema(description = "Visible on FE")
 	public Boolean visible = true;
 	
-	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "Section on FE", position = 3)
+	@Size(max = Lengths.DEFAULT)
+	@Schema(description = "Section on FE")
 	public String section;
 
 	public String getName() {

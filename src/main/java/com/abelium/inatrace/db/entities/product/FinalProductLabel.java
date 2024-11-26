@@ -1,10 +1,9 @@
 package com.abelium.inatrace.db.entities.product;
 
 import com.abelium.inatrace.db.base.BaseEntity;
-
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Entity representing connection between a Final product and selected supported Product Labels.

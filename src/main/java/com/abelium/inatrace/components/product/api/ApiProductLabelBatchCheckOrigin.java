@@ -1,19 +1,19 @@
 package com.abelium.inatrace.components.product.api;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import org.springframework.validation.annotation.Validated;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiProductLabelBatchCheckOrigin extends ApiBaseEntity {
 
 	@NotNull
-	@ApiModelProperty(value = "Batch number", position = 1)
-	@Pattern(regexp = "^[\\p{Alnum}]*$")
+	@Schema(description = "Batch number")
+	@Pattern(regexp = "^\\p{Alnum}*$")
 	public String number;
 	
 	public String getNumber() {

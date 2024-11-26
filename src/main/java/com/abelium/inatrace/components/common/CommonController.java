@@ -10,7 +10,10 @@ import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.components.common.api.ApiGlobalSettingsValue;
 import com.abelium.inatrace.security.service.CustomUserDetails;
 import com.abelium.inatrace.types.DocumentType;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,27 +22,26 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.io.IOException;
 
 @RestController
 @RequestMapping("/common")
-public class CommonController 
-{
+public class CommonController {
+
     @Autowired
     private CommonService commonEngine;
     
     @Autowired
     private GlobalSettingsService globalSettingsEngine;
     
-    
-    @ApiOperation(value = "List countries")
+    @Operation(summary = "List countries")
     @GetMapping(value = "/countries")
     public ApiPaginatedResponse<ApiCountry> getCountries(@Valid ApiPaginatedQueryStringRequest filterRequest) {
         return new ApiPaginatedResponse<>(commonEngine.fetchCountryList(filterRequest));
     }
     
-    @ApiOperation(value = "Uploads a document")
+    @Operation(summary = "Uploads a document")
     @PostMapping(value = "/document", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ApiResponse<ApiDocument> uploadDocument(@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @RequestParam(value = "type", defaultValue = "GENERAL") DocumentType type,
@@ -47,7 +49,7 @@ public class CommonController
         return new ApiResponse<>(commonEngine.uploadDocument(authUser.getUserId(), file.getBytes(), file.getOriginalFilename(), file.getContentType(), file.getSize(), type));
     }    
 
-    @ApiOperation(value = "Uploads an image")
+    @Operation(summary = "Uploads an image")
     @PostMapping(value = "/image", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ApiResponse<ApiDocument> uploadImage(@AuthenticationPrincipal CustomUserDetails authUser,
     		@RequestParam(value = "resize", defaultValue = "true") boolean resize,
@@ -55,35 +57,50 @@ public class CommonController
         return new ApiResponse<>(commonEngine.uploadImage(authUser.getUserId(), file.getBytes(), file.getOriginalFilename(), file.getContentType(), file.getSize(), resize));
     }    
     
-    @ApiOperation(value = "Returns file contents for given storage key")
-    @GetMapping(value = "/document/{storageKey}")
+    @Operation(summary = "Returns file contents for given storage key")
+    @GetMapping(value = "/document/{storageKey}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> getDocument(@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @PathVariable(value = "storageKey", required = true) String storageKey) throws ApiException {
         return commonEngine.getDocument(authUser.getUserId(), storageKey, null).toResponseEntity();
     }
     
-    @ApiOperation(value = "Returns image contents for given storage key")
-    @GetMapping(value = "/image/{storageKey}")
+    @Operation(summary = "Returns image contents for given storage key")
+    @GetMapping(value = "/image/{storageKey}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> getImage(@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @PathVariable(value = "storageKey", required = true) String storageKey) throws ApiException {
         return commonEngine.getImage(authUser.getUserId(), storageKey, null).toResponseEntity();
     }
 
-    @ApiOperation(value = "Returns image contents for given storage key")
-    @GetMapping(value = "/image/{storageKey}/{size}")
+    @Operation(summary = "Returns image contents for given storage key")
+    @GetMapping(value = "/image/{storageKey}/{size}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    content = @Content(schema = @Schema(type = "string", format = "binary"))
+            )
+    })
     public ResponseEntity<byte[]> getResizedImage(@AuthenticationPrincipal CustomUserDetails authUser,
     		@Valid @PathVariable(value = "storageKey", required = true) String storageKey,
     		@Valid @PathVariable(value = "size", required = true) String size) throws ApiException {
         return commonEngine.getImage(authUser.getUserId(), storageKey, size).toResponseEntity();
     }
     
-    @ApiOperation(value = "Returns 'global settings' value")
+    @Operation(summary = "Returns 'global settings' value")
     @GetMapping(value = "/globalSettings/{name}")
     public ApiResponse<ApiGlobalSettingsValue> getGlobalSettings(@Valid @PathVariable(value = "name", required = true) String name) {
         return new ApiResponse<>(new ApiGlobalSettingsValue(globalSettingsEngine.getSettings(name, false)));
     }    
 
-    @ApiOperation(value = "Updates or creates 'global settings'")
+    @Operation(summary = "Updates or creates 'global settings'")
     @PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
     @PostMapping(value = "/globalSettings/{name}")
     public ApiDefaultResponse updateGlobalSettings(

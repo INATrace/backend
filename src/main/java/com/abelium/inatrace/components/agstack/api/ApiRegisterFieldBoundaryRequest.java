@@ -1,9 +1,9 @@
 package com.abelium.inatrace.components.agstack.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-@ApiModel(description = "API model for AgStack register field boundary request.")
+@Schema(description = "API model for AgStack register field boundary request.")
 public class ApiRegisterFieldBoundaryRequest {
 
 	@JsonProperty("s2_index")

@@ -3,11 +3,11 @@ package com.abelium.inatrace.components.company.api;
 import com.abelium.inatrace.components.user.api.ApiUserBase;
 import com.abelium.inatrace.types.CompanyUserRole;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiCompanyUser extends ApiUserBase {
 
-	@ApiModelProperty(value = "company role")
+	@Schema(description = "company role")
 	public CompanyUserRole companyRole;
 
 	public CompanyUserRole getCompanyRole() {
@@ -17,4 +17,5 @@ public class ApiCompanyUser extends ApiUserBase {
 	public void setCompanyRole(CompanyUserRole companyRole) {
 		this.companyRole = companyRole;
 	}
+
 }

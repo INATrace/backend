@@ -3,7 +3,7 @@ package com.abelium.inatrace.components.stockorder.api;
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.processingorder.api.ApiProcessingOrder;
 import com.abelium.inatrace.components.transaction.api.ApiTransaction;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
@@ -12,16 +12,16 @@ import java.util.List;
 @Validated
 public class ApiStockOrderHistory extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "The Processing order for which the history is requested")
+	@Schema(description = "The Processing order for which the history is requested")
 	private ApiProcessingOrder processingOrder;
 
-	@ApiModelProperty(value = "The Stock order for which the history is requested")
+	@Schema(description = "The Stock order for which the history is requested")
 	private ApiStockOrder stockOrder;
 
-	@ApiModelProperty(value = "The Stock order output transactions")
+	@Schema(description = "The Stock order output transactions")
 	private List<ApiTransaction> outputTransactions;
 
-	@ApiModelProperty(value = "List of history timeline items")
+	@Schema(description = "List of history timeline items")
 	private List<ApiStockOrderHistoryTimelineItem> timelineItems;
 
 	public ApiProcessingOrder getProcessingOrder() {

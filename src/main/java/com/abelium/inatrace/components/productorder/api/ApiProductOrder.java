@@ -4,7 +4,7 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.company.api.ApiCompanyCustomer;
 import com.abelium.inatrace.components.facility.api.ApiFacility;
 import com.abelium.inatrace.components.stockorder.api.ApiStockOrder;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Instant;
@@ -15,28 +15,28 @@ import java.util.List;
 @Validated
 public class ApiProductOrder extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "The order ID entered by the user")
+	@Schema(description = "The order ID entered by the user")
 	private String orderId;
 
-	@ApiModelProperty(value = "Timestamp indicates when product order have been updated")
+	@Schema(description = "Timestamp indicates when product order have been updated")
 	private Instant updateTimestamp;
 
-	@ApiModelProperty(value = "Facility to which this order is order is ordered")
+	@Schema(description = "Facility to which this order is order is ordered")
 	private ApiFacility facility;
 
-	@ApiModelProperty(value = "The delivery deadline of this order")
+	@Schema(description = "The delivery deadline of this order")
 	private LocalDate deliveryDeadline;
 
-	@ApiModelProperty(value = "The company customer for whom this order is placed")
+	@Schema(description = "The company customer for whom this order is placed")
 	private ApiCompanyCustomer customer;
 
-	@ApiModelProperty(value = "Require only women's coffee")
+	@Schema(description = "Require only women's coffee")
 	private Boolean requiredWomensOnly;
 
-	@ApiModelProperty(value = "Require organic coffee")
+	@Schema(description = "Require organic coffee")
 	private Boolean requiredOrganic;
 
-	@ApiModelProperty(value = "The ordered items(final products) of this order")
+	@Schema(description = "The ordered items(final products) of this order")
 	private List<ApiStockOrder> items;
 
 	public String getOrderId() {

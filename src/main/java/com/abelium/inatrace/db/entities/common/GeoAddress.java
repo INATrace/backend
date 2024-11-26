@@ -1,7 +1,7 @@
 package com.abelium.inatrace.db.entities.common;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class GeoAddress extends Address {

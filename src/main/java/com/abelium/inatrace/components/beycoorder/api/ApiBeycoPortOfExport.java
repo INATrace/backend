@@ -1,22 +1,22 @@
 package com.abelium.inatrace.components.beycoorder.api;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 public class ApiBeycoPortOfExport {
 
-    @ApiModelProperty(value = "Address of facility")
+    @Schema(description = "Address of facility")
     @Min(1)
     private String address;
 
-    @ApiModelProperty(value = "Latitude of facility")
+    @Schema(description = "Latitude of facility")
     private Double latitude;
 
-    @ApiModelProperty(value = "Longitude of facility")
+    @Schema(description = "Longitude of facility")
     private Double longitude;
 
-    @ApiModelProperty(value = "Country of facility")
+    @Schema(description = "Country of facility")
     @Min(1)
     private String country;
 

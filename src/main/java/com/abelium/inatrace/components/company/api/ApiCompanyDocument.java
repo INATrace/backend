@@ -5,41 +5,39 @@ import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.components.common.api.ApiDocument;
 import com.abelium.inatrace.types.CompanyDocumentCategory;
 import com.abelium.inatrace.types.CompanyDocumentType;
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
-
-import javax.validation.Valid;
 
 @Validated
 public class ApiCompanyDocument extends ApiBaseEntity {
 	
-	@ApiModelProperty(value = "type of the document (link, file)", position = 1)
+	@Schema(description = "type of the document (link, file)")
 	public CompanyDocumentType type;
 	
-	@ApiModelProperty(value = "document category", position = 2)
+	@Schema(description = "document category")
 	public CompanyDocumentCategory category;
 
-	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "name", position = 3)
+	@Size(max = Lengths.DEFAULT)
+	@Schema(description = "name")
 	public String name;
 	
-	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "description of this document", position = 4)
+	@Size(max = Lengths.DEFAULT)
+	@Schema(description = "description of this document")
 	public String description;
 
-	@Length(max = 2000)
-	@ApiModelProperty(value = "quote of this document", position = 5)
+	@Size(max = 2000)
+	@Schema(description = "quote of this document", maxLength = 2000)
 	public String quote;
 	
-	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "link", position = 6)
+	@Size(max = Lengths.DEFAULT)
+	@Schema(description = "link")
 	public String link;
 	
-	@ApiModelProperty(value = "document", position = 7)
+	@Schema(description = "document")
 	@Valid
 	public ApiDocument document;
-
 
 	public CompanyDocumentType getType() {
 		return type;

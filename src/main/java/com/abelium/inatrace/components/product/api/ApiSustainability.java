@@ -1,24 +1,24 @@
 package com.abelium.inatrace.components.product.api;
 
-import org.hibernate.validator.constraints.Length;
+import com.abelium.inatrace.api.types.Lengths;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
-import com.abelium.inatrace.api.types.Lengths;
-import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.Size;
 
 @Validated
 public class ApiSustainability {
 	
-	@Length(max = 1000)
-	@ApiModelProperty(value = "environmentally friendly production, max 1000 chars", position = 1)
+	@Size(max = 1000)
+	@Schema(description = "environmentally friendly production, max 1000 chars", maxLength = 1000)
 	public String production;
 
-	@Length(max = 1000)
-	@ApiModelProperty(value = "sustainable packaging - Describe the environmental sustainability of your packaging, max 1000 chars", position = 2)
+	@Size(max = 1000)
+	@Schema(description = "sustainable packaging - Describe the environmental sustainability of your packaging, max 1000 chars", maxLength = 1000)
 	public String packaging;
 	
-	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "CO2 footprint - If you have calculated your company CO2 footprint, please add this information", position = 3)
+	@Size(max = Lengths.DEFAULT)
+	@Schema(description = "CO2 footprint - If you have calculated your company CO2 footprint, please add this information", maxLength = Lengths.DEFAULT)
 	public String co2Footprint;
 
 	public String getProduction() {

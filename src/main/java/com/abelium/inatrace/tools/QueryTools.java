@@ -1,8 +1,7 @@
 package com.abelium.inatrace.tools;
 
-import org.torpedoquery.jpa.Torpedo;
-
 import com.abelium.inatrace.types.SortDirection;
+import org.torpedoquery.jakarta.jpa.Torpedo;
 
 public class QueryTools {
 	

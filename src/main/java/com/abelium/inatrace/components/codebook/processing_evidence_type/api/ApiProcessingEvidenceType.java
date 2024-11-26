@@ -2,7 +2,7 @@ package com.abelium.inatrace.components.codebook.processing_evidence_type.api;
 
 import com.abelium.inatrace.api.ApiCodebookBaseEntity;
 import com.abelium.inatrace.db.enums.EvidenceType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
@@ -16,28 +16,28 @@ import java.util.List;
 @Validated
 public class ApiProcessingEvidenceType extends ApiCodebookBaseEntity {
 
-	@ApiModelProperty(value = "type of evidence", position = 2)
+	@Schema(description = "type of evidence")
 	private EvidenceType type;
 
-	@ApiModelProperty(value = "if evidence is of fairness type")
+	@Schema(description = "if evidence is of fairness type")
 	private Boolean fairness;
 
-	@ApiModelProperty(value = "if evidence is of provenance type")
+	@Schema(description = "if evidence is of provenance type")
 	private Boolean provenance;
 
-	@ApiModelProperty(value = "if evidence is of quality type")
+	@Schema(description = "if evidence is of quality type")
 	private Boolean quality;
 
-	@ApiModelProperty(value = "whether the evidence is mandatory")
+	@Schema(description = "whether the evidence is mandatory")
 	private Boolean mandatory;
 
-	@ApiModelProperty(value = "whether the evidence is required on quote")
+	@Schema(description = "whether the evidence is required on quote")
 	private Boolean requiredOnQuote;
 
-	@ApiModelProperty(value = "a group in which at least one document has to be provided")
+	@Schema(description = "a group in which at least one document has to be provided")
 	private String requiredOneOfGroupIdForQuote;
 
-	@ApiModelProperty(value = "Translations for processing evidence type")
+	@Schema(description = "Translations for processing evidence type")
 	private List<ApiProcessingEvidenceTypeTranslation> translations;
 
 	public EvidenceType getType() {

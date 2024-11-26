@@ -1,14 +1,15 @@
 package com.abelium.inatrace.components.product.api;
 
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
+
+import jakarta.validation.constraints.Size;
 
 @Validated
 public class ApiProcess {
 
-	@Length(max = 2000)
-	@ApiModelProperty(value = "production description - Briefly describe your production process", position = 1)
+	@Size(max = 2000)
+	@Schema(description = "production description - Briefly describe your production process", maxLength = 2000)
 	public String production;
 	
 

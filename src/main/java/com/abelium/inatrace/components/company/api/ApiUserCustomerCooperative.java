@@ -2,19 +2,19 @@ package com.abelium.inatrace.components.company.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.types.UserCustomerType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
 public class ApiUserCustomerCooperative extends ApiBaseEntity {
 
-    @ApiModelProperty(value = "User customer", position = 0)
+    @Schema(description = "User customer")
     public ApiUserCustomer userCustomer;
 
-    @ApiModelProperty(value = "Company", position = 1)
+    @Schema(description = "Company")
     public ApiCompany company;
 
-    @ApiModelProperty(value = "User customer type (collector, farmer)", position = 2)
+    @Schema(description = "User customer type (collector, farmer)")
     public UserCustomerType userCustomerType;
 
     public ApiUserCustomer getUserCustomer() {

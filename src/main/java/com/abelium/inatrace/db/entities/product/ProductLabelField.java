@@ -1,9 +1,8 @@
 package com.abelium.inatrace.db.entities.product;
 
 import com.abelium.inatrace.api.types.Lengths;
-
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class ProductLabelField {

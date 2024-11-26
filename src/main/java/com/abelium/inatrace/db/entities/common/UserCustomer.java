@@ -6,10 +6,10 @@ import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.db.entities.product.Product;
 import com.abelium.inatrace.types.Gender;
 import com.abelium.inatrace.types.UserCustomerType;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @NamedQueries({
@@ -93,22 +93,22 @@ public class UserCustomer extends BaseEntity {
 	private FarmInformation farm;
 
 	@OneToMany(mappedBy = "userCustomer", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<UserCustomerAssociation> associations;
+	private Set<UserCustomerAssociation> associations;
 
 	@OneToMany(mappedBy = "userCustomer", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<UserCustomerCooperative> cooperatives;
+	private Set<UserCustomerCooperative> cooperatives;
 
 	@OneToMany(mappedBy = "userCustomer", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<UserCustomerCertification> certifications;
+	private Set<UserCustomerCertification> certifications;
 
 	@OneToMany(mappedBy = "userCustomer", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<UserCustomerProductType> productTypes;
+	private Set<UserCustomerProductType> productTypes;
 
 	@OneToMany(mappedBy = "userCustomer", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<FarmPlantInformation> farmPlantInformationList;
+	private Set<FarmPlantInformation> farmPlantInformationList;
 
 	@OneToMany(mappedBy = "farmer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-	private List<Plot> plots;
+	private Set<Plot> plots;
 	
 	public UserCustomerType getType() {
 		return type;
@@ -214,63 +214,63 @@ public class UserCustomer extends BaseEntity {
 		this.farm = farm;
 	}
 
-	public List<UserCustomerAssociation> getAssociations() {
+	public Set<UserCustomerAssociation> getAssociations() {
 		return associations;
 	}
 
-	public void setAssociations(List<UserCustomerAssociation> associations) {
+	public void setAssociations(Set<UserCustomerAssociation> associations) {
 		this.associations = associations;
 	}
 
-	public List<UserCustomerCooperative> getCooperatives() {
+	public Set<UserCustomerCooperative> getCooperatives() {
 		return cooperatives;
 	}
 
-	public void setCooperatives(List<UserCustomerCooperative> cooperatives) {
+	public void setCooperatives(Set<UserCustomerCooperative> cooperatives) {
 		this.cooperatives = cooperatives;
 	}
 
-	public List<UserCustomerCertification> getCertifications() {
+	public Set<UserCustomerCertification> getCertifications() {
 		if (certifications == null) {
-			certifications = new ArrayList<>();
+			certifications = new HashSet<>();
 		}
 		return certifications;
 	}
 
-	public void setCertifications(List<UserCustomerCertification> certifications) {
+	public void setCertifications(Set<UserCustomerCertification> certifications) {
 		this.certifications = certifications;
 	}
 
-	public List<UserCustomerProductType> getProductTypes() {
+	public Set<UserCustomerProductType> getProductTypes() {
 		if (productTypes == null) {
-			productTypes = new ArrayList<>();
+			productTypes = new HashSet<>();
 		}
 		return productTypes;
 	}
 
-	public void setProductTypes(List<UserCustomerProductType> productTypes) {
+	public void setProductTypes(Set<UserCustomerProductType> productTypes) {
 		this.productTypes = productTypes;
 	}
 
-	public List<FarmPlantInformation> getFarmPlantInformationList() {
+	public Set<FarmPlantInformation> getFarmPlantInformationList() {
 		if (farmPlantInformationList == null) {
-			farmPlantInformationList = new ArrayList<>();
+			farmPlantInformationList = new HashSet<>();
 		}
 		return farmPlantInformationList;
 	}
 
-	public void setFarmPlantInformationList(List<FarmPlantInformation> farmPlantInformationList) {
+	public void setFarmPlantInformationList(Set<FarmPlantInformation> farmPlantInformationList) {
 		this.farmPlantInformationList = farmPlantInformationList;
 	}
 
-	public List<Plot> getPlots() {
+	public Set<Plot> getPlots() {
 		if (plots == null) {
-			plots = new ArrayList<>();
+			plots = new HashSet<>();
 		}
 		return plots;
 	}
 
-	public void setPlots(List<Plot> plots) {
+	public void setPlots(Set<Plot> plots) {
 		this.plots = plots;
 	}
 

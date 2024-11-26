@@ -3,7 +3,7 @@ package com.abelium.inatrace.components.stockorder.api;
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.company.api.ApiUserCustomer;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
@@ -11,49 +11,49 @@ import java.math.BigDecimal;
 @Validated
 public class ApiPurchaseOrderFarmer extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "Purchase order identifier", position = 1)
+	@Schema(description = "Purchase order identifier")
 	private String identifier;
 
-	@ApiModelProperty(value = "Id of the person who has produced the entry.")
+	@Schema(description = "Id of the person who has produced the entry.")
 	private ApiUserCustomer producerUserCustomer;
 
-	@ApiModelProperty(value = "Semi product")
+	@Schema(description = "Semi product")
 	private ApiSemiProduct semiProduct;
 
-	@ApiModelProperty(value = "Total quantity")
+	@Schema(description = "Total quantity")
 	private BigDecimal totalQuantity;
 
-	@ApiModelProperty(value = "Total gross quantity")
+	@Schema(description = "Total gross quantity")
 	private BigDecimal totalGrossQuantity;
 
-	@ApiModelProperty(value = "Fulfilled quantity")
+	@Schema(description = "Fulfilled quantity")
 	private BigDecimal fulfilledQuantity;
 
-	@ApiModelProperty(value = "Available quantity")
+	@Schema(description = "Available quantity")
 	private BigDecimal availableQuantity;
 
-	@ApiModelProperty(value = "Price per unit")
+	@Schema(description = "Price per unit")
 	private BigDecimal pricePerUnit;
 
-	@ApiModelProperty(value = "Tare")
+	@Schema(description = "Tare")
 	private BigDecimal tare;
 
-	@ApiModelProperty(value = "Damaged price deduction")
+	@Schema(description = "Damaged price deduction")
 	private BigDecimal damagedPriceDeduction;
 
-	@ApiModelProperty(value = "Damaged weight deduction")
+	@Schema(description = "Damaged weight deduction")
 	private BigDecimal damagedWeightDeduction;
 
-	@ApiModelProperty(value = "Organic")
+	@Schema(description = "Organic")
 	private Boolean organic;
 
-	@ApiModelProperty(value = "Women only")
+	@Schema(description = "Women only")
 	private Boolean womenShare;
 
-	@ApiModelProperty(value = "Cost")
+	@Schema(description = "Cost")
 	public BigDecimal cost;
 
-	@ApiModelProperty(value = "Balance")
+	@Schema(description = "Balance")
 	public BigDecimal balance;
 
 	public String getIdentifier() {

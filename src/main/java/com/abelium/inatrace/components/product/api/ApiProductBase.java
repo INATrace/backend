@@ -2,24 +2,23 @@ package com.abelium.inatrace.components.product.api;
 
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.types.Lengths;
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class ApiProductBase extends ApiBaseEntity {
 
 	@NotNull
-	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "product name", position = 2)
+	@Size(max = Lengths.DEFAULT)
+	@Schema(description = "product name", maxLength = Lengths.DEFAULT)
 	public String name;
 
-	@Length(max = 2000)
-	@ApiModelProperty(value = "product description", position = 4)
+	@Size(max = 2000)
+	@Schema(description = "product description", maxLength = 2000)
 	public String description;
 
-	@ApiModelProperty(value = "origin - text and location ", position = 8)
+	@Schema(description = "origin - text and location ")
 	@Valid
 	public ApiProductOrigin origin;
 

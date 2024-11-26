@@ -6,19 +6,18 @@ import com.abelium.inatrace.api.ApiStatus;
 import com.abelium.inatrace.api.errors.ApiException;
 import com.abelium.inatrace.components.common.api.ApiCountry;
 import com.abelium.inatrace.components.common.api.ApiDocument;
-import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.db.entities.common.Country;
+import com.abelium.inatrace.db.entities.common.Document;
 import com.abelium.inatrace.tools.*;
 import com.abelium.inatrace.types.DocumentType;
 import com.abelium.inatrace.types.MediaObject;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.torpedoquery.jpa.Torpedo;
-
-import javax.transaction.Transactional;
+import org.torpedoquery.jakarta.jpa.Torpedo;
 import java.util.EnumSet;
 
 @Lazy
@@ -34,12 +33,13 @@ public class CommonService extends BaseService {
         if (StringUtils.isNotBlank(request.queryString)) {
             Torpedo.where(cProxy.getName()).like().startsWith(request.queryString);
         }
-        switch (request.sortBy) {
-        	case "name": QueryTools.orderBy(request.sort, cProxy.getName()); break;
-        	default: QueryTools.orderBy(request.sort, cProxy.getId());
+        if (request.sortBy.equals("name")) {
+            QueryTools.orderBy(request.sort, cProxy.getName());
+        } else {
+            QueryTools.orderBy(request.sort, cProxy.getId());
         }
         return cProxy;
-    }	
+    }
 	
     @Transactional
     public ApiPaginatedList<ApiCountry> fetchCountryList(ApiPaginatedQueryStringRequest filterRequest) {
@@ -106,7 +106,6 @@ public class CommonService extends BaseService {
         		throw new ApiException(ApiStatus.INVALID_OR_EXPIRED_STORAGE_KEY, "Invalid storage key or storage key has expired");
         	}
     		return Queries.getUniqueBy(em, Document.class, Document::getStorageKey, storageKey);
-    		// return Queries.get(em, Document.class, ad.id);
     	}
     	
     }
@@ -115,13 +114,11 @@ public class CommonService extends BaseService {
     public Country fetchCountry(ApiCountry ac) throws ApiException {
     	if (ac == null) return null;
     	
-    	Country c = Queries.get(em, Country.class, ac.id);
+    	Country c = Queries.get(em, Country.class, ac.getId());
     	if (c == null) {
     		throw new ApiException(ApiStatus.INVALID_REQUEST, "Invalid country id");
     	}
     	return c;
     }
-
-
 
 }

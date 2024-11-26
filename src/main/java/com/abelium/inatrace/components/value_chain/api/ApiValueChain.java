@@ -8,7 +8,7 @@ import com.abelium.inatrace.components.codebook.processingevidencefield.api.ApiP
 import com.abelium.inatrace.components.codebook.semiproduct.api.ApiSemiProduct;
 import com.abelium.inatrace.components.product.api.ApiProductType;
 import com.abelium.inatrace.db.entities.value_chain.enums.ValueChainStatus;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
@@ -21,31 +21,31 @@ import java.util.List;
 @Validated
 public class ApiValueChain extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "name of the value chain", position = 2)
+	@Schema(description = "name of the value chain")
 	private String name;
 
-	@ApiModelProperty(value = "description of the value chain", position = 3)
+	@Schema(description = "description of the value chain")
 	private String description;
 
-	@ApiModelProperty(value = "value chain status", position = 4)
+	@Schema(description = "value chain status")
 	private ValueChainStatus valueChainStatus;
 
-	@ApiModelProperty(value = "list of supported facility types", position = 5)
+	@Schema(description = "list of supported facility types")
 	private List<ApiFacilityType> facilityTypes;
 
-	@ApiModelProperty(value = "list of supported measuring unit types", position = 6)
+	@Schema(description = "list of supported measuring unit types")
 	private List<ApiMeasureUnitType> measureUnitTypes;
 
-	@ApiModelProperty(value = "list of supported processing evidence types", position = 8)
+	@Schema(description = "list of supported processing evidence types")
 	private List<ApiProcessingEvidenceType> processingEvidenceTypes;
 
-	@ApiModelProperty(value = "list of supported processing evidence fields", position = 9)
+	@Schema(description = "list of supported processing evidence fields")
 	private List<ApiProcessingEvidenceField> processingEvidenceFields;
 
-	@ApiModelProperty(value = "list of supported semi-products", position = 10)
+	@Schema(description = "list of supported semi-products")
 	private List<ApiSemiProduct> semiProducts;
 
-	@ApiModelProperty(value = "Selected product type", position = 11)
+	@Schema(description = "Selected product type")
 	private ApiProductType productType;
 
 	public String getName() {

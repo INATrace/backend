@@ -1,15 +1,14 @@
 package com.abelium.inatrace.components.product.api;
 
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
 
 @Validated
 public class ApiProductLabelValues extends ApiProductLabelBase {
 
-	@ApiModelProperty(value = "Fields", position = 5)
+	@Schema(description = "Fields")
 	public List<ApiProductLabelFieldValue> fields;
 
 	public List<ApiProductLabelFieldValue> getFields() {

@@ -4,8 +4,7 @@ import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.db.base.BaseEntity;
 import com.abelium.inatrace.db.entities.company.Company;
 import com.abelium.inatrace.types.ProductCompanyType;
-
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @NamedQueries({

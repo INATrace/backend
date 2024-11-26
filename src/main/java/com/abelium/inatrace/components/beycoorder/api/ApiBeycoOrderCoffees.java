@@ -3,35 +3,35 @@ package com.abelium.inatrace.components.beycoorder.api;
 import com.abelium.inatrace.types.BeycoIncoterms;
 import com.abelium.inatrace.types.BeycoCurrency;
 import com.abelium.inatrace.types.BeycoPriceUnit;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.math.BigDecimal;
 
 public class ApiBeycoOrderCoffees {
 
-    @ApiModelProperty(value = "Coffee description fields")
+    @Schema(description = "Coffee description fields")
     private ApiBeycoCoffee coffee;
 
-    @ApiModelProperty(value = "Is fixed price")
+    @Schema(description = "Is fixed price")
     private Boolean isFixedPrice;
 
-    @ApiModelProperty(value = "Incoterms")
+    @Schema(description = "Incoterms")
     private BeycoIncoterms incoterms;
 
-    @ApiModelProperty(value = "Custom incoterms")
+    @Schema(description = "Custom incoterms")
     private String customIncoterms;
 
     @Min(0)
     @Max(999999999999999999L)
-    @ApiModelProperty(value = "Price of order")
+    @Schema(description = "Price of order")
     private BigDecimal price;
 
-    @ApiModelProperty(value = "Price unit")
+    @Schema(description = "Price unit")
     private BeycoPriceUnit priceUnit;
 
-    @ApiModelProperty(value = "Used currency")
+    @Schema(description = "Used currency")
     private BeycoCurrency currency;
 
     public ApiBeycoCoffee getCoffee() {

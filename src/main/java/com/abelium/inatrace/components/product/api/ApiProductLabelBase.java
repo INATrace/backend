@@ -4,27 +4,28 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.api.types.Lengths;
 import com.abelium.inatrace.types.Language;
 import com.abelium.inatrace.types.ProductLabelStatus;
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
+
+import jakarta.validation.constraints.Size;
 
 @Validated
 public class ApiProductLabelBase extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "Product id", position = 2)
+	@Schema(description = "Product id")
 	public Long productId;
 	
-	@ApiModelProperty(value = "Product label status", position = 3)
+	@Schema(description = "Product label status")
     public ProductLabelStatus status;
 
-	@ApiModelProperty(value = "Product label uuid (for url)", position = 4)
+	@Schema(description = "Product label uuid (for url)")
 	public String uuid;
 	
-	@Length(max = Lengths.DEFAULT)
-	@ApiModelProperty(value = "label title", position = 5)
+	@Size(max = Lengths.DEFAULT)
+	@Schema(description = "label title", maxLength = Lengths.DEFAULT)
 	public String title;
 
-	@ApiModelProperty(value = "Label language", position = 6)
+	@Schema(description = "Label language")
 	public Language language;
 
 	public Long getProductId() {

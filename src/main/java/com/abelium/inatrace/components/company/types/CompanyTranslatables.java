@@ -3,8 +3,8 @@ package com.abelium.inatrace.components.company.types;
 import com.abelium.inatrace.db.entities.company.CompanyCertification;
 import com.abelium.inatrace.db.entities.company.CompanyDocument;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface CompanyTranslatables {
 
@@ -26,10 +26,10 @@ public interface CompanyTranslatables {
 	Map<String, String> getMediaLinks();
 	void setMediaLinks(Map<String, String> mediaLinks);
 	
-	List<CompanyDocument> getDocuments();
-	void setDocuments(List<CompanyDocument> documents);
+	Set<CompanyDocument> getDocuments();
+	void setDocuments(Set<CompanyDocument> documents);
 	
-	List<CompanyCertification> getCertifications();
-	void setCertifications(List<CompanyCertification> certifications);
+	Set<CompanyCertification> getCertifications();
+	void setCertifications(Set<CompanyCertification> certifications);
 	
 }

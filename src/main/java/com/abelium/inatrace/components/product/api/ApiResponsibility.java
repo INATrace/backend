@@ -1,12 +1,13 @@
 package com.abelium.inatrace.components.product.api;
 
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import jakarta.validation.constraints.Size;
 
 public class ApiResponsibility {
 	
-	@Length(max = 2000)
-	@ApiModelProperty(value = "labor policies - Briefly describe labor policies you have in place in your company", position = 1)
+	@Size(max = 2000)
+	@Schema(description = "labor policies - Briefly describe labor policies you have in place in your company", maxLength = 2000)
 	public String laborPolicies;
 
 	public String getLaborPolicies() {

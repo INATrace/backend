@@ -1,34 +1,34 @@
 package com.abelium.inatrace.components.company.api;
 
 import com.abelium.inatrace.components.common.api.ApiCertification;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
 @Validated
 public class ApiCompanyPublic {
 
-	@ApiModelProperty(value = "name", position = 1)
+	@Schema(description = "name")
 	public String name;
 
-	@ApiModelProperty(value = "interview", position = 2)
+	@Schema(description = "interview")
 	public String interview;
 
-	@ApiModelProperty(value = "company documents", position = 3)
+	@Schema(description = "company documents")
 	@Valid
 	public List<ApiCompanyDocument> documents;	
 
-	@ApiModelProperty(value = "company certifications", position = 4)
+	@Schema(description = "company certifications")
 	@Valid
 	public List<ApiCertification> certifications;
 	
-	@ApiModelProperty(value = "about the company", position = 5)
+	@Schema(description = "about the company")
 	public String about;
 	
-	@ApiModelProperty(value = "social media URL links (Facebook, Instagram, Twitter, YouTube, ...)", position = 6)
+	@Schema(description = "social media URL links (Facebook, Instagram, Twitter, YouTube, ...)")
 	public Map<String, String> mediaLinks;
 	
 	public String getName() {

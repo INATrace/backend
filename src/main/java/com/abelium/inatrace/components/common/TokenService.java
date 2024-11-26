@@ -15,7 +15,7 @@ import org.springframework.http.HttpCookie;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.Arrays;
@@ -25,11 +25,7 @@ import java.util.Optional;
 @Service
 public class TokenService extends BaseService {
 	 protected final Logger logger = LoggerFactory.getLogger(TokenService.class);
-	
-	
-    @Value("${INATrace.auth.authenticationTokenCookieName}")
-    private String authenticationTokenCookieName;
-    
+
     @Value("${INATrace.auth.accessTokenCookieName}")
     private String accessTokenCookieName;
 

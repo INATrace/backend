@@ -7,15 +7,15 @@ import org.springframework.validation.annotation.Validated;
 import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.types.Language;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiCompanyUpdate extends ApiCompany {
 
-	@ApiModelProperty(value = "Add users with these ids", position = 12)
+	@Schema(description = "Add users with these ids")
 	public List<ApiBaseEntity> users;
 	
-	@ApiModelProperty(value = "Language", position = 13)
+	@Schema(description = "Language")
 	public Language language = Language.EN;
 
 	public List<ApiBaseEntity> getUsers() {

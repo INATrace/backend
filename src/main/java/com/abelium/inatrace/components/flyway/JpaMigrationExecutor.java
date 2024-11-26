@@ -1,10 +1,7 @@
 package com.abelium.inatrace.components.flyway;
 
-import java.sql.SQLException;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.executor.Context;
 import org.flywaydb.core.api.executor.MigrationExecutor;
@@ -26,7 +23,7 @@ public class JpaMigrationExecutor implements MigrationExecutor {
     
     /**
      * Creates a new JpaMigrationExecutor.
-     * @param entityManagerFactory. Factory 
+     * @param entityManagerFactory Factory
      * @param migration The JpaMigration to execute.
      * @param environment The application environment
      */
@@ -37,7 +34,7 @@ public class JpaMigrationExecutor implements MigrationExecutor {
     }
 
     @Override
-    public void execute(Context context) throws SQLException {
+    public void execute(Context context) {
         EntityManager em = entityManagerFactory.createEntityManager();
         
         try {
@@ -55,6 +52,11 @@ public class JpaMigrationExecutor implements MigrationExecutor {
 
     @Override
     public boolean canExecuteInTransaction() {
+        return true;
+    }
+
+    @Override
+    public boolean shouldExecute() {
         return true;
     }
 }

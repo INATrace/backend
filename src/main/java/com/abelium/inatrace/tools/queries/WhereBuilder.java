@@ -1,8 +1,7 @@
 package com.abelium.inatrace.tools.queries;
 
+import org.torpedoquery.jakarta.jpa.Torpedo;
 import java.util.Collection;
-
-import org.torpedoquery.jpa.Torpedo;
 
 /**
  * A temporary object for building simple Torpedo-like conditions e.g.

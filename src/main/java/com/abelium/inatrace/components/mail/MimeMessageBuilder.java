@@ -1,6 +1,6 @@
 package com.abelium.inatrace.components.mail;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 import org.springframework.mail.javamail.MimeMessageHelper;
 

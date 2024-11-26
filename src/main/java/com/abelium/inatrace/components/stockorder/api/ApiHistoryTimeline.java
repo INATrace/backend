@@ -1,7 +1,7 @@
 package com.abelium.inatrace.components.stockorder.api;
 
 import com.abelium.inatrace.components.product.api.ApiProductJourneyMarker;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +13,10 @@ import java.util.List;
  */
 public class ApiHistoryTimeline {
 
-	@ApiModelProperty(value = "The items in the history timeline")
+	@Schema(description = "The items in the history timeline")
 	private List<ApiHistoryTimelineItem> items;
     
-    @ApiModelProperty(value = "The items in the journey of history timeline")
+    @Schema(description = "The items in the journey of history timeline")
     private List<ApiProductJourneyMarker> journeyMarkers;
 
 	public List<ApiHistoryTimelineItem> getItems() {

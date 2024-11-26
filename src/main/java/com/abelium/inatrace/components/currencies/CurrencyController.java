@@ -1,7 +1,7 @@
 package com.abelium.inatrace.components.currencies;
 
 import com.abelium.inatrace.api.errors.ApiException;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,13 +20,13 @@ public class CurrencyController {
     private CurrencyService currencyService;
 
     @GetMapping(path = "/convert/{value}/{from}/to/{to}")
-    @ApiOperation("Convert a value between supported currencies")
+    @Operation(summary = "Convert a value between supported currencies")
     public BigDecimal convert(@PathVariable("from") String from, @PathVariable("to") String to, @PathVariable("value") BigDecimal value) throws ApiException {
         return currencyService.convert(from, to, value);
     }
 
     @GetMapping(path = "/convert/{value}/{from}/to/{to}/on/{date}")
-    @ApiOperation("Convert a value between supported currencies at the specified date")
+    @Operation(summary = "Convert a value between supported currencies at the specified date")
     public BigDecimal convertAtDate(
             @PathVariable("value") BigDecimal value,
             @PathVariable("from") String from,

@@ -2,15 +2,15 @@ package com.abelium.inatrace.components.company.api;
 
 import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Validated
 public class ApiGeoAddress extends ApiAddress {
 
-	@ApiModelProperty(value = "location latitude", position = 6)
+	@Schema(description = "location latitude")
 	public Double latitude;
 	
-	@ApiModelProperty(value = "location longitude", position = 7)
+	@Schema(description = "location longitude")
 	public Double longitude;
 
 

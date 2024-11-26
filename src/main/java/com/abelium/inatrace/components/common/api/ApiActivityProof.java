@@ -4,7 +4,7 @@ import com.abelium.inatrace.api.ApiBaseEntity;
 import com.abelium.inatrace.tools.converters.SimpleDateConverter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Instant;
@@ -17,20 +17,20 @@ import java.time.Instant;
 @Validated
 public class ApiActivityProof extends ApiBaseEntity {
 
-	@ApiModelProperty(value = "The formal creation date of the document", position = 1)
+	@Schema(description = "The formal creation date of the document")
 	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
 	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
 	private Instant formalCreationDate;
 
-	@ApiModelProperty(value = "Date until the document is valid", position = 2)
+	@Schema(description = "Date until the document is valid")
 	@JsonSerialize(converter = SimpleDateConverter.Serialize.class)
 	@JsonDeserialize(using = SimpleDateConverter.Deserialize.class)
 	private Instant validUntil;
 
-	@ApiModelProperty(value = "The type of the activity proof", position = 3)
+	@Schema(description = "The type of the activity proof")
 	private String type;
 
-	@ApiModelProperty(value = "The attached document reference of the activity proof", position = 4)
+	@Schema(description = "The attached document reference of the activity proof")
 	private ApiDocument document;
 
 	public Instant getFormalCreationDate() {

@@ -1,59 +1,55 @@
 package com.abelium.inatrace.api;
 
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
-
-import javax.validation.constraints.NotNull;
-
-import org.apache.commons.lang3.reflect.TypeUtils;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.client.RestTemplate;
-
 import com.abelium.inatrace.api.errors.validation.ApiValidationErrorDetails;
 import com.abelium.inatrace.api.exceptions.ApiUpstreamApplicationException;
 import com.abelium.inatrace.api.exceptions.ApiUpstreamServiceException;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import org.apache.commons.lang3.reflect.TypeUtils;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.client.RestTemplate;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
 
 @Validated
-@ApiModel(description = "Generic API response. See documentation for data type for specific type details.")
+@Schema(description = "Generic API response. See documentation for data type for specific type details.")
 public class ApiResponse<DATATYPE>
 {
+
     /**
      * Response status. OK for successful reponses.
      */
     @NotNull
     @JsonProperty(required = true)
-    @ApiModelProperty(required = true, value = "Response status. OK for successful reponses.", example = "OK", position = 0)
+    @Schema(description = "Response status. OK for successful reponses.", example = "OK", requiredMode = Schema.RequiredMode.REQUIRED)
     private ApiStatus status;
     
     /**
      * Simple message to explain client developers the reason for error.
      * If status is OK, this field should be null. 
      */
-    @ApiModelProperty(value = "Simple message to explain client developers the reason for error.", position = 1)
+    @Schema(description = "Simple message to explain client developers the reason for error.")
     private String errorMessage;
     
     /**
      * Response body for successful responses.
      */
-    @ApiModelProperty(value = "Response body for successful responses.", position = 2)
+    @Schema(description = "Response body for successful responses.")
     private DATATYPE data;
 
     /**
      * Optional details for error responses.
      */
-    @ApiModelProperty(value = "Optional details for unexpected error responses.", position = 3)
+    @Schema(description = "Optional details for unexpected error responses.")
     private String errorDetails;
     
     /**
      * Optional details for validation error responses.
      */
-    @ApiModelProperty(value = "Optional details for validation error responses.", position = 4)
+    @Schema(description = "Optional details for validation error responses.")
     private ApiValidationErrorDetails validationErrorDetails;
 
     /**

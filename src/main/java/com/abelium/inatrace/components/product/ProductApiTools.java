@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -276,7 +277,9 @@ public class ProductApiTools {
 		updateProductContent(authUser.getUserId(), p, pu);
 
 		if (pu.origin != null) {
-			if (pu.origin.locations != null) updateOriginLocations(p, p.getOriginLocations(), pu.origin.locations);
+			if (pu.origin.locations != null) {
+				updateOriginLocations(p, p.getOriginLocations(), pu.origin.locations);
+			}
 		}
 		if (pu.company != null) {
 			p.setCompany(companyQueries.fetchCompany(pu.company.id));
@@ -366,7 +369,7 @@ public class ProductApiTools {
 	public void updateProductLabelContent(Long userId, ProductLabelContent p, ApiProductLabelContent pu) throws ApiException {
 		updateProductContent(userId, p, pu);
 		if (pu.origin != null) {
-			if (pu.origin.locations != null) updateOriginLocations(p, p.getOriginLocations(), pu.origin.locations);
+			if (pu.origin.locations != null) updateOriginLocations(p, new ArrayList<>(p.getOriginLocations()), pu.origin.locations);
 		}
         
         // Update product journey
@@ -383,7 +386,7 @@ public class ProductApiTools {
         }
 	}
 	
-	private void updateProductCompanies(Product p, List<ProductCompany> ac, List<ApiProductCompany> aac) throws ApiException {
+	private void updateProductCompanies(Product p, Set<ProductCompany> ac, List<ApiProductCompany> aac) throws ApiException {
 		ac.clear();
 		for (ApiProductCompany apc : aac) {
 			ProductCompany pc = new ProductCompany();
@@ -394,7 +397,7 @@ public class ProductApiTools {
 		}
 	}
 
-	private void updateOriginLocations(Product p, List<ProductLocation> pls, List<ApiLocation> als) throws ApiException  {
+	private void updateOriginLocations(Product p, Set<ProductLocation> pls, List<ApiLocation> als) throws ApiException  {
 		pls.clear();
 		for (ApiLocation apl : als) {
 			pls.add(toProductLocation(p, apl));
@@ -613,13 +616,17 @@ public class ProductApiTools {
 		plb.setNumber(aplb.number);
 		plb.setProductionDate(aplb.productionDate);
 		plb.setExpiryDate(aplb.expiryDate);
-		if (aplb.locations != null) updateBatchLocations(plb, plb.getLocations(), aplb.locations);
-		if (aplb.photo != null) plb.setPhoto(commonEngine.fetchDocument(userId, aplb.photo));
+		if (aplb.locations != null) {
+			updateBatchLocations(plb, plb.getLocations(), aplb.locations);
+		}
+		if (aplb.photo != null) {
+			plb.setPhoto(commonEngine.fetchDocument(userId, aplb.photo));
+		}
 		plb.setCheckAuthenticity(aplb.checkAuthenticity);
 		plb.setTraceOrigin(aplb.traceOrigin);
 	}
 	
-	private void updateBatchLocations(ProductLabelBatch plb, List<BatchLocation> bls, List<ApiLocation> als) throws ApiException  {
+	private void updateBatchLocations(ProductLabelBatch plb, Set<BatchLocation> bls, List<ApiLocation> als) throws ApiException  {
 		bls.clear();
 		for (ApiLocation apl : als) {
 			bls.add(toBatchLocation(plb, apl));

@@ -7,7 +7,7 @@ import com.abelium.inatrace.db.entities.product.ProductLabel;
 import com.abelium.inatrace.tools.Queries;
 import org.springframework.core.env.Environment;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 public class V2022_05_03_15_54__Update_Business_To_Customer_Settings implements JpaMigration {
