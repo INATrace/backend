@@ -207,6 +207,29 @@ public class CompanyService extends BaseService {
 		return companyApiTools.toApiCompanyGet(authUser.getUserId(), c, language, actions, users, valueChains);
 	}
 
+	public ApiCompanyOnboardingState getCompanyOnboardingState(CustomUserDetails authUser, long id) throws ApiException {
+
+		Company c = companyQueries.fetchCompany(id);
+		PermissionsUtil.checkUserIfCompanyEnrolledOrSystemAdmin(c.getUsers().stream().toList(), authUser);
+
+		Long countProducts = em.createNamedQuery("Product.countCompanyCreatedProducts", Long.class)
+				.setParameter("companyId", id).getSingleResult();
+		Long countFacilities = em.createNamedQuery("Facility.countCompanyFacilities", Long.class)
+				.setParameter("companyId", id).getSingleResult();
+		Long countProcessingActions = em.createNamedQuery("ProcessingAction.countCompanyProcessingActions", Long.class)
+				.setParameter("companyId", id).getSingleResult();
+		Long countFarmers = em.createNamedQuery("UserCustomer.countCompanyFarmers", Long.class)
+				.setParameter("companyId", id).getSingleResult();
+
+		ApiCompanyOnboardingState state = new ApiCompanyOnboardingState();
+		state.setHasCreatedProduct(countProducts > 0);
+		state.setHasCreatedFacility(countFacilities > 0);
+		state.setHasCreatedProcessingAction(countProcessingActions > 0);
+		state.setHasAddedFarmers(countFarmers > 0);
+
+		return state;
+	}
+
 	public ApiCompanyName getCompanyName(CustomUserDetails authUser, long id) throws ApiException {
 
 		Company c = companyQueries.fetchCompany(id);

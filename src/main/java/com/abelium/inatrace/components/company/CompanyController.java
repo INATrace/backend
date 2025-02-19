@@ -70,6 +70,13 @@ public class CompanyController {
     	return new ApiResponse<>(companyService.getCompany(authUser, id, Language.valueOf(language)));
     }
 
+    @GetMapping(value = "/profile/{id}/onboardingState")
+    @Operation(summary = "Get the company onboarding state")
+    public ApiResponse<ApiCompanyOnboardingState> getCompanyOnboardingState(@AuthenticationPrincipal CustomUserDetails authUser,
+                                                                            @PathVariable("id") Long id) throws ApiException {
+        return new ApiResponse<>(companyService.getCompanyOnboardingState(authUser, id));
+    }
+
     @GetMapping(value = "/profile/{id}/name")
     @Operation(summary = "Get the company name and abbreviation")
     public ApiResponse<ApiCompanyName> getCompanyName(

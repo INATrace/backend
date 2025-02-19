@@ -12,6 +12,10 @@ import java.util.Set;
 
 @Entity
 @Table(indexes = { @Index(columnList = "name") })
+@NamedQueries({
+		@NamedQuery(name = "Product.countCompanyCreatedProducts",
+				    query = "SELECT COUNT(p) FROM Product p WHERE p.company.id = :companyId")
+})
 public class Product extends ProductContent {
 	
 	@Version
