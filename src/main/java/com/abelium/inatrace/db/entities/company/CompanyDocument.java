@@ -58,6 +58,7 @@ public class CompanyDocument extends BaseEntity {
 	 * Quote (long text)
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String quote;
 
 	/**

@@ -25,6 +25,7 @@ public class ProductContent extends BaseEntity {
 	 * (example: special properties, health benefits, great value, organic production....)
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String description;
 	
 	/**
@@ -32,6 +33,7 @@ public class ProductContent extends BaseEntity {
 	 * ingredients are produced. 
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String originText;
 
 	/**

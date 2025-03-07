@@ -31,6 +31,7 @@ public class BulkPayment extends TimestampEntity {
 	private Company payingCompany;
 	
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String paymentDescription;
 	
 	@Enumerated(EnumType.STRING)
