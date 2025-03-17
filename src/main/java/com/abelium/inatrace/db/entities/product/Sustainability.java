@@ -14,6 +14,7 @@ public class Sustainability extends BaseEntity {
 	 * production… (max 1000 characters)
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String production;
 
 	/**
@@ -22,6 +23,7 @@ public class Sustainability extends BaseEntity {
 	 * reuse it? (max 1000 characters)
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String packaging;
 	
 	/**

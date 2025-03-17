@@ -37,6 +37,7 @@ public class ProductSettings extends BaseEntity {
 	 * increase in income - description
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String incomeIncreaseDescription;
 	
 	/**
@@ -50,18 +51,21 @@ public class ProductSettings extends BaseEntity {
 	 * GDPR text
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String gdprText;
 	
 	/**
 	 * Privacy policy text
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String privacyPolicyText;
 	
 	/**
 	 * Terms of use text
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String termsOfUseText;
 
 	public Boolean getCostBreakdown() {

@@ -84,6 +84,7 @@ public class ProductService extends BaseService {
 	}
     
     private TorpedoProjector<Product, ApiProductListResponse> userProductListQueryObject1(Long userId, ApiListProductsRequest request) {
+
         CompanyUser cuProxy = Torpedo.from(CompanyUser.class);
         Torpedo.where(cuProxy.getUser().getId()).eq(userId);
         List<Long> companyIds = Torpedo.select(cuProxy.getCompany().getId()).list(em);
@@ -112,7 +113,7 @@ public class ProductService extends BaseService {
     
     @Transactional
 	public ApiPaginatedList<ApiProductListResponse> listUserProducts1(Long userId, ApiListProductsRequest request) {
-    	return PaginationTools.createPaginatedResponse(em, request, () -> userProductListQueryObject1(userId, request)); 
+    	return PaginationTools.createPaginatedResponse(em, request, () -> userProductListQueryObject1(userId, request));
 	}
 
     @Transactional

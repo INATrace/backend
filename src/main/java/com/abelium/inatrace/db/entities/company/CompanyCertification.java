@@ -41,6 +41,7 @@ public class CompanyCertification extends BaseEntity {
 	 * Description of this certification
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String description;
 
 	/**

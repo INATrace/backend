@@ -18,7 +18,9 @@ import java.util.Set;
 @Table
 @NamedQueries({
 	@NamedQuery(name = "ProcessingAction.countProcessingActions",
-				query = "SELECT COUNT(pa) FROM ProcessingAction pa INNER JOIN pa.processingActionTranslations t WHERE t.language = :language")
+				query = "SELECT COUNT(pa) FROM ProcessingAction pa INNER JOIN pa.processingActionTranslations t WHERE t.language = :language"),
+	@NamedQuery(name = "ProcessingAction.countCompanyProcessingActions",
+			    query = "SELECT COUNT(pa) FROM ProcessingAction  pa WHERE pa.company.id = :companyId")
 })
 public class ProcessingAction extends TimestampEntity {
 
