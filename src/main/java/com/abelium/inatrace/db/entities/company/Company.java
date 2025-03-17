@@ -54,6 +54,7 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	 * Include the company mission and vision as well as core values. (max 2000 characters)
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String about;
 	
 	/**
@@ -61,6 +62,7 @@ public class Company extends BaseEntity implements CompanyTranslatables {
 	 * (max 2000 characters)
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String interview;
 	
 	/**

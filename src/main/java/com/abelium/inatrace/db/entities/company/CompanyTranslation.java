@@ -41,6 +41,7 @@ public class CompanyTranslation extends TranslatedEntity implements CompanyTrans
 	 * Include the company mission and vision as well as core values. (max 2000 characters)
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String about;
 	
 	/**
@@ -48,6 +49,7 @@ public class CompanyTranslation extends TranslatedEntity implements CompanyTrans
 	 * (max 2000 characters)
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String interview;
 	
 	/**

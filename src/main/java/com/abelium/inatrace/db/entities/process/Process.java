@@ -1,6 +1,7 @@
 package com.abelium.inatrace.db.entities.process;
 
 import com.abelium.inatrace.db.base.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
 
@@ -13,6 +14,7 @@ public class Process extends BaseEntity {
 	 * (e.g. organic seedlings, no chemical fertilizers, etc.)
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String production;
 
 	public String getProduction() {

@@ -16,7 +16,9 @@ import java.util.Set;
 	@NamedQuery(name = "Facility.listCollectingFacilitiesByCompany",
 				query = "SELECT f FROM Facility f INNER JOIN FETCH f.facilityTranslations t INNER JOIN f.company c WHERE c.id = :companyId AND f.isCollectionFacility = true AND t.language = :language AND (f.isDeactivated IS NULL OR f.isDeactivated = false)"),
 	@NamedQuery(name = "Facility.countCollectingFacilitiesByCompany",
-				query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId AND f.isCollectionFacility = true AND (f.isDeactivated IS NULL OR f.isDeactivated = false)")
+				query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId AND f.isCollectionFacility = true AND (f.isDeactivated IS NULL OR f.isDeactivated = false)"),
+	@NamedQuery(name = "Facility.countCompanyFacilities",
+			    query = "SELECT COUNT(f) FROM Facility f WHERE f.company.id = :companyId")
 })
 public class Facility extends TimestampEntity {
 

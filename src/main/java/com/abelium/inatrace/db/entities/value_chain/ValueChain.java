@@ -23,8 +23,8 @@ public class ValueChain extends TimestampEntity {
 	@Column(nullable = false)
 	private String name;
 
-	@Column(nullable = false)
 	@Lob
+	@Column(nullable = false, columnDefinition = "LONGTEXT")
 	private String description;
 
 	@Enumerated(EnumType.STRING)

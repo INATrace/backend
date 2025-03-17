@@ -1,6 +1,7 @@
 package com.abelium.inatrace.db.entities.product;
 
 import com.abelium.inatrace.db.base.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
 
@@ -12,6 +13,7 @@ public class Responsibility extends BaseEntity {
 	 * activities you pursue to make them happen (example: women inclusion, no child labor, etc.)
 	 */
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String laborPolicies;
 	
 	public String getLaborPolicies() {
