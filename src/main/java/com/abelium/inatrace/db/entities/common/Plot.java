@@ -38,8 +38,11 @@ public class Plot extends BaseEntity {
 	@Column
 	private Date lastUpdated;
 
-	@OneToMany(mappedBy = "plot", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-	private Set<PlotCoordinate> coordinates;
+	@OneToMany(mappedBy = "plot",
+	           cascade = CascadeType.ALL,
+	           orphanRemoval = true,
+	           fetch = FetchType.LAZY)
+	private List<PlotCoordinate> coordinates;
 
 	@ManyToOne
 	private UserCustomer farmer;
@@ -108,14 +111,14 @@ public class Plot extends BaseEntity {
 		this.lastUpdated = lastUpdated;
 	}
 
-	public Set<PlotCoordinate> getCoordinates() {
+	public List<PlotCoordinate> getCoordinates() {
 		if (coordinates == null) {
-			coordinates = new HashSet<>();
+			coordinates = new ArrayList<>();
 		}
 		return coordinates;
 	}
 
-	public void setCoordinates(Set<PlotCoordinate> coordinates) {
+	public void setCoordinates(List<PlotCoordinate> coordinates) {
 		this.coordinates = coordinates;
 	}
 
