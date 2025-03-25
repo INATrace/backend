@@ -1364,7 +1364,7 @@ public class CompanyService extends BaseService {
 		return PlotMapper.toApiPlot(plot, language);
 	}
 
-	private String generatePlotGeoID(Set<PlotCoordinate> coordinatesSet) {
+	private String generatePlotGeoID(List<PlotCoordinate> coordinatesSet) {
 
 		List<PlotCoordinate> coordinates = new ArrayList<>(coordinatesSet);
 
